@@ -1,6 +1,6 @@
 {
-  "name": "robotpu",
-  "version": "0.0.4",
+  "name": "ptx-RobotPU",
+  "version": "0.0.5",
   "description": "RobotPu MakeCode extension exposing walk, explore, dance, kick, jump, rest, talk, sing.",
   "license": "Apache-2.0",
   "dependencies": {
