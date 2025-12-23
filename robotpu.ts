@@ -1393,16 +1393,13 @@ class RobotPu {
         // 1. Move to calibration position
         this.wk.servo_move(25, this.pr);
 
-        // 2. Introduce itself
-        this.greet();
-
-        // 3. Flashes the eyes three times for visual feedback
+        // 2. Flashes the eyes three times for visual feedback
         for (let i = 0; i < 3; i++) {
             this.wk.flash(1020);  // Bright flash
             basic.pause(500); // In MakeCode, sleep(500) is basic.pause(500)
         }
 
-        // 4. Turn eyes on and return to neutral position
+        // 3. Turn eyes on and return to neutral position
         this.wk.eyes_ctl(1);
         this.wk.servo_move(0, this.pr);
         basic.pause(2000);
