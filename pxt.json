@@ -1,5 +1,5 @@
 {
-  "name": "pxt-RobotPU",
+  "name": "robotpu",
   "version": "0.0.1",
   "description": "RobotPu MakeCode extension exposing walk, explore, dance, kick, jump, rest, talk, sing.",
   "license": "Apache-2.0",
@@ -19,6 +19,6 @@
   "supportedTargets": [
     "microbit"
   ],
-  "preferredEditor": "blocksprj",
+  "preferredEditor": "tsprj",
   "public": true
 }
