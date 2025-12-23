@@ -9,7 +9,9 @@ PU can walk, explore, dance, kick, jump, rest, talk, and sing. It reacts to soun
 
 Learn more about the robot hardware and kits at:
 - https://robotgyms.com/pu
-- Buy page: https://robotgyms.com/product/robot-pu/
+Buy page: 
+- https://robotgyms.com/product/robot-pu/
+- https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN
 
 ## Features
 
