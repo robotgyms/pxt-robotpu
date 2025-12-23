@@ -1,6 +1,9 @@
 // Compile-time smoke tests for RobotPU blocks
 // These calls should type-check in the MakeCode environment
 
+// Initialize robot
+RobotPU.greet()
+
 // press button A to walk forware in circles
 input.onButtonPressed(Button.A, function () {
     for (let index = 0; index < 400; index++) {
