@@ -288,12 +288,14 @@ class HCSR04 {
     timeout_us: number;
     trig: DigitalPin;
     echo: DigitalPin;
+    private last_cm: number;
 
     constructor(trigPin: DigitalPin = DigitalPin.P2, echoPin: DigitalPin = DigitalPin.P8) {
         // Default timeout: 30000us (approx 500cm)
         this.timeout_us = 500 * 2 * 30;
         this.trig = trigPin;
         this.echo = echoPin;
+        this.last_cm = -1;
 
         // Initialize pins
         pins.digitalWritePin(this.trig, 0);
@@ -324,7 +326,22 @@ class HCSR04 {
 
         // 4. Calculate distance: (time * speed of sound / 2)
         // The original multiplier 0.0171821 is (343.64 m/s / 2 / 10000)
-        return t * 0.0171821;
+        let cm = t * 0.0171821;
+
+        // Min/Max clamp to reduce jitter and outliers
+        if (cm < 2) cm = 2;
+        if (cm > 400) cm = 400;
+
+        // Simple debouncing/smoothing against the previous reading
+        if (this.last_cm < 0) {
+            this.last_cm = cm;
+        } else {
+            let diff = Math.abs(cm - this.last_cm);
+            let alpha = diff > 60 ? 0.2 : 0.5;
+            this.last_cm = this.last_cm * (1 - alpha) + cm * alpha;
+        }
+
+        return this.last_cm;
     }
 }
 // Configuration Constants
@@ -1376,46 +1393,13 @@ class RobotPu {
 
         // 4. Process #puhi: Greeting
         else if (s.substr(0, 5) == "#puhi") {
-            robot.talk("My friend " + s.substr(5) + " is here");
+            this.talk("My friend " + s.substr(5) + " is here");
         }
 
         // 5. Process #pun: Name/Serial Update
         else if (s.substr(0, 4) == "#pun") {
-            robot.sn = s.substr(4);
-            robot.intro();
+            this.sn = s.substr(4);
+            this.intro();
         }
     }
 }
-
-let robot = new RobotPu("Peu", "Peu");
-robot.setTrim(-7, -0.0, -7, -0.0, -9.0, 0.0);
-robot.calibrate()
-
-// Register the event listener for incoming string messages
-radio.onReceivedString(function (receivedString: string) {
-    robot.runStrCMD(receivedString)
-});
-
-// 2. Use it inside the Radio Event
-radio.onReceivedValue(function (name: string, value: number) {
-    robot.runKeyValueCMD(name, value)
-});
-// when button_a.was_pressed()
-input.onButtonPressed(Button.A, function () {
-    robot.incr_group_id(1); // Increment radio group
-});
-
-// when button_b.was_pressed()
-input.onButtonPressed(Button.B, function () {
-    robot.incr_group_id(-1); // Decrement radio group
-});
-
-control.inBackground(function () {
-    while (true) {
-        robot.update_states();   // Checks sensors and falls
-        robot.state_machine();   // Executes current behavior logic
-        // Use a slightly larger pause to prevent CPU starvation
-        // 20ms is standard for robotics to maintain 50Hz responsiveness
-        basic.pause(5);
-    }
-});
