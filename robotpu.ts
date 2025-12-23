@@ -750,7 +750,7 @@ class RobotPu {
     }
 
     public show_channel() {
-        basic.showNumber(this.groupID - 160);
+        basic.showNumber(this.groupID);
     }
 
     public talk(text: string) {
@@ -1232,13 +1232,22 @@ class RobotPu {
         // 1. Combine the identification strings
         this.talk("My name is " + this.sn + " " + this.name);
     }
+
     /**
- * Adjusts the radio group ID and updates the hardware settings.
- * @param i The amount to adjust the group ID by (positive or negative).
- */
+     * Adjusts the radio group ID and updates the hardware settings.
+     * @param i The amount to adjust the group ID by (positive or negative).
+     */
     public incr_group_id(i: number): void {
+      this.set_group_id(this.groupID + i);
+    }
+
+     /**
+     * Set the radio group ID and updates the hardware settings.
+     * @param channel The channel to set the radio group ID to.
+     */
+    public set_group_id(channel: number): void {
         // 1. Calculate the new group ID with 0-255 wrapping logic
-        this.groupID = (this.groupID + i) % 256;
+        this.groupID = (channel) % 256;
 
         // 2. Handle negative results from the modulo (JavaScript specific)
         if (this.groupID < 0) {
