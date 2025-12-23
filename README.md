@@ -5,7 +5,8 @@
 RobotPU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode.
 
 PU can walk, explore, dance, kick, jump, rest, talk, and sing. It reacts to sound, balances using its IMU, and navigates with an ultrasonic sensor.
-![RobotPU](https://github.com/robotgyms/pxt-RobotPU/main/assets/robotpu.png)
+![RobotPU](https://raw.githubusercontent.com/robotgyms/pxt-RobotPU/main/assets/robotpu.png)
+
 Learn more about the robot hardware and kits at:
 - https://robotgyms.com/pu
 - Buy page: https://robotgyms.com/product/robot-pu/
