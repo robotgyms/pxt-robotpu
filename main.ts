@@ -1,5 +1,5 @@
 // MakeCode blocks wrapper for RobotPu
-//% color=#0EA5E9 icon="\uf17b" block="RobotPU"
+//% weight=50 color=#e7660b icon="\uf1b9" block="Robot PU"
 namespace RobotPU {
     let robot: RobotPu;
 
@@ -46,11 +46,18 @@ namespace RobotPU {
         return ensureRobot().explore();
     }
 
-    /** Dance to sound */
+    /** Dance to music */
     //% blockId=robotpu_dance block="dance"
     //% weight=80 blockGap=8
     export function dance(): number {
         return ensureRobot().dance();
+    }
+
+    /** Dance to music */
+    //% blockId=robotpu_dance block="dance"
+    //% weight=80 blockGap=8
+    export function dance() {
+        ensureRobot().dance();
     }
 
     /** Kick with a quick forward motion */
