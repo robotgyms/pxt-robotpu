@@ -16,10 +16,10 @@ Purchase Links:
 
 ## Features
 
-- **Maker-friendly**
-- **Classroom-ready** with block coding and Python paths
 - **Expressive personality**: dance routines, reactions, auto-pilot, soccer
-- **Open-source** with tutorials, upgrade projects, and community resources
+- **Classroom-ready** with block coding and Python paths
+- **Maker-friendly** with free tutorials and upgrade projects
+- **Open-source** with community resources
 
 ## What’s in the Kit (typical)
 
