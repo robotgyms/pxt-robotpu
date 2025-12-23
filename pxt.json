@@ -11,12 +11,14 @@
   },
   "files": [
     "robotpu.ts",
-    "extension.ts",
-    "README.md",
     "main.ts"
   ],
   "testFiles": [
     "test.ts"
   ],
+  "supportedTargets": [
+    "microbit"
+  ],
+  "preferredEditor": "blocksprj",
   "public": true
 }
