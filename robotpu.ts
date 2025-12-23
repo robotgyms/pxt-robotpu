@@ -1225,10 +1225,10 @@ class RobotPu {
         billy.singShim(s)
     }
     /**
- * Makes the robot introduce itself using text-to-speech.
- * The robot will speak its serial number and name.
- */
-    public intro(): void {
+     * Makes the robot greet using text-to-speech.
+     * The robot will speak its serial number and name.
+     */
+    public greet(): void {
         // 1. Combine the identification strings
         this.talk("My name is " + this.sn + " " + this.name);
     }
@@ -1259,6 +1259,41 @@ class RobotPu {
 
         // 4. Update the 5x5 LED display to show the new channel
         this.show_channel();
+    }
+
+    /**
+     * Returns the current radio group/channel (0..255).
+     */
+    public get_group_id(): number {
+        return this.groupID;
+    }
+
+    /**
+     * Returns the forward max speed scalar.
+     */
+    public get_fwdMaxSpeed(): number {
+        return this.fw_sp;
+    }
+
+    /**
+     * Sets the forward max speed scalar.
+     */
+    public set_fwdMaxSpeed(v: number): void {
+        this.fw_sp = v;
+    }
+
+    /**
+     * Returns the backward max speed scalar.
+     */
+    public get_bwdMaxSpeed(): number {
+        return this.bw_sp;
+    }
+
+    /**
+     * Sets the backward max speed scalar.
+     */
+    public set_bwdMaxSpeed(v: number): void {
+        this.bw_sp = v;
     }
     /**
  * Generates a random LED light show on the robot's NeoPixel strip.
