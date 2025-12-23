@@ -58,12 +58,12 @@ input.onGesture(Gesture.LogoUp, function () {
 })
 
 // Register the event listener for incoming string messages
-radio.onReceivedString(function (receivedString: string) {
+radio.onReceivedString(function (receivedString) {
     RobotPU.runStrCMD(receivedString)
-});
+})
 
 // 2. Use it inside the Radio Event
-radio.onReceivedValue(function (name: string, value: number) {
+radio.onReceivedValue(function (name, value) {
     RobotPU.runKeyValueCMD(name, value)
-});
+})
 

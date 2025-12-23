@@ -1,5 +1,5 @@
 // MakeCode blocks wrapper for RobotPu
-//% color=#0EA5E9 icon="\uf544" block="RobotPU"
+//% color=#0EA5E9 icon="\uf17b" block="RobotPU"
 namespace RobotPU {
     let robot: RobotPu;
 
@@ -7,6 +7,7 @@ namespace RobotPU {
         if (!robot) {
             const sn = "pu-" + control.deviceSerialNumber();
             robot = new RobotPu(sn, "peu");
+            robot.calibrate();
             control.inBackground(function () {
                 // add background task to update states and execute behavior logic
                 while (true) {
@@ -31,7 +32,14 @@ namespace RobotPU {
         robot = new RobotPu(realSn, name || "peu");
     }
 
-    /** Walk with speed and turn bias (-1 to 1). Positive speed is forward. */
+    /** Robot PU introduce itself  */
+    //% blockId=robotpu_intro block="intro"
+    //% weight=95 blockGap=8
+    export function intro(): void {
+        ensureRobot().intro();
+    }
+
+    /** Walk with speed (-5 to 5) and turn bias (-1 to 1). Positive speed is forward. Negative turn is left, 0 is straight, Positive is right. */
     //% blockId=robotpu_walk block="walk speed %speed turn %turn"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
@@ -107,7 +115,7 @@ namespace RobotPU {
     }
 
     /** Run string command */
-    //% blockId=robotpu_runStrCMD block="run string command %s"
+    //% blockId=robotpu_runStrCMD block="execute command %s"
     //% s.shadow=text
     //% weight=56 blockGap=8
     export function runStrCMD(s: string): void {
@@ -115,7 +123,7 @@ namespace RobotPU {
     }
 
     /** Run key/value command */
-    //% blockId=robotpu_runKeyValueCMD block="run key %key value %v"
+    //% blockId=robotpu_runKeyValueCMD block="execute command key %key value %v"
     //% key.shadow=text
     //% weight=55 blockGap=8
     export function runKeyValueCMD(key: string, v: number): void {
@@ -128,6 +136,14 @@ namespace RobotPU {
     //% weight=54
     export function incr_group_id(i: number): void {
         ensureRobot().incr_group_id(i);
+    }
+
+    /** Set radio group to a specific channel (0..255) */
+    //% blockId=robotpu_set_group_id block="set radio group to %channel"
+    //% channel.min=0 channel.max=255 channel.defl=166
+    //% weight=53 blockGap=8
+    export function set_group_id(channel: number): void {
+        ensureRobot().set_group_id(channel);
     }
 
 }
