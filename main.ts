@@ -23,15 +23,6 @@ namespace RobotPU {
         return robot;
     }
 
-    /** Initialize RobotPU with an optional serial number and name */
-    //% blockId=robotpu_init block="init RobotPU sn %sn name %name"
-    //% sn.defl="auto" name.defl="peu"
-    //% weight=100 blockGap=8
-    export function init(sn: string = "auto", name: string = "peu"): void {
-        const realSn = sn === "auto" ? ("pu-" + control.deviceSerialNumber()) : sn;
-        robot = new RobotPu(realSn, name || "peu");
-    }
-
     /** Robot PU introduce itself  */
     //% blockId=robotpu_intro block="intro"
     //% weight=95 blockGap=8
