@@ -1394,7 +1394,7 @@ class RobotPu {
         this.wk.servo_move(25, this.pr);
 
         // 2. Introduce itself
-        this.intro();
+        this.greet();
 
         // 3. Flashes the eyes three times for visual feedback
         for (let i = 0; i < 3; i++) {
@@ -1443,7 +1443,7 @@ class RobotPu {
         // 5. Process #pun: Name/Serial Update
         else if (s.substr(0, 4) == "#pun") {
             this.sn = s.substr(4);
-            this.intro();
+            this.greet();
         }
     }
 }
