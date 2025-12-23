@@ -1,13 +1,13 @@
 {
   "name": "robotpu",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "RobotPu MakeCode extension exposing walk, explore, dance, kick, jump, rest, talk, sing.",
   "license": "Apache-2.0",
   "dependencies": {
     "core": "*",
     "radio": "*",
     "neopixel": "*",
-    "pxt-billy": "github:adamish/pxt-billy"
+    "billy": "github:adamish/pxt-billy"
   },
   "files": [
     "robotpu.ts",
