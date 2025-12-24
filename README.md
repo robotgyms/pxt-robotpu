@@ -31,6 +31,10 @@ Purchase Links:
 - Manual
 - Online tutorials and examples
 
+The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches RobotPU’s `runKeyValueCMD` / `runStrCMD`), flash the official Robot PU gamepad program to the gamepad micro:bit:
+
+- https://makecode.microbit.org/S34024-98531-58275-59424
+
 ## Activities and Use Cases
 
 - **Little AI friend**: walk, dance, navigate, maze solving, chat, generate songs, sing
@@ -44,6 +48,12 @@ Purchase Links:
 2. Add extension → Import URL (or local path) → point to this repository.
 3. Ensure the dependency to Billy voice is available (see Dependencies below).
 4. Call any `RobotPU.*` block once in `on start` (for example `RobotPU.calibrate()` or `RobotPU.rest()`) to trigger auto-initialization.
+
+If you are using the retail gamepad:
+
+- Flash the official gamepad program to the **gamepad micro:bit**:
+  - https://makecode.microbit.org/S34024-98531-58275-59424
+- Make sure the gamepad and RobotPU micro:bit are on the same radio channel (see `channel()` / `set_channel(...)`).
 
 ## Dependencies
 
@@ -206,6 +216,10 @@ Because of this, there is **no separate `init` block** in the current API.
 
 These APIs are intended for advanced integrations (custom gamepads / phone apps / another micro:bit sending commands).
 
+If you have the retail Robot PU gamepad, use the official gamepad program (it is designed to be compatible with RobotPU’s command keys and message formats):
+
+- https://makecode.microbit.org/S34024-98531-58275-59424
+
 #### Radio control protocol (micro:bit radio, including BLE-to-radio bridges)
 
 RobotPU can be controlled over the micro:bit radio protocol by sending either:
@@ -234,12 +248,7 @@ RobotPU can be controlled over the micro:bit radio protocol by sending either:
 
 ```ts
 radio.onReceivedValue(function (name, value) {
-    // Normalize common joystick inputs sent as integers
-    if (name == "#puspeed" || name == "#puturn" || name == "#puroll" || name == "#pupitch") {
-        RobotPU.runKeyValueCMD(name, value / 100)
-    } else {
-        RobotPU.runKeyValueCMD(name, value)
-    }
+    RobotPU.runKeyValueCMD(name, value)
 })
 radio.onReceivedString(function (text) {
     RobotPU.runStrCMD(text)
@@ -286,10 +295,10 @@ If your controller is a phone/app over BLE, the typical architecture is:
     - Recommended normalized range: `-1 .. 1` (after scaling/normalization)
     - Smoothed internally (low-pass).
   - `#puroll`: roll bias (head/body side tilt).
-    - Recommended normalized range: `-1 .. 1` (after scaling/normalization)
+    - Recommended range: `-90 .. 90`
     - Smoothed internally.
   - `#pupitch`: pitch bias (head/body up/down).
-    - Recommended normalized range: `-1 .. 1` (after scaling/normalization)
+    - Recommended range: `-90 .. 90`
     - Smoothed internally; sign is inverted internally.
   - `#puB`: set internal behavior/state (advanced).
     - Examples: `1` explore, `3` dance, `4` kick, `2` jump.
