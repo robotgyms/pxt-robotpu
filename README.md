@@ -43,18 +43,21 @@ The retail kit includes a **gamepad that uses the second micro:bit**. For the be
 - **Learn-then-create**: programming, electronics, mechanics, 3D printing accessories
 - **Community**: share code and parts, collaborate, coordinate multiple robots
 
+## Quick Start (with the retail gamepad)
+
+1. Flash your **Robot PU micro:bit** with a MakeCode project that uses this extension.
+2. Flash your **gamepad micro:bit** with the official Robot PU gamepad program:
+   - https://makecode.microbit.org/S34024-98531-58275-59424
+3. Ensure both micro:bits use the same radio channel (group):
+   - Use `RobotPU.set_channel(...)` in your Robot PU project, or set the same `radio.setGroup(...)` on both devices.
+4. In your Robot PU project, forward radio messages to RobotPU (see the Remote Control section for example code).
+
 ## Installation
 
 1. In MakeCode, open your micro:bit project.
 2. Add extension → Import URL (or local path) → point to this repository.
 3. Ensure the dependency to Billy voice is available (see Dependencies below).
 4. Call any `RobotPU.*` block once in `on start` (for example `RobotPU.calibrate()` or `RobotPU.rest()`) to trigger auto-initialization.
-
-If you are using the retail gamepad:
-
-- Flash the official gamepad program to the **gamepad micro:bit**:
-  - https://makecode.microbit.org/S34024-98531-58275-59424
-- Make sure the gamepad and RobotPU micro:bit are on the same radio channel (see `channel()` / `set_channel(...)`).
 
 ## Dependencies
 
@@ -217,9 +220,7 @@ Because of this, there is **no separate `init` block** in the current API.
 
 These APIs are intended for advanced integrations (custom gamepads / phone apps / another micro:bit sending commands).
 
-If you have the retail Robot PU gamepad, use the official gamepad program (it is designed to be compatible with RobotPU’s command keys and message formats):
-
-- https://makecode.microbit.org/S34024-98531-58275-59424
+If you have the retail Robot PU gamepad, use the official gamepad program (it is designed to be compatible with RobotPU’s command keys and message formats).
 
 #### Radio control protocol (micro:bit radio, including BLE-to-radio bridges)
 
@@ -237,8 +238,9 @@ RobotPU can be controlled over the micro:bit radio protocol by sending either:
 **Important note about `radio.sendValue`**:
 
 - micro:bit radio “value” packets are transmitted as integers.
-- For **movement control** (`#puspeed`, `#puturn`), it’s common to send scaled integers (for example `-100 .. 100`) representing a normalized value.
-- For **gesture head control** (`#puroll`, `#pupitch`), the official gamepad program sends angles (degrees) so RobotPU can yaw/pitch its head.
+- For **movement control** (`#puspeed`, `#puturn`), RobotPU expects a value roughly in `-1 .. 1`.
+  - If your controller sends a different scale (for example `-100 .. 100`), scale it on the receiver before calling `RobotPU.runKeyValueCMD`.
+- For **gesture head control** (`#puroll`, `#pupitch`), values are treated as angles (degrees) to yaw/pitch PU’s head.
 
 **Channel / pairing**:
 
@@ -259,10 +261,9 @@ radio.onReceivedString(function (text) {
 **Sender (gamepad micro:bit) example**:
 
 ```ts
-// send joystick values as integers (recommended)
-// your gamepad program may choose any scale; RobotPU uses the value you send
-radio.sendValue("#puspeed", 80)
-radio.sendValue("#puturn", -40)
+// movement (normalized)
+radio.sendValue("#puspeed", 1)
+radio.sendValue("#puturn", -1)
 
 // gesture remote control (head): send micro:bit roll/pitch as degrees
 // RobotPU maps #puroll/#pupitch to head yaw/pitch offsets (smoothed internally)
@@ -282,6 +283,20 @@ radio.sendString("#putHello!")
   - `#pupitch` controls head **pitch** (up/down)
 - Values are interpreted as **degrees of offset** and are smoothed internally.
 - Recommended range: `-90 .. 90` (values outside this range may saturate at servo limits).
+
+**Custom controller scaling (optional)**:
+
+If your controller sends larger integers for movement (for example `-100 .. 100`), scale them before forwarding:
+
+```ts
+radio.onReceivedValue(function (name, value) {
+    if (name == "#puspeed" || name == "#puturn") {
+        RobotPU.runKeyValueCMD(name, value / 100)
+    } else {
+        RobotPU.runKeyValueCMD(name, value)
+    }
+})
+```
 
 If your controller is a phone/app over BLE, the typical architecture is:
 
