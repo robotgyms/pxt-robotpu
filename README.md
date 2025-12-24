@@ -5,6 +5,7 @@
 RobotPU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode.
 
 PU can walk, autopilot, dance, kick, jump, rest, talk, and sing. It reacts to music, balances using its IMU, and navigates with an ultrasonic sensor.
+The retail kit includes a gamepad built from the second micro:bit for radio-based remote control, including gesture head control (tilt to yaw/pitch PU’s head).
 ![RobotPU](https://raw.githubusercontent.com/robotgyms/pxt-RobotPU/main/assets/robotpu.png)
 
 Learn more about The Story of PU, which shows robot PU's activities, hardware, software, tutorials, and upgrade projects at:
@@ -236,8 +237,8 @@ RobotPU can be controlled over the micro:bit radio protocol by sending either:
 **Important note about `radio.sendValue`**:
 
 - micro:bit radio “value” packets are transmitted as integers.
-- RobotPU’s joystick-style commands (`#puspeed`, `#puturn`, `#puroll`, `#pupitch`) are designed to work best with normalized values around `-1 .. 1`.
-- Recommended approach: send `-100 .. 100` (or `-1000 .. 1000`) and divide on the receiver before calling `RobotPU.runKeyValueCMD`.
+- For **movement control** (`#puspeed`, `#puturn`), it’s common to send scaled integers (for example `-100 .. 100`) representing a normalized value.
+- For **gesture head control** (`#puroll`, `#pupitch`), the official gamepad program sends angles (degrees) so RobotPU can yaw/pitch its head.
 
 **Channel / pairing**:
 
@@ -259,12 +260,28 @@ radio.onReceivedString(function (text) {
 
 ```ts
 // send joystick values as integers (recommended)
-// receiver divides by 100 to convert to approximately -1..1
+// your gamepad program may choose any scale; RobotPU uses the value you send
 radio.sendValue("#puspeed", 80)
 radio.sendValue("#puturn", -40)
+
+// gesture remote control (head): send micro:bit roll/pitch as degrees
+// RobotPU maps #puroll/#pupitch to head yaw/pitch offsets (smoothed internally)
+radio.sendValue("#puroll", input.rotation(Rotation.Roll))
+radio.sendValue("#pupitch", input.rotation(Rotation.Pitch))
 // text actions
 radio.sendString("#putHello!")
 ```
+
+**Gesture remote control (gamepad)**:
+
+- The retail gamepad program reads the gamepad micro:bit’s tilt:
+  - **Roll** (left/right tilt) → sends `#puroll`
+  - **Pitch** (forward/back tilt) → sends `#pupitch`
+- RobotPU uses these values to control its head orientation:
+  - `#puroll` controls head **yaw** (left/right)
+  - `#pupitch` controls head **pitch** (up/down)
+- Values are interpreted as **degrees of offset** and are smoothed internally.
+- Recommended range: `-90 .. 90` (values outside this range may saturate at servo limits).
 
 If your controller is a phone/app over BLE, the typical architecture is:
 
