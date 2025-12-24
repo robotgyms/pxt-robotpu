@@ -4,32 +4,30 @@
 // Initialize robot
 RobotPU.greet()
 
-// press button A to walk forware in circles
+// press button A to walk forward in circles
 input.onButtonPressed(Button.A, function () {
     for (let index = 0; index < 400; index++) {
-        RobotPU.walk(3, -0.3)
+        RobotPU.walk(3, -0.5)
     }
 });
 
-//press button B to walk forware in circles
+//press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
     for (let index = 0; index < 400; index++) {
-        RobotPU.walk(-1, -0.3)
+        RobotPU.walk(-1, -0.5)
     }
 });
 
-//press button A+B to walk forware in circles
+//press button A+B to do autopilot
 input.onButtonPressed(Button.AB, function () {
     for (let index = 0; index < 1000; index++) {
         RobotPU.explore()
     }
 });
 
-// press logo button to dance
+// press logo button to dance using set mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    for (let index = 0; index < 1000; index++) {
-        RobotPU.dance()
-    }
+    RobotPU.setMode(Mode.Dance)
 })
 
 // face down to talk

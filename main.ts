@@ -5,6 +5,21 @@
 namespace RobotPU {
     let robot: RobotPu;
 
+    export enum Mode {
+        //% block="rest"
+        Rest = 0,
+        //% block="explore"
+        Explore = 1,
+        //% block="jump"
+        Jump = 2,
+        //% block="dance"
+        Dance = 3,
+        //% block="kick"
+        Kick = 4,
+        //% block="walk (remote control)"
+        Walk = 5
+    }
+
     function ensureRobot(): RobotPu {
         if (!robot) {
             const sn = "pu-" + control.deviceSerialNumber();
@@ -31,6 +46,18 @@ namespace RobotPU {
     //% subcategory="Actions"
     export function greet(): void {
         ensureRobot().greet();
+    }
+
+    /** Set current robot behavior mode (state machine). */
+    //% blockId=robotpu_setMode block="set mode %mode"
+    //% weight=94 blockGap=8
+    //% subcategory="Actions"
+    export function setMode(mode: Mode): void {
+        const r = ensureRobot();
+        r.gst = mode as number;
+        r.last_cmd_ts = control.millis();
+        // sticky mode with large timeout
+        ensureRobot().beacon_timeout = 200000;
     }
 
     /** Walk with speed (-5 to 5) and turn bias (-1 to 1). Positive speed is forward. Negative turn is left, 0 is straight, Positive is right. */

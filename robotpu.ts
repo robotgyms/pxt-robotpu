@@ -645,6 +645,9 @@ class RobotPu {
     // Define the State Dictionary
     private st_dict: { [key: number]: () => void };
 
+    // beacon timeout
+    public beacon_timeout: number = 2000;
+
     constructor(sn: string, name: string = "peu") {
         // Initialize Core Components inside constructor
         this.pr = new Parameters();
@@ -836,7 +839,7 @@ class RobotPu {
         if (this.gst > 0) { // If in an active state
             this.alt_l = 10; // Reset alert level
             // 2-second timeout to return to idle
-            if (control.millis() - this.last_cmd_ts > 2000) {
+            if (control.millis() - this.last_cmd_ts > this.beacon_timeout) {
                 this.gst = 0;
             }
         }
@@ -1407,6 +1410,7 @@ class RobotPu {
 
     public runKeyValueCMD(key: string, v: number) {
         this.last_cmd_ts = control.millis();
+        this.beacon_timeout = 2000;
 
         // 3. Look up the function in the dictionary
         let action = this.cmdDict[key];
@@ -1419,7 +1423,7 @@ class RobotPu {
 
     public runStrCMD(s: string) {
         // 1. Update the timestamp of the last received command
-        this.last_cmd_ts = control.millis();
+        this.last_cmd_ts = control.millis()
 
         // 2. Process #put: Text-to-Speech
         if (s.substr(0, 4) == "#put") {
