@@ -32,7 +32,7 @@ Purchase Links:
 - Manual
 - Online tutorials and examples
 
-The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches RobotPU’s `runKeyValueCMD` / `runStrCMD`), flash the official Robot PU gamepad program to the gamepad micro:bit:
+The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
 
 - https://makecode.microbit.org/S34024-98531-58275-59424
 
@@ -49,15 +49,15 @@ The retail kit includes a **gamepad that uses the second micro:bit**. For the be
 2. Flash your **gamepad micro:bit** with the official Robot PU gamepad program:
    - https://makecode.microbit.org/S34024-98531-58275-59424
 3. Ensure both micro:bits use the same radio channel (group):
-   - Use `RobotPU.set_channel(...)` in your Robot PU project, or set the same `radio.setGroup(...)` on both devices.
-4. In your Robot PU project, forward radio messages to RobotPU (see the Remote Control section for example code).
+   - Use `robotPu.setChannel(...)` in your Robot PU project, or set the same `radio.setGroup(...)` on both devices.
+4. In your Robot PU project, forward radio messages to robotPu (see the Remote Control section for example code).
 
 ## Installation
 
 1. In MakeCode, open your micro:bit project.
 2. Add extension → Import URL (or local path) → point to this repository.
 3. Ensure the dependency to Billy voice is available (see Dependencies below).
-4. Call any `RobotPU.*` block once in `on start` (for example `RobotPU.calibrate()` or `RobotPU.rest()`) to trigger auto-initialization.
+4. Call any `robotPu.*` block once in `on start` (for example `robotPu.calibrate()` or `robotPu.rest()`) to trigger auto-initialization.
 
 ## Dependencies
 
@@ -66,7 +66,7 @@ The retail kit includes a **gamepad that uses the second micro:bit**. For the be
 
 ## Blocks / API
 
-This extension auto-initializes the robot on the first call to any `RobotPU.*` API:
+This extension auto-initializes the robot on the first call to any `robotPu.*` API:
 
 - **Creates** an internal `RobotPu` instance
 - **Runs** `calibrate()` once
@@ -101,7 +101,7 @@ Because of this, there is **no separate `init` block** in the current API.
   - This is designed to be called repeatedly (e.g. inside `basic.forever`).
   - You may use speed higher than 5 to make the robot move faster but the robot will be less stable because it cannot balance well due to the limited sampling rate of IMU and servo action speed.
 
-#### `walk_do(speed: number, turn: number): void`
+#### `walkDo(speed: number, turn: number): void`
 
 - **Block**: `walk speed %speed turn %turn` (statement form)
 - **What it does**: Same as `walk(...)` but discards the return value.
@@ -116,10 +116,10 @@ Because of this, there is **no separate `init` block** in the current API.
 - **Notes**:
   - The explore speed range is influenced by `setWalkSpeedRange(min, max)`.
 
-#### `explore_do(): void`
+#### `exploreDo(): void`
 
 - **Block**: `explore` (statement form)
-- **What it does**: Same as `explore()` but discards the return value.
+-- **What it does**: Same as `explore()` but discards the return value.
 
 #### `dance(): number`
 
@@ -129,10 +129,10 @@ Because of this, there is **no separate `init` block** in the current API.
   - Animates the NeoPixel LEDs during high beats.
 - **Return**: `number` motion status (same convention as `walk`)
 
-#### `dance_do(): void`
+#### `danceDo(): void`
 
 - **Block**: `dance` (statement form)
-- **What it does**: Same as `dance()` but discards the return value.
+-- **What it does**: Same as `dance()` but discards the return value.
 
 #### `kick(): number`
 
@@ -141,10 +141,10 @@ Because of this, there is **no separate `init` block** in the current API.
 - **Return**: `number` motion status
   - Returns `0` when the kick completes and the robot transitions back to manual/neutral behavior internally.
 
-#### `kick_do(): void`
+#### `kickDo(): void`
 
 - **Block**: `kick` (statement form)
-- **What it does**: Same as `kick()` but discards the return value.
+-- **What it does**: Same as `kick()` but discards the return value.
 
 #### `jump(): number`
 
@@ -154,10 +154,10 @@ Because of this, there is **no separate `init` block** in the current API.
 - **Return**: `number` motion status
   - Returns `0` when the jump completes and the auxiliary servo retracts.
 
-#### `jump_do(): void`
+#### `jumpDo(): void`
 
 - **Block**: `jump` (statement form)
-- **What it does**: Same as `jump()` but discards the return value.
+-- **What it does**: Same as `jump()` but discards the return value.
 
 #### `rest(): number`
 
@@ -167,10 +167,10 @@ Because of this, there is **no separate `init` block** in the current API.
   - Reacts to sound level with subtle motion.
 - **Return**: `number` motion status (same convention as `walk`)
 
-#### `rest_do(): void`
+#### `restDo(): void`
 
 - **Block**: `rest` (statement form)
-- **What it does**: Same as `rest()` but discards the return value.
+-- **What it does**: Same as `rest()` but discards the return value.
 
 #### `talk(text: string): void`
 
@@ -188,9 +188,9 @@ Because of this, there is **no separate `init` block** in the current API.
 
 ### Setup
 
-#### `setServoTrim(left_foot: number, left_leg: number, right_foot: number, right_leg: number, head_yaw: number, head_pitch: number): void`
+#### `setServoTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number): void`
 
-- **Block**: `set servo trim left foot %left_foot left leg %left_leg right foot %right_foot right leg %right_leg head yaw %head_yaw head pitch %head_pitch`
+- **Block**: `set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch`
 - **What it does**: Sets persistent trim offsets (in degrees) added to the target servo angles.
 - **When to use**: If your robot does not stand level, walks crooked, or the head is not centered.
 - **Notes**:
@@ -229,32 +229,32 @@ RobotPU can be controlled over the micro:bit radio protocol by sending either:
 - **Value messages** (recommended for joysticks / continuous control)
   - Send using `radio.sendValue(name, value)`
   - Receive using `radio.onReceivedValue((name, value) => ...)`
-  - Forward to RobotPU using `RobotPU.runKeyValueCMD(name, value)`
+  - Forward to robotPu using `robotPu.runKeyValueCommand(name, value)`
 - **String messages** (recommended for text, singing, and simple triggers)
   - Send using `radio.sendString(text)`
   - Receive using `radio.onReceivedString((text) => ...)`
-  - Forward to RobotPU using `RobotPU.runStrCMD(text)`
+  - Forward to robotPu using `robotPu.runStringCommand(text)`
 
 **Important note about `radio.sendValue`**:
 
 - micro:bit radio “value” packets are transmitted as integers.
 - For **movement control** (`#puspeed`, `#puturn`), RobotPU expects a value roughly in `-1 .. 1`.
-  - If your controller sends a different scale (for example `-100 .. 100`), scale it on the receiver before calling `RobotPU.runKeyValueCMD`.
+  - If your controller sends a different scale (for example `-100 .. 100`), scale it on the receiver before calling `robotPu.runKeyValueCommand`.
 - For **gesture head control** (`#puroll`, `#pupitch`), values are treated as angles (degrees) to yaw/pitch PU’s head.
 
 **Channel / pairing**:
 
 - RobotPU uses the micro:bit radio **group** as its channel.
-- Use `RobotPU.channel()` / `RobotPU.set_channel(...)` (or `radio.setGroup(...)` on the sender) so both devices are on the same group (0..255).
+- Use `robotPu.channel()` / `robotPu.setChannel(...)` (or `radio.setGroup(...)` on the sender) so both devices are on the same group (0..255).
 
 **Receiver (RobotPU micro:bit) example**:
 
 ```ts
 radio.onReceivedValue(function (name, value) {
-    RobotPU.runKeyValueCMD(name, value)
+    robotPu.runKeyValueCommand(name, value)
 })
 radio.onReceivedString(function (text) {
-    RobotPU.runStrCMD(text)
+    robotPu.runStringCommand(text)
 })
 ```
 
@@ -291,9 +291,9 @@ If your controller sends larger integers for movement (for example `-100 .. 100`
 ```ts
 radio.onReceivedValue(function (name, value) {
     if (name == "#puspeed" || name == "#puturn") {
-        RobotPU.runKeyValueCMD(name, value / 100)
+        robotPu.runKeyValueCommand(name, value / 100)
     } else {
-        RobotPU.runKeyValueCMD(name, value)
+        robotPu.runKeyValueCommand(name, value)
     }
 })
 ```
@@ -302,9 +302,9 @@ If your controller is a phone/app over BLE, the typical architecture is:
 
 - Phone/app (BLE)
 - Controller micro:bit receives BLE events and converts them to `radio.sendValue(...)` / `radio.sendString(...)`
-- RobotPU micro:bit receives radio and calls `RobotPU.runKeyValueCMD(...)` / `RobotPU.runStrCMD(...)`
+- RobotPU micro:bit receives radio and calls `robotPu.runKeyValueCommand(...)` / `robotPu.runStringCommand(...)`
 
-#### `runStrCMD(s: string): void`
+#### `runStringCommand(s: string): void`
 
 - **Block**: `execute command %s`
 - **What it does**: Parses and executes a string command.
@@ -314,7 +314,7 @@ If your controller is a phone/app over BLE, the typical architecture is:
   - `#puhi<name>`: speak “My friend <name> is here”
   - `#pun<sn>`: set the robot serial/name string to `<sn>` and then `greet()`
 
-#### `runKeyValueCMD(key: string, v: number): void`
+#### `runKeyValueCommand(key: string, v: number): void`
 
 - **Block**: `execute command key %key value %v`
 - **What it does**: Executes a key/value command (mostly used for joystick-style control).
@@ -346,14 +346,14 @@ If your controller is a phone/app over BLE, the typical architecture is:
 - **What it does**: Returns the current radio group/channel used for communication.
 - **Return**: `0 .. 255`
 
-#### `set_channel(channel: number): void`
+#### `setChannel(channel: number): void`
 
 - **Block**: `set channel to %channel`
 - **What it does**: Sets the radio group/channel used for communication.
 - **Parameter**:
   - `channel`: `0 .. 255`
 
-#### `change_channel(delta: number): void`
+#### `changeChannel(delta: number): void`
 
 - **Block**: `change channel by %delta`
 - **What it does**: Adjusts the radio group/channel by `delta`.
@@ -364,57 +364,57 @@ If your controller is a phone/app over BLE, the typical architecture is:
 
 ```ts
 // Initialize robot by ask it to greet
-RobotPU.greet()
+robotPu.greet()
 
 // press button A to walk forward in circles
 input.onButtonPressed(Button.A, function () {
     for (let index = 0; index < 400; index++) {
-        RobotPU.walk(3, -0.5)
+        robotPu.walk(3, -0.5)
     }
 })
 // logo up to sing
 input.onGesture(Gesture.LogoUp, function () {
-    RobotPU.sing("E D G F B A C5 B ")
+    robotPu.sing("E D G F B A C5 B ")
 })
 // tilt left to kick
 input.onGesture(Gesture.TiltLeft, function () {
-    RobotPU.kick()
+    robotPu.kick()
 })
 // face down to talk
 input.onGesture(Gesture.ScreenDown, function () {
-    RobotPU.talk("Put me down")
+    robotPu.talk("Put me down")
 })
 // press button A+B to do autopilot
 input.onButtonPressed(Button.AB, function () {
     for (let index = 0; index < 4000; index++) {
-        RobotPU.explore()
+        robotPu.explore()
     }
 })
 // Register the event listener for incoming string messages
 radio.onReceivedString(function (receivedString) {
-    RobotPU.runStrCMD(receivedString)
+    robotPu.runStringCommand(receivedString)
 })
 // press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
     for (let index = 0; index < 400; index++) {
-        RobotPU.walk(-1, -0.5)
+        robotPu.walk(-1, -0.5)
     }
 })
 // tilt right to jump
 input.onGesture(Gesture.TiltRight, function () {
-    RobotPU.jump()
+    robotPu.jump()
 })
 // listen to radio messages for commands of key value pairs
 radio.onReceivedValue(function (name, value) {
-    RobotPU.runKeyValueCMD(name, value)
+    robotPu.runKeyValueCommand(name, value)
 })
 // logo down to rest
 input.onGesture(Gesture.LogoDown, function () {
-    RobotPU.rest()
+    robotPu.rest()
 })
 // press logo button to dance using set mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    RobotPU.setMode(RobotPU.Mode.Dance)
+    robotPu.setMode(robotPu.Mode.Dance)
 })
 ```
 
