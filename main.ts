@@ -1,5 +1,5 @@
 // MakeCode blocks wrapper for RobotPu
-//% weight=50 color=#e7660b icon="\uf1b9"
+//% weight=50 color=#e7660b icon="\uf2bd"
 //block="Robot PU"
 //% groups='["Setup", "Actions", "Variables"]'
 namespace robotPu {
