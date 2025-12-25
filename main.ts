@@ -56,9 +56,9 @@ namespace robotPu {
     export function setMode(mode: Mode): void {
         const r = ensureRobot();
         r.gst = mode as number;
-        r.lastCmd_ts = control.millis();
+        r.lastCmdTS = control.millis();
         // sticky mode with large timeout
-        ensureRobot().beacon_timeout = 200000;
+        ensureRobot().beaconTimeout = 200000;
     }
 
     /** Walk with speed (-5 to 5) and turn bias (-1 to 1). Positive speed is forward. Negative turn is left, 0 is straight, Positive is right. */
@@ -203,8 +203,8 @@ namespace robotPu {
     //% weight=56 blockGap=8
     export function setWalkSpeedRange(min: number, max: number): void {
         // backward max speed (negative), forward max speed (positive)
-        ensureRobot().set_bwdMaxSpeed(min);
-        ensureRobot().set_fwdMaxSpeed(max);
+        ensureRobot().setBwdMaxSpeed(min);
+        ensureRobot().setFwdMaxSpeed(max);
     }
 
     /** Run string command */
@@ -230,7 +230,7 @@ namespace robotPu {
     //% subcategory="Variables"
     //% weight=70
     export function channel(): number {
-        return ensureRobot().get_group_id();
+        return ensureRobot().setGroupId();
     }
 
     /** Set channel to a specific value (0..255). Alias for set_group_id. */
@@ -239,7 +239,7 @@ namespace robotPu {
     //% channel.min=0 channel.max=255 channel.defl=166
     //% weight=69
     export function setChannel(channel: number): void {
-        ensureRobot().set_group_id(channel);
+        ensureRobot().setGroupId(channel);
     }
 
     /** Change channel by a delta (can be negative). Alias for adjust radio group. */
@@ -248,7 +248,7 @@ namespace robotPu {
     //% delta.defl=1
     //% weight=68
     export function changeChannel(delta: number): void {
-        ensureRobot().incr_group_id(delta);
+        ensureRobot().setGroupId(delta);
     }
 
 }
