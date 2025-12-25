@@ -234,7 +234,7 @@ class Content {
     /**
      * Composes a procedural song string
      */
-    compose_song(): string {
+    composeSong(): string {
         let song: string[] = [];
         let b = this.notes.length;
         let d = this.choice(this.chord);
@@ -277,7 +277,7 @@ class Content {
     /**
      * Generates a random "cute" sentence
      */
-    cute_words(): string {
+    cuteWords(): string {
         return this.choice(this.sub) + " " +
             this.choice(this.act) + " " +
             this.choice(this.obj) + " " +

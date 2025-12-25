@@ -1,12 +1,12 @@
-# RobotPU MakeCode Extension
+# Robot PU MakeCode Extension
 
 ## Overview
 
-RobotPU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode.
+Robot PU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode.
 
 PU can walk, autopilot, dance, kick, jump, rest, talk, and sing. It reacts to music, balances using its IMU, and navigates with an ultrasonic sensor.
 The retail kit includes a gamepad built from the second micro:bit for radio-based remote control, including gesture head control (tilt to yaw/pitch PU’s head).
-![RobotPU](https://raw.githubusercontent.com/robotgyms/pxt-RobotPU/main/assets/robotpu.png)
+![Robot PU](https://raw.githubusercontent.com/robotgyms/pxt-robotpu/main/assets/robotpu.png)
 
 Learn more about The Story of PU, which shows robot PU's activities, hardware, software, tutorials, and upgrade projects at:
 - https://robotgyms.com/pu
@@ -220,11 +220,11 @@ Because of this, there is **no separate `init` block** in the current API.
 
 These APIs are intended for advanced integrations (custom gamepads / phone apps / another micro:bit sending commands).
 
-If you have the retail Robot PU gamepad, use the official gamepad program (it is designed to be compatible with RobotPU’s command keys and message formats).
+If you have the retail Robot PU gamepad, use the official gamepad program (it is designed to be compatible with Robot PU’s command keys and message formats).
 
 #### Radio control protocol (micro:bit radio, including BLE-to-radio bridges)
 
-RobotPU can be controlled over the micro:bit radio protocol by sending either:
+Robot PU can be controlled over the micro:bit radio protocol by sending either:
 
 - **Value messages** (recommended for joysticks / continuous control)
   - Send using `radio.sendValue(name, value)`
@@ -238,16 +238,16 @@ RobotPU can be controlled over the micro:bit radio protocol by sending either:
 **Important note about `radio.sendValue`**:
 
 - micro:bit radio “value” packets are transmitted as integers.
-- For **movement control** (`#puspeed`, `#puturn`), RobotPU expects a value roughly in `-1 .. 1`.
+- For **movement control** (`#puspeed`, `#puturn`), Robot PU expects a value roughly in `-1 .. 1`.
   - If your controller sends a different scale (for example `-100 .. 100`), scale it on the receiver before calling `robotPu.runKeyValueCommand`.
 - For **gesture head control** (`#puroll`, `#pupitch`), values are treated as angles (degrees) to yaw/pitch PU’s head.
 
 **Channel / pairing**:
 
-- RobotPU uses the micro:bit radio **group** as its channel.
+- Robot PU uses the micro:bit radio **group** as its channel.
 - Use `robotPu.channel()` / `robotPu.setChannel(...)` (or `radio.setGroup(...)` on the sender) so both devices are on the same group (0..255).
 
-**Receiver (RobotPU micro:bit) example**:
+**Receiver (Robot PU micro:bit) example**:
 
 ```ts
 radio.onReceivedValue(function (name, value) {
@@ -266,7 +266,7 @@ radio.sendValue("#puspeed", 1)
 radio.sendValue("#puturn", -1)
 
 // gesture remote control (head): send micro:bit roll/pitch as degrees
-// RobotPU maps #puroll/#pupitch to head yaw/pitch offsets (smoothed internally)
+// Robot PU maps #puroll/#pupitch to head yaw/pitch offsets (smoothed internally)
 radio.sendValue("#puroll", input.rotation(Rotation.Roll))
 radio.sendValue("#pupitch", input.rotation(Rotation.Pitch))
 // text actions
@@ -278,7 +278,7 @@ radio.sendString("#putHello!")
 - The retail gamepad program reads the gamepad micro:bit’s tilt:
   - **Roll** (left/right tilt) → sends `#puroll`
   - **Pitch** (forward/back tilt) → sends `#pupitch`
-- RobotPU uses these values to control its head orientation:
+- Robot PU uses these values to control its head orientation:
   - `#puroll` controls head **yaw** (left/right)
   - `#pupitch` controls head **pitch** (up/down)
 - Values are interpreted as **degrees of offset** and are smoothed internally.
@@ -302,7 +302,7 @@ If your controller is a phone/app over BLE, the typical architecture is:
 
 - Phone/app (BLE)
 - Controller micro:bit receives BLE events and converts them to `radio.sendValue(...)` / `radio.sendString(...)`
-- RobotPU micro:bit receives radio and calls `robotPu.runKeyValueCommand(...)` / `robotPu.runStringCommand(...)`
+- Robot PU micro:bit receives radio and calls `robotPu.runKeyValueCommand(...)` / `robotPu.runStringCommand(...)`
 
 #### `runStringCommand(s: string): void`
 
