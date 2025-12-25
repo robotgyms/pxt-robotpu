@@ -2,7 +2,7 @@
 //% weight=50 color=#e7660b icon="\uf1b9"
 //block="Robot PU"
 //% groups='["Setup", "Actions", "Variables"]'
-namespace RobotPU {
+namespace robotPu {
     let robot: RobotPu;
 
     export enum Mode {
@@ -28,8 +28,9 @@ namespace RobotPU {
             control.inBackground(function () {
                 // add background task to update states and execute behavior logic
                 while (true) {
-                    robot.update_states();   // Checks sensors and falls
-                    robot.state_machine();   // Executes current behavior logic
+
+                    robot.updateStates();   // Checks sensors and falls
+                    robot.stateMachine();   // Executes current behavior logic
                     // Use a slightly larger pause to prevent CPU starvation
                     // 20ms is standard for robotics to maintain 50Hz responsiveness
                     // but robot PU need 200Hz to maintain smooth movement
@@ -55,7 +56,7 @@ namespace RobotPU {
     export function setMode(mode: Mode): void {
         const r = ensureRobot();
         r.gst = mode as number;
-        r.last_cmd_ts = control.millis();
+        r.lastCmd_ts = control.millis();
         // sticky mode with large timeout
         ensureRobot().beacon_timeout = 200000;
     }
@@ -76,7 +77,7 @@ namespace RobotPU {
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=89 blockGap=8
-    export function walk_do(speed: number, turn: number): void {
+    export function walkDo(speed: number, turn: number): void {
         ensureRobot().walk(speed, turn);
     }
 
@@ -92,7 +93,7 @@ namespace RobotPU {
     //% blockId=robotpu_explore_do block="explore"
     //% subcategory="Actions"
     //% weight=84 blockGap=8
-    export function explore_do(): void {
+    export function exploreDo(): void {
         ensureRobot().explore();
     }
 
@@ -108,7 +109,7 @@ namespace RobotPU {
     //% blockId=robotpu_dance_do block="dance"
     //% subcategory="Actions"
     //% weight=79 blockGap=8
-    export function dance_do() {
+    export function danceDo(): void {
         ensureRobot().dance();
     }
 
@@ -124,7 +125,7 @@ namespace RobotPU {
     //% blockId=robotpu_kick_do block="kick"
     //% subcategory="Actions"
     //% weight=74 blockGap=8
-    export function kick_do(): void {
+    export function kickDo(): void {
         ensureRobot().kick();
     }
 
@@ -140,7 +141,7 @@ namespace RobotPU {
     //% blockId=robotpu_jump_do block="jump"
     //% subcategory="Actions"
     //% weight=69 blockGap=8
-    export function jump_do(): void {
+    export function jumpDo(): void {
         ensureRobot().jump();
     }
 
@@ -156,7 +157,7 @@ namespace RobotPU {
     //% blockId=robotpu_rest_do block="rest"
     //% subcategory="Actions"
     //% weight=64 blockGap=8
-    export function rest_do(): void {
+    export function restDo(): void {
         ensureRobot().rest();
     }
 
@@ -179,12 +180,12 @@ namespace RobotPU {
     }
 
     /** Set servo trim offsets: left_foot, left_leg, right_foot, right_leg, head_yaw, head_pitch */
-    //% blockId=robotpu_setServoTrim block="set servo trim left foot %left_foot left leg %left_leg right foot %right_foot right leg %right_leg head yaw %head_yaw head pitch %head_pitch"
+    //% blockId=robotpu_setServoTrim block="set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch"
     //% subcategory="Setup"
-    //% left_foot.defl=0 left_leg.defl=0 right_foot.defl=0 right_leg.defl=0 head_yaw.defl=0 head_pitch.defl=0
+    //% leftFoot.defl=0 leftLeg.defl=0 rightFoot.defl=0 rightLeg.defl=0 headYaw.defl=0 headPitch.defl=0
     //% weight=58 blockGap=8
-    export function setServoTrim(left_foot: number, left_leg: number, right_foot: number, right_leg: number, head_yaw: number, head_pitch: number): void {
-        ensureRobot().setTrim(left_foot, left_leg, right_foot, right_leg, head_yaw, head_pitch);
+    export function setServoTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number): void {
+        ensureRobot().setTrim(leftFoot, leftLeg, rightFoot, rightLeg, headYaw, headPitch);
     }
 
     /** Run calibration routine */
@@ -211,8 +212,8 @@ namespace RobotPU {
     //% s.shadow=text
     //% subcategory="Remote Control"
     //% weight=56 blockGap=8
-    export function runStrCMD(s: string): void {
-        ensureRobot().runStrCMD(s);
+    export function runStringCommand(s: string): void {
+        ensureRobot().runStringCommand(s);
     }
 
     /** Run key/value command */
@@ -220,8 +221,8 @@ namespace RobotPU {
     //% key.shadow=text
     //% subcategory="Remote Control"
     //% weight=55 blockGap=8
-    export function runKeyValueCMD(key: string, v: number): void {
-        ensureRobot().runKeyValueCMD(key, v);
+    export function runKeyValueCommand(key: string, v: number): void {
+        ensureRobot().runKeyValueCommand(key, v);
     }
 
     /** Current radio channel (0..255) */
@@ -237,7 +238,7 @@ namespace RobotPU {
     //% subcategory="Variables"
     //% channel.min=0 channel.max=255 channel.defl=166
     //% weight=69
-    export function set_channel(channel: number): void {
+    export function setChannel(channel: number): void {
         ensureRobot().set_group_id(channel);
     }
 
@@ -246,7 +247,7 @@ namespace RobotPU {
     //% subcategory="Variables"
     //% delta.defl=1
     //% weight=68
-    export function change_channel(delta: number): void {
+    export function changeChannel(delta: number): void {
         ensureRobot().incr_group_id(delta);
     }
 
