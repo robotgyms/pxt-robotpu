@@ -426,7 +426,7 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 
 ## License
 
-- Apache License 2.0. See `LICENSE`.
+- MIT License. See `LICENSE`.
 - Copyright © 2025 Robot Gyms Inc.
 
 ## Acknowledgments
