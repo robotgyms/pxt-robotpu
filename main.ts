@@ -230,7 +230,7 @@ namespace robotPu {
     //% subcategory="Variables"
     //% weight=70
     export function channel(): number {
-        return ensureRobot().setGroupId();
+        return ensureRobot().getGroupId();
     }
 
     /** Set channel to a specific value (0..255). Alias for setGroupId. */
