@@ -20,6 +20,21 @@ namespace robotPu {
         Walk = 5
     }
 
+    export enum ServoJoint {
+        //% block="left foot"
+        LeftFoot = 0,
+        //% block="left leg"
+        LeftLeg = 1,
+        //% block="right foot"
+        RightFoot = 2,
+        //% block="right leg"
+        RightLeg = 3,
+        //% block="head yaw"
+        HeadYaw = 4,
+        //% block="head pitch"
+        HeadPitch = 5
+    }
+
     function ensureRobot(): RobotPu {
         if (!robot) {
             const sn = "pu-" + control.deviceSerialNumber();
@@ -35,8 +50,8 @@ namespace robotPu {
                     // 20ms is standard for robotics to maintain 50Hz responsiveness
                     // but robot PU need 200Hz to maintain smooth movement
                     basic.pause(5);
-            }
-});
+                }
+            });
         }
         return robot;
     }
@@ -59,6 +74,30 @@ namespace robotPu {
         r.lastCmdTS = control.millis();
         // sticky mode with large timeout
         ensureRobot().beaconTimeout = 200000;
+    }
+
+    /** Set a Robot PU servo/joint angle (0-180). */
+    //% blockId=robotpu_servo block="move %joint servo to %angle"
+    //% subcategory="Actuators"
+    //% angle.min=0 angle.max=180 angle.defl=90
+    //% weight=93 blockGap=8
+    export function servo(joint: ServoJoint, angle: number): void {
+        const r = ensureRobot();
+        angle = Math.min(180, Math.max(0, Math.floor(angle)));
+        r.wk.servo(joint as number, angle);
+    }
+
+    /** Move a Robot PU servo/joint toward a target angle using progressive stepping. */
+    //% blockId=robotpu_servo_step block="move %joint servo to %target with step size %stepSize"
+    //% subcategory="Actuators"
+    //% target.min=0 target.max=180 target.defl=90
+    //% stepSize.min=1 stepSize.max=20 stepSize.defl=2
+    //% weight=92 blockGap=8
+    export function servoStep(joint: ServoJoint, target: number, stepSize: number): void {
+        const r = ensureRobot();
+        target = Math.min(180, Math.max(0, Math.floor(target)));
+        stepSize = Math.min(20, Math.max(1, Math.floor(stepSize)));
+        r.wk.servoStep(target, stepSize, joint as number, r.pr);
     }
 
     /** Walk with speed (-5 to 5) and turn bias (-1 to 1). Positive speed is forward. Negative turn is left, 0 is straight, Positive is right. */
@@ -96,6 +135,13 @@ namespace robotPu {
     export function exploreDo(): void {
         ensureRobot().explore();
     }
+
+     //% blockId=robotpu_sonar_distance_cm block="sonar distance (cm)"
+     //% subcategory="Sensors"
+     //% weight=70 blockGap=8
+     export function sonarDistanceCm(): number {
+         return ensureRobot().sonar.distanceCm();
+     }
 
     /** Dance to music */
     //% blockId=robotpu_dance block="dance"

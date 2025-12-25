@@ -407,18 +407,6 @@ class WK {
     }
 
     /**
-     * Control onboard LED lights.
-     */
-    public setLight(light: number): void {
-        let buf3 = pins.createBuffer(4);
-        buf3.setNumber(NumberFormat.UInt8LE, 0, 0x12);
-        buf3.setNumber(NumberFormat.UInt8LE, 1, light);
-        buf3.setNumber(NumberFormat.UInt8LE, 2, 0);
-        buf3.setNumber(NumberFormat.UInt8LE, 3, 0);
-        pins.i2cWriteBuffer(this.i2cAddress, buf3);
-    }
-
-    /**
      * Move servo toward target with controlled speed.
      */
     public servoStep(target: number, sp: number, idx: number, p: Parameters): void {
@@ -480,6 +468,18 @@ class WK {
             return 0;
         }
         return 1;
+    }
+
+    /**
+     * Control onboard LED lights.
+     */
+    public setLight(light: number): void {
+        let buf3 = pins.createBuffer(4);
+        buf3.setNumber(NumberFormat.UInt8LE, 0, 0x12);
+        buf3.setNumber(NumberFormat.UInt8LE, 1, light);
+        buf3.setNumber(NumberFormat.UInt8LE, 2, 0);
+        buf3.setNumber(NumberFormat.UInt8LE, 3, 0);
+        pins.i2cWriteBuffer(this.i2cAddress, buf3);
     }
 
     /**
