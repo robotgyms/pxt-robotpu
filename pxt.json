@@ -1,6 +1,6 @@
 {
   "name": "pxt-robotpu",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Robot PU MakeCode extension exposing walk, autopilot, dance, kick, jump, rest, talk, sing.",
   "license": "MIT",
   "dependencies": {
@@ -11,8 +11,7 @@
   },
   "files": [
     "robotpu.ts",
-    "main.ts",
-    "icon.png"
+    "main.ts"
   ],
   "testFiles": [
     "test.ts"
