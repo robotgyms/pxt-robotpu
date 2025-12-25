@@ -233,7 +233,7 @@ namespace robotPu {
         return ensureRobot().setGroupId();
     }
 
-    /** Set channel to a specific value (0..255). Alias for set_group_id. */
+    /** Set channel to a specific value (0..255). Alias for setGroupId. */
     //% blockId=robotpu_set_channel block="set channel to %channel"
     //% subcategory="Variables"
     //% channel.min=0 channel.max=255 channel.defl=166
