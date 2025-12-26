@@ -1,7 +1,7 @@
 // MakeCode blocks wrapper for RobotPu
 //% weight=50 color=#e7660b icon="\uf2bd"
 //block="Robot PU"
-//% groups='["Setup", "Actions", "Variables"]'
+//% groups='["Variables", "Setup", "Sensors", "Actuators", "Actions", "Remote Control"]'
 namespace robotPu {
     let robot: RobotPu;
 
@@ -60,6 +60,7 @@ namespace robotPu {
     //% blockId=robotpu_greet block="greet"
     //% weight=55 blockGap=8
     //% subcategory="Actions"
+    //% group="Actions"
     export function greet(): void {
         ensureRobot().greet();
     }
@@ -68,6 +69,7 @@ namespace robotPu {
     //% blockId=robotpu_setMode block="set mode %mode"
     //% weight=54 blockGap=8
     //% subcategory="Actions"
+    //% group="Actions"
     export function setMode(mode: Mode): void {
         const r = ensureRobot();
         r.gst = mode as number;
@@ -79,6 +81,7 @@ namespace robotPu {
     /** Set a Robot PU servo/joint angle (0-180). */
     //% blockId=robotpu_servo block="move %joint servo to %angle"
     //% subcategory="Actuators"
+    //% group="Actuators"
     //% angle.min=0 angle.max=180 angle.defl=90
     //% weight=65 blockGap=8
     export function servo(joint: ServoJoint, angle: number): void {
@@ -90,6 +93,7 @@ namespace robotPu {
     /** Move a Robot PU servo/joint toward a target angle using progressive stepping. */
     //% blockId=robotpu_servo_step block="move %joint servo to %target with step size %stepSize"
     //% subcategory="Actuators"
+    //% group="Actuators"
     //% target.min=0 target.max=180 target.defl=90
     //% stepSize.min=1 stepSize.max=20 stepSize.defl=2
     //% weight=64 blockGap=8
@@ -103,6 +107,7 @@ namespace robotPu {
     /** Walk with speed (-5 to 5) and turn bias (-1 to 1). Positive speed is forward. Negative turn is left, 0 is straight, Positive is right. */
     //% blockId=robotpu_walk block="walk speed %speed turn %turn"
     //% subcategory="Actions"
+    //% group="Actions"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=53 blockGap=8
@@ -113,6 +118,7 @@ namespace robotPu {
     /** Walk with the given speed and turn bias. Statement version (no return). */
     //% blockId=robotpu_walk_do block="walk speed %speed turn %turn"
     //% subcategory="Actions"
+    //% group="Actions"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=52 blockGap=8
@@ -123,6 +129,7 @@ namespace robotPu {
     /** Explore autonomously using sonar */
     //% blockId=robotpu_explore block="explore"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=51 blockGap=8
     export function explore(): number {
         return ensureRobot().explore();
@@ -131,6 +138,7 @@ namespace robotPu {
     /** Explore the environment using sonar. Statement version (no return). */
     //% blockId=robotpu_explore_do block="explore"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=50 blockGap=8
     export function exploreDo(): void {
         ensureRobot().explore();
@@ -138,6 +146,7 @@ namespace robotPu {
 
      //% blockId=robotpu_sonar_distance_cm block="sonar distance (cm)"
      //% subcategory="Sensors"
+     //% group="Sensors"
      //% weight=70 blockGap=8
      export function sonarDistanceCm(): number {
          return ensureRobot().sonar.distanceCm();
@@ -146,6 +155,7 @@ namespace robotPu {
     /** Dance to music */
     //% blockId=robotpu_dance block="dance"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=49 blockGap=8
     export function dance(): number {
         return ensureRobot().dance();
@@ -154,6 +164,7 @@ namespace robotPu {
     /** Dance to music. Statement version (no return). */
     //% blockId=robotpu_dance_do block="dance"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=48 blockGap=8
     export function danceDo(): void {
         ensureRobot().dance();
@@ -162,6 +173,7 @@ namespace robotPu {
     /** Kick with a quick forward motion */
     //% blockId=robotpu_kick block="kick"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=47 blockGap=8
     export function kick(): number {
         return ensureRobot().kick();
@@ -170,6 +182,7 @@ namespace robotPu {
     /** Kick action. Statement version (no return). */
     //% blockId=robotpu_kick_do block="kick"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=46 blockGap=8
     export function kickDo(): void {
         ensureRobot().kick();
@@ -178,6 +191,7 @@ namespace robotPu {
     /** Jump action */
     //% blockId=robotpu_jump block="jump"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=45 blockGap=8
     export function jump(): number {
         return ensureRobot().jump();
@@ -186,6 +200,7 @@ namespace robotPu {
     /** Jump action. Statement version (no return). */
     //% blockId=robotpu_jump_do block="jump"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=44 blockGap=8
     export function jumpDo(): void {
         ensureRobot().jump();
@@ -194,6 +209,7 @@ namespace robotPu {
     /** Rest in balanced idle */
     //% blockId=robotpu_rest block="rest"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=43 blockGap=8
     export function rest(): number {
         return ensureRobot().rest();
@@ -202,6 +218,7 @@ namespace robotPu {
     /** Move to balanced idle/rest. Statement version (no return). */
     //% blockId=robotpu_rest_do block="rest"
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=42 blockGap=8
     export function restDo(): void {
         ensureRobot().rest();
@@ -211,6 +228,7 @@ namespace robotPu {
     //% blockId=robotpu_talk block="talk %text"
     //% text.shadow=text
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=41 blockGap=8
     export function talk(text: string): void {
         ensureRobot().talk(text);
@@ -220,6 +238,7 @@ namespace robotPu {
     //% blockId=robotpu_sing block="sing %s"
     //% s.shadow=text
     //% subcategory="Actions"
+    //% group="Actions"
     //% weight=40
     export function sing(s: string): void {
         ensureRobot().sing(s);
@@ -228,6 +247,7 @@ namespace robotPu {
     /** Set servo trim offsets: left_foot, left_leg, right_foot, right_leg, head_yaw, head_pitch */
     //% blockId=robotpu_setServoTrim block="set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch"
     //% subcategory="Setup"
+    //% group="Setup"
     //% leftFoot.defl=0 leftLeg.defl=0 rightFoot.defl=0 rightLeg.defl=0 headYaw.defl=0 headPitch.defl=0
     //% weight=80 blockGap=8
     export function setServoTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number): void {
@@ -238,6 +258,7 @@ namespace robotPu {
     //% blockId=robotpu_calibrate block="calibrate"
     //% weight=79 blockGap=8
     //% subcategory="Setup"
+    //% group="Setup"
     export function calibrate(): void {
         ensureRobot().calibrate();
     }
@@ -245,6 +266,7 @@ namespace robotPu {
     /** Set walk speed range: min maps to backward max speed, max maps to forward max speed */
     //% blockId=robotpu_setWalkSpeedRange block="set walk speed range min %min max %max"
     //% subcategory="Setup"
+    //% group="Setup"
     //% min.defl=-3 max.defl=4
     //% weight=78 blockGap=8
     export function setWalkSpeedRange(min: number, max: number): void {
@@ -257,6 +279,7 @@ namespace robotPu {
     //% blockId=robotpu_runStrCMD block="execute command %s"
     //% s.shadow=text
     //% subcategory="Remote Control"
+    //% group="Remote Control"
     //% weight=30 blockGap=8
     export function runStringCommand(s: string): void {
         ensureRobot().runStringCommand(s);
@@ -266,6 +289,7 @@ namespace robotPu {
     //% blockId=robotpu_runKeyValueCMD block="execute command key %key value %v"
     //% key.shadow=text
     //% subcategory="Remote Control"
+    //% group="Remote Control"
     //% weight=29 blockGap=8
     export function runKeyValueCommand(key: string, v: number): void {
         ensureRobot().runKeyValueCommand(key, v);
@@ -274,6 +298,7 @@ namespace robotPu {
     /** Current radio channel (0..255) */
     //% blockId=robotpu_channel block="channel"
     //% subcategory="Variables"
+    //% group="Variables"
     //% weight=90
     export function channel(): number {
         return ensureRobot().getGroupId();
@@ -282,6 +307,7 @@ namespace robotPu {
     /** Set channel to a specific value (0..255). Alias for setGroupId. */
     //% blockId=robotpu_set_channel block="set channel to %channel"
     //% subcategory="Variables"
+    //% group="Variables"
     //% channel.min=0 channel.max=255 channel.defl=166
     //% weight=89
     export function setChannel(channel: number): void {
@@ -291,6 +317,7 @@ namespace robotPu {
     /** Change channel by a delta (can be negative). Alias for adjust radio group. */
     //% blockId=robotpu_change_channel block="change channel by %delta"
     //% subcategory="Variables"
+    //% group="Variables"
     //% delta.defl=1
     //% weight=88
     export function changeChannel(delta: number): void {
