@@ -116,9 +116,10 @@ basic.forever(function () {
 ```
 
 ---
-
+ 
 ## 🧪 5. Testing & Maintenance
 Code: https://makecode.microbit.org/_Ft8biP4kugAF
+Download (.hex): https://github.com/robotgyms/pxt-robotpu/raw/master/tutorials/JavaScripts/microbit-robot-pu-submarine-sonar.hex
 1. **Deployment**: Upload the script via USB to your Robot PU.
 2. **Calibration**: Ensure PU's chest sensor is unobstructed.
 3. **Material Test**: Try moving different materials toward PU. Hard surfaces (walls) reflect better than soft surfaces (cloth).
