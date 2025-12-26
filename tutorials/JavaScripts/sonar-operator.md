@@ -121,10 +121,11 @@ Ultrasonic sensors can be "jittery". They might report 15.2cm one millisecond an
 ---
 
 ## 6. Testing & Next Steps
-Code: https://makecode.microbit.org/S81118-63767-88308-72596
-1. **Download** the code to your Robot PU.
-2. **Tracking Test**: Hold your hand 15cm from PU's chest. He should say "Distance 15".
-3. **The Red Alert**: Move your hand very close (under 6cm). PU should turn up his volume and shout "Danger, stop!".
+ Code: https://makecode.microbit.org/S81118-63767-88308-72596
+ Download (.hex): https://github.com/robotgyms/pxt-robotpu/raw/master/tutorials/JavaScripts/microbit-robot-pu-sonar-operator.hex
+ 1. **Download** the code to your Robot PU.
+ 2. **Tracking Test**: Hold your hand 15cm from PU's chest. He should say "Distance 15".
+ 3. **The Red Alert**: Move your hand very close (under 6cm). PU should turn up his volume and shout "Danger, stop!".
 
 **What can be done next?**
 

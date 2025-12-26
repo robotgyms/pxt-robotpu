@@ -168,6 +168,7 @@ Even though the grammar might be a little silly, it ensures that Robot PU has th
 
 ## 5. Testing
 Code: https://makecode.microbit.org/S81118-63767-88308-72596
+Download (.hex): https://github.com/robotgyms/pxt-robotpu/raw/master/tutorials/JavaScripts/microbit-robot-pu-pxt-billy-content.hex
 1. **Download** the code to your Robot PU.
 2. **Toggle Moods**: Press **Button B**. Does PU's face change? Does his voice sound different?
 3. **Generate Sentences**: Press **Button A**. Are the sentences longer than before? Does the voice match the mood you picked?

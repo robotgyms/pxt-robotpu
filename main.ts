@@ -144,6 +144,24 @@ namespace robotPu {
         ensureRobot().explore();
     }
 
+    //% blockId=robotpu_side_step block="side step %direction"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% direction.min=-1 (move left) direction.max=1 (move right) direction.defl=-1
+    //% weight=50 blockGap=8
+    export function sideStep(direction: number): number {
+        return ensureRobot().sideStep(direction);
+    }
+
+    //% blockId=robotpu_side_step_do block="side step %direction"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% direction.min=-1 direction.max=1 direction.defl=-1
+    //% weight=49 blockGap=8
+    export function sideStepDo(direction: number): void {
+        ensureRobot().sideStep(direction);
+    }
+
      //% blockId=robotpu_sonar_distance_cm block="sonar distance (cm)"
      //% subcategory="Sensors"
      //% group="Sensors"
@@ -224,12 +242,28 @@ namespace robotPu {
         ensureRobot().rest();
     }
 
+    //% blockId=robotpu_stand block="stand"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=41 blockGap=8
+    export function stand(): number {
+        return ensureRobot().stand();
+    }
+
+    //% blockId=robotpu_stand_do block="stand"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=40 blockGap=8
+    export function standDo(): void {
+        ensureRobot().stand();
+    }
+
     /** Speak text using Billy */
     //% blockId=robotpu_talk block="talk %text"
     //% text.shadow=text
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=41 blockGap=8
+    //% weight=39 blockGap=8
     export function talk(text: string): void {
         ensureRobot().talk(text);
     }
@@ -239,7 +273,7 @@ namespace robotPu {
     //% s.shadow=text
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=40
+    //% weight=38
     export function sing(s: string): void {
         ensureRobot().sing(s);
     }
