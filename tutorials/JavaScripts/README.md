@@ -29,15 +29,18 @@ These lessons are written for the **micro:bit MakeCode editor**:
   
 - **Observation (sensors / perception)**
   - `observation-pu.md`
-  
+ 
+- **Music analysis (beats / tempo) + music-reactive behaviors**
+  - `music-pu.md`
+ 
 - **Actions (asynchronous motion APIs, return codes, sequencing)**
   - `action-pu.md`
 
+- **Robot thinking (feedback loops / control)**
+  - `thinking-pu.md`
+
 - **Event loop + Observation → Thinking → Action (robot multitasking)**
   - `event-loop-pu.md`
-
-- **Music analysis (beats / tempo) + music-reactive behaviors**
-  - `music-pu.md`
 
 - **Autopilot navigation (sonar explore)**
   - `autopilot-pu.md`
@@ -63,7 +66,6 @@ The following files exist but are currently empty placeholders:
 - `dance-pu.md`
 - `emotion-pu.md`
 - `maze-pu.md`
-- `thinking-pu.md`
 
 ---
 
