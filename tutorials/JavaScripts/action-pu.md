@@ -81,8 +81,54 @@
  if (rc == 0) {
      // A completion boundary happened (a gait state finished)
  }
- basic.pause(5)
  ```
+ 
+ ---
+
+ ## 3.5 Example: call `walk()` 100 times (no return checking)
+
+ Sometimes you just want to “drive” the motion for a fixed amount of time and you do not care about counting steps.
+
+ This pattern ignores the return value and simply calls `walk(...)` repeatedly:
+
+ ```typescript
+ for (let i = 0; i < 100; i++) {
+     robotPu.walk(2, 0) // ignore rc
+ }
+ ```
+
+ ## 3.6 JavaScript “function pointers” (callbacks)
+ 
+ In JavaScript / TypeScript, you can store a function in a variable and pass it to another function. This is often called a **callback** (similar idea to a “function pointer” in C).
+ 
+ In this lesson we pass a function like `() => number` into helpers such as `doCompletions(...)`.
+ 
+ Example:
+ 
+ ```typescript
+ function myAction(): number {
+     return robotPu.walk(2, 0)
+ }
+ 
+ function do400Times(run: () => number): void {
+     let done = 0
+     while (done < 400) {
+         const rc = run()
+         done += 1
+     }
+ }
+ 
+ // Pass a function *reference* (do not call it here)
+ do400Times(myAction)
+ 
+ // Or pass an inline anonymous function (arrow function)
+ do400Times(() => robotPu.walk(2, 0))
+ ```
+ 
+ Key idea:
+ 
+ - `robotPu.walk(2, 0)` calls the function immediately and produces a `number`.
+ - `() => robotPu.walk(2, 0)` produces a function that we can call later, many times.
  
  ---
  
@@ -91,8 +137,8 @@
  The safest pattern is:
  
  - Call the action
- - If it returns `1`, wait a little and try again
- - When it returns `0`, treat that as “done enough” for your step counter
+ - If it returns `1`, it is still running (keep calling)
+ - When it returns `0`, treat that as a completion boundary for counting
  
  ### A. Wait until one completion event
  
@@ -101,7 +147,6 @@
      while (true) {
          const rc = run()
          if (rc == 0) return
-         basic.pause(5)
      }
  }
  ```
@@ -114,19 +159,14 @@
      while (done < completions) {
          const rc = run()
          if (rc == 0) done += 1
-         basic.pause(5)
      }
  }
  ```
  
  Notes:
  
- - `basic.pause(5)` prevents starving the CPU.
- - Robot PU balancing needs at least ~200Hz IMU/balance updates. `basic.pause(5)` = 5ms = **200Hz**, which keeps motion stable.
- - The micro:bit V2 motion sensor footprint supports either **NXP FXOS8700CQ** or **ST LSM303AGR** (detected at runtime by the DAL).
- - The **FXOS8700CQ** supports accelerometer ODR up to **800Hz** (and interleaved accel+mag up to **400Hz**), so a 200Hz control loop is well within the sensor’s capability.
- - In the micro:bit runtime, the accelerometer sampling period is configurable (e.g. `setPeriod(periodMs)`), so the *actual* sampling rate depends on configuration.
  - The meaning of a “completion” depends on the action (it is typically a gait/state boundary).
+ - For some gaits, one physical “step” is made of multiple internal states. If your gait uses **2 states per step**, then you will see `rc == 0` **twice per step**.
  
  ---
  
@@ -134,31 +174,31 @@
  
  Requirements:
  
- - walk forward for **3 steps** (count `return == 0` for **4 times**)
+ - walk forward for **3 steps** (if it is **2 states per step**, count `return == 0` for **6 times**)
  - side step left for **3 steps**
  - jump **1** time
  - stand
  
  ```typescript
- function doCompletions(run: () => number, completions: number): void {
-     let done = 0
-     while (done < completions) {
-         const rc = run()
-         if (rc == 0) done += 1
-         basic.pause(5)
-     }
+function doCompletions(run: () => number, completions: number): void {
+ let done = 0
+ while (done < completions) {
+  const rc = run()
+  if (rc == 0) done += 1
  }
- 
- // 1) Walk forward: 3 steps (count 0 four times)
- doCompletions(() => robotPu.walk(2, 0), 4)
- 
- // 2) Side step left: 3 steps
- // direction: negative = left, positive = right
- doCompletions(() => robotPu.sideStep(-1), 4)
- 
- // 3) Jump one time
- doCompletions(() => robotPu.jump(), 1)
- 
- // 4) Stand (return to neutral)
- doCompletions(() => robotPu.stand(), 1)
+}
+
+// 1) Walk forward: 3 steps
+// If your gait uses 2 states per step, count 0 six times
+doCompletions(() => robotPu.walk(2, 0), 6)
+
+// 2) Side step left: 3 steps
+// direction: negative = left, positive = right
+doCompletions(() => robotPu.sideStep(-0.2), 6)
+
+// 3) Jump one time
+doCompletions(() => robotPu.jump(), 4)
+
+// 4) Stand (return to neutral)
+doCompletions(() => robotPu.stand(), 1)
  ```
