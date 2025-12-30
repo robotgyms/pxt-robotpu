@@ -176,10 +176,7 @@ function track3 () {
     music.rest(music.beat(BeatFraction.Double))
     started = 0
 }
-// press button A to walk forward in circles
-input.onButtonPressed(Button.A, function () {
-    robotPu.changeChannel(1)
-})
+
 function track4 () {
     started = 1
     music.playTone(440, music.beat(BeatFraction.Half))
@@ -544,6 +541,10 @@ function track2 () {
 radio.onReceivedString(function (receivedString) {
     robotPu.runStringCommand(receivedString)
 })
+// press button A to walk forward in circles
+input.onButtonPressed(Button.A, function () {
+    robotPu.changeChannel(1)
+})
 // press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
     robotPu.changeChannel(-1)
@@ -571,7 +572,7 @@ let started = 0
 robotPu.greet()
 
 ```
-
+Example program can be downloaded from https://makecode.microbit.org/S24031-00421-18959-80697
 ## Technical explaination
 
 ### A. Why “channel % 4” works
