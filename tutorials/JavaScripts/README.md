@@ -27,13 +27,13 @@ These lessons are written for the **micro:bit MakeCode editor**:
 - **Motorization + I2C + servos (how Robot PU moves)**
   - `motorize-pu.md`
   
-- **Observation (sensors / perception)**
+- **Robot Observation (sensors / perception)**
   - `observation-pu.md`
  
 - **Music analysis (beats / tempo) + music-reactive behaviors**
   - `music-pu.md`
  
-- **Actions (asynchronous motion APIs, return codes, sequencing)**
+- **Robot Actions (asynchronous motion APIs, return codes, sequencing)**
   - `action-pu.md`
 
 - **Robot thinking (feedback loops / control)**

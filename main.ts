@@ -355,7 +355,7 @@ namespace robotPu {
     //% delta.defl=1
     //% weight=88
     export function changeChannel(delta: number): void {
-        ensureRobot().setGroupId(delta);
+        ensureRobot().incrGroupId(delta);
     }
 
 }
