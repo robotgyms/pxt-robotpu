@@ -1241,7 +1241,7 @@ class RobotPu {
      * @param s The phonetic or musical string to be synthesized.
      */
     public sing(s: string): void {
-        billy.singShim(s)
+        music.play(music.stringPlayable(s, 120), music.PlaybackMode.InBackground)
     }
     /**
      * Makes the robot greet using text-to-speech.
