@@ -31,10 +31,10 @@
  - **Discrete buttons** from:
    - micro:bit buttons A/B/AB
    - external buttons wired to P8/P13/P14/P15/P16 using `pins.onPulsed(...)`
+
+ ## Implementation
  
-## Implementation
- 
-Flash this program to the **controller micro:bit** (not Robot PU).
+ Flash this program to the **controller micro:bit** (not Robot PU).
 
 ```typescript
 pins.onPulsed(DigitalPin.P16, PulseValue.High, function () {
@@ -168,4 +168,85 @@ basic.forever(function () {
     basic.pause(20)
 })
 
-```
+## Technical explanation
+
+### A. What the controller sends (message protocol)
+
+This gamepad controller uses a small “protocol” based on radio keys:
+
+- `#puturn` (number): left/right steering input
+- `#puspeed` (number): forward/back speed input
+- `#pupitch` (number): current pitch angle of the controller
+- `#puroll` (number): current roll angle of the controller
+- `#puA`, `#puB`, `#puAB` (number): button events from A/B/AB
+- `#pulogo` (number): logo pressed (fallback case)
+- `#pun<name>` (string): controller name broadcast
+- `#put<phrase>` (string): a phrase chosen by tilting
+
+On the Robot PU program, you typically listen with:
+
+- `radio.onReceivedValue((name, value) => robotPu.runKeyValueCommand(name, value))`
+- `radio.onReceivedString((s) => robotPu.runStringCommand(s))`
+
+### B. Continuous steering (20ms loop)
+
+The `basic.forever(...)` loop runs every 20ms, so the controller transmits updates at about **50Hz**.
+
+That’s fast enough to feel responsive, while still leaving CPU time for radio and UI.
+
+### C. Analog input scaling
+
+The code reads:
+
+- P2 → `x` (turn)
+- P1 → `y` (speed)
+
+and maps the raw 0–1023 ADC range into a roughly -1..+1 range using:
+
+- `(512 - read) / 512`
+
+If your joystick is centered at a different value, you can calibrate by changing `512` (but this lesson keeps your code as-is).
+
+### D. External buttons on pins
+
+The pin buttons are set to `PullUp`, so they idle HIGH.
+
+When pressed (typically wired to GND), they produce an edge/pulse that triggers `pins.onPulsed(...)` and sends a corresponding `#puB` value.
+
+### E. Tilt-to-phrase grid
+
+Pressing the logo turns pitch/roll into a row/column index into `sentences`.
+
+If the index is valid, it sends:
+
+- `#put` + `my_word`
+
+Otherwise it sends a generic `#pulogo`.
+
+## Testing
+
+### A. Controller sanity check
+
+- Flash this file to the controller micro:bit.
+- Press A/B and confirm the displayed channel changes.
+- Press AB and confirm it shows `name` and the channel.
+
+### B. Radio output check (receiver micro:bit)
+
+- Flash a simple receiver that prints received values.
+- Confirm you see `#puturn` and `#puspeed` updating repeatedly.
+
+### C. Robot PU integration
+
+- Set Robot PU to the same radio group as the controller.
+- Move the analog controls and verify Robot PU turns and changes speed.
+- Press pin buttons and confirm Robot PU reacts (depending on how you map `#puB` values on the robot side).
+
+## Next steps
+
+- **Add a dead-zone**
+  - Ignore small `x/y` values near 0 to prevent drift.
+- **Add a safety timeout on Robot PU**
+  - If no `#puturn/#puspeed` message arrives for ~500ms, stop.
+- **Add a pairing indicator**
+  - Use `#puack` to show the controller is connected to the robot.
