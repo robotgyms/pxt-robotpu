@@ -78,6 +78,30 @@ namespace robotPu {
         ensureRobot().beaconTimeout = 200000;
     }
 
+    //% blockId=robotpu_left_eye_bright block="set left eye brightness %brightness"
+    //% weight=53 blockGap=8
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% brightness.min=0 brightness.max=1 brightness.defl=1
+    export function leftEyeBright(brightness: number): void {
+        const r = ensureRobot();
+        brightness = Math.min(1, Math.max(0, brightness));
+        const b = Math.min(1023, Math.max(0, Math.round(brightness * 1023)));
+        r.wk.leftEyeBright(b);
+    }
+
+    //% blockId=robotpu_right_eye_bright block="set right eye brightness %brightness"
+    //% weight=52 blockGap=8
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% brightness.min=0 brightness.max=1 brightness.defl=1
+    export function rightEyeBright(brightness: number): void {
+        const r = ensureRobot();
+        brightness = Math.min(1, Math.max(0, brightness));
+        const b = Math.min(1023, Math.max(0, Math.round(brightness * 1023)));
+        r.wk.rightEyeBright(b);
+    }
+
     /** Set a Robot PU servo/joint angle (0-180). */
     //% blockId=robotpu_servo block="move %joint servo to %angle"
     //% subcategory="Actuators"

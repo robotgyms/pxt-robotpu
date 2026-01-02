@@ -518,7 +518,7 @@ class WK {
             if (ts_diff > this.blinkInterval) {
                 this.eyesCtl(0);
             } else {
-                let brightness = alert_l * 102;
+                let brightness = Math.min(1023, alert_l * 102);
                 this.blinkG = alert_l * 400;
                 this.leftEyeBright(brightness);
                 this.rightEyeBright(brightness);
@@ -1462,7 +1462,8 @@ class RobotPu {
 
         // 4. Process #puhi: Greeting
         else if (s.substr(0, 5) == "#puhi") {
-            this.talk("My friend " + s.substr(5) + " is here");
+            this.talk("My friend " + s.substr(5) + " is here")
+            this.sendStatusCode("ACK")
         }
 
         // 5. Process #pun: Name/Serial Update
