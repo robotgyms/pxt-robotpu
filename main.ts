@@ -82,7 +82,7 @@ namespace robotPu {
     //% weight=53 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
-    //% brightness.min=0 brightness.max=1 brightness.defl=1
+    //% brightness.min=0 brightness.max=1 brightness.defl=0.05
     export function leftEyeBright(brightness: number): void {
         const r = ensureRobot();
         brightness = Math.min(1, Math.max(0, brightness));
@@ -94,7 +94,7 @@ namespace robotPu {
     //% weight=52 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
-    //% brightness.min=0 brightness.max=1 brightness.defl=1
+    //% brightness.min=0 brightness.max=1 brightness.defl=0.05
     export function rightEyeBright(brightness: number): void {
         const r = ensureRobot();
         brightness = Math.min(1, Math.max(0, brightness));
@@ -134,7 +134,7 @@ namespace robotPu {
     //% group="Actions"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
-    //% weight=53 blockGap=8
+    //% weight=55 blockGap=8
     export function walk(speed: number, turn: number): number {
         return ensureRobot().walk(speed, turn);
     }
@@ -145,7 +145,7 @@ namespace robotPu {
     //% group="Actions"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
-    //% weight=52 blockGap=8
+    //% weight=54 blockGap=8
     export function walkDo(speed: number, turn: number): void {
         ensureRobot().walk(speed, turn);
     }
