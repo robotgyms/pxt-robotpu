@@ -45,6 +45,9 @@ These lessons are written for the **micro:bit MakeCode editor**:
 - **Autopilot navigation (sonar explore)**
   - `autopilot-pu.md`
 
+- **Remote control (radio gamepad / message protocol)**
+  - `remote-control.md`
+
 ### Projects
 
 - **Submarine Sonar**

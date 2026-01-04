@@ -81,7 +81,7 @@ input.onButtonPressed(Button.A, function () {
         channel = 0
     }
     radio.setGroup(channel)
-    basic.showNumber(channel - hidden)
+    basic.showNumber(channel)
 })
 pins.onPulsed(DigitalPin.P15, PulseValue.High, function () {
     radio.sendValue("#puB", 3)
@@ -91,7 +91,7 @@ input.onButtonPressed(Button.AB, function () {
     radio.sendValue("#puAB", 1)
     radio.sendString("#pun" + name)
     basic.showString(name)
-    basic.showNumber(channel - hidden)
+    basic.showNumber(channel)
 })
 radio.onReceivedString(function (receivedString) {
     if (receivedString == "#puack") {
@@ -105,16 +105,15 @@ input.onButtonPressed(Button.B, function () {
         channel = 255
     }
     radio.setGroup(channel)
-    basic.showNumber(channel - hidden)
+    basic.showNumber(channel)
 })
 pins.onPulsed(DigitalPin.P8, PulseValue.High, function () {
     radio.sendValue("#puB", 0)
     cmd_count += 1
 })
 function init_radio () {
-    hidden = 160
     radio.setGroup(channel)
-    basic.showNumber(channel - hidden)
+    basic.showNumber(channel)
 }
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     r = Math.round((input.rotation(Rotation.Pitch) + 40) / 20)
@@ -151,7 +150,6 @@ let c = 0
 let r = 0
 let cmd_count = 0
 let ack_count = 0
-let hidden = 0
 let sentences: string[][] = []
 let channel = 0
 let name = ""

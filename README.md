@@ -34,7 +34,7 @@ Purchase Links:
 
 The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
 
-- https://makecode.microbit.org/S34024-98531-58275-59424
+- https://makecode.microbit.org/_JbygU12aCAsU
 
 ## Activities and Use Cases
 
