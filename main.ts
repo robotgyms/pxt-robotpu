@@ -39,6 +39,22 @@ namespace robotPu {
         HeadPitch = 5
     }
 
+    //% blockId=robotpu_mode_var block="mode"
+    //% subcategory="Variables"
+    //% group="Variables"
+    //% weight=95
+    export function mode(): Mode {
+        return ensureRobot().gst as Mode;
+    }
+
+    //% blockId=robotpu_set_mode_var block="set mode to %mode"
+    //% subcategory="Variables"
+    //% group="Variables"
+    //% weight=94
+    export function setModeVar(mode: Mode): void {
+        setMode(mode);
+    }
+
     function ensureRobot(): RobotPu {
         if (!robot) {
             const sn = "pu-" + control.deviceSerialNumber();
@@ -52,7 +68,7 @@ namespace robotPu {
                     robot.stateMachine();   // Executes current behavior logic
                     // Use a slightly larger pause to prevent CPU starvation
                     // 20ms is standard for robotics to maintain 50Hz responsiveness
-                    // but robot PU need 200Hz to maintain smooth movement
+                    // but robot PU need 200Hz to maintain 200Hz responsiveness
                     basic.pause(5);
                 }
             });
