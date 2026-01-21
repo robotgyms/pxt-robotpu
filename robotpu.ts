@@ -713,7 +713,8 @@ class RobotPu {
             }
 
             // Otherwise, stay in idle stance
-            return this.rest();
+            return 0;
+            //return this.rest();
         } else {
             // 3. If there is speed, perform the balanced walk
             return this.walk(this.walkSpeed, this.walkDirection);
