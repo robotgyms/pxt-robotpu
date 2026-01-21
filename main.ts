@@ -1,10 +1,12 @@
 // MakeCode blocks wrapper for RobotPu
 //% weight=50 color=#e7660b icon="\uf2bd"
-//block="Robot PU"
+//% block="Robot PU"
 //% groups='["Variables", "Setup", "Sensors", "Actuators", "Actions", "Remote Control"]'
 namespace robotPu {
     let robot: RobotPu;
 
+    //% subcategory="Variables"
+    //% group="Variables"
     export enum Mode {
         //% block="rest"
         Rest = 0,
@@ -17,7 +19,9 @@ namespace robotPu {
         //% block="kick"
         Kick = 4,
         //% block="walk (remote control)"
-        Walk = 5
+        Walk = 5,
+        // other
+        Others = 6
     }
 
     export enum ServoJoint {
