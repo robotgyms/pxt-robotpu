@@ -172,7 +172,11 @@ namespace robotPu {
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=54 blockGap=8
     export function walkDo(speed: number, turn: number): void {
-        ensureRobot().walk(speed, turn);
+        const r = ensureRobot();
+        r.gst = Mode.Others;
+        r.walkSpeed = speed;
+        r.walkDirection = turn;
+        r.walk(speed, turn);
     }
 
     /** Explore autonomously using sonar */
