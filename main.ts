@@ -156,7 +156,11 @@ namespace robotPu {
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=55 blockGap=8
     export function walk(speed: number, turn: number): number {
-        return ensureRobot().walk(speed, turn);
+        const r = ensureRobot();
+        r.gst = Mode.Others
+        r.walkSpeed = speed;
+        r.walkDirection = turn;
+        return r.walk(speed, turn);
     }
 
     /** Walk with the given speed and turn bias. Statement version (no return). */
