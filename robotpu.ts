@@ -1431,7 +1431,6 @@ class RobotPu {
 
     public runKeyValueCMD(key: string, v: number) {
         this.lastCmdTS = control.millis();
-        this.beaconTimeout = 2000;
 
         // 3. Look up the function in the dictionary
         let action = this.cmdFuncDict[key];

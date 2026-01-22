@@ -63,7 +63,6 @@ namespace robotPu {
             control.inBackground(function () {
                 // add background task to update states and execute behavior logic
                 while (true) {
-
                     robot.updateStates();   // Checks sensors and falls
                     robot.stateMachine();   // Executes current behavior logic
                     // Use a slightly larger pause to prevent CPU starvation
@@ -73,6 +72,8 @@ namespace robotPu {
                 }
             });
         }
+        // set last command timestamp to prevent timeout reset
+        robot.lastCmdTS = control.millis();
         return robot;
     }
 
@@ -93,9 +94,6 @@ namespace robotPu {
     export function setMode(mode: Mode): void {
         const r = ensureRobot();
         r.gst = mode as number;
-        r.lastCmdTS = control.millis();
-        // sticky mode with large timeout
-        ensureRobot().beaconTimeout = 200000;
     }
 
     //% blockId=robotpu_left_eye_bright block="set left eye brightness %brightness"
@@ -161,7 +159,6 @@ namespace robotPu {
         r.walkSpeed = speed;
         r.walkDirection = turn;
         return r.walk(speed, turn);
-        //return ensureRobot().walk(speed, turn);
     }
 
     /** Walk with the given speed and turn bias. Statement version (no return). */
