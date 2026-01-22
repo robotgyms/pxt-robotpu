@@ -1188,7 +1188,7 @@ class RobotPu {
  * Puts the robot into a low-power standby mode.
  * Ported from sleep() in Python.
  */
-    public sleep_mode(): void {
+    public sleepMode(): void {
         // 1. Refresh IMU data and return to a neutral standing pose
         this.balanceParam();
         this.stand();
@@ -1208,10 +1208,6 @@ class RobotPu {
         }
     }
 
-    public sleepMode(): void {
-        this.sleep_mode();
-    }
-
     /**
      * Main state machine for robot behavior control.
      * Processes the current state (gst) and executes the corresponding behavior.
@@ -1220,12 +1216,8 @@ class RobotPu {
         // 1. Execute the current state's behavior
         // Python: self.stateFuncDict.get(self.gst, self.sleep)()
         let behavior = this.stateFuncDict[this.gst];
-
         if (behavior) {
             behavior();
-        } else {
-            // Fallback to sleep if state index is not found
-            this.sleepMode();
         }
 
         // 2. Handle blinking and state tracking
