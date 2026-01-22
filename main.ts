@@ -148,7 +148,7 @@ namespace robotPu {
 
     function getRobotAPI(): RobotPu {
         const r = ensureRobot();
-        r.gst = Mode.Others;
+        r.gst = Mode.API;
         return r;
     }
 
