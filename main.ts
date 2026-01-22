@@ -79,7 +79,7 @@ namespace robotPu {
 
     /** Robot PU introduce itself  */
     //% blockId=robotpu_greet block="greet"
-    //% weight=55 blockGap=8
+    //% weight=58 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
     export function greet(): void {
@@ -88,7 +88,7 @@ namespace robotPu {
 
     /** Set current robot behavior mode (state machine). */
     //% blockId=robotpu_setMode block="set mode %mode"
-    //% weight=54 blockGap=8
+    //% weight=59 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
     export function setMode(mode: Mode): void {
@@ -158,7 +158,7 @@ namespace robotPu {
     //% group="Actions"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
-    //% weight=55 blockGap=8
+    //% weight=57 blockGap=8
     export function walk(speed: number, turn: number): number {
         const r = getRobotAPI();
         r.walkSpeed = speed;
@@ -172,7 +172,7 @@ namespace robotPu {
     //% group="Actions"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
-    //% weight=54 blockGap=8
+    //% weight=57 blockGap=8
     export function walkDo(speed: number, turn: number): void {
         const r = getRobotAPI();
         r.walkSpeed = speed;
@@ -184,7 +184,7 @@ namespace robotPu {
     //% blockId=robotpu_explore block="explore"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=51 blockGap=8
+    //% weight=56 blockGap=8
     export function explore(): number {
         return getRobotAPI().explore();
     }
@@ -193,7 +193,7 @@ namespace robotPu {
     //% blockId=robotpu_explore_do block="explore"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=50 blockGap=8
+    //% weight=56 blockGap=8
     export function exploreDo(): void {
         getRobotAPI().explore();
     }
@@ -211,7 +211,7 @@ namespace robotPu {
     //% subcategory="Actions"
     //% group="Actions"
     //% direction.min=-1 direction.max=1 direction.defl=-1
-    //% weight=49 blockGap=8
+    //% weight=50 blockGap=8
     export function sideStepDo(direction: number): void {
         getRobotAPI().sideStep(direction);
     }
@@ -228,7 +228,7 @@ namespace robotPu {
     //% blockId=robotpu_dance block="dance"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=49 blockGap=8
+    //% weight=55 blockGap=8
     export function dance(): number {
         return getRobotAPI().dance();
     }
@@ -237,7 +237,7 @@ namespace robotPu {
     //% blockId=robotpu_dance_do block="dance"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=48 blockGap=8
+    //% weight=55 blockGap=8
     export function danceDo(): void {
         getRobotAPI().dance();
     }
@@ -246,7 +246,7 @@ namespace robotPu {
     //% blockId=robotpu_kick block="kick"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=47 blockGap=8
+    //% weight=54 blockGap=8
     export function kick(): number {
         return getRobotAPI().kick();
     }
@@ -255,7 +255,7 @@ namespace robotPu {
     //% blockId=robotpu_kick_do block="kick"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=46 blockGap=8
+    //% weight=54 blockGap=8
     export function kickDo(): void {
         getRobotAPI().kick();
     }
@@ -264,7 +264,7 @@ namespace robotPu {
     //% blockId=robotpu_jump block="jump"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=45 blockGap=8
+    //% weight=53 blockGap=8
     export function jump(): number {
         return getRobotAPI().jump();
     }
@@ -273,7 +273,7 @@ namespace robotPu {
     //% blockId=robotpu_jump_do block="jump"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=44 blockGap=8
+    //% weight=53 blockGap=8
     export function jumpDo(): void {
         getRobotAPI().jump();
     }
@@ -282,7 +282,7 @@ namespace robotPu {
     //% blockId=robotpu_rest block="rest"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=43 blockGap=8
+    //% weight=52 blockGap=8
     export function rest(): number {
         return getRobotAPI().rest();
     }
@@ -291,7 +291,7 @@ namespace robotPu {
     //% blockId=robotpu_rest_do block="rest"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=42 blockGap=8
+    //% weight=52 blockGap=8
     export function restDo(): void {
         getRobotAPI().rest();
     }
@@ -299,7 +299,7 @@ namespace robotPu {
     //% blockId=robotpu_stand block="stand"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=41 blockGap=8
+    //% weight=51 blockGap=8
     export function stand(): number {
         return getRobotAPI().stand();
     }
@@ -307,7 +307,7 @@ namespace robotPu {
     //% blockId=robotpu_stand_do block="stand"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=40 blockGap=8
+    //% weight=51 blockGap=8
     export function standDo(): void {
         getRobotAPI().stand();
     }
