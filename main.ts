@@ -21,7 +21,7 @@ namespace robotPu {
         //% block="walk (remote control)"
         Walk = 5,
         // other
-        Others = 6
+        API = 6
     }
 
     export enum ServoJoint {
@@ -127,7 +127,7 @@ namespace robotPu {
     //% angle.min=0 angle.max=180 angle.defl=90
     //% weight=65 blockGap=8
     export function servo(joint: ServoJoint, angle: number): void {
-        const r = ensureRobot();
+        const r = getRobotAPI();
         angle = Math.min(180, Math.max(0, Math.floor(angle)));
         r.wk.servo(joint as number, angle);
     }
@@ -140,10 +140,16 @@ namespace robotPu {
     //% stepSize.min=1 stepSize.max=20 stepSize.defl=2
     //% weight=64 blockGap=8
     export function servoStep(joint: ServoJoint, target: number, stepSize: number): void {
-        const r = ensureRobot();
+        const r = getRobotAPI();
         target = Math.min(180, Math.max(0, Math.floor(target)));
         stepSize = Math.min(20, Math.max(1, Math.floor(stepSize)));
         r.wk.servoStep(target, stepSize, joint as number, r.pr);
+    }
+
+    function getRobotAPI(): RobotPu {
+        const r = ensureRobot();
+        r.gst = Mode.Others;
+        return r;
     }
 
     /** Walk with speed (-5 to 5) and turn bias (-1 to 1). Positive speed is forward. Negative turn is left, 0 is straight, Positive is right. */
@@ -154,8 +160,7 @@ namespace robotPu {
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=55 blockGap=8
     export function walk(speed: number, turn: number): number {
-        const r = ensureRobot();
-        r.gst = Mode.Others;
+        const r = getRobotAPI();
         r.walkSpeed = speed;
         r.walkDirection = turn;
         return r.walk(speed, turn);
@@ -169,8 +174,7 @@ namespace robotPu {
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=54 blockGap=8
     export function walkDo(speed: number, turn: number): void {
-        const r = ensureRobot();
-        r.gst = Mode.Others;
+        const r = getRobotAPI();
         r.walkSpeed = speed;
         r.walkDirection = turn;
         r.walk(speed, turn);
@@ -182,7 +186,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=51 blockGap=8
     export function explore(): number {
-        return ensureRobot().explore();
+        return getRobotAPI().explore();
     }
 
     /** Explore the environment using sonar. Statement version (no return). */
@@ -191,7 +195,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=50 blockGap=8
     export function exploreDo(): void {
-        ensureRobot().explore();
+        getRobotAPI().explore();
     }
 
     //% blockId=robotpu_side_step block="side step %direction"
@@ -200,7 +204,7 @@ namespace robotPu {
     //% direction.min=-1 (move left) direction.max=1 (move right) direction.defl=-1
     //% weight=50 blockGap=8
     export function sideStep(direction: number): number {
-        return ensureRobot().sideStep(direction);
+        return getRobotAPI().sideStep(direction);
     }
 
     //% blockId=robotpu_side_step_do block="side step %direction"
@@ -209,7 +213,7 @@ namespace robotPu {
     //% direction.min=-1 direction.max=1 direction.defl=-1
     //% weight=49 blockGap=8
     export function sideStepDo(direction: number): void {
-        ensureRobot().sideStep(direction);
+        getRobotAPI().sideStep(direction);
     }
 
      //% blockId=robotpu_sonar_distance_cm block="sonar distance (cm)"
@@ -226,7 +230,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=49 blockGap=8
     export function dance(): number {
-        return ensureRobot().dance();
+        return getRobotAPI().dance();
     }
 
     /** Dance to music. Statement version (no return). */
@@ -235,7 +239,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=48 blockGap=8
     export function danceDo(): void {
-        ensureRobot().dance();
+        getRobotAPI().dance();
     }
 
     /** Kick with a quick forward motion */
@@ -244,7 +248,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=47 blockGap=8
     export function kick(): number {
-        return ensureRobot().kick();
+        return getRobotAPI().kick();
     }
 
     /** Kick action. Statement version (no return). */
@@ -253,7 +257,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=46 blockGap=8
     export function kickDo(): void {
-        ensureRobot().kick();
+        getRobotAPI().kick();
     }
 
     /** Jump action */
@@ -262,7 +266,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=45 blockGap=8
     export function jump(): number {
-        return ensureRobot().jump();
+        return getRobotAPI().jump();
     }
 
     /** Jump action. Statement version (no return). */
@@ -271,7 +275,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=44 blockGap=8
     export function jumpDo(): void {
-        ensureRobot().jump();
+        getRobotAPI().jump();
     }
 
     /** Rest in balanced idle */
@@ -280,7 +284,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=43 blockGap=8
     export function rest(): number {
-        return ensureRobot().rest();
+        return getRobotAPI().rest();
     }
 
     /** Move to balanced idle/rest. Statement version (no return). */
@@ -289,7 +293,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=42 blockGap=8
     export function restDo(): void {
-        ensureRobot().rest();
+        getRobotAPI().rest();
     }
 
     //% blockId=robotpu_stand block="stand"
@@ -297,7 +301,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=41 blockGap=8
     export function stand(): number {
-        return ensureRobot().stand();
+        return getRobotAPI().stand();
     }
 
     //% blockId=robotpu_stand_do block="stand"
@@ -305,7 +309,7 @@ namespace robotPu {
     //% group="Actions"
     //% weight=40 blockGap=8
     export function standDo(): void {
-        ensureRobot().stand();
+        getRobotAPI().stand();
     }
 
     /** Speak text using Billy */
