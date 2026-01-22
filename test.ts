@@ -34,7 +34,7 @@ radio.onReceivedString(function (receivedString) {
 input.onButtonPressed(Button.B, function () {
     robotPu.talk("Move backward!")
     for (let index = 0; index < 400; index++) {
-        robotPu.walkDo(2, -0.5)
+        robotPu.walkDo(-2, -0.5)
     }
 })
 input.onGesture(Gesture.Shake, function () {
