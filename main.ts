@@ -157,7 +157,7 @@ namespace robotPu {
     //% weight=55 blockGap=8
     export function walk(speed: number, turn: number): number {
         const r = ensureRobot();
-        r.gst = Mode.Others
+        r.gst = Mode.Others;
         r.walkSpeed = speed;
         r.walkDirection = turn;
         return r.walk(speed, turn);

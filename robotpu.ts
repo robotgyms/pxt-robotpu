@@ -577,8 +577,8 @@ class RobotPu {
     public lastCmdTS: number;
     private fwdSpeed: number = 4;
     private bwdSpeed: number = -3;
-    private walkSpeed: number = 0;
-    private walkDirection: number = 0;
+    public walkSpeed: number = 0;
+    public walkDirection: number = 0;
     private headPitchBias: number = 0;
     private headYawBias: number = 0;
     private alertLevel: number = 10;
