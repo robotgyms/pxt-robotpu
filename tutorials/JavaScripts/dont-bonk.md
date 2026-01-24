@@ -255,6 +255,65 @@ if (filteredCm <= HARD_STOP_CM) {
 speed = clamp(speed, 0, 2.5)
 ```
 
+### 8.4 Remote Commands + Sonar “Beep & Walk” Demo
+
+This example does two things at the same time:
+
+1. It listens for **radio commands** from another micro:bit (or controller program) and passes them into Robot PU’s command runner.
+2. It uses the **sonar distance** to generate an audio “parking sensor” effect (closer wall = higher pitch + faster beeps), while also mapping distance into a walking speed.
+
+```typescript
+radio.onReceivedString(function (receivedString) {
+    robotPu.runStringCommand(receivedString)
+})
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+let pulseDelay = 0
+let pitch = 0
+let distance = 0
+robotPu.setChannel(166)
+robotPu.setWalkSpeedRange(-3, 4)
+basic.forever(function () {
+    distance = robotPu.sonarDistanceCm()
+    if (distance > 2 && distance < 100) {
+        // Map 2cm->2000Hz and 100cm->200Hz
+        pitch = Math.map(distance, 2, 100, 2000, 200)
+        // Map 2cm->100ms and 100cm->800ms
+        pulseDelay = Math.map(distance, 2, 100, 100, 800)
+        music.setVolume(255)
+        music.playTone(pitch, 50)
+        basic.pause(pulseDelay)
+    } else {
+        basic.pause(500)
+    }
+    robotPu.walkDo(Math.map(distance, 8, 20, 0, 4), 0)
+})
+```
+
+What each part is doing:
+
+1. `radio.onReceivedString(...)` and `radio.onReceivedValue(...)`
+   - Any incoming radio message is forwarded into `robotPu.runStringCommand(...)` or `robotPu.runKeyValueCommand(...)`.
+   - This lets a second micro:bit send higher-level “commands” (strings or named values) while this program is also running its autonomous sonar logic.
+2. `robotPu.setChannel(166)`
+   - Sets the radio group/channel so only devices on the same channel talk to each other.
+3. `robotPu.setWalkSpeedRange(-3, 4)`
+   - Defines the allowed walking speed range. The negative minimum is important if you want to ever walk backward.
+4. Sonar “beep” block
+   - When distance is between `2` and `100` cm, the code maps distance into:
+     - `pitch`: closer = higher frequency.
+     - `pulseDelay`: closer = shorter delay (faster beeps).
+   - Outside that range, it waits longer to avoid annoying noise when the reading is out-of-range.
+5. `robotPu.walkDo(Math.map(distance, 8, 20, 0, 4), 0)`
+   - Converts distance into forward walking speed: when the wall is close, speed approaches `0`; when farther, speed approaches `4`.
+
+To allow PU to **back up** when it gets too close, tweak the mapping so very small distances produce a **negative speed**:
+
+```typescript
+robotPu.walkDo(Math.map(distance, 7, 20, -1, 4), 0)
+```
+
 ---
 
 *For more information, visit [robotgyms.com/pu](https://robotgyms.com/pu).*
