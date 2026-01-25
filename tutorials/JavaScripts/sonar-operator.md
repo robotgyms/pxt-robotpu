@@ -187,4 +187,100 @@ basic.forever(function () {
 
 ### 🚀 What's Next?
 
+### 🧠 Advanced Threat Tracking: Speed + Collision Time (Torpedo Warning)
+
+Real sonar operators don’t react to distance alone. They also care about:
+
+1. **Closing speed**: Is the object moving toward you quickly?
+2. **Time-to-collision (TTC)**: If it keeps closing at this speed, how many seconds until contact?
+
+Below is a more complex demo that estimates target speed by comparing the current sonar reading to the previous one, then computes an estimated TTC. If the target is **close** *and* the closing speed is **high**, it will:
+
+1. Send a radio message: `"torpedo warning"`
+2. Speak the estimated contact time: `"Contact in X seconds"`
+
+Replace your current `basic.forever` loop with this version:
+
+```typescript
+// Optional: if you want to broadcast the warning to another micro:bit
+radio.setGroup(166)
+
+let lastDistance = Math.round(sonarDevice.distance_cm())
+let lastMs = control.millis()
+
+basic.forever(function () {
+    const nowMs = control.millis()
+    const distance = Math.round(sonarDevice.distance_cm())
+
+    // dt in seconds (avoid divide-by-zero)
+    const dt = Math.max(0.05, (nowMs - lastMs) / 1000)
+
+    // Closing speed in cm/s
+    // Positive = approaching (distance getting smaller)
+    const closingSpeed = (lastDistance - distance) / dt
+
+    // --- VISUAL RADAR ---
+    led.plotBarGraph(distance, 50)
+
+    // --- SONAR PING LOGIC ---
+    const pitch = Math.map(distance, 2, 100, 2000, 200)
+    const pulseDelay = Math.map(distance, 2, 100, 100, 800)
+    music.playTone(pitch, 50)
+    basic.pause(pulseDelay)
+
+    // --- COMPLEX LOGIC CASES ---
+    // Threat thresholds (tune these!)
+    const CLOSE_CM = 18
+    const FAST_CM_PER_S = 25
+
+    // Estimate time-to-collision (seconds)
+    // Only meaningful when the target is approaching
+    let ttc = 999
+    if (closingSpeed > 1) {
+        ttc = distance / closingSpeed
+    }
+
+    // CASE A: TORPEDO WARNING (close + fast approaching)
+    if (distance > 0 && distance <= CLOSE_CM && closingSpeed >= FAST_CM_PER_S) {
+        music.setVolume(255)
+        basic.showIcon(IconNames.Skull)
+        radio.sendString("torpedo warning")
+        billy.say("Torpedo warning")
+        billy.say("Contact in " + Math.round(ttc) + " seconds")
+        music.playMelody("C5 P C5 P C5 P C5 P", 500)
+        basic.pause(200)
+    }
+    // CASE B: DANGER ZONE (close but not fast)
+    else if (distance > 0 && distance < 6) {
+        music.setVolume(255)
+        basic.showIcon(IconNames.Skull)
+        billy.say("Danger, stop!")
+        basic.pause(200)
+    }
+    // CASE C: TRACKING REPORT (approaching target)
+    else if (distance >= 6 && distance < 30 && closingSpeed > 5) {
+        music.setVolume(220)
+        basic.showIcon(IconNames.Target)
+        billy.say("Closing")
+        billy.say("Time " + Math.round(ttc) + " seconds")
+        basic.pause(300)
+    }
+    // CASE D: CLEAR SKIES
+    else {
+        music.setVolume(150)
+        // No icon here so the Bar Graph stays visible
+        basic.pause(200)
+    }
+
+    lastDistance = distance
+    lastMs = nowMs
+})
+```
+
+Key ideas to notice:
+
+1. **Speed comes from differences**: `closingSpeed = (lastDistance - distance) / dt`
+2. **Time-to-collision is a prediction**: `ttc = distance / closingSpeed`
+3. **Complex logic** combines multiple conditions (distance + speed) to decide which warning to trigger.
+
 

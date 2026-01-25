@@ -287,8 +287,12 @@ basic.forever(function () {
     } else {
         basic.pause(500)
     }
-    robotPu.walkDo(Math.map(distance, 8, 20, 0, 4), 0)
 })
+basic.forever(function () {
+    robotPu.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    basic.pause(10)
+})
+
 ```
 
 What each part is doing:
