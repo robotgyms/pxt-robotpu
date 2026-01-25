@@ -178,6 +178,87 @@ Download (.hex): https://github.com/robotgyms/pxt-robotpu/raw/master/tutorials/J
 
 ## 6. What Can Be Done Next?
 
+### Tweaking the pxt-billy Voice (Pitch & Speed)
+
+To tweak the voice of the `pxt-billy` extension for the BBC micro:bit, you primarily adjust two parameters in the config API: **Pitch** (the frequency of the voice) and **Speed** (how fast the words are spoken).
+
+The "Billy" extension uses an 8-bit style synthesis. Generally, higher pitches sound younger/feminine, while lower pitches sound older/masculine.
+
+### Voice Configuration Guide
+
+| Age Group | Target Voice | Pitch | Speed | Why these settings? |
+| --- | --- | --- | --- | --- |
+| Toddler | High-pitched/Squeaky | 200–255 | 80 | Max pitch creates a tiny, cartoonish feel; slower speed mimics early speech. |
+| 10yo Boy | Pre-pubescent | 160 | 100 | High pitch, but lower than a toddler. Standard speed for clarity. |
+| 10yo Girl | Bright/Light | 180 | 110 | Slightly higher pitch and faster tempo than a boy of the same age. |
+| Teenager | Fast/Energetic | 140 | 150 | Mid-range pitch but very high speed to mimic fast-talking teens. |
+| Young Adult | Clear/Balanced | 100–120 | 110 | Standard "default" settings; clear and modern-sounding. |
+| Middle Age | Deep/Settled | 80 | 95 | Lower pitch creates a more "authoritative" or mature tone. |
+| Old Person | Raspy/Slow | 60 | 70 | Very low pitch and slow speed creates the effect of a weathered voice. |
+
+### How to apply this in MakeCode
+
+In the JavaScript/Python editor, your configuration block would look like this (using the "Middle Age" example):
+
+```typescript
+// Middle Age Voice Example
+billy.configure(80, 95, 128, 0)
+billy.say("Hello, how are you today?")
+```
+
+Note: The `configure` function usually takes four arguments: (`pitch`, `speed`, `mouth`, `throat`). While Pitch and Speed are the most impactful, you can slightly increase the Throat value (the 4th parameter) to `140+` for older voices to make them sound "grittier."
+
+```typescript
+radio.onReceivedString(function (receivedString) {
+    robotPu.runStringCommand(receivedString)
+})
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+let pulseDelay = 0
+let pitch = 0
+let distance = 0
+robotPu.setChannel(166)
+billy.configureVoice(
+80,
+95,
+128,
+0
+)
+billy.say("I have a sonar")
+basic.forever(function () {
+    distance = robotPu.sonarDistanceCm()
+    if (distance > 2 && distance < 100) {
+        // Map 2cm->2000Hz and 100cm->200Hz
+        pitch = Math.map(distance, 2, 100, 2000, 200)
+        // Map 2cm->100ms and 100cm->800ms
+        pulseDelay = Math.map(distance, 2, 100, 100, 800)
+        music.setVolume(255)
+        music.playTone(pitch, 50)
+        basic.pause(pulseDelay)
+        // --- CASE 1: DANGER ZONE (Too Close!) ---
+        // --- CASE 2: DETECTION ZONE (Reporting Distance) ---
+        if (distance > 0 && distance < 6) {
+            basic.showIcon(IconNames.Skull)
+            // Red Alert Sound
+            music.playMelody("C5 P C5 P C5 P C5 P", 500)
+            billy.say("Danger, stop!")
+        } else if (distance >= 6 && distance < 20) {
+            basic.showIcon(IconNames.Target)
+            // Report distance: e.g., "Distance 25"
+            billy.say("Distance " + distance)
+        }
+    } else {
+        basic.pause(500)
+    }
+})
+basic.forever(function () {
+    robotPu.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    basic.pause(10)
+})
+
+```
+
 * **More Moods**: Add a third state for `BillyVoicePreset.Dalek` to make PU sound like a metallic villain.
 * **Touch Interaction**: Use the micro:bit V2 **Touch Logo** to trigger a "Giggle" sound or a special greeting.
 * **Chatty Sonar**: Update your sonar code so that when an object is closer than 10cm, PU shouts "Too close!" in his current mood voice.

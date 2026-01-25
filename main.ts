@@ -224,6 +224,30 @@ namespace robotPu {
          return ensureRobot().sonar.distanceCm();
      }
 
+     //% blockId=robotpu_body_roll block="body roll"
+     //% subcategory="Sensors"
+     //% group="Sensors"
+     //% weight=69 blockGap=8
+     export function bodyRoll(): number {
+         return ensureRobot().getBodyRoll();
+     }
+
+     //% blockId=robotpu_body_pitch block="body pitch"
+     //% subcategory="Sensors"
+     //% group="Sensors"
+     //% weight=68 blockGap=8
+     export function bodyPitch(): number {
+         return ensureRobot().getBodyPitch();
+     }
+
+     //% blockId=robotpu_music_tempo block="music tempo"
+     //% subcategory="Sensors"
+     //% group="Sensors"
+     //% weight=67 blockGap=8
+     export function musicTempo(): number {
+         return ensureRobot().getMusicTempo();
+     }
+
     /** Dance to music */
     //% blockId=robotpu_dance block="dance"
     //% subcategory="Actions"
