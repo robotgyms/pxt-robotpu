@@ -97,7 +97,7 @@ namespace robotPu {
     }
 
     //% blockId=robotpu_left_eye_bright block="set left eye brightness %brightness"
-    //% weight=53 blockGap=8
+    //% weight=49 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
     //% brightness.min=0 brightness.max=1 brightness.defl=0.05
@@ -109,7 +109,7 @@ namespace robotPu {
     }
 
     //% blockId=robotpu_right_eye_bright block="set right eye brightness %brightness"
-    //% weight=52 blockGap=8
+    //% weight=49 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
     //% brightness.min=0 brightness.max=1 brightness.defl=0.05
