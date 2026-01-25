@@ -695,6 +695,24 @@ class RobotPu {
         this.showChannel();
     }
 
+    public getBodyRoll(): number {
+        return this.bodyRoll;
+    }
+
+    public getBodyPitch(): number {
+        return this.bodyPitch;
+    }
+
+    public getMusicPeriod(): number {
+        return this.music.period;
+    }
+
+    public getMusicTempo(): number {
+        const p = this.music.period;
+        if (p <= 0) return 0;
+        return 60000 / p;
+    }
+
     /**
  * Handles manual movement and stance control from a remote.
  * Ported from joystick() in Python.
