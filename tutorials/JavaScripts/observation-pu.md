@@ -133,7 +133,110 @@
  
  ---
  
- ## 6. Summary
+ ## 6. Example: send the front distance array via radio (key/value pairs)
+ 
+ This example uses **two micro:bits**:
+ 
+ - Robot PU micro:bit = **sender**
+ - Gamepad micro:bit = **receiver**
+ 
+ The sender transmits 5 values using `radio.sendValue(key, value)`.
+ 
+ ### A. Sender (Robot PU) code
+ 
+ ```typescript
+radio.onReceivedString(function (receivedString) {
+    robotPu.runStringCommand(receivedString)
+})
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+let d: number[] = []
+robotPu.setChannel(166)
+basic.forever(function () {
+    d = robotPu.frontDistanceArray()
+    radio.sendValue("fd0", d[0])
+    radio.sendValue("fd1", d[1])
+    radio.sendValue("fd2", d[2])
+    radio.sendValue("fd3", d[3])
+    radio.sendValue("fd4", d[4])
+    radio.sendValue("broll", robotPu.bodyRoll())
+    radio.sendValue("bpitch", robotPu.bodyPitch())
+    basic.pause(100)
+})
+ ```
+ 
+ Notes:
+ 
+ - `robotPu.frontDistanceArray()` returns 5 bins from left-to-right across the front view.
+ - If you’re already using a specific radio group/channel elsewhere, keep them consistent on both devices.
+ 
+ ### B. Receiver (Gamepad) code
+ 
+ The receiver listens for the 5 keys and plots them as **5 columns** on the 5×5 LED display.
+ 
+ ```typescript
+ radio.setGroup(166)
+ 
+ let d: number[] = [0, 0, 0, 0, 0]
+ let minD = 0
+ 
+ function clampInt(x: number, lo: number, hi: number): number {
+     if (x < lo) return lo
+     if (x > hi) return hi
+     return x
+ }
+
+ function updateMinDistance(): void {
+     minD = d[0]
+     for (let i = 1; i < 5; i++) {
+         if (d[i] < minD) minD = d[i]
+     }
+ }
+ 
+ffunction drawDistances () {
+    basic.clearScreen()
+    for (let x2 = 0; x2 <= 4; x2++) {
+        h = Math.map(d[x2], 2, 50, 5, 0)
+        for (let y2 = 4; y2 >= h; y2--) {
+            led.plot(x2, y2)
+        }
+    }
+}
+ 
+ radio.onReceivedValue(function (name: string, value: number) {
+     if (name == "fd0") d[0] = value
+     else if (name == "fd1") d[1] = value
+     else if (name == "fd2") d[2] = value
+     else if (name == "fd3") d[3] = value
+     else if (name == "fd4") d[4] = value
+ })
+
+ basic.forever(function () {
+     const distance = clampInt(minD, 0, 100)
+
+     // Closer = Higher Frequency
+     let pitch = Math.map(distance, 2, 100, 2000, 200); 
+     
+     // Closer = Faster Beeps
+     let pulseDelay = Math.map(distance, 2, 100, 100, 800); 
+
+     // Play the ping
+     music.playTone(pitch, 50); 
+     
+     // Wait before the next pulse
+     basic.pause(pulseDelay);
+ })
+ ```
+ 
+ Notes:
+ 
+ - The LED visualization maps distance (0–100cm) into a column height.
+ - You can tune the display mapping by changing the `100`cm max range.
+ 
+ ---
+ 
+ ## 7. Summary
  
  - Use `robotPu.sonarDistanceCm()` to measure distance in cm.
  - Use `input.isGesture(...)` and `input.rotation(...)` for motion sensing.
