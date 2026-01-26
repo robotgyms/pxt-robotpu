@@ -248,6 +248,15 @@ namespace robotPu {
          return ensureRobot().getMusicTempo();
      }
 
+     //% blockId=robotpu_explore_distance_array block="front distance array"
+     //% subcategory="Sensors"
+     //% group="Sensors"
+     //% weight=66 blockGap=8
+     export function frontDistanceArray(): number[] {
+         const d = ensureRobot().pr.exploreDistance;
+         return [d[0], d[1], (d[1]+d[2])*0.5, d[2], d[3]];
+     }
+
     /** Dance to music */
     //% blockId=robotpu_dance block="dance"
     //% subcategory="Actions"
