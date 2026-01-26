@@ -39,15 +39,23 @@ Wall-following can loop forever in mazes with **islands** (walls not connected t
 
 ## 🛠️ 3. Hardware & Sensing Strategy
 
-Robot PU’s sonar faces ~35° downward. While walking, PU sways, and we can also **intentionally steer the head yaw** to sample distances at different directions.
+Robot PU’s sonar faces ~35° downward. While walking, PU naturally sways, and the extension maintains a small “front scan” array.
 
-We will measure three directions:
+In this updated tutorial we use:
 
-* **Right**: head yaw ~ `90 + YAW_SCAN`
-* **Front**: head yaw `90`
-* **Left**: head yaw ~ `90 - YAW_SCAN`
+* **Front scan array**: `robotPu.frontDistanceArray()`
 
-Then we decide the next motion using a priority order:
+It returns **5 distance bins** from **left to right**:
+
+* `d[0]` = far left
+* `d[1]` = left
+* `d[2]` = center/front
+* `d[3]` = right
+* `d[4]` = far right
+
+These bins are based on the internal scan ranges used by the extension (see the angle-to-bin mapping in `robotpu.ts` around line ~1078).
+
+Then we decide the next motion using a priority order.
 
 ### Right-hand rule priority
 
@@ -63,20 +71,17 @@ Then we decide the next motion using a priority order:
 Copy this code into the **JavaScript** tab of the MakeCode Editor.
 
 ```typescript
-// Choose which wall to follow
-const FOLLOW_RIGHT_WALL = true
-
-// Head yaw scan angles
-const YAW_CENTER = 90
-const YAW_SCAN = 35
+// Right-hand rule maze solver using robotPu.frontDistanceArray()
+// d[0..4] are left -> right distance bins
 
 // Distance thresholds (cm)
-const OPEN_CM = 25
-const TOO_CLOSE_CM = 10
+// These align with the extension's internal safety thresholds (~7.5cm danger + ~20cm caution)
+const OPEN_CM = 28
+const TOO_CLOSE_CM = 12
 
 // Movement tuning
-const FWD_SPEED = 1.6
-const TURN_SPEED = 1.2
+const FWD_SPEED = 1.8
+const TURN_SPEED = 1.4
 
 // Turn bias: -1 left, +1 right
 const TURN_BIAS = 0.9
@@ -87,21 +92,8 @@ function clampInt(x: number, lo: number, hi: number): number {
     return x
 }
 
-function headYaw(angle: number): void {
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, clampInt(angle, 0, 180))
-}
-
-function readDistanceAtYaw(yaw: number): number {
-    headYaw(yaw)
-    basic.pause(60)
-
-    // Take a small average to reduce jitter
-    let sum = 0
-    for (let i = 0; i < 3; i++) {
-        sum += robotPu.sonarDistanceCm()
-        basic.pause(10)
-    }
-    return sum / 3
+function max2(a: number, b: number): number {
+    return a > b ? a : b
 }
 
 function driveFor(ms: number, speed: number, turn: number): void {
@@ -135,47 +127,32 @@ function turnAround(): void {
 }
 
 basic.forever(function () {
-    // 1) Scan three directions
-    const dRight = readDistanceAtYaw(YAW_CENTER + YAW_SCAN)
-    const dFront = readDistanceAtYaw(YAW_CENTER)
-    const dLeft = readDistanceAtYaw(YAW_CENTER - YAW_SCAN)
+    // 1) Read 5-bin front scan (left -> right)
+    const d = robotPu.frontDistanceArray()
 
-    // Return head to center for walking
-    headYaw(YAW_CENTER)
+    const dLeft = max2(d[0], d[1])
+    const dFront = d[2]
+    const dRight = max2(d[3], d[4])
 
     const rightOpen = dRight > OPEN_CM
     const frontOpen = dFront > OPEN_CM
     const leftOpen = dLeft > OPEN_CM
 
-    // 2) Emergency: if front is very close, prioritize turning away
-    if (dFront < TOO_CLOSE_CM) {
-        if (FOLLOW_RIGHT_WALL) turnLeft90ish()
-        else turnRight90ish()
+    // 2) Emergency: if the center/front bin is very close, turn left immediately
+    if (dFront > 0 && dFront < TOO_CLOSE_CM) {
+        turnLeft90ish()
         return
     }
 
-    // 3) Wall follower decision
-    if (FOLLOW_RIGHT_WALL) {
-        if (rightOpen) {
-            turnRight90ish()
-        } else if (frontOpen) {
-            stepForward()
-        } else if (leftOpen) {
-            turnLeft90ish()
-        } else {
-            turnAround()
-        }
+    // 3) Right-hand rule priority
+    if (rightOpen) {
+        turnRight90ish()
+    } else if (frontOpen) {
+        stepForward()
+    } else if (leftOpen) {
+        turnLeft90ish()
     } else {
-        // Left-hand rule (mirror priority)
-        if (leftOpen) {
-            turnLeft90ish()
-        } else if (frontOpen) {
-            stepForward()
-        } else if (rightOpen) {
-            turnRight90ish()
-        } else {
-            turnAround()
-        }
+        turnAround()
     }
 })
 
