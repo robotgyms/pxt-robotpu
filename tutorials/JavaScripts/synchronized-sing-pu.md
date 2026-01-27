@@ -641,3 +641,125 @@ Tip:
 - **Add a conductor UI**
   - a separate micro:bit to assign channels and broadcast start/stop commands
 
+---
+
+## Synchronization methods (practical options)
+
+When multiple robots must start a song together, there are a few common synchronization strategies. Each has tradeoffs in complexity vs accuracy.
+
+### A. Manual count-in (simplest)
+
+- Someone counts “3, 2, 1, go” and everyone presses the logo.
+- Works for demos, but humans introduce large timing error.
+
+### B. Radio START trigger (good)
+
+- A conductor micro:bit sends a single radio message like `START`.
+- Each robot starts when the message is received.
+- Better than humans, but there can still be small arrival-time differences between robots.
+
+### C. Start-at-timestamp (best on micro:bit)
+
+- Conductor sends a **future start time** such as `startAt = control.millis() + 800`.
+- Each robot waits until its own `control.millis()` reaches `startAt` before starting.
+- Even if radio packets arrive at slightly different times, robots still start together.
+
+### D. Tempo/beat agreement (important)
+
+Even with a synchronized start, the robots can drift if they don’t share the same tempo.
+
+- Conductor broadcasts a tempo like `bpm=120`.
+- Robots call `music.setTempo(bpm)` before starting.
+
+### E. Resync / “bar beacons” (optional)
+
+For long songs, you can periodically broadcast a “bar number” or “beat number” so everyone can correct drift.
+
+---
+
+## Synchronized Minion chorus: one conductor + many Robot PUs
+
+In this pattern:
+
+- All Robot PUs run the same quartet code.
+- Each robot selects its part using `track = robotPu.channel() % 4`.
+- A conductor micro:bit starts all robots together.
+
+### A. Conductor micro:bit code (broadcast tempo + startAt)
+
+Flash this to your *conductor* (a gamepad micro:bit or any micro:bit).
+
+```typescript
+radio.setGroup(166)
+
+let bpm = 120
+
+input.onButtonPressed(Button.A, function () {
+    bpm += 5
+})
+
+input.onButtonPressed(Button.B, function () {
+    bpm -= 5
+})
+
+// Press logo to start everyone together
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    bpm = Math.max(60, Math.min(200, bpm))
+    radio.sendValue("bpm", bpm)
+
+    // Start a bit in the future so all robots can receive the packet
+    const startAt = control.millis() + 800
+    radio.sendValue("startAt", startAt)
+})
+```
+
+### B. Robot PU code change (listen for startAt)
+
+Add this receiver logic to the quartet program (near the bottom where radio handlers are registered). It will start the correct track **in sync**.
+
+```typescript
+let startAt = -1
+let bpm = 120
+
+radio.onReceivedValue(function (name: string, value: number) {
+    // keep existing:
+    // robotPu.runKeyValueCommand(name, value)
+
+    if (name == "bpm") {
+        bpm = value
+    } else if (name == "startAt") {
+        startAt = value
+        control.inBackground(function () {
+            // apply shared tempo before starting
+            music.setTempo(bpm)
+
+            // wait until the agreed start time
+            while (control.millis() < startAt) {
+                basic.pause(5)
+            }
+
+            // select the role and start that part
+            track = robotPu.channel() % 4
+            if (track == 0) track1()
+            else if (track == 1) track2()
+            else if (track == 2) track3()
+            else track4()
+        })
+    }
+})
+```
+
+Notes:
+
+- `control.inBackground(...)` prevents the radio callback from blocking.
+- Using `startAt` is more reliable than “start immediately on receive”.
+- If you already use `radio.onReceivedValue` for `robotPu.runKeyValueCommand(...)`, merge the logic into one handler.
+
+---
+
+## Testing checklist
+
+- Flash the quartet code to all Robot PUs.
+- Set each robot’s channel so `channel % 4` covers 0,1,2,3.
+- Flash the conductor code to a controller micro:bit.
+- Press logo on the conductor and confirm all robots begin together.
