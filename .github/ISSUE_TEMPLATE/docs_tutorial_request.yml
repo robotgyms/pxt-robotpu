@@ -1,0 +1,58 @@
+name: Documentation / tutorial request
+description: Request improvements or new tutorials for Robot PU
+title: "[Docs]: "
+labels:
+  - documentation
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for documentation improvements or new tutorials (especially under tutorials/JavaScripts).
+
+  - type: dropdown
+    id: doc_area
+    attributes:
+      label: Documentation area
+      options:
+        - Main README
+        - Tutorials/JavaScripts learning path
+        - New tutorial
+        - Fix or clarify existing tutorial
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: request
+    attributes:
+      label: What should be added or improved?
+      description: Describe what you want to see changed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: audience
+    attributes:
+      label: Target audience
+      description: Beginner / intermediate / advanced; classroom; makers; etc.
+      placeholder: Beginner
+
+  - type: textarea
+    id: success
+    attributes:
+      label: Success criteria
+      description: What should a reader be able to do after following the docs?
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to related issues, MakeCode projects, videos, or external references.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and discussions
+          required: true
