@@ -1,0 +1,103 @@
+name: Bug report
+description: Report a problem with the Robot PU MakeCode extension
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please include enough detail for us to reproduce the issue in MakeCode.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Blocks / main.ts
+        - Robot behaviors (walk/explore/dance)
+        - Sensors / perception
+        - Remote control (radio)
+        - Tutorials / documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior.
+      placeholder: "When I call robotPu.explore(), the robot..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal set of steps.
+      placeholder: |
+        1. Open MakeCode
+        2. Add the Robot PU extension
+        3. Paste this code...
+        4. Flash to micro:bit
+        5. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: makecode_share
+    attributes:
+      label: MakeCode share link (recommended)
+      description: Paste the MakeCode project share link if available.
+      placeholder: https://makecode.microbit.org/_xxxxxxxxxxxx
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Relevant code snippet (if no share link)
+      render: typescript
+
+  - type: input
+    id: microbit
+    attributes:
+      label: micro:bit version
+      description: e.g. v1, v2
+      placeholder: v2
+
+  - type: input
+    id: robot_firmware
+    attributes:
+      label: Robot PU hardware/kit notes
+      description: Any modifications, servo changes, unusual power setup, etc.
+      placeholder: "Stock kit" / "Modified legs" / "External battery"...
+
+  - type: input
+    id: extension_version
+    attributes:
+      label: Extension version / commit
+      description: If you know the version/commit of this extension.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Screenshots / videos / logs
+      description: Attach anything that helps.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues to avoid duplicates
+          required: true
+        - label: I included a MakeCode share link or a minimal code snippet
+          required: true

@@ -1,0 +1,63 @@
+name: Feature request
+description: Suggest a new feature or improvement for Robot PU
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Please describe the outcome you want and how it helps users in MakeCode.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New Block / API
+        - Behaviors (walk/explore/dance)
+        - Sensors / perception
+        - Remote control (radio)
+        - Tutorials / examples
+        - Tooling (telemetry, dashboards)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you trying to solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the feature you’d like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds you tried or other approaches.
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and constraints
+      description: micro:bit limits, memory/CPU, battery life, safety, compatibility concerns.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I checked for existing feature requests
+          required: true
+        - label: This feature is compatible with MakeCode (Blocks + TypeScript)
+          required: false
