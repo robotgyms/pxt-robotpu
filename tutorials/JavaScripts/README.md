@@ -92,6 +92,68 @@ mindmap
       Advanced balance (complementary + PD + prediction)
         improved-balance-pu.md
 ```
+
+## Advanced ROS topics knowledge graph
+![Robot PU Advanced Topics - ROS inspired](advanced-ros-mindmap.png)
+
+```mermaid
+mindmap
+  root((Robot PU Advanced Topics - ROS inspired))
+    ROS concepts
+      Nodes
+        Perception node
+        Planner node
+        Controller node
+        Safety node
+      Topics
+        odom
+        scan
+        cmd_vel
+        diagnostics
+      Tools
+        visualization
+        logging
+        debugging
+    Tooling and Observability
+      Telemetry logging
+        telemetry-logging-pu.md
+      Base station dashboard
+        base-station-dashboard-pu.md
+    Safety and Reliability
+      Watchdog and E stop
+        safety-watchdog-pu.md
+      Recovery behaviors
+        fault-recovery-pu.md
+    Localization
+      Odometry lite
+        odometry-pu.md
+      Heading fusion
+        heading-fusion-pu.md
+    Mapping
+      Occupancy grid
+        occupancy-grid-pu.md
+      Shared map (multi robot)
+        shared-map-pu.md
+    Planning
+      Grid planning BFS Astar
+        path-planning-pu.md
+      Path following
+        path-following-pu.md
+    Local Planning
+      Cost based local planner
+        local-planner-pu.md
+    Architecture
+      Behavior trees
+        behavior-tree-pu.md
+      Mission recipes
+        missions-pu.md
+    Multi robot
+      Task allocation
+        task-allocation-pu.md
+      Formation control
+        formation-control-pu.md
+```
+
 ## Content index
 
 Follow this sequence from beginner to advanced. Each step assumes you’re comfortable with the previous ones.
@@ -170,6 +232,18 @@ Follow this sequence from beginner to advanced. Each step assumes you’re comfo
 - **Signal filters (clean noisy sonar / sensor signals)**
   - `signal-filters-pu.md`
 
+- **Telemetry + logging (ROS-style topics)**
+  - `telemetry-logging-pu.md`
+
+- **Base station dashboard (visualize robot state)**
+  - `base-station-dashboard-pu.md`
+
+- **Safety watchdog + E-stop**
+  - `safety-watchdog-pu.md`
+
+- **Fault recovery behaviors (unstuck routines)**
+  - `fault-recovery-pu.md`
+
 - **Maze solving (right-hand / left-hand wall following)**
   - `maze-pu.md`
 
@@ -181,6 +255,39 @@ Follow this sequence from beginner to advanced. Each step assumes you’re comfo
 
 - **2D mapping concepts (occupancy grid + local mapping)**
   - `2d-map.md`
+
+- **Odometry-lite (pose estimation)**
+  - `odometry-pu.md`
+
+- **Heading fusion (complementary filtering patterns)**
+  - `heading-fusion-pu.md`
+
+- **Occupancy grid (tiny mapping project)**
+  - `occupancy-grid-pu.md`
+
+- **Shared mapping (multi-robot occupancy grid)**
+  - `shared-map-pu.md`
+
+- **Path planning (BFS / A*)**
+  - `path-planning-pu.md`
+
+- **Path following (waypoints → motion)**
+  - `path-following-pu.md`
+
+- **Local planner (cost-based motion selection)**
+  - `local-planner-pu.md`
+
+- **Behavior trees (ROS-style mission structure)**
+  - `behavior-tree-pu.md`
+
+- **Missions pack (autonomy recipes)**
+  - `missions-pu.md`
+
+- **Task allocation (multi-robot roles)**
+  - `task-allocation-pu.md`
+
+- **Formation control (follow-the-leader 2.0)**
+  - `formation-control-pu.md`
 
 - **Robot thinking (feedback loops / control)**
   - `thinking-pu.md`
