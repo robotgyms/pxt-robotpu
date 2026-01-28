@@ -17,7 +17,7 @@ These lessons are written for the **micro:bit MakeCode editor**:
 
 ---
 ## Knowledge graph
-![Robot PU JavaScript Tutorials Mindmap](mindmap.png)
+[comment]: <> (![Robot PU JavaScript Tutorials Mindmap](mindmap.png))
 
 ```mermaid
 mindmap
