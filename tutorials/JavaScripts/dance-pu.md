@@ -1,87 +1,142 @@
+# Dance tutorial (Robot PU)
 
-# 🤖 Robot PU: Q-Learning Dance Choreography (Beat-Synced Gait Sequencer) Project Wiki
+This tutorial teaches you how to make Robot PU dance in MakeCode, starting from the built-in `robotPu.dance()` behavior and progressing to a **beat-synced choreography**.
 
-Welcome to the official project repository for **Robot PU (Pair Up)**. In this project, we build a **dance controller** that:
+The final section includes an optional **advanced** project: a Q-learning gait sequencer.
 
-* Starts from the robot’s **current pose (gait)**
-* Detects **music beats** from the micro:bit microphone
-* Changes to a **next gait** every **N beats**
-* Uses **gait interpolation** + small **vibration wiggles** that track the music loudness
-* Uses a simple **Q-table** to learn which gait transitions people prefer
+## Prerequisites
 
-The learning signals:
+- Open https://makecode.microbit.org
+- Add the Robot PU extension
+- Make sure you have good footing (non-slippery surface) and enough battery
 
-* **Penalty**: robot falling (detected by free-fall gesture)
-* **Reward**: background noise level (`input.soundLevel()`), assuming people yell louder when the dance looks good
+## Part 1: Quick start (built-in dance)
 
----
+The easiest way to dance is to call `robotPu.dance()` in a loop.
 
-## 📂 1. Introduction to Robot PU Dance Mode
+```typescript
+basic.forever(function () {
+    robotPu.dance()
+    basic.pause(20)
+})
+```
 
-Robot PU already has a built-in `robotPu.dance()` behavior inside the extension. Internally it:
+## Part 2: What is a “gait”?
 
-* Uses a beat detector (ring buffer + adaptive threshold)
-* Adds pitch/yaw wiggles
-* Randomly switches among stable dance poses every ~8–16 beats
+A gait (pose) can be represented as a 6-value vector of servo angles:
 
-In this tutorial, we will **build our own choreography layer** on top of public MakeCode APIs.
+- LeftFoot, LeftLeg, RightFoot, RightLeg, HeadYaw, HeadPitch
 
----
+By switching among a few safe gaits, you can create choreography.
 
-## 🧠 2. Key Concepts
+## Part 3: Smooth choreography (interpolate between poses)
 
-### 2.1 Gaits (poses) as servo angle vectors
+Jumping directly between poses can make PU wobble. Interpolating (moving in small steps) looks smoother and is safer.
 
-We represent each gait as 6 servo angles:
+```typescript
+// Gaits: [LeftFoot, LeftLeg, RightFoot, RightLeg, HeadYaw, HeadPitch]
+// Angles are examples. Tune these for your robot.
+let gaits: number[][] = [
+    [90, 90, 90, 90, 90, 80],   // 0 neutral
+    [80, 120, 100, 60, 70, 80], // 1 lean left
+    [100, 60, 80, 120, 110, 80],// 2 lean right
+    [95, 110, 85, 70, 90, 65],  // 3 squat-ish
+    [85, 70, 95, 110, 120, 75], // 4 twist head right
+    [95, 70, 85, 110, 60, 75],  // 5 twist head left
+]
 
-* LeftFoot, LeftLeg, RightFoot, RightLeg, HeadYaw, HeadPitch
+let currentAngles = [90, 90, 90, 90, 90, 80]
 
-### 2.2 Gait interpolation (smooth transition)
+function setPose(angles: number[]): void {
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, angles[0])
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, angles[1])
+    robotPu.servo(robotPu.ServoJoint.RightFoot, angles[2])
+    robotPu.servo(robotPu.ServoJoint.RightLeg, angles[3])
+    robotPu.servo(robotPu.ServoJoint.HeadYaw, angles[4])
+    robotPu.servo(robotPu.ServoJoint.HeadPitch, angles[5])
+}
 
-Instead of jumping instantly from one gait to another, we interpolate:
+function interpolateTo(target: number[], steps: number, stepMs: number): void {
+    let start = currentAngles
+    for (let k = 1; k <= steps; k++) {
+        let a0 = Math.round(start[0] + (target[0] - start[0]) * k / steps)
+        let a1 = Math.round(start[1] + (target[1] - start[1]) * k / steps)
+        let a2 = Math.round(start[2] + (target[2] - start[2]) * k / steps)
+        let a3 = Math.round(start[3] + (target[3] - start[3]) * k / steps)
+        let a4 = Math.round(start[4] + (target[4] - start[4]) * k / steps)
+        let a5 = Math.round(start[5] + (target[5] - start[5]) * k / steps)
 
-* For `K` steps, gradually move each servo from current angle to target angle
+        currentAngles = [a0, a1, a2, a3, a4, a5]
+        setPose(currentAngles)
+        basic.pause(stepMs)
+    }
+}
+```
 
-This helps reduce instability and makes the dance look smoother.
+## Part 4: Beat-synced dance (simple beat clock)
 
-### 2.3 Music vibration wiggle
+We can approximate a beat with a **threshold + cooldown** using `input.soundLevel()`.
 
-On each interpolation step, we add a small oscillation (wiggle) whose amplitude depends on:
+- When loudness spikes above a threshold, count it as a beat.
+- Every `BEATS_PER_MOVE` beats, choose a new gait.
 
-* `input.soundLevel()` (louder music -> bigger wiggle)
+```typescript
+const BEATS_PER_MOVE = 8
 
-### 2.4 Beat clock: change gait every N beats
+let threshold = 140
+let lastBeatMs = 0
+let beatCount = 0
+let currentGait = 0
 
-We implement a simple beat detector (threshold + cooldown). Every time a beat happens, we increment `beatCount`.
+function detectBeat(now: number, loud: number): boolean {
+    // Cooldown prevents double-triggering
+    if (loud > threshold && (now - lastBeatMs) > 200) {
+        lastBeatMs = now
+        return true
+    }
+    return false
+}
 
-When `beatCount % BEATS_PER_MOVE == 0`, we choose the next gait.
+setPose(currentAngles)
 
-### 2.5 Q-table learning
+basic.forever(function () {
+    let now = control.millis()
+    let loud = input.soundLevel()
 
-We define:
+    if (detectBeat(now, loud)) {
+        beatCount += 1
 
-* **State**: current gait index `s`
-* **Action**: next gait index `a`
+        if (beatCount % BEATS_PER_MOVE == 0) {
+            // Pick a different gait
+            let next = Math.randomRange(0, gaits.length - 1)
+            if (next == currentGait) next = (next + 1) % gaits.length
 
-Q-learning updates the value of transitions:
+            interpolateTo(gaits[next], 18, 20)
+            currentGait = next
+        }
+    }
 
-`Q[s][a] = Q[s][a] + alpha * (reward + gamma * max(Q[a][*]) - Q[s][a])`
+    // Idle motion between beats
+    interpolateTo(gaits[currentGait], 1, 20)
+})
+```
 
----
+## Part 5 (optional): Add “wiggle” based on loudness
 
-## 🛠️ 3. APIs Used (MakeCode + pxt-robotpu)
+To make the robot look more alive, you can add a small head wiggle that scales with loudness.
 
-* `robotPu.servo(joint, angle)`
-* `robotPu.servoStep(joint, target, stepSize)` (optional alternative)
-* `robotPu.setMode(robotPu.Mode.API)` (optional, we can just drive servos)
-* `input.soundLevel()`
-* `input.isGesture(Gesture.FreeFall)`
+The simplest place to do this is inside the interpolation step (modify head angles slightly).
 
----
+## Part 6 (advanced): Q-learning gait sequencer
 
-## 💻 4. Implementation Script
+This section is optional. It keeps the idea of a “gait sequencer”, but uses a simple Q-table to learn which transitions look best.
 
-Copy this code into the **JavaScript** tab of the MakeCode Editor.
+The learning signals in this example:
+
+- **Penalty**: robot falling (detected by `Gesture.FreeFall`)
+- **Reward**: “crowd noise” (`input.soundLevel()`), assuming people cheer louder for good moves
+
+Copy the following into the JavaScript tab if you want to experiment:
 
 ```typescript
 const GAITS = 6
@@ -240,7 +295,7 @@ basic.forever(function () {
 
 ---
 
-## 🧪 5. Testing & Calibration
+## Testing and calibration
 
 1. **Start quiet**: run in a quiet room first to avoid accidental beat triggers.
 2. **Tune beat threshold**:
@@ -255,7 +310,7 @@ basic.forever(function () {
 
 ---
 
-## 🚀 6. Next Steps
+## Next steps
 
 * **Better state definition**: include beat phase (downbeat vs offbeat) or “energy level” (quiet vs loud) as part of state.
 * **Better reward**: normalize loudness by tracking background baseline noise.
@@ -264,4 +319,13 @@ basic.forever(function () {
 
 ---
 
-*For more information, visit [robotgyms.com/pu](https://robotgyms.com/pu).*
+## Troubleshooting
+
+- **It changes gaits too often**
+  - increase `threshold` or increase the beat cooldown in `detectBeat()`
+- **It never detects a beat**
+  - decrease `threshold`
+- **It wobbles or tips**
+  - increase interpolation `steps` or `stepMs`
+  - reduce extreme gait angles
+  - avoid dancing on slippery surfaces

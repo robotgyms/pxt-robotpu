@@ -1,33 +1,44 @@
 
-# 🤖 Robot PU: Emotions (Eye Blinks + Body Language) Project Wiki
+# Emotions tutorial (Robot PU)
 
-Welcome to the official project repository for **Robot PU (Pair Up)**. Robot PU can communicate emotions using:
+Robot PU can communicate “emotions” using:
 
-* **Eye brightness + blinking patterns**
-* **Body language** (rest / stand / explore / dance / small head movements)
-* Optional **speech** (`robotPu.talk(...)`)
+- **Eye brightness + blink patterns**
+- **Body language** (rest / stand / walk / explore / dance / head gestures)
+- Optional **speech** (`robotPu.talk(...)`)
 
 In this tutorial you will build a simple pipeline:
 
-1. **Environment State → Emotion** (what the world “feels like”)
-2. **Emotion → Actions** (how PU expresses that emotion)
+1. **Signals → Emotion** (what the world “feels like”)
+2. **Emotion → Expression** (how PU shows it)
 
 ---
 
-## 📂 1. Signals We Can Sense
+## Prerequisites
+
+- Open https://makecode.microbit.org
+- Add the Robot PU extension
+
+## What you will build
+
+- A small **emotion state machine** (Calm / Curious / Scared / Excited / Sad)
+- A non-blocking **eye blink scheduler** using `control.millis()`
+- A simple **body language mapper** (emotion → action)
+
+## Signals we can sense
 
 Robot PU projects typically have access to these signals:
 
 * **Distance to obstacles**: `robotPu.sonarDistanceCm()`
 * **Sound / noise level**: `input.soundLevel()`
-* **Falls / instability**: `input.isGesture(Gesture.FreeFall)` (simple) and/or “fell” behavior inside the robot
+* **Falls / instability**: `input.isGesture(Gesture.FreeFall)`
 * **Time**: `control.millis()`
 
 We’ll combine them into a small set of environment states.
 
 ---
 
-## 😊 2. Define Emotions (State Machine)
+## Define emotions (state machine)
 
 We’ll use an `Emotion` enum (discrete states). Example set:
 
@@ -44,7 +55,7 @@ Important idea:
 
 ---
 
-## 👀 3. Emotion → Eye Blink Patterns
+## Emotion → eye blink patterns
 
 Robot PU exposes public eye controls:
 
@@ -63,7 +74,7 @@ Examples:
 
 ---
 
-## 🕺 4. Emotion → Body Language Actions
+## Emotion → body language actions
 
 We’ll map emotions to actions such as:
 
@@ -79,7 +90,7 @@ Note:
 
 ---
 
-## 💻 5. Implementation Script
+## Implementation (copy/paste)
 
 Copy this code into the **JavaScript** tab of the MakeCode Editor.
 
@@ -246,7 +257,7 @@ basic.forever(function () {
 
 ---
 
-## 🧪 6. Testing & Calibration
+## Testing and calibration
 
 1. **Calm test**: quiet room, no obstacles nearby. Eyes should blink slowly.
 2. **Curious test**: place a wall ~20–30cm in front. Eyes should double-blink.
@@ -262,12 +273,24 @@ Tune:
 
 ---
 
-## 🚀 7. Next Steps
+## Troubleshooting
+
+- **Eyes flicker too fast / looks jittery**
+  - increase `basic.pause(20)` to `basic.pause(40)`
+  - increase `EMOTION_HOLD_MS`
+- **It’s always scared**
+  - increase `DANGER_CM` only if needed; otherwise decrease it
+  - ensure `sonarDistanceCm()` is returning realistic values (not 0)
+- **It never gets excited**
+  - lower `LOUD_LEVEL`
+  - test by clapping close to the micro:bit
+- **It keeps switching emotions**
+  - increase `EMOTION_HOLD_MS`
+  - widen the gap between thresholds (example: raise `NEAR_CM` and lower `DANGER_CM`)
+
+## Next steps
 
 * **More environment states**: include compass heading changes, repeated obstacle hits, or maze progress.
 * **Emotion blending**: use probabilities instead of discrete states.
 * **Personalities**: different robots can map the same world to different emotional responses.
 
----
-
-*For more information, visit [robotgyms.com/pu](https://robotgyms.com/pu).*
