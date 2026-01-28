@@ -9,13 +9,15 @@ The retail kit includes a gamepad built from the second micro:bit for radio-base
 ![Robot PU](https://raw.githubusercontent.com/robotgyms/pxt-robotpu/main/assets/robotpu.png)
 
 Learn more about The Story of PU, which shows robot PU's activities, hardware, software, tutorials, and upgrade projects at:
-- https://robotgyms.com/pu
-- https://www.youtube.com/@TheStoryofPu-yw8tr
-- https://www.tiktok.com/@thestoryofpu
 
-Purchase Links: 
-- https://robotgyms.com/product/robot-pu/
-- https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN
+- **Website**: [robotgyms.com/pu](https://robotgyms.com/pu)
+- **YouTube**: [The Story of PU](https://www.youtube.com/@TheStoryofPu-yw8tr)
+- **TikTok**: [@thestoryofpu](https://www.tiktok.com/@thestoryofpu)
+
+Purchase links:
+
+- **Robot Gyms store**: [Robot PU kit](https://robotgyms.com/product/robot-pu/)
+- **Amazon**: [Robot PU kit](https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN)
 
 ## Features
 
