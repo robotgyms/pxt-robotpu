@@ -107,12 +107,23 @@ Follow this sequence from beginner to advanced. Each step assumes you’re comfo
 - **JavaScript / TypeScript quick start**
   - `javascript-quick-start.md`
 
-- **Talk content (speech/script content patterns)**
-  - `talk-content.md`
+- **Submarine sonar (complete project)**
+  - `submarine.md`
+  - `.hex` included: `microbit-robot-pu-submarine-sonar.hex`
+
+- **Don’t bonk (basic obstacle avoidance patterns)**
+  - `dont-bonk.md`
+
+- **Sonar operator (operator UI + control patterns)**
+  - `sonar-operator.md`
+  - `.hex` included: `microbit-robot-pu-sonar-operator.hex`
 
 - **Talk (pxt-billy content)**
   - `talk-pxt-billy-content.md`
   - `.hex` included: `microbit-robot-pu-pxt-billy-content.hex`
+
+- **Talk content (speech/script content patterns)**
+  - `talk-content.md`
 
 - **How Robot PU moves (motorization + I2C + servos)**
   - `motorize-pu.md`
@@ -123,11 +134,11 @@ Follow this sequence from beginner to advanced. Each step assumes you’re comfo
 - **Robot observation (sensors / perception)**
   - `observation-pu.md`
 
-- **Don’t bonk (basic obstacle avoidance patterns)**
-  - `dont-bonk.md`
-
 - **Music + beat-driven behaviors**
   - `music-pu.md`
+
+- **Synchronized singing (timing + coordination across robots)**
+  - `synchronized-sing-pu.md`
 
 - **Music library utilities (notes, tempo helpers, etc.)**
   - `musiclib-pu.md`
@@ -150,17 +161,14 @@ Follow this sequence from beginner to advanced. Each step assumes you’re comfo
 - **State machines (structured robot behavior)**
   - `state-machine-pu.md`
 
-- **OOP + event handlers (clean, modular robot software design)**
-  - `OOP-pu.md`
-
-- **Synchronized singing (timing + coordination across robots)**
-  - `synchronized-sing-pu.md`
-
 - **Dance: from built-in `dance()` to beat-synced choreography**
   - `dance-pu.md`
 
 - **Emotions: eyes + blinking + body language (signals → emotion → expression)**
   - `emotion-pu.md`
+
+- **Signal filters (clean noisy sonar / sensor signals)**
+  - `signal-filters-pu.md`
 
 - **Maze solving (right-hand / left-hand wall following)**
   - `maze-pu.md`
@@ -171,28 +179,20 @@ Follow this sequence from beginner to advanced. Each step assumes you’re comfo
 - **Leader-following decision engine (follow leader while avoiding obstacles)**
   - `decision-engine-pu.md`
 
-- **Sonar operator (operator UI + control patterns)**
-  - `sonar-operator.md`
-  - `.hex` included: `microbit-robot-pu-sonar-operator.hex`
-
-- **Submarine sonar (complete project)**
-  - `submarine.md`
-  - `.hex` included: `microbit-robot-pu-submarine-sonar.hex`
-
 - **2D mapping concepts (occupancy grid + local mapping)**
   - `2d-map.md`
 
 - **Robot thinking (feedback loops / control)**
   - `thinking-pu.md`
 
-- **Signal filters (clean noisy sonar / sensor signals)**
-  - `signal-filters-pu.md`
-
 - **Balancing (PID-based discussion and examples)**
   - `balance-PID-pu.md`
 
 - **Improved balancing (noise + delay, complementary filter + PD + prediction)**
   - `improved-balance-pu.md`
+
+- **OOP + event handlers (clean, modular robot software design)**
+  - `OOP-pu.md`
 
 ---
 
