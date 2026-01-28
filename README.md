@@ -43,6 +43,26 @@ The retail kit includes a **gamepad that uses the second micro:bit**. For the be
 - **Learn-then-create**: programming, electronics, mechanics, 3D printing accessories
 - **Community**: share code and parts, collaborate, coordinate multiple robots
 
+## Tutorial knowledge graphs (JavaScript)
+
+The JavaScript tutorial set includes **knowledge graphs** (mindmaps) that show how topics connect and suggest a learning path.
+
+- The knowledge graphs are maintained in:
+  - `tutorials/JavaScripts/README.md`
+- They include:
+  - a general tutorial mindmap (`mindmap.png` + Mermaid source)
+  - an advanced, ROS-inspired mindmap (`advanced-ros-mindmap.png` + Mermaid source)
+
+![JavaScript Tutorials Knowledge Graph](tutorials/JavaScripts/mindmap.png)
+
+![Advanced ROS Topics Knowledge Graph](tutorials/JavaScripts/advanced-ros-mindmap.png)
+
+Use these graphs to:
+
+- pick the next tutorial based on your current programming and math level
+- understand dependencies (sensors → filtering → state machines → planning)
+- navigate the advanced track (telemetry, safety, localization, mapping, planning, multi-robot)
+
 ## Quick Start (with the retail gamepad)
 
 1. Flash your **Robot PU micro:bit** with a MakeCode project that uses this extension.
@@ -73,6 +93,15 @@ This extension auto-initializes the robot on the first call to any `robotPu.*` A
 - **Starts** a background loop that continuously updates sensors and runs the internal behavior state machine
 
 Because of this, there is **no separate `init` block** in the current API.
+
+The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and are organized into groups:
+
+- **Variables**
+- **Setup**
+- **Sensors**
+- **Actuators**
+- **Actions**
+- **Remote Control**
 
 ### Actions
 
@@ -117,6 +146,30 @@ Because of this, there is **no separate `init` block** in the current API.
   - The explore speed range is influenced by `setWalkSpeedRange(min, max)`.
 
 #### `exploreDo(): void`
+
+#### `stand(): number`
+
+- **Block**: `stand`
+- **What it does**: Moves the robot into a standing pose (balanced / ready).
+- **Return**: `number` motion status (same convention as `walk`)
+
+#### `standDo(): void`
+
+- **Block**: `stand` (statement form)
+- **What it does**: Same as `stand()` but discards the return value.
+
+#### `sideStep(direction: number): number`
+
+- **Block**: `side step %direction`
+- **Parameters**:
+  - `direction`: `-1 .. 1` (negative = left, positive = right)
+- **What it does**: Performs a sideways step.
+- **Return**: `number` motion status
+
+#### `sideStepDo(direction: number): void`
+
+- **Block**: `side step %direction` (statement form)
+- **What it does**: Same as `sideStep()` but discards the return value.
 
 - **Block**: `explore` (statement form)
 -- **What it does**: Same as `explore()` but discards the return value.
@@ -169,6 +222,20 @@ Because of this, there is **no separate `init` block** in the current API.
 
 #### `restDo(): void`
 
+#### `leftEyeBright(brightness: number): void`
+
+- **Block**: `set left eye brightness %brightness`
+- **Parameters**:
+  - `brightness`: `0 .. 1`
+- **What it does**: Sets left eye LED brightness.
+
+#### `rightEyeBright(brightness: number): void`
+
+- **Block**: `set right eye brightness %brightness`
+- **Parameters**:
+  - `brightness`: `0 .. 1`
+- **What it does**: Sets right eye LED brightness.
+
 - **Block**: `rest` (statement form)
 -- **What it does**: Same as `rest()` but discards the return value.
 
@@ -215,6 +282,52 @@ Because of this, there is **no separate `init` block** in the current API.
   - `max`: forward max speed (typically positive)
 - **Notes**:
   - This affects `explore()` speed planning and remote-control mapping.
+
+### Sensors
+
+#### `sonarDistanceCm(): number`
+
+- **Block**: `sonar distance (cm)`
+- **What it does**: Returns the current ultrasonic distance reading in centimeters.
+
+#### `frontDistanceArray(): number[]`
+
+- **Block**: `front distance array`
+- **What it does**: Returns a 5-element array describing the forward “distance profile” used by explore:
+  - `[left, leftFront, front, rightFront, right]`
+
+#### `bodyRoll(): number`
+
+- **Block**: `body roll`
+- **What it does**: Returns current body roll estimate.
+
+#### `bodyPitch(): number`
+
+- **Block**: `body pitch`
+- **What it does**: Returns current body pitch estimate.
+
+#### `musicTempo(): number`
+
+- **Block**: `music tempo`
+- **What it does**: Returns the internal beat tracker tempo estimate.
+
+### Actuators
+
+#### `servo(joint: ServoJoint, angle: number): void`
+
+- **Block**: `move %joint servo to %angle`
+- **Parameters**:
+  - `joint`: one of `left foot`, `left leg`, `right foot`, `right leg`, `head yaw`, `head pitch`
+  - `angle`: `0 .. 180`
+- **What it does**: Directly moves a selected joint servo to the given angle.
+
+#### `servoStep(joint: ServoJoint, target: number, stepSize: number): void`
+
+- **Block**: `move %joint servo to %target with step size %stepSize`
+- **Parameters**:
+  - `target`: `0 .. 180`
+  - `stepSize`: `1 .. 20`
+- **What it does**: Moves a servo toward a target using progressive stepping (useful for smoother gestures).
 
 ### Remote Control
 
@@ -339,6 +452,21 @@ If your controller is a phone/app over BLE, the typical architecture is:
     - Example: send `26` for the rest pose.
 
 ### Variables
+
+#### `mode(): Mode`
+
+- **Block**: `mode`
+- **What it does**: Returns the current robot behavior mode.
+
+#### `setMode(mode: Mode): void`
+
+- **Block**: `set mode %mode`
+- **What it does**: Sets the robot behavior mode (state machine mode).
+
+#### `setModeVar(mode: Mode): void`
+
+- **Block**: `set mode to %mode`
+- **What it does**: Alias of `setMode(...)` (provided as a variable-style block).
 
 #### `channel(): number`
 
