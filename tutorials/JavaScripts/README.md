@@ -16,11 +16,7 @@ These lessons are written for the **micro:bit MakeCode editor**:
 - If a tutorial provides a compiled `.hex` file, you can download it directly and flash it to the micro:bit.
 
 ---
-
-## Content index
-
-Follow this sequence from beginner to advanced. Each step assumes you’re comfortable with the previous ones.
-
+## Knowledge graph
 ![Robot PU JavaScript Tutorials Mindmap](mindmap.png)
 
 ```mermaid
@@ -96,6 +92,9 @@ mindmap
       Advanced balance (complementary + PD + prediction)
         improved-balance-pu.md
 ```
+## Content index
+
+Follow this sequence from beginner to advanced. Each step assumes you’re comfortable with the previous ones.
 
 ### Learning path (beginner → advanced)
 
