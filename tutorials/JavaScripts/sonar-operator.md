@@ -199,82 +199,109 @@ Below is a more complex demo that estimates target speed by comparing the curren
 1. Send a radio message: `"torpedo warning"`
 2. Speak the estimated contact time: `"Contact in X seconds"`
 
-Replace your current `basic.forever` loop with this version:
+It also adds two behaviors:
+
+1. **Jump** when the target is approaching fast (torpedo warning).
+2. **Stop** (rest) when the object is too close.
+
+Here is the version to make robot PU take actions to react with torpedo:
 
 ```typescript
-// Optional: if you want to broadcast the warning to another micro:bit
-radio.setGroup(166)
+radio.onReceivedString(function (receivedString) {
+    robotPu.runStringCommand(receivedString)
+})
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+robotPu.setChannel(166)
 
-let lastDistance = Math.round(sonarDevice.distance_cm())
+let distance = 0
+let lastDistance = Math.round(robotPu.sonarDistanceCm())
 let lastMs = control.millis()
 
+let closingSpeed = 0
+let ttc = 999
+
+// 0 = normal walk, 1 = closing/evade, 2 = stop, 3 = jump
+let mode = 0
+
+// Threat thresholds (tune these!)
+const CLOSE_CM = 18
+const STOP_CM = 7
+const FAST_CM_PER_S = 5
+
+basic.forever(function () {
+    if (mode == 1) {
+        robotPu.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0.6)
+    } else if (mode == 2) {
+        robotPu.restDo()
+    } else if (mode == 3) {
+        // use loop to make robot PU jump for a while to escape from the torpedo
+        for (let index = 0; index < 100; index++) {
+            robotPu.jumpDo()
+        }
+    } else {
+        robotPu.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0)
+    }
+    basic.pause(20)
+})
 basic.forever(function () {
     const nowMs = control.millis()
-    const distance = Math.round(sonarDevice.distance_cm())
-
+    distance = Math.round(robotPu.sonarDistanceCm())
     // dt in seconds (avoid divide-by-zero)
     const dt = Math.max(0.05, (nowMs - lastMs) / 1000)
-
     // Closing speed in cm/s
     // Positive = approaching (distance getting smaller)
-    const closingSpeed = (lastDistance - distance) / dt
-
+    closingSpeed = (lastDistance - distance) / dt
     // --- VISUAL RADAR ---
     led.plotBarGraph(distance, 50)
-
     // --- SONAR PING LOGIC ---
     const pitch = Math.map(distance, 2, 100, 2000, 200)
     const pulseDelay = Math.map(distance, 2, 100, 100, 800)
     music.playTone(pitch, 50)
     basic.pause(pulseDelay)
-
-    // --- COMPLEX LOGIC CASES ---
-    // Threat thresholds (tune these!)
-    const CLOSE_CM = 18
-    const FAST_CM_PER_S = 25
-
     // Estimate time-to-collision (seconds)
     // Only meaningful when the target is approaching
-    let ttc = 999
+    ttc = 999
     if (closingSpeed > 1) {
         ttc = distance / closingSpeed
     }
-
     // CASE A: TORPEDO WARNING (close + fast approaching)
+    // CASE B: DANGER ZONE (close but not fast)
+    // CASE C: TRACKING REPORT (approaching target)
+    // CASE D: CLEAR SKIES
     if (distance > 0 && distance <= CLOSE_CM && closingSpeed >= FAST_CM_PER_S) {
         music.setVolume(255)
+        mode = 3
         basic.showIcon(IconNames.Skull)
         radio.sendString("torpedo warning")
         billy.say("Torpedo warning")
         billy.say("Contact in " + Math.round(ttc) + " seconds")
         music.playMelody("C5 P C5 P C5 P C5 P", 500)
         basic.pause(200)
-    }
-    // CASE B: DANGER ZONE (close but not fast)
-    else if (distance > 0 && distance < 6) {
+    } else if (distance > 0 && distance < STOP_CM) {
+        mode = 2
         music.setVolume(255)
         basic.showIcon(IconNames.Skull)
         billy.say("Danger, stop!")
         basic.pause(200)
-    }
-    // CASE C: TRACKING REPORT (approaching target)
-    else if (distance >= 6 && distance < 30 && closingSpeed > 5) {
+    } else if (distance >= 6 && distance < 30 && closingSpeed > 5) {
+        mode = 1
         music.setVolume(220)
         basic.showIcon(IconNames.Target)
         billy.say("Closing")
         billy.say("Time " + Math.round(ttc) + " seconds")
         basic.pause(300)
-    }
-    // CASE D: CLEAR SKIES
-    else {
+    } else {
+        mode = 0
         music.setVolume(150)
         // No icon here so the Bar Graph stays visible
         basic.pause(200)
     }
-
     lastDistance = distance
     lastMs = nowMs
 })
+
 ```
 
 Key ideas to notice:
@@ -282,5 +309,12 @@ Key ideas to notice:
 1. **Speed comes from differences**: `closingSpeed = (lastDistance - distance) / dt`
 2. **Time-to-collision is a prediction**: `ttc = distance / closingSpeed`
 3. **Complex logic** combines multiple conditions (distance + speed) to decide which warning to trigger.
+
+One important detail: this demo uses **two `basic.forever` loops**.
+
+1. One loop continuously **chooses an action** (walk / evade / stop / jump) based on `mode`.
+2. One loop continuously **measures distance + speed** and updates `mode`.
+
+This avoids long blocking loops and keeps the robot responsive.
 
 
