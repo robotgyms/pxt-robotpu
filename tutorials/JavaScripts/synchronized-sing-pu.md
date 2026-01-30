@@ -545,8 +545,11 @@ To use this with the synchronization methods above:
 
 ```typescript
 radio.setGroup(166)
-// MIDI in this repo declares 120 BPM. Change this if you want a faster/slower version.
-music.setTempo(120)
+// MIDI in this repo declares 60 BPM. Change this if you want a faster/slower version.
+music.setTempo(20)
+music.setVolume(255)
+let track = 0
+let started = 0
 
 function playSequence(freqs: number[], durs: BeatFraction[]) {
     for (let i = 0; i < freqs.length; i++) {
@@ -557,18 +560,14 @@ function playSequence(freqs: number[], durs: BeatFraction[]) {
 
 function track1 () {
     started = 1
-    let freqs: number[] = [
-        0,
-        0,
-        0,
-        0
-    ]
-    let durs: BeatFraction[] = [
-        BeatFraction.Half,
-        BeatFraction.Half,
-        BeatFraction.Half,
-        BeatFraction.Half
-    ]
+    let freqs: number[] =  [0,0,392,392,392,392,392]
+    let durs: BeatFraction[] = [BeatFraction.Whole,
+                                BeatFraction.Whole,
+                                BeatFraction.Eighth,
+                                BeatFraction.Eighth,
+                                BeatFraction.Eighth,
+                                BeatFraction.Sixteenth,
+                                BeatFraction.Quarter]
     playSequence(freqs, durs)
     started = 0
 }
@@ -609,33 +608,38 @@ function track4 () {
     started = 0
 }
 
+function playTrack(){
+    if (track == 0) track1()
+    else if (track == 1) track2()
+    else if (track == 2) track3()
+    else track4()
+}
+
 radio.onReceivedString(function (receivedString) {
     robotPu.runStringCommand(receivedString)
 })
 
 radio.onReceivedValue(function (name, value) {
+    if (name == "#puB") {
+        playTrack()
+    }
     robotPu.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
-    robotPu.changeChannel(1)
+    track += 1
+    basic.showNumber(track)
 })
 
 input.onButtonPressed(Button.B, function () {
-    robotPu.changeChannel(-1)
+    track -= 1
+    basic.showNumber(track)
 })
 
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    track = robotPu.channel() % 4
-    if (track == 0) track1()
-    else if (track == 1) track2()
-    else if (track == 2) track3()
-    else track4()
+    playTrack()
 })
 
-let track = 0
-let started = 0
-robotPu.greet()
 ```
 
 Continue transcription workflow (repeatable):
