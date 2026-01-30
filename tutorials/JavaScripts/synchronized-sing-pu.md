@@ -481,16 +481,6 @@ function track2 () {
     music.playTone(247, music.beat(BeatFraction.Quarter))
     music.playTone(220, music.beat(BeatFraction.Quarter))
     music.rest(music.beat(BeatFraction.Whole))
-    music.rest(music.beat(BeatFraction.Double))
-    started = 0
-}
-// Register the event listener for incoming string messages
-radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
-})
-// press button A to walk forward in circles
-input.onButtonPressed(Button.A, function () {
-    robotPu.changeChannel(1)
 })
 // press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
@@ -528,10 +518,10 @@ This section provides a **runnable** quartet “soundtrack” template (4 indepe
 
 Mapping used:
 
-- `track1` = Tenor Solo (melody)
-- `track2` = Whistle
-- `track3` = Baritone
-- `track4` = Bass
+- `track = 0` = Tenor Solo (melody)
+- `track = 1` = Whistle
+- `track = 2` = Baritone
+- `track = 3` = Bass
 
 Tempo/time settings used:
 
@@ -541,106 +531,96 @@ Tempo/time settings used:
 To use this with the synchronization methods above:
 
 - Keep your existing `radio` handlers.
-- Replace the bodies of `track1..track4` with the note sequences you want.
+- Fill `tracksFreqs[]` and `tracksDursMs[]` with the note sequences you want.
 
 ```typescript
-radio.setGroup(166)
-// MIDI in this repo declares 60 BPM. Change this if you want a faster/slower version.
-music.setTempo(20)
+robotPu.setChannel(166)
+// Set your tempo here. The MIDI-extraction script below uses this BPM to convert ticks -> milliseconds.
+music.setTempo(120)
 music.setVolume(255)
 let track = 0
 let started = 0
 
-function playSequence(freqs: number[], durs: BeatFraction[]) {
+function playTrack(freqs: number[], dursMs: number[]) {
     for (let i = 0; i < freqs.length; i++) {
-        if (freqs[i] <= 0) music.rest(music.beat(durs[i]))
-        else music.playTone(freqs[i], music.beat(durs[i]))
+        if (freqs[i] <= 0) music.rest(dursMs[i])
+        else music.playTone(freqs[i], dursMs[i])
     }
 }
 
-function track1 () {
-    started = 1
-    let freqs: number[] =  [0,0,392,392,392,392,392]
-    let durs: BeatFraction[] = [BeatFraction.Whole,
-                                BeatFraction.Whole,
-                                BeatFraction.Eighth,
-                                BeatFraction.Eighth,
-                                BeatFraction.Eighth,
-                                BeatFraction.Sixteenth,
-                                BeatFraction.Quarter]
-    playSequence(freqs, durs)
-    started = 0
-}
+let tracksFreqs: number[][] = [
+    [0,294,330,330,294,262,330,392,330,330,294],
+    [
+        // Fill in
+        0,392,392,392,392,392,392,392,392,392
+    ],
+    [
+        // Fill in
+        0,659,659,659,659,659,659,659,659,659
+    ],
+    [
+        // Fill in
+        523,523,523,523,523,523,523,523,523,523
+    ]
+]
 
-function track2 () {
-    started = 1
-    let freqs: number[] = [
+let tracksDursMs: number[][] = [
+    [
+        5500,250,250,250,250,750,250,250,250,250
+    ],
+    [
         // Fill in
-    ]
-    let durs: BeatFraction[] = [
+        4000,250,250,375,500,125,500,250,250,375
+    ],
+    [
         // Fill in
+        2000,250,250,375,250,250,125,500,250,250
+    ],
+    [
+        // Fill in
+        250,250,375,250,250,125,500,250,250,375
     ]
-    playSequence(freqs, durs)
-    started = 0
-}
+]
 
-function track3 () {
+function playSelectedTrack () {
+    const n = tracksFreqs.length
+    if (n <= 0) return
+    const idx = ((track % n) + n) % n
     started = 1
-    let freqs: number[] = [
-        // Fill in
-    ]
-    let durs: BeatFraction[] = [
-        // Fill in
-    ]
-    playSequence(freqs, durs)
+    playTrack(tracksFreqs[idx], tracksDursMs[idx])
     started = 0
-}
-
-function track4 () {
-    started = 1
-    let freqs: number[] = [
-        // Fill in
-    ]
-    let durs: BeatFraction[] = [
-        // Fill in
-    ]
-    playSequence(freqs, durs)
-    started = 0
-}
-
-function playTrack(){
-    if (track == 0) track1()
-    else if (track == 1) track2()
-    else if (track == 2) track3()
-    else track4()
 }
 
 radio.onReceivedString(function (receivedString) {
+    if (receivedString == "#puChorus") {
+        playSelectedTrack()
+    }
     robotPu.runStringCommand(receivedString)
 })
 
 radio.onReceivedValue(function (name, value) {
-    if (name == "#puB") {
-        playTrack()
-    }
     robotPu.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
     track += 1
-    basic.showNumber(track)
+    basic.showNumber(((track % tracksFreqs.length) + tracksFreqs.length) % tracksFreqs.length)
 })
 
 input.onButtonPressed(Button.B, function () {
     track -= 1
-    basic.showNumber(track)
+    basic.showNumber(((track % tracksFreqs.length) + tracksFreqs.length) % tracksFreqs.length)
 })
 
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    playTrack()
+    playSelectedTrack()
 })
 
 ```
+upload to 4 robot PU's microbit. Press the button A or B to set sound track of each robot PU to 0,1,2,3.
+Then load this gamepad program to gamepad's microbit:
+ -https://makecode.microbit.org/_fq9VkJYgY8qM
+When you make the gamepad face-down, the chorus of 4 robot PU will start.
 
 Continue transcription workflow (repeatable):
 
@@ -670,7 +650,7 @@ Suggested mapping to the quartet parts:
 - Baritone = Track 0 (Elec. Piano)
 - Bass = Track 1 (Grand Piano)
 
-Run this command locally to print arrays you can paste into `track1..track4`:
+Run this command locally to print arrays you can paste into `tracksFreqs[]` / `tracksDursMs[]`:
 
 ```bash
 .venv/bin/python - <<'PY'
@@ -679,31 +659,15 @@ import mido
 mid = mido.MidiFile('Minions Banana Song.mid')
 TPB = mid.ticks_per_beat
 
-FRACS = [
-    ('Whole', 4*TPB),
-    ('Half', 2*TPB),
-    ('Quarter', 1*TPB),
-    ('Eighth', TPB//2),
-    ('Sixteenth', TPB//4),
-]
+# BPM used to convert ticks -> milliseconds.
+# Keep this in sync with the MakeCode program's music.setTempo(...)
+BPM = 120
 
 def midi_note_to_freq(n: int) -> int:
     return int(round(440.0 * (2.0 ** ((n - 69) / 12.0))))
 
-def ticks_to_beatfractions(dt: int):
-    out=[]
-    remaining=dt
-    for name, ticks in FRACS:
-        while remaining >= ticks:
-            out.append(name)
-            remaining -= ticks
-    six = TPB//4
-    if remaining:
-        remaining = int(round(remaining / six)) * six
-        while remaining > 0:
-            out.append('Sixteenth')
-            remaining -= six
-    return out
+def ticks_to_ms(dt: int) -> int:
+    return int(round((dt / TPB) * (60000.0 / BPM)))
 
 def extract_monophonic(track: mido.MidiTrack):
     t=0
@@ -731,22 +695,17 @@ def extract_monophonic(track: mido.MidiTrack):
             active.discard(msg.note)
 
     freqs=[]
-    durs=[]
+    durs_ms=[]
     for pitch, dt in segments:
         if dt<=0:
             continue
-        parts = ticks_to_beatfractions(dt)
         f = 0 if pitch is None else midi_note_to_freq(pitch)
-        for bf in parts:
-            freqs.append(f)
-            durs.append(bf)
-    return freqs, durs
+        freqs.append(f)
+        durs_ms.append(ticks_to_ms(dt))
+    return freqs, durs_ms
 
 def js_array_int(arr):
     return '[' + ','.join(str(x) for x in arr) + ']'
-
-def js_array_bf(arr):
-    return '[' + ','.join('BeatFraction.'+x for x in arr) + ']'
 
 mapping = {
     'TENOR': 3,
@@ -756,10 +715,10 @@ mapping = {
 }
 
 for role, ti in mapping.items():
-    freqs, durs = extract_monophonic(mid.tracks[ti])
+    freqs, durs_ms = extract_monophonic(mid.tracks[ti])
     print('\nROLE', role, 'TRACK', ti)
     print('FREQS', js_array_int(freqs))
-    print('DURS', js_array_bf(durs))
+    print('DURS_MS', js_array_int(durs_ms))
 PY
 ```
 
