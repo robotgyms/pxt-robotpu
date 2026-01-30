@@ -70,19 +70,29 @@ Use these graphs to:
 
 ## Quick Start (with the retail gamepad)
 
-1. Flash your **Robot PU micro:bit** with a MakeCode project that uses this extension.
+1. Flash your **Robot PU micro:bit** with a MakeCode project that uses this test program.
+   - https://makecode.microbit.org/_0pKUH5JvWbVL
 2. Flash your **gamepad micro:bit** with the official Robot PU gamepad program:
    - https://makecode.microbit.org/S34024-98531-58275-59424
-3. Ensure both micro:bits use the same radio channel (group):
+3. Default Gamepad control:
+   - PushJoystick: walk (move, turn, side step)
+   - Press joystick down: rest
+   - Press button B1: autopilot
+   - Press button B2: jump
+   - Press button B3: soccer kick
+   - Press button B4: dance
+   - In walk mode, pitch gamepad up/down: head move up/down
+   - In walk mode, roll gamepad left/right: head move left/right
+4. Ensure both micro:bits use the same radio channel (group):
    - Use `robotPu.setChannel(...)` in your Robot PU project, or set the same `radio.setGroup(...)` on both devices.
-4. In your Robot PU project, forward radio messages to robotPu (see the Remote Control section for example code).
+5. In your Robot PU project, forward radio messages to robotPu (see the Remote Control section for example code).
 
 ## Installation
 
 1. In MakeCode, open your micro:bit project.
 2. Add extension → Import URL (or local path) → point to this repository.
-3. Ensure the dependency to Billy voice is available (see Dependencies below).
-4. Call any `robotPu.*` block once in `on start` (for example `robotPu.calibrate()` or `robotPu.rest()`) to trigger auto-initialization.
+   - https://github.com/robotgyms/pxt-robotpu
+   - or simply enter: robotgyms/pxt-robotpu
 
 ## Dependencies
 
