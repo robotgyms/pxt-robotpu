@@ -227,7 +227,6 @@ billy.configureVoice(
 )
 billy.say("I have a sonar")
 basic.forever(function () {
-    distance = robotPu.sonarDistanceCm()
     if (distance > 2 && distance < 100) {
         // Map 2cm->2000Hz and 100cm->200Hz
         pitch = Math.map(distance, 2, 100, 2000, 200)
@@ -251,8 +250,10 @@ basic.forever(function () {
     } else {
         basic.pause(500)
     }
+    basic.pause(2000)
 })
 basic.forever(function () {
+    distance = robotPu.sonarDistanceCm()
     robotPu.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
     basic.pause(10)
 })

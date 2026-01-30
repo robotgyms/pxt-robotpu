@@ -67,6 +67,23 @@ Robot PU uses a **front-facing ultrasonic sonar sensor**.
 | `robotPu.sonarDistanceCm()` | Read the current sonar distance in centimeters. |
 | `robotPu.walk(speed, turn)` | Walk with forward speed and turning bias. |
 
+The basic code is to get distance and walk, do not add any other code to slow down the observe-think-action loop.
+```typescript
+radio.onReceivedString(function (receivedString) {
+    robotPu.runStringCommand(receivedString)
+})
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+let distance = 0
+robotPu.setChannel(166)
+basic.forever(function () {
+    distance = robotPu.sonarDistanceCm()
+    robotPu.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    basic.pause(10)
+})
+
+```
 ---
 
 ## 💻 5. Implementation Script
