@@ -526,12 +526,20 @@ Mapping used:
 Tempo/time settings used:
 
 - `music.setTempo(...)` (see MIDI note below)
-- 2/4 feel (you express durations using `music.beat(BeatFraction.Quarter)` / `Eighth` / etc.)
+- durations are expressed as milliseconds in `tracksDursMs[]`
 
 To use this with the synchronization methods above:
 
 - Keep your existing `radio` handlers.
 - Fill `tracksFreqs[]` and `tracksDursMs[]` with the note sequences you want.
+
+When you make the gamepad face-down, the chorus of 4 robot PU will start.
+
+Continue transcription workflow (repeatable):
+
+- For each staff (Tenor/Whistle/Baritone/Bass), go **measure by measure**.
+- For each measure, append to `tracksFreqs[trackId]` and `tracksDursMs[trackId]`.
+- Use frequency `0` for rests.
 
 ```typescript
 robotPu.setChannel(166)
@@ -549,7 +557,7 @@ function playTrack(freqs: number[], dursMs: number[]) {
 }
 
 let tracksFreqs: number[][] = [
-    [0,294,330,330,294,262,330,392,330,330,294],
+    [0,294,330,330,294,262,330,392,330,330],
     [
         // Fill in
         0,392,392,392,392,392,392,392,392,392
@@ -594,6 +602,7 @@ function playSelectedTrack () {
 radio.onReceivedString(function (receivedString) {
     if (receivedString == "#puChorus") {
         playSelectedTrack()
+        return
     }
     robotPu.runStringCommand(receivedString)
 })
@@ -617,20 +626,583 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 })
 
 ```
-upload to 4 robot PU's microbit. Press the button A or B to set sound track of each robot PU to 0,1,2,3.
+Upload https://makecode.microbit.org/_b30bwjUuq58T to 4 robot PU's microbit. Press the button A or B to set sound track of each robot PU to 0,1,2,3.
 Then load this gamepad program to gamepad's microbit:
  -https://makecode.microbit.org/_fq9VkJYgY8qM
-When you make the gamepad face-down, the chorus of 4 robot PU will start.
 
-Continue transcription workflow (repeatable):
+### Generate `freqs[]` + `durs[]` using GenAI for any quartet song
 
-- For each staff (Tenor/Whistle/Baritone/Bass), go **measure by measure**.
-- For each measure, write a sequence of `tone(frequency, BeatFraction.X)` calls that add up to the measure length.
-- Use `tone(0, ...)` for rests.
+Simply use following prompt in Microsoft Copilot to fill in the blank of the
 
-If you tell me which measure you want next (for example: “start at measure 1, Tenor Solo”), I’ll transcribe that measure into `tone(...)` calls and you can confirm it before we proceed.
+```typescript
+let tracksFreqs: number[][] = []
+let tracksDursMs: number[][] = []
+```
 
-If you paste note sequences from your score, I can help you convert each measure into `tone(frequency, BeatFraction. ...)` calls.
+Prompts:
+Generate a chorus quartet about 60 seconds, similar to the Minion banana. Using javascript, pack the frequence into tracksFreqs as number[][], pack the duration into tracksDursMs  as number[][]
+
+then, copy and paste the code from Copilot outputs to replace the code above.
+
+here is am example.
+
+```typescript
+robotPu.setChannel(166)
+// Set your tempo here. The MIDI-extraction script below uses this BPM to convert ticks -> milliseconds.
+music.setTempo(120)
+music.setVolume(255)
+let track = 0
+let started = 0
+
+function playTrack(freqs: number[], dursMs: number[]) {
+    for (let i = 0; i < freqs.length; i++) {
+        if (freqs[i] <= 0) music.rest(dursMs[i])
+        else music.playTone(freqs[i], dursMs[i])
+    }
+}
+
+let tracksFreqs: number[][] = [
+    // TRACK 0 — TENOR (Main Melody)
+    [
+        // INTRO
+        523.25, 659.25, 783.99, 1046.5,
+        987.77, 880.0, 783.99, 659.25,
+
+        // THEME A
+        523.25, 587.33, 659.25, 783.99,
+        880.0, 783.99, 659.25, 587.33,
+        659.25, 783.99, 880.0, 987.77,
+        880.0, 783.99, 659.25, 523.25,
+
+        // THEME B
+        659.25, 783.99, 987.77, 1046.5,
+        987.77, 880.0, 783.99, 880.0,
+        987.77, 1046.5, 1174.66, 1046.5,
+        987.77, 880.0, 783.99, 659.25,
+
+        // BRIDGE
+        523.25, 587.33, 659.25, 698.46,
+        739.99, 698.46, 659.25, 587.33,
+
+        // FINAL CHORUS
+        523.25, 659.25, 783.99, 880.0,
+        987.77, 1046.5, 987.77, 880.0,
+        783.99, 659.25, 523.25, 523.25
+    ],
+
+    // TRACK 1 — WHISTLE (Counter‑Melody)
+    [
+        // INTRO
+        0, 880.0, 987.77, 1174.66,
+        1046.5, 987.77, 880.0, 0,
+
+        // THEME A
+        880.0, 987.77, 1046.5, 987.77,
+        880.0, 783.99, 880.0, 987.77,
+        1046.5, 1174.66, 1046.5, 987.77,
+        880.0, 783.99, 880.0, 987.77,
+
+        // THEME B
+        1174.66, 1318.51, 1174.66, 1046.5,
+        987.77, 880.0, 987.77, 1046.5,
+        1174.66, 1318.51, 1396.91, 1318.51,
+        1174.66, 1046.5, 987.77, 880.0,
+
+        // BRIDGE
+        880.0, 987.77, 1046.5, 987.77,
+        880.0, 783.99, 698.46, 659.25,
+
+        // FINAL CHORUS
+        880.0, 987.77, 1046.5, 1174.66,
+        1318.51, 1396.91, 1318.51, 1174.66,
+        1046.5, 987.77, 880.0, 880.0
+    ],
+
+    // TRACK 2 — BARITONE (Harmony)
+    [
+        // INTRO
+        130.81, 196.0, 261.63, 196.0,
+        174.61, 220.0, 246.94, 220.0,
+
+        // THEME A
+        130.81, 164.81, 196.0, 164.81,
+        146.83, 174.61, 196.0, 174.61,
+        130.81, 164.81, 196.0, 164.81,
+        146.83, 174.61, 196.0, 174.61,
+
+        // THEME B
+        174.61, 220.0, 261.63, 220.0,
+        196.0, 246.94, 293.66, 246.94,
+        174.61, 220.0, 261.63, 220.0,
+        196.0, 246.94, 293.66, 246.94,
+
+        // BRIDGE
+        130.81, 146.83, 164.81, 174.61,
+        196.0, 174.61, 164.81, 146.83,
+
+        // FINAL CHORUS
+        130.81, 164.81, 196.0, 220.0,
+        246.94, 261.63, 246.94, 220.0,
+        196.0, 164.81, 130.81, 130.81
+    ],
+
+    // TRACK 3 — BASS (Foundation)
+    [
+        // INTRO
+        65.41, 98.0, 130.81, 98.0,
+        73.42, 110.0, 146.83, 110.0,
+
+        // THEME A
+        65.41, 98.0, 65.41, 98.0,
+        55.0, 82.41, 55.0, 82.41,
+        43.65, 65.41, 43.65, 65.41,
+        49.0, 73.42, 49.0, 73.42,
+
+        // THEME B
+        65.41, 98.0, 130.81, 98.0,
+        73.42, 110.0, 146.83, 110.0,
+        82.41, 123.47, 164.81, 123.47,
+        98.0, 146.83, 196.0, 146.83,
+
+        // BRIDGE
+        65.41, 73.42, 82.41, 87.31,
+        98.0, 87.31, 82.41, 73.42,
+
+        // FINAL CHORUS
+        65.41, 98.0, 130.81, 146.83,
+        164.81, 196.0, 164.81, 146.83,
+        130.81, 98.0, 65.41, 65.41
+    ]
+];
+
+let tracksDursMs: number[][] = [
+    // TRACK 0 — TENOR
+    [
+        // INTRO
+        500, 500, 500, 750,
+        500, 500, 500, 750,
+
+        // THEME A
+        500, 250, 250, 500,
+        750, 500, 500, 500,
+        250, 250, 500, 750,
+        500, 500, 500, 1000,
+
+        // THEME B
+        500, 500, 750, 500,
+        500, 500, 500, 500,
+        500, 500, 750, 500,
+        500, 500, 500, 1000,
+
+        // BRIDGE
+        500, 250, 250, 500,
+        500, 500, 500, 750,
+
+        // FINAL CHORUS
+        500, 500, 500, 500,
+        750, 750, 500, 500,
+        500, 500, 1000, 1000
+    ],
+
+    // TRACK 1 — WHISTLE
+    [
+        // INTRO
+        500, 250, 250, 500,
+        500, 250, 250, 500,
+
+        // THEME A
+        250, 250, 500, 250,
+        250, 500, 250, 250,
+        500, 500, 250, 250,
+        500, 250, 250, 500,
+
+        // THEME B
+        250, 250, 500, 500,
+        250, 250, 500, 250,
+        250, 250, 500, 500,
+        500, 250, 250, 500,
+
+        // BRIDGE
+        250, 250, 500, 250,
+        250, 500, 250, 500,
+
+        // FINAL CHORUS
+        250, 250, 500, 500,
+        500, 500, 250, 250,
+        500, 500, 750, 750
+    ],
+
+    // TRACK 2 — BARITONE
+    [
+        // INTRO
+        1000, 500, 500, 1000,
+        750, 750, 500, 1000,
+
+        // THEME A
+        1000, 500, 500, 1000,
+        750, 750, 500, 1000,
+        1000, 500, 500, 1000,
+        750, 750, 500, 1000,
+
+        // THEME B
+        1000, 500, 500, 1000,
+        750, 750, 500, 1000,
+        1000, 500, 500, 1000,
+        750, 750, 500, 1000,
+
+        // BRIDGE
+        750, 500, 500, 750,
+        1000, 750, 500, 750,
+
+        // FINAL CHORUS
+        1000, 500, 500, 750,
+        750, 1000, 750, 750,
+        1000, 750, 1000, 1000
+    ],
+
+    // TRACK 3 — BASS
+    [
+        // INTRO
+        500, 500, 750, 250,
+        500, 500, 750, 250,
+
+        // THEME A
+        500, 250, 250, 500,
+        500, 250, 250, 500,
+        500, 250, 250, 500,
+        500, 250, 250, 500,
+
+        // THEME B
+        500, 500, 750, 250,
+        500, 500, 750, 250,
+        500, 500, 750, 250,
+        500, 500, 750, 250,
+
+        // BRIDGE
+        500, 250, 250, 500,
+        500, 250, 250, 500,
+
+        // FINAL CHORUS
+        500, 500, 750, 250,
+        500, 500, 750, 250,
+        500, 500, 1000, 1000
+    ]
+];
+
+function playSelectedTrack(trackID:number) {
+    const n = tracksFreqs.length
+    if (n <= 0) return
+    const idx = ((trackID % n) + n) % n
+    started = 1
+    playTrack(tracksFreqs[idx], tracksDursMs[idx])
+    started = 0
+}
+
+radio.onReceivedString(function (receivedString) {
+    if (receivedString == "#puChorus") {
+        playSelectedTrack(track)
+    }
+    robotPu.runStringCommand(receivedString)
+})
+
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+
+input.onButtonPressed(Button.A, function () {
+    track += 1
+    basic.showNumber(((track % tracksFreqs.length) + tracksFreqs.length) % tracksFreqs.length)
+})
+
+input.onButtonPressed(Button.B, function () {
+    track -= 1
+    basic.showNumber(((track % tracksFreqs.length) + tracksFreqs.length) % tracksFreqs.length)
+})
+
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    playSelectedTrack(track)
+})
+
+```
+Another example:
+```typescript
+robotPu.setChannel(166)
+// Set your tempo here. The MIDI-extraction script below uses this BPM to convert ticks -> milliseconds.
+music.setTempo(120)
+music.setVolume(255)
+let track = 0
+let started = 0
+
+function playTrack(freqs: number[], dursMs: number[]) {
+    for (let i = 0; i < freqs.length; i++) {
+        if (freqs[i] <= 0) music.rest(dursMs[i])
+        else music.playTone(freqs[i], dursMs[i])
+    }
+}
+
+let tracksFreqs: number[][] = [
+    // TRACK 0 — TENOR (Main goofy melody)
+    [
+        // INTRO
+        523.25, 587.33, 659.25, 698.46,
+        659.25, 587.33, 523.25, 392.00,
+
+        // THEME A
+        523.25, 659.25, 783.99, 880.0,
+        783.99, 659.25, 587.33, 523.25,
+        659.25, 783.99, 880.0, 987.77,
+        880.0, 783.99, 659.25, 523.25,
+
+        // THEME B (more excited)
+        659.25, 698.46, 783.99, 880.0,
+        987.77, 880.0, 783.99, 698.46,
+        783.99, 880.0, 987.77, 1046.5,
+        987.77, 880.0, 783.99, 659.25,
+
+        // BRIDGE (curious)
+        523.25, 587.33, 659.25, 698.46,
+        739.99, 698.46, 659.25, 587.33,
+
+        // FINAL CHORUS
+        523.25, 659.25, 783.99, 880.0,
+        987.77, 1046.5, 987.77, 880.0,
+        783.99, 659.25, 523.25, 523.25
+    ],
+
+    // TRACK 1 — WHISTLE (Minion‑style silliness)
+    [
+        // INTRO
+        0, 880.0, 987.77, 1174.66,
+        1046.5, 987.77, 880.0, 0,
+
+        // THEME A
+        880.0, 987.77, 1046.5, 987.77,
+        880.0, 783.99, 880.0, 987.77,
+        1046.5, 1174.66, 1046.5, 987.77,
+        880.0, 783.99, 880.0, 987.77,
+
+        // THEME B
+        1174.66, 1318.51, 1174.66, 1046.5,
+        987.77, 880.0, 987.77, 1046.5,
+        1174.66, 1318.51, 1396.91, 1318.51,
+        1174.66, 1046.5, 987.77, 880.0,
+
+        // BRIDGE
+        880.0, 987.77, 1046.5, 987.77,
+        880.0, 783.99, 698.46, 659.25,
+
+        // FINAL CHORUS
+        880.0, 987.77, 1046.5, 1174.66,
+        1318.51, 1396.91, 1318.51, 1174.66,
+        1046.5, 987.77, 880.0, 880.0
+    ],
+
+    // TRACK 2 — BARITONE (Harmony support)
+    [
+        // INTRO
+        261.63, 329.63, 392.00, 329.63,
+        293.66, 349.23, 392.00, 349.23,
+
+        // THEME A
+        261.63, 293.66, 329.63, 293.66,
+        261.63, 293.66, 329.63, 293.66,
+        261.63, 329.63, 392.00, 329.63,
+        293.66, 349.23, 392.00, 349.23,
+
+        // THEME B
+        329.63, 392.00, 440.00, 392.00,
+        349.23, 392.00, 440.00, 392.00,
+        329.63, 392.00, 440.00, 392.00,
+        349.23, 392.00, 440.00, 392.00,
+
+        // BRIDGE
+        261.63, 293.66, 329.63, 349.23,
+        392.00, 349.23, 329.63, 293.66,
+
+        // FINAL CHORUS
+        261.63, 329.63, 392.00, 440.00,
+        493.88, 523.25, 493.88, 440.00,
+        392.00, 329.63, 261.63, 261.63
+    ],
+
+    // TRACK 3 — BASS (Bouncy Minion stomp)
+    [
+        // INTRO
+        130.81, 196.0, 130.81, 196.0,
+        146.83, 220.0, 146.83, 220.0,
+
+        // THEME A
+        130.81, 196.0, 130.81, 196.0,
+        110.0, 164.81, 110.0, 164.81,
+        98.0, 146.83, 98.0, 146.83,
+        110.0, 164.81, 110.0, 164.81,
+
+        // THEME B
+        130.81, 196.0, 261.63, 196.0,
+        146.83, 220.0, 293.66, 220.0,
+        164.81, 246.94, 329.63, 246.94,
+        196.0, 293.66, 392.00, 293.66,
+
+        // BRIDGE
+        130.81, 146.83, 164.81, 174.61,
+        196.0, 174.61, 164.81, 146.83,
+
+        // FINAL CHORUS
+        130.81, 196.0, 261.63, 293.66,
+        329.63, 392.00, 329.63, 293.66,
+        261.63, 196.0, 130.81, 130.81
+    ]
+];
+
+let tracksDursMs: number[][] = [
+    // TRACK 0 — TENOR
+    [
+        // INTRO
+        300, 300, 300, 500,
+        300, 300, 300, 500,
+
+        // THEME A
+        400, 200, 200, 400,
+        600, 400, 300, 300,
+        200, 200, 400, 600,
+        400, 300, 300, 800,
+
+        // THEME B
+        400, 300, 500, 400,
+        300, 300, 300, 300,
+        400, 400, 600, 400,
+        300, 300, 300, 800,
+
+        // BRIDGE
+        400, 200, 200, 400,
+        400, 400, 300, 500,
+
+        // FINAL CHORUS
+        400, 400, 400, 400,
+        600, 600, 400, 400,
+        400, 400, 800, 800
+    ],
+
+    // TRACK 1 — WHISTLE
+    [
+        // INTRO
+        400, 200, 200, 400,
+        400, 200, 200, 400,
+
+        // THEME A
+        200, 200, 400, 200,
+        200, 400, 200, 200,
+        400, 400, 200, 200,
+        400, 200, 200, 400,
+
+        // THEME B
+        200, 200, 400, 400,
+        200, 200, 400, 200,
+        200, 200, 400, 400,
+        400, 200, 200, 400,
+
+        // BRIDGE
+        200, 200, 400, 200,
+        200, 400, 200, 400,
+
+        // FINAL CHORUS
+        200, 200, 400, 400,
+        400, 400, 200, 200,
+        400, 400, 600, 600
+    ],
+
+    // TRACK 2 — BARITONE
+    [
+        // INTRO
+        800, 400, 400, 800,
+        600, 600, 400, 800,
+
+        // THEME A
+        800, 400, 400, 800,
+        600, 600, 400, 800,
+        800, 400, 400, 800,
+        600, 600, 400, 800,
+
+        // THEME B
+        800, 400, 400, 800,
+        600, 600, 400, 800,
+        800, 400, 400, 800,
+        600, 600, 400, 800,
+
+        // BRIDGE
+        600, 400, 400, 600,
+        800, 600, 400, 600,
+
+        // FINAL CHORUS
+        800, 400, 400, 600,
+        600, 800, 600, 600,
+        800, 600, 800, 800
+    ],
+
+    // TRACK 3 — BASS
+    [
+        // INTRO
+        400, 400, 600, 200,
+        400, 400, 600, 200,
+
+        // THEME A
+        400, 200, 200, 400,
+        400, 200, 200, 400,
+        400, 200, 200, 400,
+        400, 200, 200, 400,
+
+        // THEME B
+        400, 400, 600, 200,
+        400, 400, 600, 200,
+        400, 400, 600, 200,
+        400, 400, 600, 200,
+
+        // BRIDGE
+        400, 200, 200, 400,
+        400, 200, 200, 400,
+
+        // FINAL CHORUS
+        400, 400, 600, 200,
+        400, 400, 600, 200,
+        400, 400, 800, 800
+    ]
+];
+
+function playSelectedTrack(trackID:number) {
+    const n = tracksFreqs.length
+    if (n <= 0) return
+    const idx = ((trackID % n) + n) % n
+    started = 1
+    playTrack(tracksFreqs[idx], tracksDursMs[idx])
+    started = 0
+}
+
+radio.onReceivedString(function (receivedString) {
+    if (receivedString == "#puChorus") {
+        playSelectedTrack(track)
+    }
+    robotPu.runStringCommand(receivedString)
+})
+
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+
+input.onButtonPressed(Button.A, function () {
+    track += 1
+    basic.showNumber(((track % tracksFreqs.length) + tracksFreqs.length) % tracksFreqs.length)
+})
+
+input.onButtonPressed(Button.B, function () {
+    track -= 1
+    basic.showNumber(((track % tracksFreqs.length) + tracksFreqs.length) % tracksFreqs.length)
+})
+
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    playSelectedTrack(track)
+})
+
+```
 
 ### Generate `freqs[]` + `durs[]` from the MIDI file (recommended)
 
@@ -1107,3 +1679,4 @@ Notes:
 - Set each robot’s channel so `channel % 4` covers 0,1,2,3.
 - Flash the conductor code to a controller micro:bit.
 - Press logo on the conductor and confirm all robots begin together.
+
