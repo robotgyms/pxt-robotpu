@@ -30,9 +30,12 @@ Purchase links:
 
 - Robot PU (pre-built and upgradable)
 - 2× micro:bit
-- Gamepad
-- Manual
-- Online tutorials and examples
+- Gamepad (remote control and distributed computation)
+- [Manual](https://robotgyms.com/courses/the-story-of-pu-book-1-pair-up/)
+- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials)
+- [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/)
+- [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth)
+- [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
 
 The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
 
