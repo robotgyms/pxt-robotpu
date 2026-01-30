@@ -152,7 +152,7 @@ class MusicLib {
             this.buf[idx] = (this.buf[idx] * (this.hits - 1) + this.loud) / this.hits;
         } else {
             // fill the new bucket
-            this.hits = 0;
+            this.hits = 1;
             this.buf[idx] = this.loud;
             this.lastIndex = idx;
 
@@ -176,7 +176,6 @@ class MusicLib {
                 if (this.buf[cIdx] > this.buf[nl] * snr &&
                     this.buf[cIdx] > this.buf[nr] * snr &&
                     this.buf[cIdx] > avgLoudness) {
-
                     c++;
                     if (prevIdx == cIdx) {
                         this.loudThreshold = this.buf[cIdx] * 0.9;
