@@ -86,6 +86,21 @@ namespace robotPu {
         ensureRobot().greet();
     }
 
+    /** Play a sequence of tones using frequency (Hz) and duration (ms) arrays. Use frequency 0 for rests. */
+    //% blockId=robotpu_play_tone_sequence_ms block="play tone sequence freqs %freqs|durations(ms) %dursMs"
+    //% weight=35 blockGap=8
+    //% subcategory="Actions"
+    //% group="Actions"
+    export function playToneSequenceMs(freqs: number[], dursMs: number[]): void {
+        const n = Math.min(freqs ? freqs.length : 0, dursMs ? dursMs.length : 0);
+        for (let i = 0; i < n; i++) {
+            const dur = Math.max(0, Math.round(dursMs[i]));
+            const f = Math.round(freqs[i]);
+            if (f <= 0) music.rest(dur);
+            else music.playTone(f, dur);
+        }
+    }
+
     /** Set current robot behavior mode (state machine). */
     //% blockId=robotpu_setMode block="set mode %mode"
     //% weight=59 blockGap=8
