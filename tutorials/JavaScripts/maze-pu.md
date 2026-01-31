@@ -86,91 +86,62 @@ Then we decide the next motion using a priority order.
 Copy this code into the **JavaScript** tab of the MakeCode Editor.
 
 ```typescript
-// Follow the right wall maze solver using robotPu.frontDistanceArray()
-// d[0..4] are left -> right distance bins
 
-// Distance thresholds (cm)
-// These align with the extension's internal safety thresholds (~7.5cm danger + ~20cm caution)
-const OPEN_CM = 28
-const TOO_CLOSE_CM = 12
-
-// Movement tuning
-const FWD_SPEED = 1.8
-const TURN_SPEED = 1.4
-
-// Turn bias: -1 left, +1 right
-const TURN_BIAS = 0.9
-
-function clampInt(x: number, lo: number, hi: number): number {
-    if (x < lo) return lo
-    if (x > hi) return hi
+function clampInt (x: number, lo: number, hi: number) {
+    if (x < lo) {
+        return lo
+    }
+    if (x > hi) {
+        return hi
+    }
     return x
 }
+let leftOpen = false
+let frontOpen = false
+let rightOpen = false
+let dRight = 0
+let dFront = 0
+let dLeft = 0
+let d: number[] = []
+let t0 = 0
+let TURN_BIAS = 0
+let FWD_SPEED = 0
 
-function max2(a: number, b: number): number {
-    return a > b ? a : b
-}
-
-function driveFor(ms: number, speed: number, turn: number): void {
-    const t0 = control.millis()
-    while (control.millis() - t0 < ms) {
-        robotPu.walk(speed, turn)
-        basic.pause(10)
-    }
-}
-
-function stepForward(): void {
-    // If we are too close, slow down to avoid bonking
-    driveFor(220, FWD_SPEED, 0)
-}
-
-function turnRight90ish(): void {
-    // Curved step to the right
-    driveFor(380, TURN_SPEED, TURN_BIAS)
-}
-
-function turnLeft90ish(): void {
-    // Curved step to the left
-    driveFor(380, TURN_SPEED, -TURN_BIAS)
-}
-
-function turnAround(): void {
-    // Two left turns (roughly 180)
-    turnLeft90ish()
-    basic.pause(50)
-    turnLeft90ish()
-}
-
+robotPu.setChannel(166)
+// Distance thresholds (cm)
+// These align with the extension's internal safety thresholds (~7.5cm danger + ~20cm caution)
+let OPEN_CM = 30
+// Movement tuning
+FWD_SPEED = 4
+// Turn bias: -1 left, +1 right
+TURN_BIAS = 0.
 basic.forever(function () {
+    robotPu.sonarScan()
     // 1) Read 5-bin front scan (left -> right)
-    const d = robotPu.frontDistanceArray()
-
-    const dLeft = max2(d[0], d[1])
-    const dFront = d[2]
-    const dRight = max2(d[3], d[4])
-
-    const rightOpen = dRight > OPEN_CM
-    const frontOpen = dFront > OPEN_CM
-    const leftOpen = dLeft > OPEN_CM
-
-    // 2) Emergency: if the center/front bin is very close, turn left immediately
-    if (dFront > 0 && dFront < TOO_CLOSE_CM) {
-        turnLeft90ish()
-        return
-    }
-
+    d = robotPu.frontDistanceArray()
+    dLeft = (dLeft * 9+ d[0]) * 0.1
+    dFront = (dFront * 9 + d[2]) * 0.1
+    dRight = (dRight * 9 + d[4]) *0.1
+    rightOpen = dRight > OPEN_CM
+    frontOpen = dFront > OPEN_CM *0.8
+    leftOpen = dLeft > OPEN_CM * 0.4
+    FWD_SPEED = Math.map(Math.max(dRight, dLeft), 7, 20, -1, 3)
     // 3) Right-hand rule priority
     if (rightOpen) {
-        turnRight90ish()
+        robotPu.walk(FWD_SPEED, 0.2)
     } else if (frontOpen) {
-        stepForward()
-    } else if (leftOpen) {
-        turnLeft90ish()
+        robotPu.walk(FWD_SPEED, 0)
     } else {
-        turnAround()
+        robotPu.explore()
     }
+    radio.sendValue("fd0", d[0])
+    radio.sendValue("fd1", d[1])
+    radio.sendValue("fd2", d[2])
+    radio.sendValue("fd3", d[3])
+    radio.sendValue("fd4", d[4])
+    radio.sendValue("broll", robotPu.bodyRoll())
+    radio.sendValue("bpitch", robotPu.bodyPitch())
 })
-
 ```
 
 ## Left-hand rule variant
