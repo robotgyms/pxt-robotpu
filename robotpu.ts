@@ -186,7 +186,7 @@ class MusicLib {
             }
 
             if (c > 0) {
-                let newPeriod = sampleMs * length / c * 0.5;
+                let newPeriod = sampleMs * length / c;
                 let periodRatio = this.period > 0 ? newPeriod / this.period : 1.0;
                 let smoothFactor = (periodRatio > 0.8 && periodRatio < 1.2) ? 0.1 : 0.05;
 
@@ -1352,7 +1352,7 @@ class RobotPu {
         let ms = input.soundLevel();
 
         // 1. Check for a musical beat using the MusicLib helper
-        let il = this.music.isABeat(ts, ms, 1.1);
+        let il = this.music.isABeat(ts, ms, 1.005);
 
         // 2. High-beat logic: Pulse LEDs and flip wiggle direction
         if (ts - this.lastHIghBeat > this.music.period * 0.5) {
