@@ -86,6 +86,15 @@ namespace robotPu {
         ensureRobot().greet();
     }
 
+    /** Update the internal front distance array by taking one sonar reading. */
+    //% blockId=robotpu_sonar_scan block="sonar scan"
+    //% weight=48 blockGap=8
+    //% subcategory="Actions"
+    //% group="Actions"
+    export function sonarScan(): void {
+        ensureRobot().sonarScan();
+    }
+
     /** Play a sequence of tones using frequency (Hz) and duration (ms) arrays. Use frequency 0 for rests. */
     //% blockId=robotpu_play_tone_sequence_ms block="play tone sequence freqs %freqs|durations(ms) %dursMs"
     //% weight=35 blockGap=8

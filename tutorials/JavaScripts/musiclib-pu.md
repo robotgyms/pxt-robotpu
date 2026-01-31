@@ -1,15 +1,6 @@
 
 # 🎛️ Lesson: `MusicLib` Beat + Tempo Detection (Syncing Artistic Moves)
 
-Knowledge
-
-  - https://makecode.microbit.org/types/array
-  - https://arcade.makecode.com/courses/csintro2/arrays
-  - https://en.wikipedia.org/wiki/Circular_buffer
-  - https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem
-  - https://en.wikipedia.org/wiki/Quasi-peak_detector
-
-
 ## Introduction
 
 Robot PU can look *artistic* when its body motion is synchronized to music.
@@ -21,6 +12,14 @@ This lesson focuses on rhythm:
 - detect **beats**
 - estimate **tempo (BPM)**
 - sync **dance / body movements** to those beats
+
+## Knowledge
+
+- https://makecode.microbit.org/types/array
+- https://arcade.makecode.com/courses/csintro2/arrays
+- https://en.wikipedia.org/wiki/Circular_buffer
+- https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem
+- https://en.wikipedia.org/wiki/Quasi-peak_detector
 
 ## Problem definition
 
@@ -224,15 +223,17 @@ Important:
 Example (extension dev):
 
 ```typescript
-let micLoudness = 0
 let now = 0
+let micLoudness = 0
 let musicDetector = new MusicLib()
+
 basic.forever(function () {
     micLoudness = input.soundLevel()
     now = control.millis()
     musicDetector.isABeat(now, micLoudness, 1.005)
     basic.pause(5)
 })
+
 basic.forever(function () {
     if (randint(0, 300) == 0) {
         basic.showNumber(musicDetector.period)
@@ -240,9 +241,9 @@ basic.forever(function () {
         led.plotBarGraph(micLoudness,255)
     }
 })
-
 ```
-Example program can be dlownlowed from https://makecode.microbit.org/S24031-00421-18959-80697
+Example program can be downloaded from 
+  - https://makecode.microbit.org/_0qMPvR9cjRu5
 
 ### B. MakeCode-friendly beat detector (public projects)
 
@@ -274,7 +275,7 @@ basic.forever(function () {
 })
 ```
 
-## Technical explaination
+## Technical explanation
 
 ### A. Beat detection
 

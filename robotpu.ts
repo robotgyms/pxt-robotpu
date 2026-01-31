@@ -1012,10 +1012,6 @@ class RobotPu {
         this.exploreSpeed = (this.exploreSpeed + target_sp) * 0.5;
     }
 
-    private set_explore_param(): void {
-        this.setExploreParam();
-    }
-
     /**
  * Map sonar distance readings to a steering direction for auto-pilot.
  * @param ep_dis List of sonar distance readings from left to right
@@ -1063,26 +1059,24 @@ class RobotPu {
         return this.getTurnFromSonar(ep_dis, turn_gain);
     }
 
+    public sonarScan(): void {
+        let targetIndex = this.wk.pos < 2 ? 1 : 3;
+        let angleValue = this.pr.servoTarget[targetIndex];
+
+        let d_i = angleValue > 110 ? 0 :
+            angleValue > 90 ? 1 :
+                angleValue > 70 ? 2 : 3;
+
+        let currentSonar = this.sonar.distanceCm();
+        this.pr.exploreDistance[d_i] = (this.pr.exploreDistance[d_i] + currentSonar) * 0.5;
+    }
+
     /**
  * Autonomous exploration with obstacle point-cloud mapping.
  * Updates the distance array and adjusts movement parameters.
  */
     public explore(): number {
-        // 1. Determine which index of the target states (s_tg) to check
-        // Python: pr.s_tg[1 if wk.pos < 2 else 3]
-        let targetIndex = this.wk.pos < 2 ? 1 : 3;
-        let angleValue = this.pr.servoTarget[targetIndex];
-
-        // 2. Map the angle value to a point-cloud index (0-3)
-        // Python: 0 if a > 110 else 1 if a > 90 else 2 if a > 70 else 3
-        let d_i = angleValue > 110 ? 0 :
-            angleValue > 90 ? 1 :
-                angleValue > 70 ? 2 : 3;
-
-        // 3. Update the exploration distance array with a rolling average
-        // We multiply by 0.5 to give 50% weight to the new sonar reading
-        let currentSonar = this.sonar.distanceCm();
-        this.pr.exploreDistance[d_i] = (this.pr.exploreDistance[d_i] + currentSonar) * 0.5;
+        this.sonarScan();
 
         // 4. Update the exploration speed (exploreSpeed) and direction (exploreDirection)
         this.setExploreParam();
