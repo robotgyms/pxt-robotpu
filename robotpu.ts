@@ -186,7 +186,7 @@ class MusicLib {
             }
 
             if (c > 0) {
-                let newPeriod = sampleMs * length / c * 2.0;
+                let newPeriod = sampleMs * length / c * 0.5;
                 let periodRatio = this.period > 0 ? newPeriod / this.period : 1.0;
                 let smoothFactor = (periodRatio > 0.8 && periodRatio < 1.2) ? 0.1 : 0.05;
 
