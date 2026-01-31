@@ -152,7 +152,6 @@ namespace robotPu {
     //% weight=65 blockGap=8
     export function servo(joint: ServoJoint, angle: number): void {
         const r = getRobotAPI();
-        angle = Math.min(180, Math.max(0, Math.floor(angle)));
         r.wk.servo(joint as number, angle);
     }
 
@@ -165,9 +164,19 @@ namespace robotPu {
     //% weight=64 blockGap=8
     export function servoStep(joint: ServoJoint, target: number, stepSize: number): void {
         const r = getRobotAPI();
-        target = Math.min(180, Math.max(0, Math.floor(target)));
-        stepSize = Math.min(20, Math.max(1, Math.floor(stepSize)));
         r.wk.servoStep(target, stepSize, joint as number, r.pr);
+    }
+
+    /** Move a Robot PU servo/joint toward a target angle and return a status (0=arrived, 1=moving). */
+    //% blockId=robotpu_servo_step_status block="servo step %joint to %target step %stepSize"
+    //% subcategory="Actuators"
+    //% group="Actuators"
+    //% target.min=0 target.max=180 target.defl=90
+    //% stepSize.min=1 stepSize.max=20 stepSize.defl=2
+    //% weight=64 blockGap=8
+    export function servoStepStatus(joint: ServoJoint, target: number, stepSize: number): number {
+        const r = getRobotAPI();
+        return r.wk.servoStep(target, stepSize, joint as number, r.pr);
     }
 
     function getRobotAPI(): RobotPu {
