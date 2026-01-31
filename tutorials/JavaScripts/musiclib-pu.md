@@ -224,24 +224,23 @@ Important:
 Example (extension dev):
 
 ```typescript
-let now = 0
 let micLoudness = 0
-
+let now = 0
 let musicDetector = new MusicLib()
-
 basic.forever(function () {
     micLoudness = input.soundLevel()
     now = control.millis()
-
-    // SNR is a sensitivity knob (typical starting point: ~1.1 to 1.3)
-    if (musicDetector.isABeat(now, micLoudness, 1.1)) {
-        // Beat detected
-        led.plotBarGraph(255, 255)
+    musicDetector.isABeat(now, micLoudness, 1.005)
+    basic.pause(5)
+})
+basic.forever(function () {
+    if (randint(0, 300) == 0) {
+        basic.showNumber(musicDetector.period)
     } else {
-        // No beat: show loudness bar
-        led.plotBarGraph(micLoudness, 255)
+        led.plotBarGraph(micLoudness,255)
     }
 })
+
 ```
 Example program can be dlownlowed from https://makecode.microbit.org/S24031-00421-18959-80697
 
