@@ -408,7 +408,7 @@ class WK {
     /**
      * Move servo toward target with controlled speed.
      */
-    public servoStep(target: number, sp: number, idx: number, p: Parameters): void {
+    public servoStep(target: number, sp: number, idx: number, p: Parameters): number {
         sp = Math.abs(sp);
         target = Math.max(0, Math.min(179, target));
         let err = target - p.servoTarget[idx];
@@ -420,6 +420,7 @@ class WK {
             p.servoTarget[idx] += (err >= 0) ? sp : -sp;
         }
         this.servo(idx, p.servoTarget[idx]);
+        return err
     }
 
     /**

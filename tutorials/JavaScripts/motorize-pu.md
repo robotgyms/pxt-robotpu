@@ -16,7 +16,132 @@ This lesson explains how Robot PU moves using multiple servos, why it uses an **
    2. Moving multiple servos at the same time.
    3. Detecting when a motion is complete.
 
+## Knowledge
+ - https://makecode.microbit.org/javascript/functions
+ - https://makecode.microbit.org/courses/blocks-to-javascript/writing-functions
+ - https://en.wikipedia.org/wiki/Function_(computer_programming)
+ - https://makecode.microbit.org/reference/pins
+ - https://makecode.microbit.org/v2/device/pins
+ - https://en.wikipedia.org/wiki/I2C
+ - https://makecode.microbit.org/reference/pins/i2c-read-number
 ---
+
+## 0) Functions: wrap complex motor sequences into a consistent API
+
+When your robot program gets bigger, “raw motor commands” become hard to read:
+
+- lots of repeated `robotPu.servo(...)` calls
+- lots of magic numbers (angles, delays)
+- easy to accidentally move joints in the wrong order
+
+The solution is to define a small set of **functions** that act like your own “mini API”.
+
+Goals for a good motor API:
+
+- consistent naming (`pose...`, `step...`, `do...`)
+- consistent units (angles in degrees, time in ms)
+- clear joint ordering (always the same)
+- safe ranges (clamp angles)
+
+### 0.1) Joint list helper
+
+Robot PU public API controls individual joints with `robotPu.servo(joint, angle)`.
+
+Define a single canonical joint order and reuse it everywhere.
+
+```typescript
+const JOINTS: robotPu.ServoJoint[] = [
+    robotPu.ServoJoint.LeftFoot,
+    robotPu.ServoJoint.LeftLeg,
+    robotPu.ServoJoint.RightFoot,
+    robotPu.ServoJoint.RightLeg,
+    robotPu.ServoJoint.HeadYaw,
+    robotPu.ServoJoint.HeadPitch
+]
+```
+
+### 0.2) Clamp + pose application helpers
+
+```typescript
+function clampInt(x: number, lo: number, hi: number): number {
+    if (x < lo) return lo
+    if (x > hi) return hi
+    return x
+}
+
+function applyPose(angles: number[]): void {
+    const n = Math.min(JOINTS.length, angles.length)
+    for (let i = 0; i < n; i++) {
+        const a = clampInt(Math.round(angles[i]), 0, 180)
+        robotPu.servo(JOINTS[i], a)
+    }
+}
+```
+
+Now you can write readable, consistent code like:
+
+```typescript
+const POSE_STAND = [90, 90, 90, 90, 90, 80]
+const POSE_DUCK  = [10, 150, 170, 30, 40, 125]
+
+applyPose(POSE_STAND)
+basic.pause(500)
+applyPose(POSE_DUCK)
+```
+
+### 0.3) Smooth transitions (a reusable “move to pose” API)
+
+This helper interpolates between poses in small steps.
+
+```typescript
+function lerp(a: number, b: number, t: number): number {
+    return a + (b - a) * t
+}
+
+function transitionPose(fromPose: number[], toPose: number[], steps: number, stepMs: number): void {
+    const safeSteps = Math.max(1, Math.round(steps))
+    for (let k = 0; k <= safeSteps; k++) {
+        const t = k / safeSteps
+        let pose: number[] = []
+        for (let i = 0; i < JOINTS.length; i++) {
+            pose.push(lerp(fromPose[i], toPose[i], t))
+        }
+        applyPose(pose)
+        basic.pause(stepMs)
+    }
+}
+```
+
+Example:
+
+```typescript
+transitionPose(POSE_STAND, POSE_DUCK, 12, 30)
+basic.pause(500)
+transitionPose(POSE_DUCK, POSE_STAND, 12, 30)
+```
+
+### 0.4) Wrap a complex action into one function
+
+Your top-level program becomes much cleaner when actions are named.
+
+```typescript
+function doBow(): void {
+    const neutral = POSE_STAND
+    const bowPose = [90, 90, 90, 90, 90, 140]
+    transitionPose(neutral, bowPose, 10, 20)
+    basic.pause(200)
+    transitionPose(bowPose, neutral, 10, 20)
+}
+
+input.onButtonPressed(Button.A, function () {
+    doBow()
+})
+```
+
+Notes:
+
+- This is the same idea used internally by the extension: break movement into reusable building blocks.
+- If you later change the robot’s “safe angles”, you only update `applyPose()`.
 
 ## 1) Robot PU’s servos (what they are doing)
 
@@ -44,6 +169,50 @@ This is also why many gaits treat:
 
 In `Parameters.stateTargets`, pose `0` is the neutral **stand** pose and pose `1` is a compact **duck** pose.
 
+Here is an example to make the robot go to positions one by one.
+
+Key ideas:
+
+- `robotPu.setMode(robotPu.Mode.API)` tells the robot you are directly commanding joints (instead of running walk/dance state machines).
+- The `radio.onReceived...` handlers are optional. They are only needed if you want to also control the robot from a gamepad/remote using `robotPu.runStringCommand(...)` and `robotPu.runKeyValueCommand(...)`.
+- `robotPu.setChannel(166)` must match your controller/gamepad radio channel.
+
+```typescript
+function pos1 () {
+    robotPu.setMode(robotPu.Mode.API)
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, 90)
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
+    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadPitch, 90)
+}
+radio.onReceivedString(function (receivedString) {
+    robotPu.runStringCommand(receivedString)
+})
+radio.onReceivedValue(function (name, value) {
+    robotPu.runKeyValueCommand(name, value)
+})
+function pos2 () {
+    robotPu.setMode(robotPu.Mode.API)
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, 71)
+    robotPu.servo(robotPu.ServoJoint.RightFoot, 70)
+    robotPu.servo(robotPu.ServoJoint.RightLeg, 71)
+    robotPu.servo(robotPu.ServoJoint.HeadYaw, 70)
+    robotPu.servo(robotPu.ServoJoint.HeadPitch, 72)
+}
+robotPu.setChannel(166)
+basic.forever(function () {
+    pos1()
+    basic.pause(500)
+    pos2()
+    basic.pause(500)
+})
+```
+
+upload to robot PU and see what happens:
+- https://makecode.microbit.org/_H6t4wb1xq4CC
 ---
 
 ## 2) Why I2C-based servo control is used (micro:bit limits)
@@ -64,6 +233,64 @@ Power and voltage constraints also matter:
 2. **Voltage is too low for some servos**: the micro:bit is **3.3V logic**, and while many servos accept a 3.3V control signal, many hobby servos expect ~5V power for full torque/speed.
 
 To solve this, Robot PU uses an onboard controller that receives compact commands over **I2C** and handles the multi-servo pulse generation.
+
+---
+
+## 2.1) micro:bit pins (edge connector basics for Robot PU)
+
+Robot PU uses the micro:bit edge connector to access power and the I2C bus.
+
+### A. The important pins for Robot PU
+
+- **`P19`**: I2C `SCL` (clock)
+- **`P20`**: I2C `SDA` (data)
+- **`3V`**: micro:bit 3.3V output (logic-level power)
+- **`GND`**: ground reference
+
+Important:
+
+- `P19/P20` are the default I2C pins. If you use I2C devices (or Robot PU’s servo controller), avoid repurposing these pins for other uses.
+
+### B. Power caution (servos draw much more current than micro:bit can supply)
+
+Even though the micro:bit has a `3V` pin:
+
+- Do **not** try to power multiple servos from micro:bit `3V`.
+- Sudden servo load can cause **brownouts/resets**.
+
+Robot PU solves this by having its own motor power path and an onboard controller. The micro:bit mostly sends **commands**, not power.
+
+### C. How the `pins` API relates to I2C
+
+Robot PU hides the low-level `pins.i2c...` calls inside the extension, but it helps to know what’s happening.
+
+Example: simple I2C register read
+
+```typescript
+// Example pattern: read a 1-byte register from an I2C device
+const addr = 0x10
+const reg = 0x03
+
+pins.i2cWriteNumber(addr, reg, NumberFormat.UInt8LE)
+const value = pins.i2cReadNumber(addr, NumberFormat.UInt8LE)
+basic.showNumber(value)
+```
+
+Example: scan-like check ("does a device respond?")
+
+```typescript
+const addr = 0x10
+
+// Many devices will ACK a write of a single byte.
+// If the address is wrong, you may see 0 or an error-like value depending on device behavior.
+pins.i2cWriteNumber(addr, 0x00, NumberFormat.UInt8LE)
+basic.showString("OK")
+```
+
+Notes:
+
+- Different I2C chips have different register maps; the above shows the *pattern*, not Robot PU’s internal protocol.
+- In Robot PU, `WK` uses `pins.i2cWriteBuffer(...)` to send 4-byte packets.
 
 ---
 
@@ -159,6 +386,8 @@ Robot PU instead uses **stepping**:
 In the real code, the current target per servo is stored in `Parameters.servoTarget[idx]` and updated gradually.
 
 This is how Robot PU controls motion “speed” without relying on delays. Smaller steps = slower, smoother motion.
+
+
 
 ### 5.3 Moving multiple servos at the same time
 
@@ -323,3 +552,4 @@ basic.forever(function () {
 
     basic.pause(5)
 })
+```
