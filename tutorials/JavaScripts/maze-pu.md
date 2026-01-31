@@ -3,12 +3,17 @@
 
 This tutorial shows how to solve a maze using a classic strategy:
 
-- **Right-hand rule** (follow the right wall)
-- **Left-hand rule** (follow the left wall)
+- **follow the right wall** 
+- **follow the left wall** 
 
 For **simply-connected mazes** (no “floating islands” of walls), either rule is **guaranteed** to reach an exit if one exists.
 
 Robot PU doesn’t need a full map for this approach. It just needs to decide “turn / forward / turn around” based on sonar distance.
+
+## Knowledge
+ - https://makecode.microbit.org/blocks/loops
+ - https://makecode.microbit.org/javascript/statements
+ - https://en.wikipedia.org/wiki/Maze-solving_algorithm
 
 ---
 
@@ -81,7 +86,7 @@ Then we decide the next motion using a priority order.
 Copy this code into the **JavaScript** tab of the MakeCode Editor.
 
 ```typescript
-// Right-hand rule maze solver using robotPu.frontDistanceArray()
+// Follow the right wall maze solver using robotPu.frontDistanceArray()
 // d[0..4] are left -> right distance bins
 
 // Distance thresholds (cm)
