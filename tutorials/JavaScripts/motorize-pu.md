@@ -176,6 +176,8 @@ Key ideas:
 - `robotPu.setMode(robotPu.Mode.API)` tells the robot you are directly commanding joints (instead of running walk/dance state machines).
 - The `radio.onReceived...` handlers are optional. They are only needed if you want to also control the robot from a gamepad/remote using `robotPu.runStringCommand(...)` and `robotPu.runKeyValueCommand(...)`.
 - `robotPu.setChannel(166)` must match your controller/gamepad radio channel.
+- use `robotPu.servo()` to move each servo
+- use `pause()` to wait pose movement completed
 
 ```typescript
 function pos1 () {
@@ -387,7 +389,101 @@ In the real code, the current target per servo is stored in `Parameters.servoTar
 
 This is how Robot PU controls motion “speed” without relying on delays. Smaller steps = slower, smoother motion.
 
+Here is an example that moves each motor at different speed controlled by step size and pause
+ - https://makecode.microbit.org/_i9YJmw1ieKDM
 
+```typescript
+function pos1 () {
+    basic.showNumber(1)
+    resetErr()
+    while (!(allErrZero())) {
+        leftFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftFoot, 90, 2)
+        leftLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftLeg, 90, 4)
+        rightFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightFoot, 90, 2)
+        rightLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 90, 4)
+        headPitchErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadPitch, 90, 3)
+        headYawErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadYaw, 90, 1)
+        basic.pause(20)
+    }
+}
+function allErrZero () {
+    return leftFeetErr == 0 && leftLegErr == 0 && rightFeetErr == 0 && rightLegErr == 0 && headYawErr == 0 && headYawErr == 0
+}
+function pos2 () {
+    basic.showNumber(2)
+    resetErr()
+    while (!(allErrZero())) {
+        leftFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftFoot, 70, 4)
+        leftLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftLeg, 71, 2)
+        rightFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightFoot, 70, 4)
+        rightLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 71, 2)
+        headPitchErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadPitch, 70, 1)
+        headYawErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadYaw, 72, 3)
+        basic.pause(20)
+    }
+}
+function resetErr () {
+    leftFeetErr = 1
+    leftLegErr = 1
+    rightFeetErr = 1
+    rightLegErr = 1
+    headPitchErr = 1
+    headYawErr = 1
+}
+let headYawErr = 0
+let headPitchErr = 0
+let rightLegErr = 0
+let rightFeetErr = 0
+let leftLegErr = 0
+let leftFeetErr = 0
+robotPu.setChannel(166)
+basic.forever(function () {
+    pos1()
+    pos2()
+})
+```
+You can wrap the motor function event better with the help of array.
+   - https://makecode.microbit.org/_1ey03L4iwRbK
+```typescript
+function pose(target: number [], step: number [], pauseMS: number) {
+    basic.showNumber(1)
+    resetErr()
+    while (!(allErrZero())) {
+        leftFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftFoot, target[0], step[0])
+        leftLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftLeg, target[1], step[1])
+        rightFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightFoot, target[2], step[2])
+        rightLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, target[3], step[3])
+        headPitchErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadPitch, target[4], step[4])
+        headYawErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadYaw, target[5], step[5])
+        basic.pause(pauseMS)
+    }
+}
+function allErrZero () {
+    return leftFeetErr == 0 && leftLegErr == 0 && rightFeetErr == 0 && rightLegErr == 0 && headYawErr == 0 && headYawErr == 0
+}
+
+function resetErr () {
+    leftFeetErr = 1
+    leftLegErr = 1
+    rightFeetErr = 1
+    rightLegErr = 1
+    headPitchErr = 1
+    headYawErr = 1
+}
+let headYawErr = 0
+let headPitchErr = 0
+let rightLegErr = 0
+let rightFeetErr = 0
+let leftLegErr = 0
+let leftFeetErr = 0
+robotPu.setChannel(166)
+let targets : number [][] = [[90,90,90,90,90,90], [70,72,70,72,71,75]]
+let stepSizes: number [][] = [[1,1,1,1,1,1],[1,2,1,2,1,1]]
+basic.forever(function () {
+    pose(targets[0], stepSizes[0], 20)
+    pose(targets[1], stepSizes[1], 20)
+})
+```
 
 ### 5.3 Moving multiple servos at the same time
 
