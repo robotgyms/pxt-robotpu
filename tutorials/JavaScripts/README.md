@@ -17,7 +17,6 @@ These lessons are written for the **micro:bit MakeCode editor**:
 
 ---
 ## Knowledge graph
-![Robot PU JavaScript Tutorials Mindmap](mindmap.png)
 
 ```mermaid
 mindmap
@@ -94,7 +93,6 @@ mindmap
 ```
 
 ## Advanced ROS topics knowledge graph
-![Robot PU Advanced Topics - ROS inspired](advanced-ros-mindmap.png)
 
 ```mermaid
 mindmap
