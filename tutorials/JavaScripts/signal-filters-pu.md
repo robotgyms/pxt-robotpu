@@ -200,8 +200,11 @@ Copy into the **JavaScript** tab of MakeCode:
 // Right-hand rule maze solver with a combined filtering pipeline
 // d[0..4] are left -> right distance bins
 
-const OPEN_CM = 28
+const OPEN_MIN_CM = 26
 const TOO_CLOSE_CM = 12
+const OPEN_MARGIN_CM = 12
+const CLOSE_MARGIN_CM = 6
+const WALL_TRACK_MAX_CM = 40
 
 const FWD_SPEED = 1.8
 const TURN_SPEED = 1.4
@@ -214,6 +217,14 @@ const CLAMP_MAX_CM = 200
 
 // Filter state per bin
 let emaState: number[] = [0, 0, 0, 0, 0]
+
+let leftOpen = false
+let frontOpen = false
+let rightOpen = false
+
+let leftWallRef = 18
+let rightWallRef = 18
+let frontWallRef = 20
 
 function clampInt(x: number, lo: number, hi: number): number {
     if (x < lo) return lo
@@ -230,6 +241,16 @@ function median3(a: number, b: number, c: number): number {
 function ema(prev: number, x: number, a: number): number {
     if (prev <= 0) return x
     return prev + a * (x - prev)
+}
+
+function hysteresisUpdate(isOpen: boolean, d: number, openOn: number, openOff: number): boolean {
+    if (isOpen) {
+        if (d > 0 && d < openOff) return false
+        return true
+    } else {
+        if (d > openOn) return true
+        return false
+    }
 }
 
 function max2(a: number, b: number): number {
@@ -285,6 +306,13 @@ function filteredBins(): number[] {
     return out
 }
 
+function updateWallRef(prev: number, d: number, a: number): number {
+    if (d > 0 && d < WALL_TRACK_MAX_CM) {
+        return ema(prev, d, a)
+    }
+    return prev
+}
+
 basic.forever(function () {
     const d = filteredBins()
 
@@ -292,9 +320,20 @@ basic.forever(function () {
     const dFront = d[2]
     const dRight = max2(d[3], d[4])
 
-    const rightOpen = dRight > OPEN_CM
-    const frontOpen = dFront > OPEN_CM
-    const leftOpen = dLeft > OPEN_CM
+    leftWallRef = updateWallRef(leftWallRef, dLeft, 0.08)
+    rightWallRef = updateWallRef(rightWallRef, dRight, 0.08)
+    frontWallRef = updateWallRef(frontWallRef, dFront, 0.05)
+
+    const rightOn = Math.max(OPEN_MIN_CM, rightWallRef + OPEN_MARGIN_CM)
+    const rightOff = Math.max(OPEN_MIN_CM - 2, rightWallRef + CLOSE_MARGIN_CM)
+    const frontOn = Math.max(OPEN_MIN_CM, frontWallRef + OPEN_MARGIN_CM)
+    const frontOff = Math.max(OPEN_MIN_CM - 2, frontWallRef + CLOSE_MARGIN_CM)
+    const leftOn = Math.max(OPEN_MIN_CM, leftWallRef + OPEN_MARGIN_CM)
+    const leftOff = Math.max(OPEN_MIN_CM - 2, leftWallRef + CLOSE_MARGIN_CM)
+
+    rightOpen = hysteresisUpdate(rightOpen, dRight, rightOn, rightOff)
+    frontOpen = hysteresisUpdate(frontOpen, dFront, frontOn, frontOff)
+    leftOpen = hysteresisUpdate(leftOpen, dLeft, leftOn, leftOff)
 
     // Emergency: too close in front
     if (dFront > 0 && dFront < TOO_CLOSE_CM) {

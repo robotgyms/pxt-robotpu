@@ -177,7 +177,7 @@ Key ideas:
 - The `radio.onReceived...` handlers are optional. They are only needed if you want to also control the robot from a gamepad/remote using `robotPu.runStringCommand(...)` and `robotPu.runKeyValueCommand(...)`.
 - `robotPu.setChannel(166)` must match your controller/gamepad radio channel.
 - use `robotPu.servo()` to move each servo
-- use `pause()` to wait pose movement completed
+- use `pause()` to allow time for the movement to happen
 
 ```typescript
 function pos1 () {
@@ -389,7 +389,7 @@ In the real code, the current target per servo is stored in `Parameters.servoTar
 
 This is how Robot PU controls motion “speed” without relying on delays. Smaller steps = slower, smoother motion.
 
-Here is an example that moves each motor at different speed controlled by step size and pause
+Here is an example that moves each servo at different speed controlled by step size and pause
  - https://makecode.microbit.org/_i9YJmw1ieKDM
 
 ```typescript
@@ -407,7 +407,7 @@ function pos1 () {
     }
 }
 function allErrZero () {
-    return leftFeetErr == 0 && leftLegErr == 0 && rightFeetErr == 0 && rightLegErr == 0 && headYawErr == 0 && headYawErr == 0
+    return leftFeetErr == 0 && leftLegErr == 0 && rightFeetErr == 0 && rightLegErr == 0 && headPitchErr == 0 && headYawErr == 0
 }
 function pos2 () {
     basic.showNumber(2)
@@ -459,7 +459,7 @@ function pose(target: number [], step: number [], pauseMS: number) {
     }
 }
 function allErrZero () {
-    return leftFeetErr == 0 && leftLegErr == 0 && rightFeetErr == 0 && rightLegErr == 0 && headYawErr == 0 && headYawErr == 0
+    return leftFeetErr == 0 && leftLegErr == 0 && rightFeetErr == 0 && rightLegErr == 0 && headPitchErr == 0 && headYawErr == 0
 }
 
 function resetErr () {
