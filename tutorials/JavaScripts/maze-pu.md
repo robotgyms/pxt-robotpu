@@ -87,60 +87,120 @@ Copy this code into the **JavaScript** tab of the MakeCode Editor.
 
 ```typescript
 
-function clampInt (x: number, lo: number, hi: number) {
-    if (x < lo) {
-        return lo
-    }
-    if (x > hi) {
-        return hi
-    }
-    return x
-}
+const OPEN_MIN_CM = 26
+const TOO_CLOSE_CM = 12
+const OPEN_MARGIN_CM = 12
+const CLOSE_MARGIN_CM = 6
+const WALL_TRACK_MAX_CM = 40
+
+const EMA_ALPHA = 0.35
+const BETA = 0.55
+const CLAMP_MAX_CM = 200
+
+let emaState: number[] = [0, 0, 0, 0, 0]
+
 let leftOpen = false
 let frontOpen = false
 let rightOpen = false
-let dRight = 0
-let dFront = 0
-let dLeft = 0
-let d: number[] = []
-let t0 = 0
-let TURN_BIAS = 0
-let FWD_SPEED = 0
+
+let leftWallRef = 18
+let rightWallRef = 18
+let frontWallRef = 20
+
+function clampInt(x: number, lo: number, hi: number): number {
+    if (x < lo) return lo
+    if (x > hi) return hi
+    return x
+}
+
+function median3(a: number, b: number, c: number): number {
+    const arr = [a, b, c]
+    arr.sort((x, y) => x - y)
+    return arr[1]
+}
+
+function ema(prev: number, x: number, a: number): number {
+    if (prev <= 0) return x
+    return prev + a * (x - prev)
+}
+
+function max2(a: number, b: number): number {
+    return a > b ? a : b
+}
+
+function hysteresisUpdate(isOpen: boolean, d: number, openOn: number, openOff: number): boolean {
+    if (isOpen) {
+        if (d > 0 && d < openOff) return false
+        return true
+    } else {
+        if (d > openOn) return true
+        return false
+    }
+}
+
+function filteredBins(): number[] {
+    const a = robotPu.frontDistanceArray()
+    basic.pause(5)
+    const b = robotPu.frontDistanceArray()
+    basic.pause(5)
+    const c = robotPu.frontDistanceArray()
+
+    const out: number[] = [0, 0, 0, 0, 0]
+    for (let i = 0; i < 5; i++) {
+        const raw = clampInt(a[i], 0, CLAMP_MAX_CM)
+        const med = median3(a[i], b[i], c[i])
+        const medC = clampInt(med, 0, CLAMP_MAX_CM)
+
+        emaState[i] = ema(emaState[i], medC, EMA_ALPHA)
+        out[i] = BETA * raw + (1 - BETA) * emaState[i]
+    }
+    return out
+}
+
+function updateWallRef(prev: number, d: number, a: number): number {
+    if (d > 0 && d < WALL_TRACK_MAX_CM) {
+        return ema(prev, d, a)
+    }
+    return prev
+}
 
 robotPu.setChannel(166)
-// Distance thresholds (cm)
-// These align with the extension's internal safety thresholds (~7.5cm danger + ~20cm caution)
-let OPEN_CM = 30
-// Movement tuning
-FWD_SPEED = 4
-// Turn bias: -1 left, +1 right
-TURN_BIAS = 0.
 basic.forever(function () {
-    robotPu.sonarScan()
-    // 1) Read 5-bin front scan (left -> right)
-    d = robotPu.frontDistanceArray()
-    dLeft = (dLeft * 9+ d[0]) * 0.1
-    dFront = (dFront * 9 + d[2]) * 0.1
-    dRight = (dRight * 9 + d[4]) *0.1
-    rightOpen = dRight > OPEN_CM
-    frontOpen = dFront > OPEN_CM *0.8
-    leftOpen = dLeft > OPEN_CM * 0.4
-    FWD_SPEED = Math.map(Math.max(dRight, dLeft), 7, 20, -1, 3)
-    // 3) Right-hand rule priority
-    if (rightOpen) {
-        robotPu.walk(FWD_SPEED, 0.2)
+    const d = filteredBins()
+
+    const dLeft = max2(d[0], d[1])
+    const dFront = d[2]
+    const dRight = max2(d[3], d[4])
+
+    leftWallRef = updateWallRef(leftWallRef, dLeft, 0.08)
+    rightWallRef = updateWallRef(rightWallRef, dRight, 0.08)
+    frontWallRef = updateWallRef(frontWallRef, dFront, 0.05)
+
+    const rightOn = Math.max(OPEN_MIN_CM, rightWallRef + OPEN_MARGIN_CM)
+    const rightOff = Math.max(OPEN_MIN_CM - 2, rightWallRef + CLOSE_MARGIN_CM)
+    const frontOn = Math.max(OPEN_MIN_CM, frontWallRef + OPEN_MARGIN_CM)
+    const frontOff = Math.max(OPEN_MIN_CM - 2, frontWallRef + CLOSE_MARGIN_CM)
+
+    rightOpen = hysteresisUpdate(rightOpen, dRight, rightOn, rightOff)
+    frontOpen = hysteresisUpdate(frontOpen, dFront, frontOn, frontOff)
+
+    const safeSpeed = Math.map(Math.max(dRight, dLeft), 7, 25, 0, 3)
+
+    if (dFront > 0 && dFront < TOO_CLOSE_CM) {
+        robotPu.walk(1.6, -0.9)
+    } else if (rightOpen) {
+        robotPu.walk(safeSpeed, 0.35)
     } else if (frontOpen) {
-        robotPu.walk(FWD_SPEED, 0)
+        robotPu.walk(safeSpeed, 0)
     } else {
-        robotPu.explore()
+        robotPu.walk(1.6, -0.9)
     }
+
     radio.sendValue("fd0", d[0])
     radio.sendValue("fd1", d[1])
     radio.sendValue("fd2", d[2])
     radio.sendValue("fd3", d[3])
     radio.sendValue("fd4", d[4])
-    radio.sendValue("broll", robotPu.bodyRoll())
-    radio.sendValue("bpitch", robotPu.bodyPitch())
 })
 ```
 
