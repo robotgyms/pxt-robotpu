@@ -57,6 +57,9 @@ mindmap
         gamepad.md
       Peer to peer messaging
         pu-peer-chat.md
+    Vision & Human Interaction
+      K230 AI Camera (HUSKYLENS 2)
+        K230-AI-Camera-pu.md
     Programming Structure (higher programming skill)
       Event loop (Observe Think Act)
         event-loop-pu.md
@@ -193,6 +196,9 @@ Follow this sequence from beginner to advanced. Each step assumes you’re comfo
 
 - **Robot observation (sensors / perception)**
   - `observation-pu.md`
+
+- **K230 AI camera (HUSKYLENS 2) — human interaction**
+  - `K230-AI-Camera-pu.md`
 
 - **Music + beat-driven behaviors**
   - `music-pu.md`
