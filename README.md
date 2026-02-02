@@ -32,7 +32,7 @@ Purchase links:
 - 2× micro:bit
 - Gamepad (remote control and distributed computation)
 - [Manual](https://robotgyms.com/courses/the-story-of-pu-book-1-pair-up/)
-- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials)
+- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/JavaScripts/README.md)
 - [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/)
 - [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth)
 - [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
