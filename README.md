@@ -17,7 +17,6 @@ Learn more about The Story of PU, which shows robot PU's activities, hardware, s
 Purchase links:
 
 - **Amazon**: [Robot PU kit](https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN)
-- **Robot Gyms store**: [Robot PU kit](https://robotgyms.com/product/robot-pu/)
 
 ## Features
 
