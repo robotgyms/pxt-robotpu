@@ -16,7 +16,6 @@ Learn more about The Story of PU, which shows robot PU's activities, hardware, s
 
 Purchase links:
 
-- **Robot Gyms store**: [Robot PU kit](https://robotgyms.com/product/robot-pu/)
 - **Amazon**: [Robot PU kit](https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN)
 
 ## Features
@@ -32,7 +31,7 @@ Purchase links:
 - 2× micro:bit
 - Gamepad (remote control and distributed computation)
 - [Manual](https://robotgyms.com/courses/the-story-of-pu-book-1-pair-up/)
-- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials)
+- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/JavaScripts/README.md)
 - [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/)
 - [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth)
 - [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
