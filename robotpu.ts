@@ -622,11 +622,11 @@ class RobotPu {
     private r_o_t: number = 0;         // Right tilt offset
     private maxRollCtrl: number = 15.0; // Max roll control authority
 
-    /** Current exploration speed (calculated by set_explore_param) */
-    private exploreSpeed: number = 0.0;
-
     /** Current exploration direction bias (-1.0 to 1.0) */
     private exploreDirection: number = 0.0;
+
+    /** Smoothed steering command for heading hold (-1.0 to 1.0) */
+    private headingDirection: number = 0.0;
 
     /** Index in the ep_dis array representing the clearest path */
     private ep_max_i: number = 0;
@@ -1084,6 +1084,27 @@ class RobotPu {
 
         // 5. Execute the walk using exploration parameters
         return this.walk(this.exploreSpeed, this.exploreDirection);
+    }
+
+    /**
+ * Walks to a target compass heading while maintaining obstacle avoidance.
+ */
+    public walkToHeading(targetHeadingDeg: number, kp: number = 0.02, maxDi: number = 1.0): number {
+        // Keep the point-cloud updated so obstacle avoidance stays responsive.
+        this.sonarScan();
+        this.setExploreParam();
+        let h = compass.heading();
+
+        // Normalize heading to [0, 359] so the shortest-error math works even with out-of-range inputs.
+        let err = ((targetHeadingDeg - h + 540) % 360) - 180;
+
+        let diCmd = kp * err + 0.5 * this.exploreDirection;
+        if (diCmd > maxDi) diCmd = maxDi;
+        if (diCmd < -maxDi) diCmd = -maxDi;
+
+        this.headingDirection = (this.headingDirection * 3 + diCmd) * 0.25;
+
+        return this.walk(this.exploreSpeed * 2, this.headingDirection);
     }
 
     /**
