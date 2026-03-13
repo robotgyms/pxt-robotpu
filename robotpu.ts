@@ -104,6 +104,67 @@ class Parameters {
         ];
     }
 }
+
+class PID {
+    public kp: number;
+    public ki: number;
+    public kd: number;
+
+    private integral: number;
+    private prevError: number;
+    private lastTs: number;
+    private hasPrev: boolean;
+
+    constructor(kp: number = 0, ki: number = 0, kd: number = 0) {
+        this.kp = kp;
+        this.ki = ki;
+        this.kd = kd;
+        this.integral = 0;
+        this.prevError = 0;
+        this.lastTs = 0;
+        this.hasPrev = false;
+    }
+
+    public setGains(kp: number, ki: number, kd: number): void {
+        this.kp = kp;
+        this.ki = ki;
+        this.kd = kd;
+    }
+
+    public reset(): void {
+        this.integral = 0;
+        this.prevError = 0;
+        this.lastTs = 0;
+        this.hasPrev = false;
+    }
+
+    public update(error: number, nowMs: number, integralLimit: number = 0): number {
+        if (!this.hasPrev) {
+            this.hasPrev = true;
+            this.prevError = error;
+            this.lastTs = nowMs;
+            return this.kp * error;
+        }
+
+        let dtMs = nowMs - this.lastTs;
+        if (dtMs <= 0) dtMs = 1;
+        let dt = dtMs / 1000.0;
+
+        this.integral += error * dt;
+        if (integralLimit > 0) {
+            if (this.integral > integralLimit) this.integral = integralLimit;
+            if (this.integral < -integralLimit) this.integral = -integralLimit;
+        }
+
+        let derivative = (error - this.prevError) / dt;
+
+        this.prevError = error;
+        this.lastTs = nowMs;
+
+        return this.kp * error + this.ki * this.integral + this.kd * derivative;
+    }
+}
+
 class MusicLib {
     loudThreshold: number;
     loud: number;
@@ -628,6 +689,8 @@ class RobotPu {
     /** Smoothed steering command for heading hold (-1.0 to 1.0) */
     private headingDirection: number = 0.0;
 
+    private headingPid: PID = new PID();
+
     /** Index in the ep_dis array representing the clearest path */
     private ep_max_i: number = 0;
 
@@ -1089,16 +1152,44 @@ class RobotPu {
     /**
  * Walks to a target compass heading while maintaining obstacle avoidance.
  */
-    public walkToHeading(targetHeadingDeg: number, kp: number = 0.02, maxDi: number = 1.0): number {
+    public walkByCompass(targetHeadingDeg: number, kp: number = 0.02, maxDi: number = 1.0): number {
         // Keep the point-cloud updated so obstacle avoidance stays responsive.
         this.sonarScan();
         this.setExploreParam();
         let h = compass.heading();
 
         // Normalize heading to [0, 359] so the shortest-error math works even with out-of-range inputs.
-        let err = ((targetHeadingDeg - h + 540) % 360) - 180;
+        let th = Math.floor(targetHeadingDeg) % 360;
+        if (th < 0) th += 360;
+
+        let err = ((th - h + 540) % 360) - 180;
 
         let diCmd = kp * err + 0.5 * this.exploreDirection;
+        if (diCmd > maxDi) diCmd = maxDi;
+        if (diCmd < -maxDi) diCmd = -maxDi;
+
+        this.headingDirection = (this.headingDirection * 3 + diCmd) * 0.25;
+
+        return this.walk(this.exploreSpeed * 2, this.headingDirection);
+    }
+
+    public walkByCompassPID(targetHeadingDeg: number, kp: number = 0.02, ki: number = 0.0005, kd: number = 0.0, maxDi: number = 1.0, integralLimit: number = 0.0, resetPid: boolean = false): number {
+        if (resetPid) this.headingPid.reset();
+        this.headingPid.setGains(kp, ki, kd);
+
+        this.sonarScan();
+        this.setExploreParam();
+
+        let h = compass.heading();
+
+        let th = Math.floor(targetHeadingDeg) % 360;
+        if (th < 0) th += 360;
+
+        let err = ((th - h + 540) % 360) - 180;
+
+        let pidOut = this.headingPid.update(err, control.millis(), integralLimit);
+
+        let diCmd = pidOut + 0.5 * this.exploreDirection;
         if (diCmd > maxDi) diCmd = maxDi;
         if (diCmd < -maxDi) diCmd = -maxDi;
 

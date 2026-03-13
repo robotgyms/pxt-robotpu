@@ -222,7 +222,6 @@ namespace robotPu {
         return getRobotAPI().explore();
     }
 
-   /** Walks to a target compass heading while maintaining obstacle avoidance. */
     /** Explore the environment using sonar. Statement version (no return). */
     //% blockId=robotpu_explore_do block="explore"
     //% subcategory="Actions"
@@ -232,13 +231,22 @@ namespace robotPu {
         getRobotAPI().explore();
     }
 
-    //% blockId=robotpu_walk_to_heading block="walk to heading %headingDeg"
+    //% blockId=robotpu_walk_by_compass block="walk by compass %headingDeg"
     //% subcategory="Actions"
     //% group="Actions"
     //% headingDeg.min=0 headingDeg.max=359 headingDeg.defl=0
     //% weight=54 blockGap=8
-    export function walkToHeading(headingDeg: number): number {
-        return getRobotAPI().walkToHeading(headingDeg);
+    export function walkByCompass(headingDeg: number): number {
+        return getRobotAPI().walkByCompass(headingDeg);
+    }
+
+    //% blockId=robotpu_walk_by_compass_pid block="walk by compass PID %headingDeg"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% headingDeg.min=0 headingDeg.max=359 headingDeg.defl=0
+    //% weight=53 blockGap=8
+    export function walkByCompassPID(headingDeg: number): number {
+        return getRobotAPI().walkByCompassPID(headingDeg);
     }
 
     //% blockId=robotpu_side_step block="side step %direction"
