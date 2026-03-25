@@ -41,7 +41,7 @@ The retail kit includes a **gamepad that uses the second micro:bit**. For the be
 - https://makecode.microbit.org/_JbygU12aCAsU
 
 ## The Story Of Robot PU
-- [The Saga of Saduka](https://robotgyms.com/courses/the-saga-of-robot-pu)
+- [Return to Saduka](https://robotgyms.com/courses/the-saga-of-robot-pu)
 
 ## Activities and Use Cases
 
