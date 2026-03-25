@@ -21,7 +21,7 @@ Purchase links:
 ## Features
 
 - **Expressive personality**: dance routines, reactions, auto-pilot, soccer
-- **Classroom-ready** with block coding, javascript and Python paths
+- **Classroom-ready** with block coding, javascript and [Python](https://github.com/NovaSeq/RobotPu.git) paths
 - **Maker-friendly** with free tutorials and projects of hardware and software to upgrade robot PU
 - **Open-source** with community resources
 
