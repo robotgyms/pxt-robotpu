@@ -686,6 +686,9 @@ class RobotPu {
     /** Current exploration direction bias (-1.0 to 1.0) */
     private exploreDirection: number = 0.0;
 
+    /** Current exploration speed command */
+    private exploreSpeed: number = 0.0;
+
     /** Smoothed steering command for heading hold (-1.0 to 1.0) */
     private headingDirection: number = 0.0;
 
@@ -1156,7 +1159,7 @@ class RobotPu {
         // Keep the point-cloud updated so obstacle avoidance stays responsive.
         this.sonarScan();
         this.setExploreParam();
-        let h = compass.heading();
+        let h = input.compassHeading();
 
         // Normalize heading to [0, 359] so the shortest-error math works even with out-of-range inputs.
         let th = Math.floor(targetHeadingDeg) % 360;
@@ -1180,7 +1183,7 @@ class RobotPu {
         this.sonarScan();
         this.setExploreParam();
 
-        let h = compass.heading();
+        let h = input.compassHeading();
 
         let th = Math.floor(targetHeadingDeg) % 360;
         if (th < 0) th += 360;

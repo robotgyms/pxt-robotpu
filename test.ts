@@ -1,4 +1,5 @@
 // press button A to walk forward in circles
+let walkingNorth = false
 input.onButtonPressed(Button.A, function () {
     robotPu.talk("Move forward!")
     for (let index = 0; index < 400; index++) {
@@ -39,6 +40,16 @@ input.onButtonPressed(Button.B, function () {
 })
 input.onGesture(Gesture.Shake, function () {
     robotPu.talk("I am here")
+    if (!(walkingNorth)) {
+        walkingNorth = true
+        control.inBackground(function () {
+            for (let i = 0; i < 200; i++) {
+                robotPu.walkByCompass(0)
+                basic.pause(5)
+            }
+            walkingNorth = false
+        })
+    }
     if (randint(0, 1) == 0) {
         music.play(music.createSoundExpression(WaveShape.Square, 400, 600, 255, 0, 100, SoundExpressionEffect.Warble, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
     } else {
