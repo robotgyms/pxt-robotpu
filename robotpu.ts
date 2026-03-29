@@ -1037,8 +1037,8 @@ class RobotPu {
         let nd = 0; // New Direction variable
 
         // 2. Decision Logic based on distance thresholds
-        if (obs_hcsr < this.exploreDangerDistance + this.exploreCautionDistance) {
-            // Path is getting tight: Look only at middle indices for turn direction
+        if (obs_hcsr > this.exploreDangerDistance + this.exploreCautionDistance) {
+            // Path is getting wide open: Look only at middle indices for turn direction
             // Python slice [mid1 : mid2+1]
             let slice = this.pr.exploreDistance.slice(this.pr.exploreMid1, this.pr.exploreMid2 + 1);
             nd = this.getTurnFromSonar(slice, 3);
