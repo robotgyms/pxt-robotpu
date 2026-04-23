@@ -36,7 +36,11 @@ namespace robotPu {
         //% block="head yaw"
         HeadYaw = 4,
         //% block="head pitch"
-        HeadPitch = 5
+        HeadPitch = 5,
+        //% block="Reserve 1"
+        Reserve1 = 6,
+        //% block="Reserve 2"
+        Reserve2 = 7
     }
 
     //% blockId=robotpu_mode_var block="mode"
@@ -231,10 +235,33 @@ namespace robotPu {
         getRobotAPI().explore();
     }
 
+    /** Keep walking to a target compass heading while maintaining obstacle avoidance. */
+    //% blockId=robotpu_walk_by_compass block="walk by compass %headingDeg"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% headingDeg.min=0 headingDeg.max=359 headingDeg.defl=0
+    //% weight=56 blockGap=8
+    export function walkByCompass(headingDeg: number): number {
+        return getRobotAPI().walkByCompass(headingDeg);
+    }
+
+    /** Use PID control to keep walking to a target compass heading while maintaining obstacle avoidance. */
+    //% blockId=robotpu_walk_by_compass_pid block="walk by compass PID %headingDeg kp %kp ki %ki kd %kd"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% headingDeg.min=0 headingDeg.max=359 headingDeg.defl=0
+    //% kp.min=0 kp.max=0.2 kp.defl=0.02
+    //% ki.min=0 ki.max=0.01 ki.defl=0.0005
+    //% kd.min=0 kd.max=0.5 kd.defl=0
+    //% weight=56 blockGap=8
+    export function walkByCompassPID(headingDeg: number, kp: number, ki: number, kd: number): number {
+        return getRobotAPI().walkByCompassPID(headingDeg, kp, ki, kd);
+    }
+
     //% blockId=robotpu_side_step block="side step %direction"
     //% subcategory="Actions"
     //% group="Actions"
-    //% direction.min=-1 (move left) direction.max=1 (move right) direction.defl=-1
+    //% direction.min=-1 direction.max=1 direction.defl=-1
     //% weight=50 blockGap=8
     export function sideStep(direction: number): number {
         return getRobotAPI().sideStep(direction);
