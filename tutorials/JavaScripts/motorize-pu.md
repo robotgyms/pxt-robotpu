@@ -112,6 +112,87 @@ function transitionPose(fromPose: number[], toPose: number[], steps: number, ste
 }
 ```
 
+### 0.3.1) Graceful motion: easy-in / easy-out servo control (easing)
+
+Linear interpolation (`t = 0..1`) moves at a constant speed. For robots, constant speed often looks a bit *robotic*: the motion starts abruptly and stops abruptly.
+
+An **easy-in / easy-out** profile makes the robot:
+
+1. Accelerate smoothly at the beginning.
+2. Move fastest in the middle.
+3. Decelerate smoothly near the end.
+
+You can do this by transforming `t` with an easing function, then using that eased value for interpolation.
+
+```typescript
+function clamp01(t: number): number {
+    if (t < 0) return 0
+    if (t > 1) return 1
+    return t
+}
+
+// Smoothstep: 0->1 with zero slope at both ends
+function easeInOutSmoothStep(t: number): number {
+    t = clamp01(t)
+    return t * t * (3 - 2 * t)
+}
+
+function transitionPoseEase(fromPose: number[], toPose: number[], steps: number, stepMs: number): void {
+    const safeSteps = Math.max(1, Math.round(steps))
+    for (let k = 0; k <= safeSteps; k++) {
+        const t = k / safeSteps
+        const te = easeInOutSmoothStep(t)
+        let pose: number[] = []
+        for (let i = 0; i < JOINTS.length; i++) {
+            pose.push(lerp(fromPose[i], toPose[i], te))
+        }
+        applyPose(pose)
+        basic.pause(stepMs)
+    }
+}
+```
+
+Cosine-based alternatives (also easy-in/easy-out):
+
+```typescript
+// Cosine interpolation curve: te = (1 - cos(pi * t)) / 2
+function easeInOutCosine(t: number): number {
+    t = clamp01(t)
+    return (1 - Math.cos(Math.PI * t)) / 2
+}
+
+// Direct cosine interpolation between a and b.
+// Equivalent to: lerp(a, b, easeInOutCosine(t))
+function coserp(a: number, b: number, t: number): number {
+    return lerp(a, b, easeInOutCosine(t))
+}
+```
+
+If you want cosine easing instead of smoothstep, just replace:
+
+```typescript
+const te = easeInOutSmoothStep(t)
+```
+
+with:
+
+```typescript
+const te = easeInOutCosine(t)
+```
+
+Example (try comparing linear vs eased):
+
+```typescript
+transitionPose(POSE_STAND, POSE_DUCK, 18, 20)
+basic.pause(600)
+transitionPoseEase(POSE_DUCK, POSE_STAND, 18, 20)
+```
+
+Notes:
+
+- If the robot still feels “jerky”, increase `steps` (more intermediate poses) or increase `stepMs` (slower updates).
+- Easing mainly improves the *start/stop feel*. To also limit per-tick jumps, keep step sizes small enough that your servos can follow smoothly.
+
 Example:
 
 ```typescript
