@@ -2,7 +2,7 @@
 
 ## Overview
 
-Robot PU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode.
+Robot PU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode. This software package was ported from [Python Version](https://github.com/NovaSeq/RobotPu.git).
 
 PU can walk, autopilot, dance, kick, jump, rest, talk, and sing. It reacts to music, balances using its IMU, and navigates with an ultrasonic sensor.
 The retail kit includes a gamepad built from the second micro:bit for radio-based remote control, including gesture head control (tilt to yaw/pitch PU’s head).
@@ -21,14 +21,14 @@ Purchase links:
 ## Features
 
 - **Expressive personality**: dance routines, reactions, auto-pilot, soccer
-- **Classroom-ready** with block coding and Python paths
-- **Maker-friendly** with free tutorials and upgrade projects
+- **Classroom-ready** with block coding, javascript and [Python](https://github.com/NovaSeq/RobotPu.git) paths
+- **Maker-friendly** with free tutorials and projects of hardware and software to upgrade robot PU
 - **Open-source** with community resources
 
-## What’s in the Kit (typical)
+## What’s in the Kit
 
 - Robot PU (pre-built and upgradable)
-- 2× micro:bit
+- 2 × micro:bit compatible board
 - Gamepad (remote control and distributed computation)
 - [Manual](https://robotgyms.com/courses/the-story-of-pu-book-1-pair-up/)
 - [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/JavaScripts/README.md)
@@ -39,6 +39,9 @@ Purchase links:
 The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
 
 - https://makecode.microbit.org/_JbygU12aCAsU
+
+## The Story Of Robot PU
+- [Return to Saduka](https://robotgyms.com/courses/the-saga-of-robot-pu)
 
 ## Activities and Use Cases
 

@@ -248,6 +248,15 @@ This is also why many gaits treat:
 1. The **legs** as `[0, 1, 2, 3]`
 2. The **head/body** as `[4, 5]`
 
+| Robot Position | Left Foot | Left Leg | Right Foot | Right Leg | Neck (Yaw) | Head (Pitch) | Notes |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Stand | 90 | 90 | 90 | 90 | 90 | 90 | Robot Stands Straight |
+| Jump | 130 | 90 | 50 | 90 | 90 | 30 | Robot Jumps with Feet, head raised |
+| Duck | 0 | 85 | 180 | 95 | 90 | 90 | Robot squats down, with feet folded |
+| Calibrate | 90 | 60 | 90 | 120 | 90 | 90 | Robot calibrates by putting heels aligned |
+| Side Move 1 | 75 | 90 | 30 | 90 | 135 | 105 | Robot tiptoes to left |
+| Side Move 2 | 150 | 90 | 105 | 90 | 45 | 105 | Robot tiptoes to right |
+
 In `Parameters.stateTargets`, pose `0` is the neutral **stand** pose and pose `1` is a compact **duck** pose.
 
 Here is an example to make the robot go to positions one by one.
@@ -730,3 +739,90 @@ basic.forever(function () {
     basic.pause(5)
 })
 ```
+
+### 7.6 Kungfu, Taiji, and Yoga
+
+This example shows how to create **slow, steady, “flowing” motions** (Kungfu / Taiji / Yoga style) by moving joints in small increments rather than jumping directly to the final angle.
+
+You’ll typically combine 3 APIs:
+
+1. **`robotPu.servo(joint, angle)`**
+   - Sets a joint immediately to an angle (good for resetting to a known starting pose).
+2. **`robotPu.servoStep(joint, targetAngle, speed)`**
+   - Moves the joint gradually toward `targetAngle`.
+   - Smaller `speed` values produce slower / smoother motion.
+3. **`robotPu.servoStepStatus(joint, targetAngle, speed)`**
+   - Returns `0` when the joint has reached the target, otherwise non‑zero.
+   - Useful for building “move-until-finished” loops while you simultaneously step other joints.
+
+In the demo below:
+
+- **`Stand()`** resets the robot to a neutral pose.
+- **`Yoga()`** and **`Jump()`** are direct poses (instant set).
+- **`Yoga2()`** and **`Yoga3()`** demonstrate a *controlled transition*:
+  - One joint (the right leg) is treated as the *main* motion.
+  - While the right leg is still moving (status non‑zero), the head yaw/pitch are stepped too, giving a coordinated “performance” feel.
+
+Tuning tips:
+
+- **Speed**: try `0.02` (very slow) to `0.10` (faster). If motion becomes jerky, lower the value.
+- **Loop friendliness**: if you find the `while (...)` loop blocks other behaviors, add a tiny pause inside the loop (for example `basic.pause(1)` to `basic.pause(5)`).
+- **Angle safety**: if a pose causes binding or strain, reduce extreme angles first (especially feet/legs) and test incrementally.
+
+MakeCode share link:
+
+https://makecode.microbit.org/#pub:40302-28555-29408-09924
+
+```javascript
+function Stand () {
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, 90)
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
+    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadPitch, 90)
+}
+function Yoga3 () {
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
+    while (robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 170, 0.05) != 0) {
+        robotPu.servoStep(robotPu.ServoJoint.HeadYaw, 135, 0.05)
+        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, 60, 0.05)
+    }
+}
+function Yoga () {
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.RightFoot, 0)
+    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadPitch, 30)
+}
+function Yoga2 () {
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
+    while (robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 20, 0.05) != 0) {
+        robotPu.servoStep(robotPu.ServoJoint.HeadYaw, 45, 0.05)
+        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, 90, 0.05)
+    }
+}
+function Jump () {
+    robotPu.servo(robotPu.ServoJoint.LeftFoot, 100)
+    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.RightFoot, 45)
+    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
+    robotPu.servo(robotPu.ServoJoint.HeadPitch, 30)
+}
+basic.forever(function () {
+    Stand()
+    basic.pause(500)
+    Jump()
+    basic.pause(500)
+    Yoga()
+    basic.pause(500)
+    Yoga2()
+    Yoga3()
+})
