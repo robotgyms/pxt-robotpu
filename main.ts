@@ -59,6 +59,14 @@ namespace robotPu {
         setMode(mode);
     }
 
+    //% blockId=robotpu_ai_mode_var block="AI mode"
+    //% subcategory="Variables"
+    //% group="Variables"
+    //% weight=93
+    export function aiMode(): boolean {
+        return ensureRobot().aiMode;
+    }
+
     function ensureRobot(): RobotPu {
         if (!robot) {
             const sn = "pu-" + control.deviceSerialNumber();
@@ -308,10 +316,20 @@ namespace robotPu {
          return ensureRobot().getMusicTempo();
      }
 
-     //% blockId=robotpu_explore_distance_array block="front distance array"
+     /** JointAngles array items: left foot angle, left leg angle, right foot angle, right leg angle, head yaw, head pitch */
+     //% blockId=robotpu_joint_angles block="JointAngles"
      //% subcategory="Sensors"
      //% group="Sensors"
      //% weight=66 blockGap=8
+     export function JointAngles(): number[] {
+         const a = ensureRobot().pr.servoTarget;
+         return [a[0], a[1], a[2], a[3], a[4], a[5]];
+     }
+
+     //% blockId=robotpu_explore_distance_array block="front distance array"
+     //% subcategory="Sensors"
+     //% group="Sensors"
+     //% weight=65 blockGap=8
      export function frontDistanceArray(): number[] {
          const d = ensureRobot().pr.exploreDistance;
          return [d[0], d[1], (d[1]+d[2])*0.5, d[2], d[3]];
@@ -454,6 +472,16 @@ namespace robotPu {
         // backward max speed (negative), forward max speed (positive)
         ensureRobot().setBwdMaxSpeed(min);
         ensureRobot().setFwdMaxSpeed(max);
+    }
+
+    /** Turn AI mode on or off */
+    //% blockId=robotpu_set_ai_mode block="turn AI mode %enabled"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% enabled.shadow=toggleOnOff
+    //% weight=77 blockGap=8
+    export function setAiMode(enabled: boolean): void {
+        ensureRobot().aiMode = enabled;
     }
 
     /** Run string command */

@@ -34,7 +34,7 @@ class Parameters {
         this.servoTarget = [90.0, 90.0, 90.0, 90.0, 90.0, 90.0];
 
         // Servo trim
-        this.servoTrim = [-7, -0.0, -7, -0.0, -9.0, 0.0];
+        this.servoTrim = [4.0, 4.0, 0, -8.0, 0.0, 0.0];
 
         // Turning directions
         this.exploreDirection = [-1.0, -0.7, 0.7, 1.0];
@@ -714,6 +714,9 @@ class RobotPu {
     // beacon timeout
     public beaconTimeout: number = 2000;
 
+    // AI mode
+    public aiMode: boolean = false;
+
     constructor(sn: string, name: string = "peu") {
         // Initialize Core Components inside constructor
         this.pr = new Parameters();
@@ -1348,7 +1351,7 @@ class RobotPu {
         }
 
         // 2. Handle blinking and state tracking
-        if (this.gst >= 0) {
+        if (this.gst >= 0 && this.aiMode) {
             // Update eye blink animation based on alert level (alertLevel)
             this.wk.blink(this.alertLevel);
 
