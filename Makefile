@@ -16,7 +16,7 @@ check: build
 test: build
 
 release: build
-	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=1.0.39" && exit 1)
+	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=*.*.**" && exit 1)
 	python3 -c 'import json; p="pxt.json"; data=json.load(open(p)); data["version"]="$(VERSION)"; open(p,"w").write(json.dumps(data, indent=4) + "\n")'
 	git add pxt.json robotpu.ts main.ts Makefile
 	git commit -m "Release $(VERSION)"
