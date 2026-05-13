@@ -20,8 +20,8 @@ release: build
 	python3 -c 'import json; p="pxt.json"; data=json.load(open(p)); data["version"]="$(VERSION)"; open(p,"w").write(json.dumps(data, indent=4) + "\n")'
 	git add pxt.json robotpu.ts main.ts Makefile
 	git diff --cached --quiet --exit-code || git commit -m "Release $(VERSION)"
+	git rev-parse "$(VERSION)" >/dev/null 2>&1 || git tag "$(VERSION)"
 	git push
-	git tag "$(VERSION)"
 	git push origin "$(VERSION)"
 
 clean:
