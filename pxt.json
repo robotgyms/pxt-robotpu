@@ -1,24 +1,25 @@
 {
-  "name": "pxt-robotpu",
-  "version": "1.0.35",
-  "description": "Robot PU MakeCode extension exposing walk, autopilot, dance, kick, jump, rest, talk, sing.",
-  "license": "MIT",
-  "dependencies": {
-    "core": "*",
-    "radio": "*",
-    "neopixel": "github:microsoft/pxt-neopixel",
-    "billy": "github:adamish/pxt-billy"
-  },
-  "files": [
-    "robotpu.ts",
-    "main.ts"
-  ],
-  "testFiles": [
-    "test.ts"
-  ],
-  "supportedTargets": [
-    "microbit"
-  ],
-  "preferredEditor": "tsprj",
-  "public": true
+    "name": "pxt-robotpu",
+    "version": "1.0.39",
+    "description": "Robot PU MakeCode extension exposing walk, autopilot, dance, kick, jump, rest, talk, sing.",
+    "license": "MIT",
+    "dependencies": {
+        "core": "*",
+        "radio": "*",
+        "neopixel": "github:microsoft/pxt-neopixel",
+        "billy": "github:adamish/pxt-billy",
+        "microphone": "*"
+    },
+    "files": [
+        "robotpu.ts",
+        "main.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "public": true,
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "tsprj"
 }
