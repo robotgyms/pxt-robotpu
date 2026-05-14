@@ -880,10 +880,17 @@ class RobotPu {
         this.bodyPitch2 = (this.bodyPitch + 9 * this.bodyPitch2) * 0.1;
     }
 
-    private setCt(indexList: number[], valueList: number[]) {
+    public setCt(indexList: number[], valueList: number[]) {
         let le = Math.min(indexList.length, valueList.length);
         for (let i = 0; i < le; i++) {
             this.pr.servoCtrl[indexList[i]] = valueList[i]; // Reference internal pr
+        }
+    }
+
+    public incrCt(indexList: number[], valueList: number[], gain=1.0) {
+        let le = Math.min(indexList.length, valueList.length);
+        for (let i = 0; i < le; i++) {
+            this.pr.servoCtrl[indexList[i]] += valueList[i] * gain; // Reference internal pr
         }
     }
 
@@ -962,12 +969,15 @@ class RobotPu {
 
     public rest(): number {
         this.balanceParam();
+        for (let i = 0; i < this.pr.dof; i++) {
+            this.pr.servoCtrl[i] *= 0.99;
+        }
         let rl = Math.min(35.0, Math.max(-35.0, this.bodyRoll2));
         if (Math.abs(rl) > 5) {
-            this.setCt([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5]);
+            this.incrCt([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5], 0.05);
         }
-        if (Math.abs(this.bodyPitch2) > 12) {
-            this.setCt([5], [-this.bodyPitch2]);
+        if (Math.abs(this.bodyPitch2) > 10) {
+            this.incrCt([5], [-this.bodyPitch2], 0.05);
         }
         let sl = input.soundLevel();
         this.pr.stateTargets[this.restState][5] = 90 - sl * 0.3;
