@@ -101,6 +101,83 @@ Use these graphs to:
 - core, radio, neopixel (from MakeCode)
 - Billy voice package: github:adamish/pxt-billy
 
+## Development with Makefile
+
+This repository includes a `Makefile` to wrap common PXT and release commands.
+
+### Build and compile check
+
+Run a full local MakeCode compile check before pushing:
+
+```bash
+make build
+```
+
+This runs:
+
+```bash
+pxt target microbit
+pxt install
+pxt build
+```
+
+You can also use:
+
+```bash
+make check
+```
+
+`make check` is an alias for `make build`.
+
+### Install or refresh the MakeCode target
+
+If this is a fresh clone, or if PXT says the target is missing, run:
+
+```bash
+make target
+```
+
+To install or refresh package dependencies from `pxt.json`, run:
+
+```bash
+make install
+```
+
+### Clean local build output
+
+```bash
+make clean
+```
+
+This removes the local `built/` directory.
+
+### Release example
+
+To release version `1.0.42`:
+
+```bash
+make release VERSION=1.0.42
+```
+
+The release target:
+
+1. Runs the build.
+2. Updates the `version` key in `pxt.json`.
+3. Stages release files.
+4. Creates a git commit named `Release 1.0.42` if there are staged changes.
+5. Runs `git push`.
+6. Creates the local git tag if it does not already exist.
+7. Pushes the tag with `git push origin 1.0.42`.
+
+You can also manage tags separately:
+
+```bash
+make tag VERSION=1.0.42
+make push-tag VERSION=1.0.42
+```
+
+Before running a release, make sure your GitHub authentication is configured for pushing to the repository.
+
 ## Blocks / API
 
 This extension auto-initializes the robot on the first call to any `robotPu.*` API:
