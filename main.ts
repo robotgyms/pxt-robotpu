@@ -337,20 +337,30 @@ namespace robotPu {
          return ensureRobot().getMusicTempo();
      }
 
-     /** JointAngles array items: left foot angle, left leg angle, right foot angle, right leg angle, head yaw, head pitch */
-     //% blockId=robotpu_joint_angles block="JointAngles"
+     /** ServoTargets array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
+     //% blockId=robotpu_servo_targets block="ServoTargets"
      //% subcategory="Sensors"
      //% group="Sensors"
      //% weight=66 blockGap=8
-     export function JointAngles(): number[] {
+     export function ServoTargets(): number[] {
          const a = ensureRobot().pr.servoTarget;
+         return [a[0], a[1], a[2], a[3], a[4], a[5]];
+     }
+
+     /** ServoControls array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
+     //% blockId=robotpu_servo_controls block="ServoControls"
+     //% subcategory="Sensors"
+     //% group="Sensors"
+     //% weight=65 blockGap=8
+     export function ServoControls(): number[] {
+         const a = ensureRobot().pr.servoCtrl;
          return [a[0], a[1], a[2], a[3], a[4], a[5]];
      }
 
      //% blockId=robotpu_explore_distance_array block="front distance array"
      //% subcategory="Sensors"
      //% group="Sensors"
-     //% weight=65 blockGap=8
+     //% weight=64 blockGap=8
      export function frontDistanceArray(): number[] {
          const d = ensureRobot().pr.exploreDistance;
          return [d[0], d[1], (d[1]+d[2])*0.5, d[2], d[3]];

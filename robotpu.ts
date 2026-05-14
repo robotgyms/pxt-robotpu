@@ -974,10 +974,10 @@ class RobotPu {
         }
         let rl = Math.min(35.0, Math.max(-35.0, this.bodyRoll2));
         if (Math.abs(rl) > 5) {
-            this.incrCt([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5], 0.05);
+            this.setCt([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5]);
         }
         if (Math.abs(this.bodyPitch2) > 10) {
-            this.incrCt([5], [-this.bodyPitch2], 0.05);
+            this.setCt([5], [-this.bodyPitch2]);
         }
         let sl = input.soundLevel();
         this.pr.stateTargets[this.restState][5] = 90 - sl * 0.3;
