@@ -20,8 +20,9 @@ namespace robotPu {
         Kick = 4,
         //% block="walk (remote control)"
         Walk = 5,
-        // other
-        API = 6
+        // % block="API (advanced programming)"
+        API = 6,
+
     }
 
     export enum ServoJoint {
@@ -57,14 +58,6 @@ namespace robotPu {
     //% weight=94
     export function setModeVar(mode: Mode): void {
         setMode(mode);
-    }
-
-    //% blockId=robotpu_ai_mode_var block="AI mode"
-    //% subcategory="Variables"
-    //% group="Variables"
-    //% weight=93
-    export function aiMode(): boolean {
-        return ensureRobot().aiMode;
     }
 
     function ensureRobot(): RobotPu {
@@ -503,16 +496,6 @@ namespace robotPu {
         // backward max speed (negative), forward max speed (positive)
         ensureRobot().setBwdMaxSpeed(min);
         ensureRobot().setFwdMaxSpeed(max);
-    }
-
-    /** Turn AI mode on or off. AI mode examples: make robot blink with emotions, track face if connected to a smart hat, etc */
-    //% blockId=robotpu_set_ai_mode block="turn AI mode %enabled"
-    //% subcategory="Setup"
-    //% group="Setup"
-    //% enabled.shadow=toggleOnOff
-    //% weight=77 blockGap=8
-    export function setAiMode(enabled: boolean): void {
-        ensureRobot().aiMode = enabled;
     }
 
     /** Run string command */

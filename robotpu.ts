@@ -714,9 +714,6 @@ class RobotPu {
     // beacon timeout
     public beaconTimeout: number = 2000;
 
-    // AI mode
-    public aiMode: boolean = false;
-
     constructor(sn: string, name: string = "peu") {
         // Initialize Core Components inside constructor
         this.pr = new Parameters();
@@ -1361,7 +1358,7 @@ class RobotPu {
         }
 
         // 2. Handle blinking and state tracking
-        if (this.gst >= 0 && this.aiMode) {
+        if (this.gst >= 0 && this.gst<=5) {
             // Update eye blink animation based on alert level (alertLevel)
             this.wk.blink(this.alertLevel);
 
