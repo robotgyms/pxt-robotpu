@@ -191,6 +191,27 @@ namespace robotPu {
         return r.wk.servoStep(target, stepSize, joint as number, r.pr);
     }
 
+    /** Set servo control offsets for feedback/feedforward control. Indexes are servo IDs; values are angle offsets added to motion targets. */
+    //% blockId=robotpu_set_ct block="set control offsets indexes %indexes values %values"
+    //% subcategory="Actuators"
+    //% group="Actuators"
+    //% indexes.shadow=lists_create_with values.shadow=lists_create_with
+    //% weight=63 blockGap=8
+    export function setCt(indexes: number[], values: number[]): void {
+        getRobotAPI().setCt(indexes, values);
+    }
+
+    /** Increment servo control offsets for smooth feedback/feedforward control. Each value is multiplied by gain, then added to the current control offset. */
+    //% blockId=robotpu_incr_ct block="increment control offsets indexes %indexes values %values gain %gain"
+    //% subcategory="Actuators"
+    //% group="Actuators"
+    //% indexes.shadow=lists_create_with values.shadow=lists_create_with
+    //% gain.defl=1 gain.min=-1 gain.max=1
+    //% weight=62 blockGap=8
+    export function incrCt(indexes: number[], values: number[], gain: number): void {
+        getRobotAPI().incrCt(indexes, values, gain);
+    }
+
     function getRobotAPI(): RobotPu {
         const r = ensureRobot();
         r.gst = Mode.API;
@@ -474,7 +495,7 @@ namespace robotPu {
         ensureRobot().setFwdMaxSpeed(max);
     }
 
-    /** Turn AI mode on or off */
+    /** Turn AI mode on or off. AI mode examples: make robot blink with emotions, track face if connected to a smart hat, etc */
     //% blockId=robotpu_set_ai_mode block="turn AI mode %enabled"
     //% subcategory="Setup"
     //% group="Setup"
