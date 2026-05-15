@@ -60,6 +60,23 @@ namespace robotPu {
         setMode(mode);
     }
 
+    //% blockId=robotpu_eye_brightness_var block="eye brightness"
+    //% subcategory="Variables"
+    //% group="Variables"
+    //% weight=93
+    export function eyeBrightness(): number {
+        return ensureRobot().wk.eyeBrightness;
+    }
+
+    //% blockId=robotpu_set_eye_brightness_var block="set eye brightness to %brightness"
+    //% subcategory="Variables"
+    //% group="Variables"
+    //% brightness.min=0 brightness.max=1 brightness.defl=0.5
+    //% weight=92
+    export function setEyeBrightness(brightness: number): void {
+        ensureRobot().wk.eyeBrightness = brightness;
+    }
+
     function ensureRobot(): RobotPu {
         if (!robot) {
             const sn = "pu-" + control.deviceSerialNumber();

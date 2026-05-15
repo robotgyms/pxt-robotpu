@@ -410,6 +410,8 @@ class WK {
     public i2cAddress: number;
     private lastBlinkTS: number;
     private eyeIsOn: boolean;
+    // eye
+    public eyeBrightness:number = 0.5
     private leftEyeBrightness: number;
     private rightEyeBrightness: number;
     private eyeBrightIcr: number;
@@ -579,8 +581,8 @@ class WK {
             if (ts_diff > this.blinkInterval) {
                 this.eyesCtl(0);
             } else {
-                let brightness = Math.min(1023, alert_l * 102);
                 this.blinkG = alert_l * 400;
+                let brightness = Math.min(1023, alert_l * 102 * this.eyeBrightness);
                 this.leftEyeBright(brightness);
                 this.rightEyeBright(brightness);
             }
