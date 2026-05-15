@@ -72,8 +72,10 @@ namespace robotPu {
     //% subcategory="Variables"
     //% group="Variables"
     //% brightness.min=0 brightness.max=1 brightness.defl=0.5
+    //% brightness.fieldOptions.precision=0.01
     //% weight=92
     export function setEyeBrightness(brightness: number): void {
+        brightness = Math.min(1, Math.max(0, brightness));
         ensureRobot().wk.eyeBrightness = brightness;
     }
 
