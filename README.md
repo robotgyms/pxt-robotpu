@@ -13,6 +13,7 @@ Learn more about The Story of PU, which shows robot PU's activities, hardware, s
 - **Website**: [robotgyms.com/pu](https://robotgyms.com/pu)
 - **YouTube**: [The Story of PU](https://www.youtube.com/@TheStoryofPu-yw8tr)
 - **TikTok**: [@thestoryofpu](https://www.tiktok.com/@thestoryofpu)
+- **Quick Start**： [How to use this library](https://youtu.be/aBw55nYjWDg)
 
 Purchase links:
 
