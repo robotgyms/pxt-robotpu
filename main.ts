@@ -8,6 +8,8 @@ namespace robotPu {
     //% subcategory="Variables"
     //% group="Variables"
     export enum Mode {
+        //% block="trim calibration"
+        TrimCalibration = -4,
         //% block="rest"
         Rest = 0,
         //% block="explore"
@@ -355,8 +357,7 @@ namespace robotPu {
      //% group="Sensors"
      //% weight=66 blockGap=8
      export function ServoTargets(): number[] {
-         const a = ensureRobot().pr.servoTarget;
-         return [a[0], a[1], a[2], a[3], a[4], a[5]];
+         return ensureRobot().pr.servoTarget;
      }
 
      /** ServoControls array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
@@ -365,14 +366,22 @@ namespace robotPu {
      //% group="Sensors"
      //% weight=65 blockGap=8
      export function ServoControls(): number[] {
-         const a = ensureRobot().pr.servoCtrl;
-         return [a[0], a[1], a[2], a[3], a[4], a[5]];
+         return ensureRobot().pr.servoCtrl;
      }
+
+    /** ServoTrim array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
+    //% blockId=robotpu_servo_trims block="ServoTrim"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=64 blockGap=8
+    export function ServoTrims(): number[] {
+        return ensureRobot().pr.servoTrim;
+    }
 
      //% blockId=robotpu_explore_distance_array block="front distance array"
      //% subcategory="Sensors"
      //% group="Sensors"
-     //% weight=64 blockGap=8
+     //% weight=63 blockGap=8
      export function frontDistanceArray(): number[] {
          const d = ensureRobot().pr.exploreDistance;
          return [d[0], d[1], (d[1]+d[2])*0.5, d[2], d[3]];
@@ -450,6 +459,15 @@ namespace robotPu {
         getRobotAPI().rest();
     }
 
+    /** Got to calibration position */
+    //% blockId=robotpu_calibrate block="calibrate"
+    //% weight=52 blockGap=8
+    //% group="Actions"
+    //% subcategory="Actions"
+    export function calibrate(): void {
+        ensureRobot().calibrate();
+    }
+
     //% blockId=robotpu_stand block="stand"
     //% subcategory="Actions"
     //% group="Actions"
@@ -496,13 +514,53 @@ namespace robotPu {
         ensureRobot().setTrim(leftFoot, leftLeg, rightFoot, rightLeg, headYaw, headPitch);
     }
 
-    /** Run calibration routine */
-    //% blockId=robotpu_calibrate block="calibrate"
-    //% weight=79 blockGap=8
+    //% blockId=robotpu_begin_trim_calibration block="begin servo trim calibration"
     //% subcategory="Setup"
     //% group="Setup"
-    export function calibrate(): void {
-        ensureRobot().calibrate();
+    //% weight=79 blockGap=8
+    export function beginServoTrimCalibration(): void {
+        ensureRobot().beginTrimCalibration();
+    }
+
+    //% blockId=robotpu_select_trim_servo block="select trim servo %servo"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=78 blockGap=8
+    export function selectTrimServo(servo: ServoJoint): void {
+        ensureRobot().setTrimIndex(servo);
+    }
+
+    //% blockId=robotpu_adjust_trim block="adjust selected servo trim by %delta"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% delta.defl=1
+    //% weight=77 blockGap=8
+    export function adjustSelectedServoTrim(delta: number): void {
+        ensureRobot().adjustTrim(delta);
+    }
+
+    //% blockId=robotpu_save_trim_calibration block="save servo trim calibration"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=76 blockGap=8
+    export function saveServoTrimCalibration(): void {
+        ensureRobot().saveTrimCalibration();
+    }
+
+    //% blockId=robotpu_read_config block="read config"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=75 blockGap=8
+    export function readConfig(): void {
+        ensureRobot().readConfig();
+    }
+
+    //% blockId=robotpu_write_config block="write config"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=74 blockGap=8
+    export function writeConfig(): void {
+        ensureRobot().writeConfig();
     }
 
     /** Set walk speed range: min maps to backward max speed, max maps to forward max speed */
