@@ -1638,13 +1638,13 @@ class RobotPu {
     }
 
     public toggleServoTrim(): void {
-        if(this.gst = -4) {
+        if(this.gst == -4) {
             this.saveTrimCalibration();
-        }
-        else
+        } else
         {
             this.beginTrimCalibration();
         }
+        basic.pause(1000)
     }
 
     public saveTrimCalibration(): void {
