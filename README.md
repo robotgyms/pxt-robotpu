@@ -358,6 +358,65 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 - **Notes**:
   - Trims are applied immediately and remain active until changed.
 
+#### Servo calibration / trim mode
+
+Use servo calibration / trim mode to align the robot’s feet, legs, neck yaw, and head pitch into a neutral standing position.
+
+- **Enter trim mode**: Press the micro:bit logo button.
+- **Robot pose**: The robot moves into calibration stand mode so the foot heels can be aligned.
+- **Select servo**:
+  - Press gamepad `B2` to decrease servo index.
+  - Press gamepad `B3` to increase servo index.
+  - The selected servo index is shown on the micro:bit display.
+- **Adjust trim**:
+  - Press gamepad `B1` to move the selected servo one trim step in one direction.
+  - Press gamepad `B4` to move the selected servo one trim step in the other direction.
+  - Adjust until the robot’s feet, legs, neck yaw, and head pitch are in a neutral stand position.
+- **Save and exit**: Press the micro:bit logo button again.
+- **Saved configuration**:
+  - Servo trim values are saved.
+  - The current radio channel number is saved.
+  - When the robot boots again, it remembers the saved servo trim and radio channel.
+
+The servo index order is:
+
+1. Left foot
+2. Left leg
+3. Right foot
+4. Right leg
+5. Head yaw
+6. Head pitch
+
+#### `beginServoTrimCalibration(): void`
+
+- **Block**: `begin servo trim calibration`
+- **What it does**: Enters servo trim calibration mode from code or blocks.
+
+#### `selectTrimServo(servo: ServoJoint): void`
+
+- **Block**: `select trim servo %servo`
+- **What it does**: Selects which servo trim value will be adjusted.
+
+#### `adjustSelectedServoTrim(delta: number): void`
+
+- **Block**: `adjust selected servo trim by %delta`
+- **What it does**: Changes the selected servo trim by `delta` degrees and moves the robot to the calibration pose.
+
+#### `saveServoTrimCalibration(): void`
+
+- **Block**: `save servo trim calibration`
+- **What it does**: Saves the current servo trim values and radio channel, exits trim calibration mode, and returns to normal operation.
+
+#### `readConfig(): void`
+
+- **Block**: `read config`
+- **What it does**: Loads saved robot configuration, including servo trim values and radio channel.
+
+#### `writeConfig(): void`
+
+- **Block**: `write config`
+- **What it does**: Saves current robot configuration, including servo trim values and radio channel.
+
 #### `calibrate(): void`
 
 - **Block**: `calibrate`
