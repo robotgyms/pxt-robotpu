@@ -8,6 +8,8 @@ namespace robotPu {
     //% subcategory="Variables"
     //% group="Variables"
     export enum Mode {
+        //% block="trim calibration"
+        CalibrateServo = -4,
         //% block="rest"
         Rest = 0,
         //% block="explore"
@@ -355,8 +357,7 @@ namespace robotPu {
      //% group="Sensors"
      //% weight=66 blockGap=8
      export function ServoTargets(): number[] {
-         const a = ensureRobot().pr.servoTarget;
-         return [a[0], a[1], a[2], a[3], a[4], a[5]];
+         return ensureRobot().pr.servoTarget;
      }
 
      /** ServoControls array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
@@ -365,14 +366,22 @@ namespace robotPu {
      //% group="Sensors"
      //% weight=65 blockGap=8
      export function ServoControls(): number[] {
-         const a = ensureRobot().pr.servoCtrl;
-         return [a[0], a[1], a[2], a[3], a[4], a[5]];
+         return ensureRobot().pr.servoCtrl;
      }
+
+    /** ServoTrim array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
+    //% blockId=robotpu_servo_trims block="ServoTrim"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=64 blockGap=8
+    export function ServoTrims(): number[] {
+        return ensureRobot().pr.servoTrim;
+    }
 
      //% blockId=robotpu_explore_distance_array block="front distance array"
      //% subcategory="Sensors"
      //% group="Sensors"
-     //% weight=64 blockGap=8
+     //% weight=63 blockGap=8
      export function frontDistanceArray(): number[] {
          const d = ensureRobot().pr.exploreDistance;
          return [d[0], d[1], (d[1]+d[2])*0.5, d[2], d[3]];
@@ -450,6 +459,15 @@ namespace robotPu {
         getRobotAPI().rest();
     }
 
+    /** Got to calibration position */
+    //% blockId=robotpu_calibrate block="calibrate"
+    //% weight=52 blockGap=8
+    //% group="Actions"
+    //% subcategory="Actions"
+    export function calibrate(): void {
+        ensureRobot().calibrate();
+    }
+
     //% blockId=robotpu_stand block="stand"
     //% subcategory="Actions"
     //% group="Actions"
@@ -486,7 +504,7 @@ namespace robotPu {
         ensureRobot().sing(s);
     }
 
-    /** Set servo trim offsets: left_foot, left_leg, right_foot, right_leg, head_yaw, head_pitch */
+    /** Set servo trim offsets manually: left_foot, left_leg, right_foot, right_leg, head_yaw, head_pitch */
     //% blockId=robotpu_setServoTrim block="set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch"
     //% subcategory="Setup"
     //% group="Setup"
@@ -496,13 +514,37 @@ namespace robotPu {
         ensureRobot().setTrim(leftFoot, leftLeg, rightFoot, rightLeg, headYaw, headPitch);
     }
 
-    /** Run calibration routine */
-    //% blockId=robotpu_calibrate block="calibrate"
-    //% weight=79 blockGap=8
+    /** Turn on/off (toggle) servo trim calibration mode using Gamepad */
+    //% blockId=robotpu_toggle_trim_calibration block="toggle servo trim calibration mode"
     //% subcategory="Setup"
     //% group="Setup"
-    export function calibrate(): void {
-        ensureRobot().calibrate();
+    //% weight=79 blockGap=8
+    export function toggleServoTrim(): void {
+        ensureRobot().toggleServoTrim();
+    }
+
+    //% blockId=robotpu_save_trim_calibration block="save servo trim calibration"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=76 blockGap=8
+    export function saveServoTrimCalibration(): void {
+        ensureRobot().saveTrimCalibration();
+    }
+
+    //% blockId=robotpu_read_config block="read config"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=75 blockGap=8
+    export function readConfig(): void {
+        ensureRobot().readConfig();
+    }
+
+    //% blockId=robotpu_write_config block="write config"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=74 blockGap=8
+    export function writeConfig(): void {
+        ensureRobot().writeConfig();
     }
 
     /** Set walk speed range: min maps to backward max speed, max maps to forward max speed */

@@ -662,6 +662,7 @@ class RobotPu {
     private fellCount: number = 0;
     private lastState: number = 0;
     private radioGroupID: number = 166;
+    private trimIndex: number = 0;
 
     // Current dance state (sequence of state indices)
     private danceState: number[] = [0];
@@ -725,6 +726,7 @@ class RobotPu {
         this.name = name;
         this.gst = 0;
         this.lastCmdTS = control.millis();
+        this.readConfig();
 
         // Hardware Setup
         this.sonar = new HCSR04(DigitalPin.P2, DigitalPin.P8);
@@ -749,6 +751,7 @@ class RobotPu {
         };
         // We use arrow functions () => to ensure 'this' refers to the RobotPu instance
         this.stateFuncDict = {
+            [-4]: () => this.trim(),
             [-3]: () => this.fall(),
             [-2]: () => this.fetal(),
             [0]: () => this.idle(),
@@ -841,6 +844,32 @@ class RobotPu {
 
     public showChannel() {
         basic.showNumber(this.radioGroupID);
+    }
+
+    public readConfig(): void {
+        let storedSn = settings.readString("robotpu.sn");
+        if (storedSn && storedSn.length > 0) {
+            this.sn = storedSn;
+        }
+        let storedGroup = settings.readNumber("robotpu.group");
+        if (!isNaN(storedGroup)) {
+            this.radioGroupID = Math.round(storedGroup) % 256;
+            if (this.radioGroupID < 0) this.radioGroupID += 256;
+        }
+        for (let i = 0; i < this.pr.dof; i++) {
+            let v = settings.readNumber("robotpu.trim." + i);
+            if (!isNaN(v)) {
+                this.pr.servoTrim[i] = v;
+            }
+        }
+    }
+
+    public writeConfig(): void {
+        settings.writeString("robotpu.sn", this.sn);
+        settings.writeNumber("robotpu.group", this.radioGroupID);
+        for (let i = 0; i < this.pr.dof; i++) {
+            settings.writeNumber("robotpu.trim." + i, this.pr.servoTrim[i]);
+        }
     }
 
     public talk(text: string) {
@@ -981,6 +1010,10 @@ class RobotPu {
         let sl = input.soundLevel();
         this.pr.stateTargets[this.restState][5] = 90 - sl * 0.3;
         return this.wk.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + sl * 0.001, [], 0.5);
+    }
+
+    public trim(): void {
+        this.wk.servoMove(25, this.pr);
     }
 
     /**
@@ -1384,6 +1417,15 @@ class RobotPu {
         this.talk("My name is " + this.sn + " " + this.name);
     }
 
+    public stateTalk(): void {
+        let words = [
+            "Hello! I am " + this.sn + " " + this.name + ". ",
+            this.content.cuteWords(),
+            "Temperature is " + input.temperature() + " degree."
+        ];
+        this.talk(words[Math.randomRange(0, words.length - 1)]);
+    }
+
     /**
      * Adjusts the radio group ID and updates the hardware settings.
      * @param i The amount to adjust the group ID by (positive or negative).
@@ -1529,12 +1571,92 @@ class RobotPu {
     public turn(v: number) { this.walkDirection = (this.walkDirection * 4 + v) * 0.2; }
     public roll(v: number) { this.headYawBias = (v + this.headYawBias) * 0.5; }
     public pitch(v: number) { this.headPitchBias = (v * -1 + this.headPitchBias) * 0.5; }
-    public button(v: number) { this.gst = v; }
-    public logo(v: number) { this.talk(this.sn); }
+    public button(v: number) {
+        this.pr.servoCtrl = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        if (v == 0) {
+            this.gst = 0;
+            this.headPitchBias = 0;
+            this.headYawBias = 0;
+            this.talk("Rest!");
+        } else if (v == 1) {
+            if (this.gst == -4) {
+                this.adjustTrim(-1);
+            } else {
+                this.talk("Exploring");
+                this.exploreSpeed = 4.0;
+                this.exploreDirection = 0.0;
+                this.gst = 1;
+            }
+        } else if (v == 2) {
+            if (this.gst == -4) {
+                this.setTrimIndex(this.trimIndex + 1);
+            } else {
+                this.gst = 2;
+            }
+        } else if (v == 3) {
+            if (this.gst == -4) {
+                this.setTrimIndex(this.trimIndex - 1);
+            } else {
+                this.talk("Dance!");
+                this.danceSpeed = 1.5;
+                this.gst = 3;
+            }
+        } else if (v == 4) {
+            if (this.gst == -4) {
+                this.adjustTrim(1);
+            } else {
+                this.gst = 4;
+            }
+        }
+    }
+
+    public logo(v: number) {
+        this.stateTalk();
+    }
+
     public pose(v: number) { this.restState = v; this.gst = 0; }
 
     public setTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number) {
         this.pr.servoTrim = [leftFoot, leftLeg, rightFoot, rightLeg, headYaw, headPitch];
+    }
+
+    public setTrimIndex(index: number): void {
+        this.trimIndex = index % this.pr.dof;
+        if (this.trimIndex < 0) this.trimIndex = this.pr.dof -1;
+        this.showTrimIndex();
+    }
+
+    public adjustTrim(delta: number): void {
+        this.pr.servoTrim[this.trimIndex] += delta;
+        this.showTrimIndex();
+        this.wk.servoMove(25, this.pr);
+    }
+
+    public beginTrimCalibration(): void {
+        this.gst = -4;
+        this.showTrimIndex();
+    }
+
+    public toggleServoTrim(): void {
+        if(this.gst == -4) {
+            this.saveTrimCalibration();
+        } else
+        {
+            this.beginTrimCalibration();
+        }
+        basic.pause(1000)
+    }
+
+    public saveTrimCalibration(): void {
+        this.writeConfig();
+        this.stand();
+        this.talk("Saved!");
+        this.gst = 0;
+        this.showChannel();
+    }
+
+    private showTrimIndex(): void {
+        basic.showNumber(this.trimIndex + 1);
     }
 
     public calibrate() {
