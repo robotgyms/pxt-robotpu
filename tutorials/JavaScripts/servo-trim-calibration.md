@@ -105,7 +105,10 @@
      basic.pause(500)
  })
  ```
+ The program will print the servo trim values to the serial monitor. 
  
+ It can be downloaded from https://makecode.microbit.org/_fJpff9K92emh.
+
  ---
  
  ## Tuning tips
