@@ -638,8 +638,8 @@ class RobotPu {
 
     // Movement & State
     public lastCmdTS: number;
-    private fwdSpeed: number = 4;
-    private bwdSpeed: number = -3;
+    private fwdSpeed: number = 3;
+    private bwdSpeed: number = -2;
     public walkSpeed: number = 0;
     public walkDirection: number = 0;
     private headPitchBias: number = 0;
@@ -1583,7 +1583,7 @@ class RobotPu {
                 this.adjustTrim(-1);
             } else {
                 this.talk("Exploring");
-                this.exploreSpeed = 4.0;
+                this.exploreSpeed = 3.0;
                 this.exploreDirection = 0.0;
                 this.gst = 1;
             }
