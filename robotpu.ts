@@ -675,7 +675,7 @@ class RobotPu {
         16: [17, 16, 17, 16, 17]      // Rocking motion
     };
 
-    private danceSpeed: number = 1.5;           // Dance speed multiplier
+    private danceSpeed: number = 1.0;           // Dance speed multiplier
     private lastLowBeat: number = 0;       // Timestamp of last low beat
     private lastHIghBeat: number = 0;      // Timestamp of last high beat
     private danceYawWiggle: number = 12;     // Left/right wiggle angle (degrees)
@@ -1547,7 +1547,7 @@ class RobotPu {
             [ft, lt, ft, lt, this.rl, this.dancePitchWiggle - ms * 0.001]);
 
         // 6. Dynamic speed adjustment
-        this.danceSpeed = Math.min(2.5, this.danceSpeed * 1.015);
+        this.danceSpeed = Math.min(1.5, this.danceSpeed * 1.015);
         if (this.maxG > 1800) { // If shaking too hard, slow down
             this.danceSpeed *= 0.9;
         }
