@@ -9,7 +9,7 @@ namespace robotPu {
     //% group="Variables"
     export enum Mode {
         //% block="trim calibration"
-        TrimCalibration = -4,
+        CalibrateServo = -4,
         //% block="rest"
         Rest = 0,
         //% block="explore"
@@ -504,7 +504,7 @@ namespace robotPu {
         ensureRobot().sing(s);
     }
 
-    /** Set servo trim offsets: left_foot, left_leg, right_foot, right_leg, head_yaw, head_pitch */
+    /** Set servo trim offsets manually: left_foot, left_leg, right_foot, right_leg, head_yaw, head_pitch */
     //% blockId=robotpu_setServoTrim block="set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch"
     //% subcategory="Setup"
     //% group="Setup"
@@ -514,29 +514,13 @@ namespace robotPu {
         ensureRobot().setTrim(leftFoot, leftLeg, rightFoot, rightLeg, headYaw, headPitch);
     }
 
-    //% blockId=robotpu_begin_trim_calibration block="begin servo trim calibration"
+    /** Turn on/off (toggle) servo trim calibration mode using Gamepad */
+    //% blockId=robotpu_toggle_trim_calibration block="toggle servo trim calibration mode"
     //% subcategory="Setup"
     //% group="Setup"
     //% weight=79 blockGap=8
-    export function beginServoTrimCalibration(): void {
-        ensureRobot().beginTrimCalibration();
-    }
-
-    //% blockId=robotpu_select_trim_servo block="select trim servo %servo"
-    //% subcategory="Setup"
-    //% group="Setup"
-    //% weight=78 blockGap=8
-    export function selectTrimServo(servo: ServoJoint): void {
-        ensureRobot().setTrimIndex(servo);
-    }
-
-    //% blockId=robotpu_adjust_trim block="adjust selected servo trim by %delta"
-    //% subcategory="Setup"
-    //% group="Setup"
-    //% delta.defl=1
-    //% weight=77 blockGap=8
-    export function adjustSelectedServoTrim(delta: number): void {
-        ensureRobot().adjustTrim(delta);
+    export function toggleServoTrim(): void {
+        ensureRobot().toggleServoTrim();
     }
 
     //% blockId=robotpu_save_trim_calibration block="save servo trim calibration"

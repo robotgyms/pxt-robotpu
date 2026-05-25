@@ -1417,6 +1417,15 @@ class RobotPu {
         this.talk("My name is " + this.sn + " " + this.name);
     }
 
+    public stateTalk(): void {
+        let words = [
+            "Hello! I am " + this.sn + " " + this.name + ". ",
+            this.content.cuteWords(),
+            "Temperature is " + input.temperature() + " degree."
+        ];
+        this.talk(words[Math.randomRange(0, words.length - 1)]);
+    }
+
     /**
      * Adjusts the radio group ID and updates the hardware settings.
      * @param i The amount to adjust the group ID by (positive or negative).
@@ -1600,18 +1609,11 @@ class RobotPu {
             }
         }
     }
+
     public logo(v: number) {
-        if (this.gst == -4) {
-            this.writeConfig();
-            this.stand();
-            this.talk("Saved!");
-            this.gst = 0;
-            this.showChannel();
-        } else {
-            this.gst = -4;
-            this.showTrimIndex();
-        }
+        this.stateTalk();
     }
+
     public pose(v: number) { this.restState = v; this.gst = 0; }
 
     public setTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number) {
@@ -1633,6 +1635,16 @@ class RobotPu {
     public beginTrimCalibration(): void {
         this.gst = -4;
         this.showTrimIndex();
+    }
+
+    public toggleServoTrim(): void {
+        if(this.gst = -4) {
+            this.saveTrimCalibration();
+        }
+        else
+        {
+            this.beginTrimCalibration();
+        }
     }
 
     public saveTrimCalibration(): void {
