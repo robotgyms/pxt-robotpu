@@ -103,6 +103,7 @@ namespace robotPu {
         ensureRobot().incrGroupId(delta);
     }
 
+    /** The current mode robot PU is in */
     //% blockId=robotpu_mode_var block="mode"
     //% subcategory="Setup"
     //% group="Setup"
@@ -111,6 +112,7 @@ namespace robotPu {
         return ensureRobot().gst as Mode;
     }
 
+    /** Set robot PU's mode. For example to walk mode, then robot PU will keep walking until you change mode. */
     //% blockId=robotpu_set_mode_var block="set mode to %mode"
     //% subcategory="Setup"
     //% group="Setup"
@@ -138,6 +140,7 @@ namespace robotPu {
         ensureRobot().toggleServoTrim();
     }
 
+    /** Save servo trim calibration to configuration file */
     //% blockId=robotpu_save_trim_calibration block="save servo trim calibration"
     //% subcategory="Setup"
     //% group="Setup"
@@ -146,6 +149,7 @@ namespace robotPu {
         ensureRobot().saveTrimCalibration();
     }
 
+    /** Load robot configurations, such as servo trim, channel number, etc. */
     //% blockId=robotpu_read_config block="read config"
     //% subcategory="Setup"
     //% group="Setup"
@@ -154,6 +158,7 @@ namespace robotPu {
         ensureRobot().readConfig();
     }
 
+    /** Save robot configurations, such as servo trim, channel number, etc. */
     //% blockId=robotpu_write_config block="write config"
     //% subcategory="Setup"
     //% group="Setup"
@@ -174,6 +179,7 @@ namespace robotPu {
         ensureRobot().setFwdMaxSpeed(max);
     }
 
+    /** Get the max brightness of the eyes */
     //% blockId=robotpu_eye_brightness_var block="eye brightness"
     //% subcategory="Setup"
     //% group="Setup"
@@ -182,6 +188,7 @@ namespace robotPu {
         return ensureRobot().wk.eyeBrightness;
     }
 
+    /** Set the max brightness of the eyes */
     //% blockId=robotpu_set_eye_brightness_var block="set eye brightness to %brightness"
     //% subcategory="Setup"
     //% group="Setup"
@@ -305,6 +312,7 @@ namespace robotPu {
         getRobotAPI().explore();
     }
 
+    /** Move sidewards. Return 0 when done */
     //% blockId=robotpu_side_step block="side step %direction"
     //% subcategory="Actions"
     //% group="Actions"
@@ -314,6 +322,7 @@ namespace robotPu {
         return getRobotAPI().sideStep(direction);
     }
 
+    /** Move sidewards. Statement version (no return). */
     //% blockId=robotpu_side_step_do block="side step %direction"
     //% subcategory="Actions"
     //% group="Actions"
@@ -323,7 +332,7 @@ namespace robotPu {
         getRobotAPI().sideStep(direction);
     }
 
-    /** Dance to music */
+    /** Dance to music, return 0 when done with one dance move */
     //% blockId=robotpu_dance block="dance"
     //% subcategory="Actions"
     //% group="Actions"
@@ -341,7 +350,7 @@ namespace robotPu {
         getRobotAPI().dance();
     }
 
-    /** Kick with a quick forward motion */
+    /** Kick with a quick forward motion. Return 0 when done */
     //% blockId=robotpu_kick block="kick"
     //% subcategory="Actions"
     //% group="Actions"
@@ -359,7 +368,7 @@ namespace robotPu {
         getRobotAPI().kick();
     }
 
-    /** Jump action */
+    /** Jump action. Return 0 when done */
     //% blockId=robotpu_jump block="jump"
     //% subcategory="Actions"
     //% group="Actions"
@@ -404,6 +413,7 @@ namespace robotPu {
         ensureRobot().calibrate();
     }
 
+    /** Stand up. Return 0 when done */
     //% blockId=robotpu_stand block="stand"
     //% subcategory="Actions"
     //% group="Actions"
@@ -412,6 +422,7 @@ namespace robotPu {
         return getRobotAPI().stand();
     }
 
+    /** Stand up. Statement version (no return). */
     //% blockId=robotpu_stand_do block="stand"
     //% subcategory="Actions"
     //% group="Actions"
@@ -496,6 +507,7 @@ namespace robotPu {
         getRobotAPI().incrCt(indexes, values, gain);
     }
 
+    /** Set left eye brightness (0 to 1). */
     //% blockId=robotpu_left_eye_bright block="set left eye brightness %brightness"
     //% weight=46 blockGap=8
     //% subcategory="Actuators"
@@ -508,6 +520,7 @@ namespace robotPu {
         r.wk.leftEyeBright(b);
     }
 
+    /** Set right eye brightness (0 to 1). */
     //% blockId=robotpu_right_eye_bright block="set right eye brightness %brightness"
     //% weight=46 blockGap=8
     //% subcategory="Actuators"
@@ -520,6 +533,7 @@ namespace robotPu {
         r.wk.rightEyeBright(b);
     }
 
+    /** Return sonar distance in centimeters. */
     //% blockId=robotpu_sonar_distance_cm block="sonar distance (cm)"
     //% subcategory="Sensors"
     //% group="Sensors"
@@ -528,6 +542,7 @@ namespace robotPu {
         return ensureRobot().sonar.distanceCm();
     }
 
+    /** Return body roll in degrees. */
     //% blockId=robotpu_body_roll block="body roll"
     //% subcategory="Sensors"
     //% group="Sensors"
@@ -536,6 +551,7 @@ namespace robotPu {
         return ensureRobot().getBodyRoll();
     }
 
+    /** Return body pitch in degrees. */
     //% blockId=robotpu_body_pitch block="body pitch"
     //% subcategory="Sensors"
     //% group="Sensors"
@@ -544,6 +560,7 @@ namespace robotPu {
         return ensureRobot().getBodyPitch();
     }
 
+    /** Return music tempo detected live in BPM. */
     //% blockId=robotpu_music_tempo block="music tempo"
     //% subcategory="Sensors"
     //% group="Sensors"
