@@ -417,6 +417,7 @@ class WK {
     private eyeBrightIcr: number;
     private blinkInterval: number;
     public pos: number;
+    public lastPos: number;
     public numSteps: number;
     private blinkG: number;
     private idle: boolean;
@@ -431,6 +432,7 @@ class WK {
         this.eyeBrightIcr = 1;
         this.blinkInterval = 6000;
         this.pos = 0;
+        this.lastPos = 0;
         this.numSteps = 0;
         this.blinkG = 4000;
         this.idle = false;
@@ -526,6 +528,7 @@ class WK {
         }
 
         if (this.isServoIdle(sync_list, p)) {
+            this.lastPos = this.pos;
             this.pos = (this.pos + 1) % states.length;
             this.numSteps += 1;
             return 0;
@@ -1020,11 +1023,11 @@ class RobotPu {
  */
     public walk(sp: number, di: number): number {
         let ret = this.moveBalance(sp, di, this.pr.walkFwdStates, this.pr.walkBwdStates);
-        if (ret ==0){
-            if (this.wk.pos == 1){ // update left step odometry
+        if (ret == 0){
+            if (this.wk.lastPos == 1){ // update left step odometry
                 this.odom.leftStep(this.pr.servoTarget[1]-this.lastLeftLegAngle);
                 this.lastLeftLegAngle = this.pr.servoTarget[1];
-            } else if (this.wk.pos == 3){ // update right step odometry
+            } else if (this.wk.lastPos == 3){ // update right step odometry
                 this.odom.rightStep(this.pr.servoTarget[3]-this.lastRightLegAngle);
                 this.lastRightLegAngle = this.pr.servoTarget[3];
             }
