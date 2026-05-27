@@ -36,6 +36,44 @@ Purchase links:
 - [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/)
 - [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth)
 - [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
+- [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)
+
+## What you can learn with Robot PU
+
+Robot PU provides a hands-on learning path from first MakeCode programs to advanced robotics. The tutorials start with blocks and JavaScript/TypeScript basics, then grow into sensing, control, autonomy, mapping, and multi-robot projects.
+Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
+
+- **Programming fundamentals**
+  - Learn MakeCode blocks, JavaScript/TypeScript, and Python-style robotics workflows.
+  - Practice variables, functions, arrays, loops, events, state machines, object-oriented design, and clean project structure.
+
+- **Robot hardware and motion**
+  - Understand how servos, motors, I2C devices, micro:bit pins, and action APIs work together.
+  - Program walking, turning, side stepping, jumping, kicking, dancing, and asynchronous motion sequences.
+
+- **Sensors, perception, and signal processing**
+  - Use sonar, IMU/body tilt, microphone/music input, radio messages, and optional AI camera perception.
+  - Filter noisy signals and turn observations into reliable robot decisions.
+
+- **Control theory, balance, and kinematics**
+  - Explore feedback control, feedforward ideas, PID/PD control, complementary filtering, prediction, and balance.
+  - Connect math concepts to real robot motion, pose, heading, and stability.
+
+- **Navigation, mapping, and SLAM (Simultaneous Localization and Mapping) concepts**
+  - Build obstacle avoidance, maze solving, autopilot exploration, odometry-lite pose estimation, heading fusion, 2D maps, occupancy grids, path planning, path following, and local planners.
+  - Use Robot PU location data as an entry point to SLAM-style robot navigation.
+
+- **Communication and multi-robot systems**
+  - Work with radio gamepad control, peer-to-peer chat, synchronized singing, shared maps, task allocation, and formation control.
+  - Learn ROS-inspired ideas such as nodes, topics, telemetry, dashboards, diagnostics, safety watchdogs, and recovery behaviors.
+
+- **Creative expression and making**
+  - Design behaviors with music, speech, emotion, blinking eyes, body language, choreography, games, and AI-camera interaction.
+  - Extend Robot PU with storytelling, classroom activities, 3D design, and 3D-printed upgrades.
+
+- **3D Design and 3D Printing**
+  - Design and print 3D accessories to upgrade Robot PU.
+    - TinkerCAD project: [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)      
 
 The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
 
