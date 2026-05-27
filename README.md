@@ -76,7 +76,6 @@ Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
     - TinkerCAD project: [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)      
 
 The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
-
 - https://makecode.microbit.org/_JbygU12aCAsU
 
 ## The Story Of Robot PU
