@@ -1026,11 +1026,11 @@ class RobotPu {
         if (ret == 0){
             if (this.wk.lastPos == 1){ // update left step odometry
                 this.odom.leftStep(this.pr.servoTarget[1]-this.lastLeftLegAngle);
-                this.lastLeftLegAngle = this.pr.servoTarget[1];
             } else if (this.wk.lastPos == 3){ // update right step odometry
                 this.odom.rightStep(this.pr.servoTarget[3]-this.lastRightLegAngle);
-                this.lastRightLegAngle = this.pr.servoTarget[3];
             }
+            this.lastLeftLegAngle = this.pr.servoTarget[1];
+            this.lastRightLegAngle = this.pr.servoTarget[3];
         }
         return ret;
     }
