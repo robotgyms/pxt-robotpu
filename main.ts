@@ -86,6 +86,7 @@ namespace robotPu {
             const sn = "pu-" + control.deviceSerialNumber();
             robot = new RobotPu(sn, "peu");
             robot.calibrate();
+            robot.stand();
             control.inBackground(function () {
                 // add background task to update states and execute behavior logic
                 while (true) {
@@ -378,14 +379,34 @@ namespace robotPu {
         return ensureRobot().pr.servoTrim;
     }
 
-     //% blockId=robotpu_explore_distance_array block="front distance array"
-     //% subcategory="Sensors"
-     //% group="Sensors"
-     //% weight=63 blockGap=8
-     export function frontDistanceArray(): number[] {
-         const d = ensureRobot().pr.exploreDistance;
-         return [d[0], d[1], (d[1]+d[2])*0.5, d[2], d[3]];
-     }
+    /** front distance array items: left, middle left, middle, middle right, right */
+    //% blockId=robotpu_explore_distance_array block="front distance array"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=63 blockGap=8
+    export function frontDistanceArray(): number[] {
+        const d = ensureRobot().pr.exploreDistance;
+        return [d[0], d[1], (d[1]+d[2])*0.5, d[2], d[3]];
+    }
+
+    /** reset odometry so that robot location is (0, 0), rotation = 0 in right hand coordinate frame */
+    //% blockId=robotpu_reset_odom block="reset robot location"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=62 blockGap=8
+    export function resetOdom(): void {
+        ensureRobot().resetOdom();
+    }
+
+    /** return (x, y, theta) in mm and degrees of right hand coordinate frame */
+    //% blockId=robotpu_location_array block="robot location array"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=58 blockGap=8
+    export function locationArray(): number[] {
+        const p = ensureRobot().odom.getPosition();
+        return [p.x_mm, p.y_mm, p.theta_deg];
+    }
 
     /** Dance to music */
     //% blockId=robotpu_dance block="dance"
