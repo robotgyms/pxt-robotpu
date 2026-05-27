@@ -718,14 +718,12 @@ class RobotPUOdometry {
 
     leftStep(yawAngleDeg: number): void {
         // Apply one walking step where the left leg is the support pivot.
-        this.currentTransformation = updateOdometry(this.currentTransformation,
-            rotateAboutPivot(deg2rad(yawAngleDeg), [-this.axisHalfDistanceMm, 0.0]));
+        this.update(rotateAboutPivot(deg2rad(yawAngleDeg), [-this.axisHalfDistanceMm, 0.0]));
     }
 
     rightStep(yawAngleDeg: number): void {
         // Apply one walking step where the right leg is the support pivot.
-        this.currentTransformation = updateOdometry(this.currentTransformation,
-            rotateAboutPivot(deg2rad(yawAngleDeg), [this.axisHalfDistanceMm, 0.0]));
+        this.update(rotateAboutPivot(deg2rad(yawAngleDeg), [this.axisHalfDistanceMm, 0.0]));
     }
 
     getPosition(): { x_mm: number; y_mm: number; theta_deg: number } {
