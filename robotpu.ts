@@ -728,10 +728,9 @@ class RobotPUOdometry {
 
     getPosition(): { x_mm: number; y_mm: number; theta_deg: number } {
         // Return (x,y,theta) extracted from the SE(2) matrix.
-        var xMm = this.currentTransformation[0][2];
-        var yMm = this.currentTransformation[1][2];
-        var thetaRad = Math.atan2(this.currentTransformation[1][0], this.currentTransformation[0][0]);
-        var thetaDeg = rad2deg(thetaRad);
+        let xMm = this.currentTransformation[0][2];
+        let yMm = this.currentTransformation[1][2];
+        let thetaDeg = rad2deg(Math.atan2(this.currentTransformation[1][0], this.currentTransformation[0][0]));
         return { x_mm: xMm, y_mm: yMm, theta_deg: thetaDeg };
     }
 

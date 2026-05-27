@@ -398,7 +398,7 @@ namespace robotPu {
         ensureRobot().resetOdom();
     }
 
-    /** return (x, y, theta) in mm and degrees of right hand coordinate frame */
+    /** return (x, y, theta). Location x,y in mm and orientation in degrees, with right hand coordinate frame */
     //% blockId=robotpu_location_array block="robot location array"
     //% subcategory="Sensors"
     //% group="Sensors"
