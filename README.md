@@ -36,7 +36,20 @@ Purchase links:
 - [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/)
 - [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth)
 - [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
-- [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)
+- [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW) 
+
+The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
+- https://makecode.microbit.org/_JbygU12aCAsU
+
+## The Story Of Robot PU
+- [Return to Saduka](https://robotgyms.com/courses/the-saga-of-robot-pu)
+
+## Activities and Use Cases
+
+- **Little AI friend**: walk, dance, navigate, maze solving, chat, generate songs, sing
+- **Games**: soccer, hide-and-seek, group dance/chorus
+- **Learn-then-create**: programming, electronics, mechanics, 3D printing accessories
+- **Community**: share code and parts, collaborate, coordinate multiple robots
 
 ## What you can learn with Robot PU
 
@@ -73,21 +86,8 @@ Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
 
 - **3D Design and 3D Printing**
   - Design and print 3D accessories to upgrade Robot PU.
-    - TinkerCAD project: [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)      
-
-The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
-- https://makecode.microbit.org/_JbygU12aCAsU
-
-## The Story Of Robot PU
-- [Return to Saduka](https://robotgyms.com/courses/the-saga-of-robot-pu)
-
-## Activities and Use Cases
-
-- **Little AI friend**: walk, dance, navigate, maze solving, chat, generate songs, sing
-- **Games**: soccer, hide-and-seek, group dance/chorus
-- **Learn-then-create**: programming, electronics, mechanics, 3D printing accessories
-- **Community**: share code and parts, collaborate, coordinate multiple robots
-
+    - TinkerCAD project: [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)
+      
 ## Tutorial knowledge graphs (JavaScript)
 
 The JavaScript tutorial set includes **knowledge graphs** (mindmaps) that show how topics connect and suggest a learning path.
