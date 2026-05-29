@@ -38,6 +38,11 @@ Purchase links:
 - [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
 - [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)
 
+## What’are in the optional parts
+- Smart Hat, enable robot PU to see, listen, and do SLAM navigation
+
+- [AI Camera](https://robotgyms.com/courses/the-story-of-pu-book-5-ai-camera)
+
 ## What you can learn with Robot PU
 
 Robot PU provides a hands-on learning path from first MakeCode programs to advanced robotics. The tutorials start with blocks and JavaScript/TypeScript basics, then grow into sensing, control, autonomy, mapping, and multi-robot projects.
