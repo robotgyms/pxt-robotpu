@@ -4,18 +4,20 @@ This folder contains the JavaScript / TypeScript tutorials for the **Robot PU** 
 
 These lessons are written for the **micro:bit MakeCode editor**:
 
-- https://makecode.microbit.org
+- **MakeCode editor**: https://makecode.microbit.org
+- **GitHub tutorial folder**: https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/JavaScripts
 
 ---
 
 ## How to use these tutorials
 
-- Open the MakeCode editor.
-- Add the **Robot PU** extension.
-- Follow a tutorial below (most lessons include copy/pasteable `typescript` code snippets).
-- If a tutorial provides a compiled `.hex` file, you can download it directly and flash it to the micro:bit.
+- **Open MakeCode**: Go to https://makecode.microbit.org.
+- **Add Robot PU**: Add the **Robot PU** extension to your MakeCode project.
+- **Choose a tutorial**: Click a tutorial link below and copy the TypeScript code into MakeCode when provided.
+- **Flash examples**: If a tutorial mentions a `.hex` file, download and flash it to the micro:bit.
 
 ---
+
 ## Knowledge graph
 
 ```mermaid
@@ -23,291 +25,296 @@ mindmap
   root((Robot PU JavaScript Tutorials))
     Setup & Basics
       Project skeleton
-        barebone.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/barebone.md
       Hello world sanity check
-        demo-program.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/demo-program.md
       TypeScript basics in MakeCode
-        javascript-quick-start.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/javascript-quick-start.md
+    Build & Calibration
+      Add arms
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/AddArms.md
+      Servo trim calibration
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/servo-trim-calibration.md
     Robot Hardware & Core APIs
-      How PU moves (motors servos I2C)
-        motorize-pu.md
-      Action APIs (async motion, sequencing)
-        action-pu.md
+      How PU moves
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/motorize-pu.md
+      Action APIs
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/action-pu.md
       Sensors and perception
-        observation-pu.md
-      Obstacle avoidance (basic)
-        dont-bonk.md
-    Music and Expression (low math, moderate logic)
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/observation-pu.md
+      Obstacle avoidance
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dont-bonk.md
+    Vision & Soccer SLAM
+      K230 AI Camera
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/K230-AI-Camera-pu.md
+      Search face
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/search-face.md
+      SLAM odometry
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-odometry-pu.md
+      Soccer ball follow
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-ball-follow.md
+      Soccer local occupancy map
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-local-map.md
+    Music and Expression
       Beat reactive behaviors
-        music-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/music-pu.md
       Music helpers
-        musiclib-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/musiclib-pu.md
       Dance choreography
-        dance-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dance-pu.md
       Emotion state to expression
-        emotion-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/emotion-pu.md
       Speech content patterns
-        talk-content.md
-      Speech content example (hex)
-        talk-pxt-billy-content.md
-    Communication & Control (radio)
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/talk-content.md
+      Speech content example
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/talk-pxt-billy-content.md
+    Communication & Control
       Remote control protocol
-        remote-control.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/remote-control.md
       Gamepad input mapping
-        gamepad.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/gamepad.md
       Peer to peer messaging
-        pu-peer-chat.md
-    Vision & Human Interaction
-      K230 AI Camera (HUSKYLENS 2)
-        K230-AI-Camera-pu.md
-    Programming Structure (higher programming skill)
-      Event loop (Observe Think Act)
-        event-loop-pu.md
-      Custom events and handlers
-        event-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/pu-peer-chat.md
+    Programming Structure
+      Event loop
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-loop-pu.md
+      Custom events
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-pu.md
       State machines
-        state-machine-pu.md
-      OOP architecture and events
-        OOP-pu.md
-      Synchronization and coordination
-        synchronized-sing-pu.md
-    Algorithms (navigation/decision complexity)
-      Maze solving (wall following)
-        maze-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/state-machine-pu.md
+      OOP architecture
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/OOP-pu.md
+      Synchronization
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/synchronized-sing-pu.md
+    Navigation & Mapping
+      Maze solving
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/maze-pu.md
       Autopilot explore
-        autopilot-pu.md
-      Leader following decision engine
-        decision-engine-pu.md
-      Operator style sonar project (hex)
-        sonar-operator.md
-      Full project submarine sonar (hex)
-        submarine.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/autopilot-pu.md
+      Leader following
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/decision-engine-pu.md
+      Sonar operator
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/sonar-operator.md
+      Submarine sonar
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/submarine.md
       2D mapping concepts
-        2d-map.md
-    Control & Math (highest math/control difficulty)
-      Feedback loops and control thinking
-        thinking-pu.md
-      Filtering noisy signals
-        signal-filters-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/2d-map.md
+    Control & Math
+      Transformation matrix
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/transformation-matrix.md
+      Feedback loops
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/thinking-pu.md
+      Signal filtering
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/signal-filters-pu.md
       PID balancing
-        balance-PID-pu.md
-      Advanced balance (complementary + PD + prediction)
-        improved-balance-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/balance-PID-pu.md
+      Advanced balancing
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/improved-balance-pu.md
 ```
+
+---
 
 ## Advanced ROS topics knowledge graph
 
 ```mermaid
 mindmap
   root((Robot PU Advanced Topics - ROS inspired))
-    ROS concepts
-      Nodes
-        Perception node
-        Planner node
-        Controller node
-        Safety node
-      Topics
-        odom
-        scan
-        cmd_vel
-        diagnostics
-      Tools
-        visualization
-        logging
-        debugging
     Tooling and Observability
       Telemetry logging
-        telemetry-logging-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/telemetry-logging-pu.md
       Base station dashboard
-        base-station-dashboard-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/base-station-dashboard-pu.md
     Safety and Reliability
       Watchdog and E stop
-        safety-watchdog-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/safety-watchdog-pu.md
       Recovery behaviors
-        fault-recovery-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/fault-recovery-pu.md
     Localization
       Odometry lite
-        odometry-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/odometry-pu.md
       Heading fusion
-        heading-fusion-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/heading-fusion-pu.md
+      SLAM odometry
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-odometry-pu.md
     Mapping
       Occupancy grid
-        occupancy-grid-pu.md
-      Shared map (multi robot)
-        shared-map-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/occupancy-grid-pu.md
+      Shared map
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/shared-map-pu.md
+      Soccer local map
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-local-map.md
     Planning
       Grid planning BFS Astar
-        path-planning-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/path-planning-pu.md
       Path following
-        path-following-pu.md
-    Local Planning
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/path-following-pu.md
       Cost based local planner
-        local-planner-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/local-planner-pu.md
     Architecture
       Behavior trees
-        behavior-tree-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/behavior-tree-pu.md
       Mission recipes
-        missions-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/missions-pu.md
     Multi robot
       Task allocation
-        task-allocation-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/task-allocation-pu.md
       Formation control
-        formation-control-pu.md
+        https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/formation-control-pu.md
 ```
-
-## Content index
-
-Follow this sequence from beginner to advanced. Each step assumes you’re comfortable with the previous ones.
-
-### Learning path (beginner → advanced)
-
-- **Bare minimum project structure**
-  - `barebone.md`
-
-- **A small demo program to verify your setup**
-  - `demo-program.md`
-
-- **JavaScript / TypeScript quick start**
-  - `javascript-quick-start.md`
-
-- **Submarine sonar (complete project)**
-  - `submarine.md`
-  - `.hex` included: `microbit-robot-pu-submarine-sonar.hex`
-
-- **Don’t bonk (basic obstacle avoidance patterns)**
-  - `dont-bonk.md`
-
-- **Sonar operator (operator UI + control patterns)**
-  - `sonar-operator.md`
-  - `.hex` included: `microbit-robot-pu-sonar-operator.hex`
-
-- **Talk (pxt-billy content)**
-  - `talk-pxt-billy-content.md`
-  - `.hex` included: `microbit-robot-pu-pxt-billy-content.hex`
-
-- **Talk content (speech/script content patterns)**
-  - `talk-content.md`
-
-- **How Robot PU moves (motorization + I2C + servos)**
-  - `motorize-pu.md`
-
-- **Robot actions (sequencing + asynchronous motion APIs)**
-  - `action-pu.md`
-
-- **Robot observation (sensors / perception)**
-  - `observation-pu.md`
-
-- **K230 AI camera (HUSKYLENS 2) — human interaction**
-  - `K230-AI-Camera-pu.md`
-
-- **Music + beat-driven behaviors**
-  - `music-pu.md`
-
-- **Synchronized singing (timing + coordination across robots)**
-  - `synchronized-sing-pu.md`
-
-- **Music library utilities (notes, tempo helpers, etc.)**
-  - `musiclib-pu.md`
-
-- **Remote control (radio gamepad / message protocol)**
-  - `remote-control.md`
-
-- **Gamepad patterns (controller mappings and input handling)**
-  - `gamepad.md`
-
-- **Peer chat over radio (message patterns)**
-  - `pu-peer-chat.md`
-
-- **Event loop: Observation → Thinking → Action (robot multitasking)**
-  - `event-loop-pu.md`
-
-- **Custom events + event handlers (MakeCode event system patterns)**
-  - `event-pu.md`
-
-- **State machines (structured robot behavior)**
-  - `state-machine-pu.md`
-
-- **Dance: from built-in `dance()` to beat-synced choreography**
-  - `dance-pu.md`
-
-- **Emotions: eyes + blinking + body language (signals → emotion → expression)**
-  - `emotion-pu.md`
-
-- **Signal filters (clean noisy sonar / sensor signals)**
-  - `signal-filters-pu.md`
-
-- **Telemetry + logging (ROS-style topics)**
-  - `telemetry-logging-pu.md`
-
-- **Base station dashboard (visualize robot state)**
-  - `base-station-dashboard-pu.md`
-
-- **Safety watchdog + E-stop**
-  - `safety-watchdog-pu.md`
-
-- **Fault recovery behaviors (unstuck routines)**
-  - `fault-recovery-pu.md`
-
-- **Maze solving (right-hand / left-hand wall following)**
-  - `maze-pu.md`
-
-- **Autopilot navigation (sonar explore behaviors)**
-  - `autopilot-pu.md`
-
-- **Leader-following decision engine (follow leader while avoiding obstacles)**
-  - `decision-engine-pu.md`
-
-- **2D mapping concepts (occupancy grid + local mapping)**
-  - `2d-map.md`
-
-- **Odometry-lite (pose estimation)**
-  - `odometry-pu.md`
-
-- **Heading fusion (complementary filtering patterns)**
-  - `heading-fusion-pu.md`
-
-- **Occupancy grid (tiny mapping project)**
-  - `occupancy-grid-pu.md`
-
-- **Shared mapping (multi-robot occupancy grid)**
-  - `shared-map-pu.md`
-
-- **Path planning (BFS / A*)**
-  - `path-planning-pu.md`
-
-- **Path following (waypoints → motion)**
-  - `path-following-pu.md`
-
-- **Local planner (cost-based motion selection)**
-  - `local-planner-pu.md`
-
-- **Behavior trees (ROS-style mission structure)**
-  - `behavior-tree-pu.md`
-
-- **Missions pack (autonomy recipes)**
-  - `missions-pu.md`
-
-- **Task allocation (multi-robot roles)**
-  - `task-allocation-pu.md`
-
-- **Formation control (follow-the-leader 2.0)**
-  - `formation-control-pu.md`
-
-- **Robot thinking (feedback loops / control)**
-  - `thinking-pu.md`
-
-- **Balancing (PID-based discussion and examples)**
-  - `balance-PID-pu.md`
-
-- **Improved balancing (noise + delay, complementary filter + PD + prediction)**
-  - `improved-balance-pu.md`
-
-- **OOP + event handlers (clean, modular robot software design)**
-  - `OOP-pu.md`
 
 ---
 
-## Folder contents (quick reference)
+## Content index
 
-- Tutorials: `*.md`
-- Compiled examples: `*.hex`
+Follow this sequence from beginner to advanced. Each tutorial link points to the GitHub file so students can click directly into the lesson.
+
+### Setup & basics
+
+- **Bare minimum project structure**: [barebone.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/barebone.md)
+- **A small demo program to verify your setup**: [demo-program.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/demo-program.md)
+- **JavaScript / TypeScript quick start**: [javascript-quick-start.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/javascript-quick-start.md)
+
+### Build, assembly, and calibration
+
+- **Add arms**: [AddArms.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/AddArms.md)
+- **Servo trim calibration**: [servo-trim-calibration.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/servo-trim-calibration.md)
+
+### Robot hardware & core APIs
+
+- **How Robot PU moves**: [motorize-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/motorize-pu.md)
+- **Robot actions**: [action-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/action-pu.md)
+- **Robot observation**: [observation-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/observation-pu.md)
+- **Don’t bonk**: [dont-bonk.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dont-bonk.md)
+
+### Vision, AI camera, and soccer SLAM
+
+- **K230 AI camera**: [K230-AI-Camera-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/K230-AI-Camera-pu.md)
+- **Search face**: [search-face.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/search-face.md)
+- **SLAM odometry**: [slam-odometry-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-odometry-pu.md)
+- **SLAM soccer ball follow**: [slam-soccer-ball-follow.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-ball-follow.md)
+- **SLAM soccer local occupancy map**: [slam-soccer-local-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-local-map.md)
+
+### Music, speech, and expression
+
+- **Music + beat-driven behaviors**: [music-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/music-pu.md)
+- **Music library utilities**: [musiclib-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/musiclib-pu.md)
+- **Dance choreography**: [dance-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dance-pu.md)
+- **Emotion state to expression**: [emotion-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/emotion-pu.md)
+- **Talk content patterns**: [talk-content.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/talk-content.md)
+- **Talk pxt-billy content**: [talk-pxt-billy-content.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/talk-pxt-billy-content.md)
+
+### Communication & control
+
+- **Remote control**: [remote-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/remote-control.md)
+- **Gamepad patterns**: [gamepad.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/gamepad.md)
+- **Peer chat over radio**: [pu-peer-chat.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/pu-peer-chat.md)
+
+### Programming structure
+
+- **Event loop**: [event-loop-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-loop-pu.md)
+- **Custom events and handlers**: [event-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-pu.md)
+- **State machines**: [state-machine-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/state-machine-pu.md)
+- **Object-oriented programming architecture**: [OOP-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/OOP-pu.md)
+- **Synchronized singing**: [synchronized-sing-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/synchronized-sing-pu.md)
+
+### Navigation, autonomy, and mapping
+
+- **Submarine sonar complete project**: [submarine.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/submarine.md)
+- **Sonar operator**: [sonar-operator.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/sonar-operator.md)
+- **Maze solving**: [maze-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/maze-pu.md)
+- **Autopilot navigation**: [autopilot-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/autopilot-pu.md)
+- **Leader-following decision engine**: [decision-engine-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/decision-engine-pu.md)
+- **2D mapping concepts**: [2d-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/2d-map.md)
+- **Occupancy grid**: [occupancy-grid-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/occupancy-grid-pu.md)
+- **Shared mapping**: [shared-map-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/shared-map-pu.md)
+- **Path planning**: [path-planning-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/path-planning-pu.md)
+- **Path following**: [path-following-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/path-following-pu.md)
+- **Local planner**: [local-planner-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/local-planner-pu.md)
+
+### ROS-inspired robotics architecture
+
+- **Telemetry logging**: [telemetry-logging-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/telemetry-logging-pu.md)
+- **Base station dashboard**: [base-station-dashboard-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/base-station-dashboard-pu.md)
+- **Safety watchdog + E-stop**: [safety-watchdog-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/safety-watchdog-pu.md)
+- **Fault recovery behaviors**: [fault-recovery-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/fault-recovery-pu.md)
+- **Behavior trees**: [behavior-tree-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/behavior-tree-pu.md)
+- **Mission recipes**: [missions-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/missions-pu.md)
+- **Task allocation**: [task-allocation-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/task-allocation-pu.md)
+- **Formation control**: [formation-control-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/formation-control-pu.md)
+
+### Control & math
+
+- **Transformation matrix**: [transformation-matrix.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/transformation-matrix.md)
+- **Robot thinking and feedback loops**: [thinking-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/thinking-pu.md)
+- **Signal filters**: [signal-filters-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/signal-filters-pu.md)
+- **Heading fusion**: [heading-fusion-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/heading-fusion-pu.md)
+- **PID balancing**: [balance-PID-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/balance-PID-pu.md)
+- **Improved balancing**: [improved-balance-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/improved-balance-pu.md)
+
+---
+
+## Complete markdown file checklist
+
+Every `.md` file in this folder is listed below with a GitHub URL.
+
+- **2d-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/2d-map.md
+- **AddArms.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/AddArms.md
+- **K230-AI-Camera-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/K230-AI-Camera-pu.md
+- **OOP-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/OOP-pu.md
+- **README.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/README.md
+- **action-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/action-pu.md
+- **autopilot-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/autopilot-pu.md
+- **balance-PID-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/balance-PID-pu.md
+- **barebone.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/barebone.md
+- **base-station-dashboard-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/base-station-dashboard-pu.md
+- **behavior-tree-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/behavior-tree-pu.md
+- **dance-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dance-pu.md
+- **decision-engine-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/decision-engine-pu.md
+- **demo-program.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/demo-program.md
+- **dont-bonk.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dont-bonk.md
+- **emotion-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/emotion-pu.md
+- **event-loop-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-loop-pu.md
+- **event-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-pu.md
+- **fault-recovery-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/fault-recovery-pu.md
+- **formation-control-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/formation-control-pu.md
+- **gamepad.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/gamepad.md
+- **heading-fusion-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/heading-fusion-pu.md
+- **improved-balance-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/improved-balance-pu.md
+- **javascript-quick-start.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/javascript-quick-start.md
+- **local-planner-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/local-planner-pu.md
+- **maze-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/maze-pu.md
+- **missions-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/missions-pu.md
+- **motorize-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/motorize-pu.md
+- **music-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/music-pu.md
+- **musiclib-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/musiclib-pu.md
+- **observation-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/observation-pu.md
+- **occupancy-grid-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/occupancy-grid-pu.md
+- **path-following-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/path-following-pu.md
+- **path-planning-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/path-planning-pu.md
+- **pu-peer-chat.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/pu-peer-chat.md
+- **remote-control.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/remote-control.md
+- **safety-watchdog-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/safety-watchdog-pu.md
+- **search-face.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/search-face.md
+- **servo-trim-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/servo-trim-calibration.md
+- **shared-map-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/shared-map-pu.md
+- **signal-filters-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/signal-filters-pu.md
+- **slam-odometry-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-odometry-pu.md
+- **slam-soccer-ball-follow.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-ball-follow.md
+- **slam-soccer-local-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-local-map.md
+- **sonar-operator.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/sonar-operator.md
+- **state-machine-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/state-machine-pu.md
+- **submarine.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/submarine.md
+- **synchronized-sing-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/synchronized-sing-pu.md
+- **talk-content.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/talk-content.md
+- **talk-pxt-billy-content.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/talk-pxt-billy-content.md
+- **task-allocation-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/task-allocation-pu.md
+- **telemetry-logging-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/telemetry-logging-pu.md
+- **thinking-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/thinking-pu.md
+- **transformation-matrix.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/transformation-matrix.md
+
+---
+
+## Folder contents quick reference
+
+- **Markdown tutorials**: `54` `.md` files, including this `README.md`.
+- **Compiled examples**: `.hex` files are included for selected complete projects.

@@ -4,6 +4,8 @@ This tutorial shows how to use the Robot PU Smart Hat camera to detect, track, a
 
 The Smart Hat runs the vision model on its ESP32 camera board. The micro:bit reads detection packets over I2C, turns the robot head toward the ball, and walks forward while correcting its heading.
 
+The demo program can be downloaded from https://makecode.microbit.org/S55741-05105-61572-94579
+
 ---
 
 ## What you will build
@@ -288,6 +290,11 @@ input.onButtonPressed(Button.A, function () {
 })
 input.onButtonPressed(Button.B, function () {
     setService(SERVICE_WIFI, false)
+})
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    // allow gamepad to trim servos to improve balancing
+    robotPu.toggleServoTrim()
+    basic.pause(500)
 })
 function i16(buf: Buffer, offset: number): number {
     let v = buf[offset] | (buf[offset + 1] << 8)
