@@ -25,91 +25,52 @@ mindmap
   root((Robot PU JavaScript Tutorials))
     Setup & Basics
       Project skeleton
-        Project skeleton
       Hello world sanity check
-        Hello world demo
       TypeScript basics in MakeCode
-        JavaScript quick start
     Build & Calibration
       Add arms
-        Add arms
       Servo trim calibration
-        Servo trim calibration
     Robot Hardware & Core APIs
       How PU moves
-        Robot motion hardware
       Action APIs
-        Robot action APIs
       Sensors and perception
-        Sensors and perception
       Obstacle avoidance
-        Obstacle avoidance
     Vision & Soccer SLAM
       K230 AI Camera
-        K230 AI camera
       Search face
-        Face search
       SLAM odometry
-        SLAM odometry
       Soccer ball follow
-        Soccer ball following
       Soccer local occupancy map
-        Soccer local occupancy map
     Music and Expression
       Beat reactive behaviors
-        Music behaviors
       Music helpers
-        Music library
       Dance choreography
-        Dance choreography
       Emotion state to expression
-        Emotion expression
       Speech content patterns
-        Speech content patterns
       Speech content example
-        Billy speech example
     Communication & Control
       Remote control protocol
-        Remote control
       Gamepad input mapping
-        Gamepad input
       Peer to peer messaging
-        Peer radio chat
     Programming Structure
       Event loop
-        Observe Think Act loop
       Custom events
-        Custom events
       State machines
-        State machines
       OOP architecture
-        Object-oriented architecture
       Synchronization
-        Synchronized singing
     Navigation & Mapping
       Maze solving
-        Maze solving
       Autopilot explore
-        Autopilot exploration
       Leader following
-        Decision engine
       Sonar operator
-        Sonar operator
       Submarine sonar
-        Submarine sonar project
       2D mapping concepts
-        2D mapping concepts
     Control & Math
       Transformation matrix
-        Transformation matrices
       Feedback loops
-        Feedback-loop thinking
       Signal filtering
-        Signal filtering
       PID balancing
-        PID balancing
       Advanced balancing
-        Improved balancing
 ```
 
 ---
@@ -121,45 +82,28 @@ mindmap
   root((Robot PU Advanced Topics - ROS inspired))
     Tooling and Observability
       Telemetry logging
-        Telemetry logging
       Base station dashboard
-        Base station dashboard
     Safety and Reliability
       Watchdog and E stop
-        Safety watchdog
       Recovery behaviors
-        Fault recovery
     Localization
       Odometry lite
-        Odometry lite
       Heading fusion
-        Heading fusion
       SLAM odometry
-        SLAM odometry
     Mapping
       Occupancy grid
-        Occupancy grid
       Shared map
-        Shared mapping
       Soccer local map
-        Soccer local occupancy map
     Planning
       Grid planning BFS Astar
-        Grid path planning
       Path following
-        Path following
       Cost based local planner
-        Local planning
     Architecture
       Behavior trees
-        Behavior trees
       Mission recipes
-        Mission recipes
     Multi robot
       Task allocation
-        Task allocation
       Formation control
-        Formation control
 ```
 
 ---
