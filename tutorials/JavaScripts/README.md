@@ -25,91 +25,91 @@ mindmap
   root((Robot PU JavaScript Tutorials))
     Setup & Basics
       Project skeleton
-        barebone.md
+        Project skeleton
       Hello world sanity check
-        demo-program.md
+        Hello world demo
       TypeScript basics in MakeCode
-        javascript-quick-start.md
+        JavaScript quick start
     Build & Calibration
       Add arms
-        AddArms.md
+        Add arms
       Servo trim calibration
-        servo-trim-calibration.md
+        Servo trim calibration
     Robot Hardware & Core APIs
       How PU moves
-        motorize-pu.md
+        Robot motion hardware
       Action APIs
-        action-pu.md
+        Robot action APIs
       Sensors and perception
-        observation-pu.md
+        Sensors and perception
       Obstacle avoidance
-        dont-bonk.md
+        Obstacle avoidance
     Vision & Soccer SLAM
       K230 AI Camera
-        K230-AI-Camera-pu.md
+        K230 AI camera
       Search face
-        search-face.md
+        Face search
       SLAM odometry
-        slam-odometry-pu.md
+        SLAM odometry
       Soccer ball follow
-        slam-soccer-ball-follow.md
+        Soccer ball following
       Soccer local occupancy map
-        slam-soccer-local-map.md
+        Soccer local occupancy map
     Music and Expression
       Beat reactive behaviors
-        music-pu.md
+        Music behaviors
       Music helpers
-        musiclib-pu.md
+        Music library
       Dance choreography
-        dance-pu.md
+        Dance choreography
       Emotion state to expression
-        emotion-pu.md
+        Emotion expression
       Speech content patterns
-        talk-content.md
+        Speech content patterns
       Speech content example
-        talk-pxt-billy-content.md
+        Billy speech example
     Communication & Control
       Remote control protocol
-        remote-control.md
+        Remote control
       Gamepad input mapping
-        gamepad.md
+        Gamepad input
       Peer to peer messaging
-        pu-peer-chat.md
+        Peer radio chat
     Programming Structure
       Event loop
-        event-loop-pu.md
+        Observe Think Act loop
       Custom events
-        event-pu.md
+        Custom events
       State machines
-        state-machine-pu.md
+        State machines
       OOP architecture
-        OOP-pu.md
+        Object-oriented architecture
       Synchronization
-        synchronized-sing-pu.md
+        Synchronized singing
     Navigation & Mapping
       Maze solving
-        maze-pu.md
+        Maze solving
       Autopilot explore
-        autopilot-pu.md
+        Autopilot exploration
       Leader following
-        decision-engine-pu.md
+        Decision engine
       Sonar operator
-        sonar-operator.md
+        Sonar operator
       Submarine sonar
-        submarine.md
+        Submarine sonar project
       2D mapping concepts
-        2d-map.md
+        2D mapping concepts
     Control & Math
       Transformation matrix
-        transformation-matrix.md
+        Transformation matrices
       Feedback loops
-        thinking-pu.md
+        Feedback-loop thinking
       Signal filtering
-        signal-filters-pu.md
+        Signal filtering
       PID balancing
-        balance-PID-pu.md
+        PID balancing
       Advanced balancing
-        improved-balance-pu.md
+        Improved balancing
 ```
 
 ---
@@ -121,45 +121,45 @@ mindmap
   root((Robot PU Advanced Topics - ROS inspired))
     Tooling and Observability
       Telemetry logging
-        telemetry-logging-pu.md
+        Telemetry logging
       Base station dashboard
-        base-station-dashboard-pu.md
+        Base station dashboard
     Safety and Reliability
       Watchdog and E stop
-        safety-watchdog-pu.md
+        Safety watchdog
       Recovery behaviors
-        fault-recovery-pu.md
+        Fault recovery
     Localization
       Odometry lite
-        odometry-pu.md
+        Odometry lite
       Heading fusion
-        heading-fusion-pu.md
+        Heading fusion
       SLAM odometry
-        slam-odometry-pu.md
+        SLAM odometry
     Mapping
       Occupancy grid
-        occupancy-grid-pu.md
+        Occupancy grid
       Shared map
-        shared-map-pu.md
+        Shared mapping
       Soccer local map
-        slam-soccer-local-map.md
+        Soccer local occupancy map
     Planning
       Grid planning BFS Astar
-        path-planning-pu.md
+        Grid path planning
       Path following
-        path-following-pu.md
+        Path following
       Cost based local planner
-        local-planner-pu.md
+        Local planning
     Architecture
       Behavior trees
-        behavior-tree-pu.md
+        Behavior trees
       Mission recipes
-        missions-pu.md
+        Mission recipes
     Multi robot
       Task allocation
-        task-allocation-pu.md
+        Task allocation
       Formation control
-        formation-control-pu.md
+        Formation control
 ```
 
 ---
