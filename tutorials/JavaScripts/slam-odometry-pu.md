@@ -20,7 +20,11 @@ basic.forever(function () {
     serial.writeLine("theta:" + location[2])
     basic.pause(2000)
 })
-
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    // allow gamepad to trim servos to improve balancing
+    robotPu.toggleServoTrim()
+    basic.pause(500)
+})
 ```
 
 Odometry estimates where the robot is by accumulating small motion updates.
