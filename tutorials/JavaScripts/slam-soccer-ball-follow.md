@@ -42,7 +42,7 @@ The Smart Hat camera board is controlled through I2C.
 - **`SERVICE_SOCCER_BALL_DETECTION = 4`**: Enables the soccer-ball detector.
 - **`SERVICE_SOCCER_GOAL_DETECTION = 5`**: Enables the soccer-goal detector for later soccer behaviors.
 
-The tutorial starts image capture with `setService(SERVICE_IMAGE_CAPTURE, true)`. It also refreshes soccer detection periodically with `setSoccerDetection(true)` and disables face detection so soccer packets are prioritized. When `DEBUG_FLAG` is `true`, Wi-Fi is enabled so you can inspect camera behavior if your Smart Hat firmware provides a web view. Button A enables Wi-Fi manually, and Button B disables it.
+The tutorial starts image capture with `setService(SERVICE_IMAGE_CAPTURE, true)`. It also refreshes soccer detection periodically with `setSoccerDetection(true)`. When `DEBUG_FLAG` is `true`, Wi-Fi is enabled so you can inspect camera behavior if your Smart Hat firmware provides a web view. Button A enables Wi-Fi manually, and Button B disables it.
 
 Before reading camera packets, the program writes `15` to `MUX_ADDR`. This selects the Smart Hat path on the I2C multiplexer so the micro:bit can communicate with the ESP32 camera board.
 
@@ -72,6 +72,18 @@ In this tutorial, `x_mm` is treated as the left/right offset of the ball and `y_
 
 ---
 
+## Program architecture
+
+The MakeCode program uses three `basic.forever(...)` loops that run cooperatively:
+
+- **Service refresh loop**: Re-enables image capture and soccer detection about every `30 s`. This helps recover if the camera firmware restarts.
+- **Detection loop**: Reads one `18` byte I2C packet and updates tracking state such as `yaw`, `pitch`, `walkSpeed`, and `walkTurn`.
+- **Action loop**: Continuously calls `robotPu.walk(walkSpeed, walkTurn)` using the latest computed command.
+
+This separation is important because the robot must keep walking smoothly even when an I2C read is delayed or a camera packet is missing.
+
+---
+
 ## Ball tracking behavior
 
 The main loop reads one packet from the Smart Hat every `20 ms` with `pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)`.
@@ -82,7 +94,21 @@ If the packet contains a soccer ball and `count > 0`, `trackBall` does three thi
 - **Center the camera**: The head yaw and pitch targets are adjusted from the camera yaw and pitch errors.
 - **Walk toward the ball**: The robot walks forward using the measured ball distance and turns using the yaw error.
 
-The walking command is `robotPu.walk(Math.max(-3, Math.min(3, (y_mm - 100) * 0.015)), Math.max(-1, Math.min(1, yaw * -0.05)))`. Here, `y_mm` is the forward distance to the ball. The `-100` offset keeps the robot from trying to drive all the way into the ball. The `Math.max` and `Math.min` calls clamp forward speed and turn speed to safe ranges. The yaw term turns the robot left or right so the ball stays near the center of the camera view.
+The forward speed is computed from the ball distance:
+
+```typescript
+walkSpeed = Math.max(-3, Math.min(3, (y_mm - 100) * 0.015))
+```
+
+Here, `y_mm` is the forward distance to the ball. The `-100` offset tells the robot to slow down when the ball is about `100 mm` away. The `Math.max` and `Math.min` calls clamp the speed to the safe range `-3..3`.
+
+The turn command is smoothed:
+
+```typescript
+walkTurn = Math.max(-0.7, Math.min(0.7, (walkTurn * 4 + yaw * -0.05) * 0.2))
+```
+
+This is a simple low-pass filter. It mixes the previous turn command with the newest yaw correction so the robot does not jerk left and right when the camera yaw error changes quickly.
 
 ---
 
@@ -90,7 +116,7 @@ The walking command is `robotPu.walk(Math.max(-3, Math.min(3, (y_mm - 100) * 0.0
 
 The camera gives yaw and pitch errors, not absolute servo angles. The code adds a small correction to the current head target with `robotPu.servoStep`.
 
-The gain `0.08` controls how aggressively the head moves toward the ball.
+The gain `0.6` controls how aggressively the head moves toward the ball in the validated program.
 
 - **If the head moves too slowly**: Increase the gain slightly.
 - **If the head shakes or overshoots**: Decrease the gain.
@@ -134,7 +160,8 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 
 - **Forward speed**: Tune `(y_mm - 100) * 0.015` if the robot walks too fast or too slowly.
 - **Turn speed**: Tune `yaw * -0.05` if the robot turns too sharply, not enough, or in the wrong direction.
-- **Head tracking gain**: Tune `yaw * 0.08` and `pitch * 0.08`.
+- **Turn smoothing**: Tune `(walkTurn * 4 + yaw * -0.05) * 0.2`. More previous-turn weight makes turning smoother but slower to react.
+- **Head tracking gain**: Tune `yaw * 0.6` and `pitch * 0.6`.
 - **Search timing**: Tune `SCAN_WAIT_FRAMES` to make each search position shorter or longer.
 - **Lost timeout**: Tune `LOST_TIMEOUT_MS` to choose how long the robot keeps following the last known ball direction.
 - **Debug output**: Set `DEBUG_FLAG` to `false` after tuning to reduce serial traffic.
@@ -145,7 +172,7 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 
 - **No I2C packets**: Check Smart Hat power, I2C wiring, the multiplexer address, and the `pins.i2cWriteNumber(MUX_ADDR, 15, ...)` setup call.
 - **Ball is not detected**: Improve lighting, move the ball into the camera view, and use a ball that matches the trained soccer-ball model.
-- **Head oscillates**: Reduce the head tracking gain from `0.08` to a smaller value.
+- **Head oscillates**: Reduce the head tracking gain from `0.6` to a smaller value.
 - **Robot turns too sharply**: Reduce the turn gain in `yaw * -0.05`.
 - **Robot walks too fast**: Reduce the forward gain in `(y_mm - 100) * 0.015`.
 - **Robot loses the ball while walking**: Slow the robot down, increase `LOST_TIMEOUT_MS`, or make the search pattern wider.
@@ -164,7 +191,7 @@ After the robot can follow the ball reliably, extend this tutorial by using socc
 
 /**
  * RobotPU soccer: follow ball
- * Turn off face detection. Turn on soccer ball detection and goal detection.
+ * Turn on soccer ball detection and goal detection.
  * Use I2C to communicate with ESP32, poll detection results.
  * If ball is detected, follow it. if not detected, search for ball.
  */
@@ -261,6 +288,8 @@ let yaw = 0
 let pitch = 0
 let lastBallSeenTime = 0
 let search_gain = 1
+let walkSpeed = 0
+let walkTurn = 0
 
 const SEARCH_PATTERN: { y: number, p: number }[] = [
     { y: 15, p: 0 },
@@ -277,7 +306,7 @@ const SEARCH_PATTERN: { y: number, p: number }[] = [
 
 robotPu.setChannel(166)
 // set servo trim to help robot balancing
-robotPu.setServoTrim(-7, 0, -7, 0, -9, 0)
+robotPu.setServoTrim(-5, 0, -5, 0, -9, 0)
 radio.onReceivedString(function (receivedString) {
     robotPu.runStringCommand(receivedString)
 })
@@ -313,8 +342,12 @@ function trackBall(p: Buffer) {
     }
 
     let type = p[0]
+    let flags = p[3]
     let count = p[4]
 
+    // note: may need to check valid flag
+    // && !(flags & STALE)
+    // it will tell you whether the result is old
     if (type == SOCCER_BALL) {
         if (count > 0) {
             lastBallSeenTime = currentTime
@@ -336,62 +369,84 @@ function trackBall(p: Buffer) {
             }
             // move head to look at the ball
             robotPu.setModeVar(robotPu.Mode.API)
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.08, 8)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.08, 8)
+            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.6, 8)
+            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.6, 8)
             robotPu.leftEyeBright(0.01)
             robotPu.rightEyeBright(0.01)
-            // walk toward the ball (simple demo: forward based on range, turn based on yaw)
+            // compute the speed and direction to walk toward the ball 
+            // (simple method: forward based on range, turn based on yaw)
             // Note: tune these gains for your field and camera.
             // to do: map y_mm to walk speed, map yaw to turn speed (clamp to -1, 1)
             // stop at 100mm away from the ball
-            robotPu.walk(Math.max(-3, Math.min(3, (y_mm - 100) * 0.015)), Math.max(-1, Math.min(1, yaw * -0.05)))
+            walkSpeed = Math.max(-3, Math.min(3, (y_mm - 100) * 0.015))
+            walkTurn = Math.max(-0.7, Math.min(0.7, (walkTurn * 4 + yaw * -0.05) * 0.2))
             // cache head pitch/yaw
             currentYaw = robotPu.ServoTargets()[4]
             currentPitch = robotPu.ServoTargets()[5]
+            if (DEBUG_FLAG) {
+                serial.writeLine(`walkSpeed: ${walkSpeed}`)
+                serial.writeLine(`walkTurn: ${walkTurn}`)
+            }
         } else if (currentTime - lastBallSeenTime < LOST_TIMEOUT_MS) {
-            // follow through (decay)for a short moment if lost the ball in the view  
+            // follow through with decay for a short moment if the ball is lost from view
             yaw *= 0.7
             pitch *= 0.7
+            walkSpeed *= 0.7
+            walkTurn *= 0.7
             robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.2, 5)
             robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.2, 5)
             // cache head pitch/yaw
             currentYaw = robotPu.ServoTargets()[4]
             currentPitch = robotPu.ServoTargets()[5]
+            if (DEBUG_FLAG) {
+                serial.writeLine(`walkSpeed: ${walkSpeed}`)
+                serial.writeLine(`walkTurn: ${walkTurn}`)
+            }
         } else {
+            // stop the robot when the ball has been lost for a long time
+            walkSpeed = 0
+            walkTurn = 0
             // lost the ball, search for ball
             searchBall(SEARCH_PATTERN)
         }
     }
 }
 basic.showString("I")
+// enable TAC I2C channels
 pins.i2cWriteNumber(
     MUX_ADDR,
     15,
     NumberFormat.Int8LE,
     false
 )
-setService(SERVICE_IMAGE_CAPTURE, true)
-basic.pause(10)
+// wait camera boots up
+basic.pause(2000)
 
+// this loop is used to handle camera reboot
+// by default, all detection services are off when the camera boots up.
+// turn on necessary services here.
+// safe to run those commands repeatedly, camera handles them well.
 basic.forever(function () {
+    // turn on image capture
+    setService(SERVICE_IMAGE_CAPTURE, true)
+    basic.pause(10)
+    // turn on soccer ball detection
     setSoccerDetection(true)
     basic.pause(10)
-    // turn off face detection
-    setService(SERVICE_FACE_DETECTION, false)
-    basic.pause(60000)
+    // turn on wifi for debugging
+    if (DEBUG_FLAG) {
+        setService(SERVICE_WIFI, true)
+    } else {
+        setService(SERVICE_WIFI, false)
+    }
+    basic.pause(30000)
 })
 
-basic.pause(5000)
-
+// cache the head pitch and yaw angle
 currentYaw = robotPu.ServoTargets()[4]
 currentPitch = robotPu.ServoTargets()[5]
 
-if (DEBUG_FLAG) {
-    setService(SERVICE_WIFI, true)
-} else {
-    setService(SERVICE_WIFI, false)
-}
-
+// Soccer ball detection loop
 basic.forever(function () {
     let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
     if (packet.length == SIZE) {
@@ -401,5 +456,12 @@ basic.forever(function () {
         basic.showIcon(IconNames.No)
     }
     basic.pause(20)
+})
+
+// robot action loop
+basic.forever(function () {
+    // use the computed walk speed and turn to move the robot
+    robotPu.walk(walkSpeed, walkTurn)
+    basic.pause(5)
 })
 ```
