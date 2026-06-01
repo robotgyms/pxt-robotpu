@@ -17,6 +17,7 @@ By the end of this tutorial, Robot PU will:
 - **Move the head toward the ball**: The head yaw and pitch servos use the camera error to keep the ball centered.
 - **Walk toward the ball**: The robot walks forward based on ball distance and turns based on camera yaw error.
 - **Search when the ball is lost**: The head scans a small pattern until the camera sees the ball again.
+- **Talk while playing**: Robot PU says short soccer phrases when it finds the ball, loses the ball, searches, and chases.
 
 ---
 
@@ -79,6 +80,7 @@ The MakeCode program uses three `basic.forever(...)` loops that run cooperativel
 - **Service refresh loop**: Re-enables image capture and soccer detection about every `30 s`. This helps recover if the camera firmware restarts.
 - **Detection loop**: Reads one `18` byte I2C packet and updates tracking state such as `yaw`, `pitch`, `walkSpeed`, and `walkTurn`.
 - **Action loop**: Continuously calls `robotPu.walk(walkSpeed, walkTurn)` using the latest computed command.
+- **Talk loop**: Speaks a short phrase about the current soccer state every `5 s`.
 
 This separation is important because the robot must keep walking smoothly even when an I2C read is delayed or a camera packet is missing.
 
@@ -135,6 +137,19 @@ The search pattern moves the head through several yaw and pitch offsets. Each ti
 
 ---
 
+## Fun factor: Robot PU talks
+
+To make the soccer behavior feel more alive, the program uses `robotPu.talk(...)` in two ways.
+
+- **State-change phrases**: When the camera first finds the ball, PU says `Soccer Ball`. When the ball has been lost long enough to start searching, PU says `Where is the ball?`.
+- **Looping soccer chatter**: A separate talk loop runs every `5 s`. If the ball is found, PU says `Kick and go go Goal`. If the ball is not found, PU says `Searching`.
+
+The variable `soccerFound` prevents the state-change phrases from repeating too quickly. It changes to `1` when the ball is detected and changes back to `0` after the robot enters long-loss search mode.
+
+You can customize the personality by changing the talk strings. Keep phrases short so Robot PU can finish speaking before the soccer behavior changes again.
+
+---
+
 ## Soccer goal packets
 
 The code enables both soccer-ball and soccer-goal detection. This tutorial only follows the ball, so goal packets are ignored by `trackBall`.
@@ -153,6 +168,7 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 - **Move the ball slowly**: The head should turn to keep the ball centered.
 - **Let the robot walk**: The robot should move toward the ball and turn when the ball is off-center.
 - **Hide the ball**: The head should continue briefly, then begin the search pattern.
+- **Listen to PU**: Confirm PU says `Soccer Ball` when the ball appears, `Where is the ball?` after a long loss, and a soccer chatter phrase about every `5 s`.
 
 ---
 
@@ -164,6 +180,8 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 - **Head tracking gain**: Tune `yaw * 0.6` and `pitch * 0.6`.
 - **Search timing**: Tune `SCAN_WAIT_FRAMES` to make each search position shorter or longer.
 - **Lost timeout**: Tune `LOST_TIMEOUT_MS` to choose how long the robot keeps following the last known ball direction.
+- **Talk timing**: Tune the `basic.pause(5000)` in the talk loop if PU talks too often or not often enough.
+- **Talk content**: Change `Soccer Ball`, `Where is the ball?`, `Kick and go go Goal`, and `Searching` to match the personality you want.
 - **Debug output**: Set `DEBUG_FLAG` to `false` after tuning to reduce serial traffic.
 
 ---
@@ -176,6 +194,7 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 - **Robot turns too sharply**: Reduce the turn gain in `yaw * -0.05`.
 - **Robot walks too fast**: Reduce the forward gain in `(y_mm - 100) * 0.015`.
 - **Robot loses the ball while walking**: Slow the robot down, increase `LOST_TIMEOUT_MS`, or make the search pattern wider.
+- **PU talks too much**: Increase the `5000 ms` pause in the talk loop or remove the looping chatter and keep only the found/lost state-change phrases.
 
 ---
 
@@ -290,6 +309,7 @@ let lastBallSeenTime = 0
 let search_gain = 1
 let walkSpeed = 0
 let walkTurn = 0
+let soccerFound = 0
 
 const SEARCH_PATTERN: { y: number, p: number }[] = [
     { y: 15, p: 0 },
@@ -369,8 +389,8 @@ function trackBall(p: Buffer) {
             }
             // move head to look at the ball
             robotPu.setModeVar(robotPu.Mode.API)
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.6, 8)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.6, 8)
+            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.2, 8)
+            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.2, 8)
             robotPu.leftEyeBright(0.01)
             robotPu.rightEyeBright(0.01)
             // compute the speed and direction to walk toward the ball 
@@ -386,6 +406,10 @@ function trackBall(p: Buffer) {
             if (DEBUG_FLAG) {
                 serial.writeLine(`walkSpeed: ${walkSpeed}`)
                 serial.writeLine(`walkTurn: ${walkTurn}`)
+            }
+            if (soccerFound == 0){
+                soccerFound = 1
+                robotPu.talk("Soccer Ball")
             }
         } else if (currentTime - lastBallSeenTime < LOST_TIMEOUT_MS) {
             // follow through with decay for a short moment if the ball is lost from view
@@ -408,6 +432,10 @@ function trackBall(p: Buffer) {
             walkTurn = 0
             // lost the ball, search for ball
             searchBall(SEARCH_PATTERN)
+            if (soccerFound == 1){
+                soccerFound = 0
+                robotPu.talk("Where is the ball?")
+            }
         }
     }
 }
@@ -463,5 +491,14 @@ basic.forever(function () {
     // use the computed walk speed and turn to move the robot
     robotPu.walk(walkSpeed, walkTurn)
     basic.pause(5)
+})
+
+basic.forever(function(){
+    if (soccerFound == 1) {
+        robotPu.talk("Kick and go go Goal")
+    } else {
+        robotPu.talk("Searching")
+    }
+    basic.pause(5000)
 })
 ```
