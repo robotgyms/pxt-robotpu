@@ -134,6 +134,7 @@ Follow this sequence from beginner to advanced. Each tutorial link points to the
 
 - **K230 AI camera**: [K230-AI-Camera-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/K230-AI-Camera-pu.md)
 - **Search face**: [search-face.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/search-face.md)
+- **SLAM I2C camera message**: [slam-i2c-camera-message.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-i2c-camera-message.md)
 - **SLAM odometry**: [slam-odometry-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-odometry-pu.md)
 - **SLAM soccer ball follow**: [slam-soccer-ball-follow.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-ball-follow.md)
 - **SLAM soccer local occupancy map**: [slam-soccer-local-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-local-map.md)
@@ -242,6 +243,7 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **servo-trim-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/servo-trim-calibration.md
 - **shared-map-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/shared-map-pu.md
 - **signal-filters-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/signal-filters-pu.md
+- **slam-i2c-camera-message.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-i2c-camera-message.md
 - **slam-odometry-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-odometry-pu.md
 - **slam-soccer-ball-follow.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-ball-follow.md
 - **slam-soccer-local-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/slam-soccer-local-map.md
@@ -260,5 +262,5 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 
 ## Folder contents quick reference
 
-- **Markdown tutorials**: `54` `.md` files, including this `README.md`.
+- **Markdown tutorials**: `55` `.md` files, including this `README.md`.
 - **Compiled examples**: `.hex` files are included for selected complete projects.
