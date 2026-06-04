@@ -63,6 +63,10 @@ Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
   - Build obstacle avoidance, maze solving, autopilot exploration, odometry-lite pose estimation, heading fusion, 2D maps, occupancy grids, path planning, path following, and local planners.
   - Use Robot PU location data as an entry point to SLAM-style robot navigation.
 
+- ** Learn AI **
+  - Use AI to generate songs and sing them.
+  - Use Smart Hat Accessories to do face detection, object tracking, and voice commands.
+  
 - **Communication and multi-robot systems**
   - Work with radio gamepad control, peer-to-peer chat, synchronized singing, shared maps, task allocation, and formation control.
   - Learn ROS-inspired ideas such as nodes, topics, telemetry, dashboards, diagnostics, safety watchdogs, and recovery behaviors.
@@ -70,7 +74,7 @@ Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
 - **Creative expression and making**
   - Design behaviors with music, speech, emotion, blinking eyes, body language, choreography, games, and AI-camera interaction.
   - Extend Robot PU with storytelling, classroom activities, 3D design, and 3D-printed upgrades.
-
+  
 - **3D Design and 3D Printing**
   - Design and print 3D accessories to upgrade Robot PU.
     - TinkerCAD project: [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)      
