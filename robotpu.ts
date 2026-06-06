@@ -630,115 +630,117 @@ function rot2(thetaRad: number): number[][] {
     ];
 }
 
-// Embed (R,t) into an SE(2) homogeneous transform.
-function se2(R: number[][], t: number[]): number[][] {
-    return [
-        [R[0][0], R[0][1], t[0]],
-        [R[1][0], R[1][1], t[1]],
-        [0, 0, 1],
-    ];
-}
-
-// Pure translation transform.
-function trans2(tx: number, ty: number): number[][] {
-    return [
-        [1, 0, tx],
-        [0, 1, ty],
-        [0, 0, 1],
-    ];
-}
-
-// Convenience: translation + rotation as a single SE(2) transform.
-function transform2(tx: number, ty: number, thetaRad: number): number[][] {
-    return se2(rot2(thetaRad), [tx, ty]);
-}
-
-// 3x3 matrix multiplication (A @ B).
-function matMul3(A: number[][], B: number[][]): number[][] {
-    return [
-        [
-            A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0],
-            A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1],
-            A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2],
-        ],
-        [
-            A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0],
-            A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1],
-            A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2],
-        ],
-        [
-            A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0],
-            A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1],
-            A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2],
-        ],
-    ];
-}
-
-// Step transform for rotating about a fixed pivot point (in robot frame).
-// T_step = Trans(p) @ Rot(dtheta) @ Trans(-p)
-function rotateAboutPivot(deltaYawRad: number, pivotXYmm: number[]): number[][]{
-    let px = pivotXYmm[0];
-    let py = pivotXYmm[1];
-    return matMul3(matMul3(trans2(px, py), se2(rot2(deltaYawRad), [0, 0])), trans2(-px, -py));
-}
-
-// Odometry accumulation: T_{k+1} = T_k @ T_step.
-function updateOdometry(TworldRobot:number[][], stepTransformationMatrix:number[][]):number[][] {
-    return matMul3(TworldRobot, stepTransformationMatrix);
-}
-
-// Degrees <-> radians helpers.
-function deg2rad(deg:number):number {
-    return (deg * Math.PI) / 180.0;
-}
-
-function rad2deg(rad:number):number {
-    return (rad * 180.0) / Math.PI;
-}
-
-// 3x3 identity matrix.
-function identity3():number[][] {
-    return [
-        [1, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1],
-    ];
-}
-
-class RobotPUOdometry {
+class Odometry {
     public axisHalfDistanceMm: number;
     public currentTransformation: number[][];
 
+    static rot2(thetaRad: number): number[][] {
+        let c = Math.cos(thetaRad);
+        let s = Math.sin(thetaRad);
+        return [
+            [c, -s],
+            [s, c],
+        ];
+    }
+
+    static se2(R: number[][], t: number[]): number[][] {
+        return [
+            [R[0][0], R[0][1], t[0]],
+            [R[1][0], R[1][1], t[1]],
+            [0, 0, 1],
+        ];
+    }
+
+    static trans2(tx: number, ty: number): number[][] {
+        return [
+            [1, 0, tx],
+            [0, 1, ty],
+            [0, 0, 1],
+        ];
+    }
+
+    static matMul3(A: number[][], B: number[][]): number[][] {
+        return [
+            [
+                A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0],
+                A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1],
+                A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2],
+            ],
+            [
+                A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0],
+                A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1],
+                A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2],
+            ],
+            [
+                A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0],
+                A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1],
+                A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2],
+            ],
+        ];
+    }
+
+    static rotateAboutPivot(deltaYawRad: number, pivotXYmm: number[]): number[][] {
+        let px = pivotXYmm[0];
+        let py = pivotXYmm[1];
+        return Odometry.matMul3(
+            Odometry.matMul3(
+                Odometry.trans2(px, py),
+                Odometry.se2(Odometry.rot2(deltaYawRad), [0, 0])
+            ),
+            Odometry.trans2(-px, -py)
+        );
+    }
+
+    static updateOdometry(TworldRobot: number[][], stepTransformationMatrix: number[][]): number[][] {
+        return Odometry.matMul3(TworldRobot, stepTransformationMatrix);
+    }
+
+    static deg2rad(deg: number): number {
+        return (deg * Math.PI) / 180.0;
+    }
+
+    static rad2deg(rad: number): number {
+        return (rad * 180.0) / Math.PI;
+    }
+
+    static identity3(): number[][] {
+        return [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+        ];
+    }
+
     constructor(axisHalfDistanceMm: number = 25.0) {
         this.axisHalfDistanceMm = axisHalfDistanceMm;
-        this.currentTransformation = identity3();
+        this.currentTransformation = Odometry.identity3();
     }
 
     update(transformationMatrix: number[][]): void {
         // Apply a general SE(2) step transform (e.g., external correction).
-        this.currentTransformation = updateOdometry(this.currentTransformation, transformationMatrix);
+        this.currentTransformation = Odometry.updateOdometry(this.currentTransformation, transformationMatrix);
     }
 
     leftStep(yawAngleDeg: number): void {
         // Apply one walking step where the left leg is the support pivot.
-        this.update(rotateAboutPivot(deg2rad(yawAngleDeg), [-this.axisHalfDistanceMm, 0.0]));
+        this.update(Odometry.rotateAboutPivot(Odometry.deg2rad(yawAngleDeg), [-this.axisHalfDistanceMm, 0.0]));
     }
 
     rightStep(yawAngleDeg: number): void {
         // Apply one walking step where the right leg is the support pivot.
-        this.update(rotateAboutPivot(deg2rad(yawAngleDeg), [this.axisHalfDistanceMm, 0.0]));
+        this.update(Odometry.rotateAboutPivot(Odometry.deg2rad(-yawAngleDeg), [this.axisHalfDistanceMm, 0.0]));
     }
 
     getPosition(): { x_mm: number; y_mm: number; theta_deg: number } {
         // Return (x,y,theta) extracted from the SE(2) matrix.
         let xMm = this.currentTransformation[0][2];
         let yMm = this.currentTransformation[1][2];
-        let thetaDeg = rad2deg(Math.atan2(this.currentTransformation[1][0], this.currentTransformation[0][0]));
+        let thetaDeg = Odometry.rad2deg(Math.atan2(this.currentTransformation[1][0], this.currentTransformation[0][0]));
         return { x_mm: xMm, y_mm: yMm, theta_deg: thetaDeg };
     }
 
     reset(): void {
-        this.currentTransformation = identity3();
+        this.currentTransformation = Odometry.identity3();
     }
 }
 
@@ -754,7 +756,7 @@ class RobotPu {
     public np: neopixel.Strip;
     public content: Content;
     public music: MusicLib;
-    public odom: RobotPUOdometry;
+    public odom: Odometry;
 
     // Basic identification
     public name: string;
@@ -861,7 +863,7 @@ class RobotPu {
         this.np = neopixel.create(DigitalPin.P16, 4, NeoPixelMode.RGB);
         this.content = new Content();
         this.music = new MusicLib();
-        this.odom = new RobotPUOdometry(25.0);
+        this.odom = new Odometry(25.0);
 
         // Audio & Radio Setup
         radio.setGroup(this.radioGroupID);
