@@ -91,10 +91,10 @@ The ESP32 returns a detection packet as a `Buffer`. A `Buffer` is an array of by
 
 ## Detection packet format
 
-The sample program reads a `16` byte packet.
+The sample program reads an `18` byte packet.
 
 ```typescript
-const SIZE = 16
+const SIZE = 18
 ```
 
 The bytes are interpreted like this:
@@ -109,10 +109,11 @@ The bytes are interpreted like this:
 | `5` | `score` | Detection confidence score |
 | `6-7` | `x_mm` | Object x position in millimeters |
 | `8-9` | `y_mm` | Object y position in millimeters |
-| `10-11` | `w` | Bounding box width |
-| `12-13` | `h` | Bounding box height |
-| `14` | `yaw` | Signed yaw error |
-| `15` | `pitch` | Signed pitch error |
+| `10-11` | `z_mm` | Object z position in millimeters |
+| `12-13` | `w` | Bounding box width |
+| `14-15` | `h` | Bounding box height |
+| `16` | `yaw` | Signed yaw error |
+| `17` | `pitch` | Signed pitch error |
 
 The object type can be:
 
@@ -153,7 +154,7 @@ function i8(v: number): number {
 }
 ```
 
-The `x_mm` and `y_mm` values use two bytes each. The `i16(...)` helper combines two bytes into one signed 16-bit number.
+The `x_mm`, `y_mm`, and `z_mm` values use two bytes each. The `i16(...)` helper combines two bytes into one signed 16-bit number.
 
 ```typescript
 function i16(buf: Buffer, offset: number): number {
@@ -183,7 +184,7 @@ The code stores the I2C addresses and packet size in constants.
 ```typescript
 const MUX_ADDR = 112
 const ESP32_ADDR = 66
-const SIZE = 16
+const SIZE = 18
 ```
 
 Using constants makes the program easier to read and easier to change later.
@@ -225,16 +226,17 @@ let count = p[4]
 let score = p[5]
 let x_mm = i16(p, 6)
 let y_mm = i16(p, 8)
-let w = u16(p, 10)
-let h = u16(p, 12)
-let yaw = i8(p[14])
-let pitch = i8(p[15])
+let z_mm = i16(p, 10)
+let w = u16(p, 12)
+let h = u16(p, 14)
+let yaw = i8(p[16])
+let pitch = i8(p[17])
 ```
 
 Then it prints the result to the serial console.
 
 ```typescript
-serial.writeLine(`objects=${count} score=${score} x_mm=${x_mm} y_mm=${y_mm}`)
+serial.writeLine(`objects=${count} score=${score} x_mm=${x_mm} y_mm=${y_mm} z_mm=${z_mm}`)
 serial.writeLine(`box=${w}x${h} yaw=${yaw} pitch=${pitch}`)
 ```
 
@@ -287,7 +289,7 @@ This is called polling. The micro:bit repeatedly asks the ESP32 camera, “What 
 // Address
 const MUX_ADDR = 112  // 0x70
 const ESP32_ADDR = 66 // 0x42
-const SIZE = 16
+const SIZE = 18
 
 // Event Types
 const IDLE = 0x00
@@ -305,7 +307,7 @@ const WEB = 1 << 3
 const SLEEP = 1 << 4
 
 /**
- * Parse 16-byte package
+ * Parse 18-byte package
  */
 function i16(buf: Buffer, offset: number): number {
     let v = buf[offset] | (buf[offset + 1] << 8)
@@ -353,22 +355,31 @@ function printPacket(p: Buffer) {
     let seq = p[2]
     let flags = p[3]
 
-    //serial.writeLine(`type=${type} ver=${ver} seq=${seq} flags=${flagsText(flags)}`)
-
     if (type == FACE || type == SOCCER_BALL || type == SOCCER_GOAL) {
         let count = p[4]
         let score = p[5]
         let x_mm = i16(p, 6)
         let y_mm = i16(p, 8)
-        let w = u16(p, 10)
-        let h = u16(p, 12)
-        let yaw = i8(p[14])
-        let pitch = i8(p[15])
-        serial.writeLine(`objects=${count} score=${score} x_mm=${x_mm} y_mm=${y_mm}`)
-        serial.writeLine(`box=${w}x${h} yaw=${yaw} pitch=${pitch}`)
-        // 映射类型到 LED 阵列
-        basic.showNumber(type)
+        let z_mm = i16(p, 10)
+        let w = u16(p, 12)
+        let h = u16(p, 14)
+        let yaw = i8(p[16])
+        let pitch = i8(p[17])
+        if (!(flags & STALE)) {
+            serial.writeLine(`type=${type} ver=${ver} seq=${seq} flags=${flagsText(flags)} objects=${count} score=${score} x_mm=${x_mm} y_mm=${y_mm} z_mm=${z_mm} box=${w}x${h} yaw=${yaw} pitch=${pitch}`)
+        }
     }
+}
+
+const CMD_SERVICE_ENABLE = 8
+const SERVICE_WIFI = 1
+const SERVICE_IMAGE_CAPTURE = 2
+const SERVICE_FACE_DETECTION = 3
+const SERVICE_SOCCER_BALL_DETECTION = 4
+const SERVICE_SOCCER_GOAL_DETECTION = 5
+
+function setService(serviceId: number, enabled: boolean) {
+    pins.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
 }
 
 basic.showString("I")
@@ -376,7 +387,19 @@ basic.showString("I")
 // Open all 4 channels in TCA9546A
 pins.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
 
-// this is the polling loop
+// turn on detections
+basic.forever(function () {
+    setService(SERVICE_IMAGE_CAPTURE, true)
+    basic.pause(10)
+    setService(SERVICE_FACE_DETECTION, true)
+    basic.pause(10)
+    setService(SERVICE_SOCCER_BALL_DETECTION, true)
+    basic.pause(10)
+    setService(SERVICE_SOCCER_GOAL_DETECTION, true)
+    basic.pause(30000)
+})
+
+// parse i2c packages
 basic.forever(function () {
     let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
 
@@ -386,6 +409,7 @@ basic.forever(function () {
         serial.writeLine("i2c read error")
         basic.showIcon(IconNames.No)
     }
+
     //serial.writeLine("---")
     basic.pause(20)
 })
