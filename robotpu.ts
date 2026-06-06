@@ -728,7 +728,7 @@ class Odometry {
 
     rightStep(yawAngleDeg: number): void {
         // Apply one walking step where the right leg is the support pivot.
-        this.update(Odometry.rotateAboutPivot(Odometry.deg2rad(-yawAngleDeg), [this.axisHalfDistanceMm, 0.0]));
+        this.update(Odometry.rotateAboutPivot(Odometry.deg2rad(yawAngleDeg), [this.axisHalfDistanceMm, 0.0]));
     }
 
     getPosition(): { x_mm: number; y_mm: number; theta_deg: number } {
