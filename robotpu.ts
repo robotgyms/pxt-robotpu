@@ -4,10 +4,6 @@ class Parameters {
     jumpTilt: number;
     legSize: number;
     dof: number;
-    servoErr: number[];
-    servoCtrl: number[];
-    servoTarget: number[];
-    servoTrim: number[];
     exploreDirection: number[];
     exploreSize: number;
     exploreDistance: number[];
@@ -27,14 +23,6 @@ class Parameters {
         this.jumpTilt = 27;
         this.legSize = 45;
         this.dof = 6;
-
-        // Initialize vectors
-        this.servoErr = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-        this.servoCtrl = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-        this.servoTarget = [90.0, 90.0, 90.0, 90.0, 90.0, 90.0];
-
-        // Servo trim
-        this.servoTrim = [4.0, 4.0, 0, -8.0, 0.0, 0.0];
 
         // Turning directions
         this.exploreDirection = [-1.0, -0.7, 0.7, 1.0];
@@ -406,12 +394,12 @@ class HCSR04 {
 }
 // Configuration Constants
 
-class WK {
+class PCB {
     public i2cAddress: number;
     private lastBlinkTS: number;
     private eyeIsOn: boolean;
     // eye
-    public eyeBrightness:number = 0.5
+    public eyeBrightness: number = 0.5
     private leftEyeBrightness: number;
     private rightEyeBrightness: number;
     private eyeBrightIcr: number;
@@ -422,6 +410,11 @@ class WK {
     private blinkG: number;
     private idle: boolean;
     public currentState: number;
+    public dof: number = 8
+    servoErr: number[];
+    public servoCtrl: number[];
+    public servoTarget: number[];
+    public servoTrim: number[];
 
     constructor() {
         this.i2cAddress = 16;
@@ -437,6 +430,19 @@ class WK {
         this.blinkG = 4000;
         this.idle = false;
         this.currentState = 0;
+
+        // Initialize vectors
+        this.servoErr = [];
+        this.servoCtrl = [];
+        this.servoTarget = [];
+        for (let i = 0; i < this.dof; i++) {
+            this.servoErr.push(0.0);
+            this.servoCtrl.push(0.0);
+            this.servoTarget.push(0.0);
+        }
+
+        // Servo trim
+        this.servoTrim = [4.0, 4.0, 0.0, -8.0, 0.0, 0.0, 0.0, 0.0]
         // I2C is initialized automatically in MakeCode
     }
 
@@ -473,27 +479,28 @@ class WK {
     /**
      * Move servo toward target with controlled speed.
      */
-    public servoStep(target: number, sp: number, idx: number, p: Parameters): number {
+    public servoStep(target: number, sp: number, idx: number): number {
         sp = Math.abs(sp);
         target = Math.max(0, Math.min(179, target));
-        let err = target - p.servoTarget[idx];
-        p.servoErr[idx] = err;
+        let err = target - this.servoTarget[idx];
+        this.servoErr[idx] = err;
 
         if (Math.abs(err) <= sp) {
-            p.servoTarget[idx] = target;
+            this.servoTarget[idx] = target;
         } else {
-            p.servoTarget[idx] += (err >= 0) ? sp : -sp;
+            this.servoTarget[idx] += (err >= 0) ? sp : -sp;
         }
-        this.servo(idx, p.servoTarget[idx]);
+        this.servo(idx, this.servoTarget[idx]);
         return err
     }
 
     /**
      * Move all servos immediately to target state.
      */
-    public servoMove(idx: number, para: Parameters): void {
-        for (let p = 0; p < para.dof; p++) {
-            this.servo(p, para.stateTargets[idx][p] + para.servoTrim[p]);
+    public servoMove(targets: number[]): void {
+        for (let p = 0; p < targets.length; p++) {
+            this.servoTarget[p] = targets[p] + this.servoTrim[p]
+            this.servo(p, this.servoTarget[p]);
         }
         this.idle = true;
     }
@@ -501,8 +508,8 @@ class WK {
     /**
      * Check if servos reached target.
      */
-    public isServoIdle(servoList: number[], p: Parameters): boolean {
-        this.idle = servoList.every(i => Math.abs(p.servoErr[i]) < 1);
+    public isServoIdle(servoList: number[]): boolean {
+        this.idle = servoList.every(i => Math.abs(this.servoErr[i]) < 1);
         return this.idle;
     }
 
@@ -515,25 +522,36 @@ class WK {
         this.pos = Math.min(this.pos, states.length - 1);
         this.currentState = states[this.pos];
         let targets = p.stateTargets[this.currentState];
-
         let sp_idx = p.stateSpeedIndices[this.currentState] || 1;
-        let sps = p.speedCandidates[sp_idx];
-
-        for (let q of sync_list) {
-            this.servoStep(targets[q] + p.servoTrim[q] + p.servoCtrl[q], sp * sps[q], q, p);
-        }
-
-        for (let r of async_list) {
-            this.servoStep(targets[r] + p.servoTrim[r] + p.servoCtrl[r], async_sp * sps[r], r, p);
-        }
-
-        if (this.isServoIdle(sync_list, p)) {
+        let speeds = p.speedCandidates[sp_idx];
+        if (this.moveServos(targets, speeds, sync_list, sp, async_list, async_sp)) {
             this.lastPos = this.pos;
             this.pos = (this.pos + 1) % states.length;
             this.numSteps += 1;
             return 0;
         }
         return 1;
+    }
+
+    /**
+     *
+     * @param targets. A list of servo targets.
+     * @param speeds. A list of servo speeds.
+     * @param sync_list. Servo indexes that move synchronously.
+     * @param sync_speed_gain. Synchronous speed gain
+     * @param async_list. Servo indexes that move aynchronously
+     * @param async_speed_gain. Asynchronous speed gain
+     */
+    public moveServos(targets: number[], speeds: number[],
+                      sync_list: number[], sync_speed_gain: number,
+                      async_list: number[], async_speed_gain: number): boolean {
+        for (let q of sync_list) {
+            this.servoStep(targets[q] + this.servoTrim[q] + this.servoCtrl[q], sync_speed_gain * speeds[q], q);
+        }
+        for (let r of async_list) {
+            this.servoStep(targets[r] + this.servoTrim[r] + this.servoCtrl[r], async_speed_gain * speeds[r], r);
+        }
+        return this.isServoIdle(sync_list);
     }
 
     /**
@@ -746,12 +764,12 @@ class Odometry {
 
 /**
  * RobotPu Class for MakeCode
- * Optimized with internal WK and Parameters instances.
+ * Optimized with internal PCB and Parameters instances.
  */
 class RobotPu {
     // Component Instances
     public pr: Parameters;
-    public wk: WK;
+    public pcb: PCB;
     public sonar: HCSR04;
     public np: neopixel.Strip;
     public content: Content;
@@ -804,7 +822,7 @@ class RobotPu {
 
     private danceSpeed: number = 1.0;           // Dance speed multiplier
     private lastLowBeat: number = 0;       // Timestamp of last low beat
-    private lastHIghBeat: number = 0;      // Timestamp of last high beat
+    private lastHighBeat: number = 0;      // Timestamp of last high beat
     private danceYawWiggle: number = 12;     // Left/right wiggle angle (degrees)
     private dancePitchWiggle: number = 15;     // Up/down wiggle angle (degrees)
 
@@ -850,7 +868,7 @@ class RobotPu {
     constructor(sn: string, name: string = "peu") {
         // Initialize Core Components inside constructor
         this.pr = new Parameters();
-        this.wk = new WK();
+        this.pcb = new PCB();
 
         this.sn = sn;
         this.name = name;
@@ -893,18 +911,18 @@ class RobotPu {
             [5]: () => this.joystick()
         };
 
-        this.wk.eyesCtl(1);
+        this.pcb.eyesCtl(1);
         this.showChannel();
     }
 
-    public start(){
+    public start() {
         this.stand();
         this.resetOdom();
     }
 
-    public resetOdom(){
-        this.lastLeftLegAngle = this.pr.servoTarget[1];
-        this.lastRightLegAngle = this.pr.servoTarget[3];
+    public resetOdom() {
+        this.lastLeftLegAngle = this.pcb.servoTarget[1];
+        this.lastRightLegAngle = this.pcb.servoTarget[3];
         this.odom.reset();
     }
 
@@ -927,16 +945,16 @@ class RobotPu {
     }
 
     /**
- * Handles manual movement and stance control from a remote.
- * Ported from joystick() in Python.
- */
+     * Handles manual movement and stance control from a remote.
+     * Ported from joystick() in Python.
+     */
     public joystick(): number {
         // 1. If speed is near zero, handle stationary behavior
         if (Math.abs(this.walkSpeed) < 0.1) {
             // Smoothly move the head/body to match bias values
             // Servo 4 is waist/roll, Servo 5 is head/pitch
-            this.wk.servoStep(90 + this.headYawBias, 1, 4, this.pr);
-            this.wk.servoStep(90 + this.headPitchBias, 1, 5, this.pr);
+            this.pcb.servoStep(90 + this.headYawBias, 1, 4);
+            this.pcb.servoStep(90 + this.headPitchBias, 1, 5);
 
             // 2. If the turn stick is pushed far left/right while standing, side-step
             if (Math.abs(this.walkDirection) > 0.9) {
@@ -953,13 +971,13 @@ class RobotPu {
     }
 
     /**
- * Executes a side-stepping (lateral) movement.
- * @param di Directional bias: positive for right, negative for left.
- */
+     * Executes a side-stepping (lateral) movement.
+     * @param di Directional bias: positive for right, negative for left.
+     */
     /**
- * Executes a side-stepping movement using specific state indices.
- * @param di Directional bias: positive for right, negative for left.
- */
+     * Executes a side-stepping movement using specific state indices.
+     * @param di Directional bias: positive for right, negative for left.
+     */
     public sideStep(di: number): number {
         // 1. Select the gait state sequence based on direction
         // Python: [20, 22, 0, 19] if walkDirection > 0 else [18, 21, 23, 0]
@@ -972,9 +990,9 @@ class RobotPu {
         // 3. Calculate movement speed based on forward speed multiplier
         let movementSpeed = di * this.fwdSpeed * 0.68;
 
-        // 4. Execute the movement via the WK engine
+        // 4. Execute the movement via the PCB engine
         // Parameters: states, sync_servos (0-3), sync_speed, async_servos (4-5), async_speed
-        return this.wk.move(
+        return this.pcb.move(
             this.pr,
             sts,
             [0, 1, 2, 3],
@@ -1001,7 +1019,7 @@ class RobotPu {
         for (let i = 0; i < this.pr.dof; i++) {
             let v = settings.readNumber("robotpu.trim." + i);
             if (!isNaN(v)) {
-                this.pr.servoTrim[i] = v;
+                this.pcb.servoTrim[i] = v;
             }
         }
     }
@@ -1009,8 +1027,8 @@ class RobotPu {
     public writeConfig(): void {
         settings.writeString("robotpu.sn", this.sn);
         settings.writeNumber("robotpu.group", this.radioGroupID);
-        for (let i = 0; i < this.pr.dof; i++) {
-            settings.writeNumber("robotpu.trim." + i, this.pr.servoTrim[i]);
+        for (let i = 0; i < this.pcb.dof; i++) {
+            settings.writeNumber("robotpu.trim." + i, this.pcb.servoTrim[i]);
         }
     }
 
@@ -1019,28 +1037,28 @@ class RobotPu {
     }
 
     /**
- * Triggers the balanced walking gait. Compute odometry for SLAM
- * @param sp Speed (positive for forward, negative for backward)
- * @param di Directional bias (-1.0 to 1.0)
- */
+     * Triggers the balanced walking gait. Compute odometry for SLAM
+     * @param sp Speed (positive for forward, negative for backward)
+     * @param di Directional bias (-1.0 to 1.0)
+     */
     public walk(sp: number, di: number): number {
         let ret = this.moveBalance(sp, di, this.pr.walkFwdStates, this.pr.walkBwdStates);
-        if (ret == 0){
-            if (this.wk.lastPos == 1){ // update left step odometry
-                this.odom.leftStep(this.pr.servoTarget[1]-this.lastLeftLegAngle);
-                this.lastLeftLegAngle = this.pr.servoTarget[1];
-                this.lastRightLegAngle = this.pr.servoTarget[3];
-            } else if (this.wk.lastPos == 3){ // update right step odometry
-                this.odom.rightStep(this.pr.servoTarget[3]-this.lastRightLegAngle);
-                this.lastLeftLegAngle = this.pr.servoTarget[1];
-                this.lastRightLegAngle = this.pr.servoTarget[3];
+        if (ret == 0) {
+            if (this.pcb.lastPos == 1) { // update left step odometry
+                this.odom.leftStep(this.pcb.servoTarget[1] - this.lastLeftLegAngle);
+                this.lastLeftLegAngle = this.pcb.servoTarget[1];
+                this.lastRightLegAngle = this.pcb.servoTarget[3];
+            } else if (this.pcb.lastPos == 3) { // update right step odometry
+                this.odom.rightStep(this.pcb.servoTarget[3] - this.lastRightLegAngle);
+                this.lastLeftLegAngle = this.pcb.servoTarget[1];
+                this.lastRightLegAngle = this.pcb.servoTarget[3];
             }
         }
         return ret;
     }
 
     /**
-     * IMU Balance Calculations using this.pr and this.wk
+     * IMU Balance Calculations using this.pr and this.pcb
      */
     private balanceParam() {
         let ax = input.acceleration(Dimension.X);
@@ -1051,10 +1069,10 @@ class RobotPu {
         this.pth = Math.atan2(ay, -az) * (180 / Math.PI);
         this.rl = Math.asin(ax / (this.maxG || 1)) * (180 / Math.PI);
 
-        // Use this.pr and this.wk for calculations
-        let bd_p = this.pth + (this.pr.stateTargets[0][5] + this.pr.servoTrim[5] - this.pr.servoTarget[5]);
-        let servo_yaw = (this.pr.servoTarget[4] - this.pr.stateTargets[0][4] - this.pr.servoTrim[4]) * (Math.PI / 180);
-        // let servo_pitch = (this.pr.servoTarget[5] - this.pr.stateTargets[0][5] - this.pr.servoTrim[5]) * (Math.PI / 180);
+        // Use this.pr and this.pcb for calculations
+        let bd_p = this.pth + (this.pr.stateTargets[0][5] + this.pcb.servoTrim[5] - this.pcb.servoTarget[5]);
+        let servo_yaw = (this.pcb.servoTarget[4] - this.pr.stateTargets[0][4] - this.pcb.servoTrim[4]) * (Math.PI / 180);
+        // let servo_pitch = (this.pcb.servoTarget[5] - this.pr.stateTargets[0][5] - this.pcb.servoTrim[5]) * (Math.PI / 180);
 
         this.bodyRoll = bd_p * Math.sin(servo_yaw) + this.rl * Math.cos(servo_yaw);
         this.bodyRoll2 = (this.bodyRoll + 9 * this.bodyRoll2) * 0.1;
@@ -1066,14 +1084,14 @@ class RobotPu {
     public setCt(indexList: number[], valueList: number[]) {
         let le = Math.min(indexList.length, valueList.length);
         for (let i = 0; i < le; i++) {
-            this.pr.servoCtrl[indexList[i]] = valueList[i]; // Reference internal pr
+            this.pcb.servoCtrl[indexList[i]] = valueList[i]; // Reference internal pr
         }
     }
 
-    public incrCt(indexList: number[], valueList: number[], gain=1.0) {
+    public incrCt(indexList: number[], valueList: number[], gain = 1.0) {
         let le = Math.min(indexList.length, valueList.length);
         for (let i = 0; i < le; i++) {
-            this.pr.servoCtrl[indexList[i]] += valueList[i] * gain; // Reference internal pr
+            this.pcb.servoCtrl[indexList[i]] += valueList[i] * gain; // Reference internal pr
         }
     }
 
@@ -1085,7 +1103,7 @@ class RobotPu {
         let r_o_t = 0;
         let lf = 0;
 
-        if (this.wk.pos < 2 || this.wk.pos == 6) { // Reference internal wk
+        if (this.pcb.pos < 2 || this.pcb.pos == 6) { // Reference internal PCB
             l_o_t = Math.min(this.maxRollCtrl, Math.max(0.0, this.bodyRoll * 0.8 - this.pr.walkTilt));
             lf = -12 * di;
         } else {
@@ -1099,14 +1117,14 @@ class RobotPu {
         this.setCt([0, 1, 2, 3, 4, 5],
             [o_t, lf - o_t, o_t, -lf - o_t, -40 * di - o_t, Math.min(25.0, -2.0 * this.bodyPitch2)]);
 
-        // Call internal wk.move
-        return this.wk.move(this.pr, sts, [0, 1, 2, 3], sp, [4, 5], sp);
+        // Call internal servo move
+        return this.pcb.move(this.pr, sts, [0, 1, 2, 3], sp, [4, 5], sp);
     }
 
     /**
- * Update robot states based on sensor inputs.
- * Ported from set_states() in Python.
- */
+     * Update robot states based on sensor inputs.
+     * Ported from set_states() in Python.
+     */
     public updateStates(): void {
         // 1. Fall detection using Accelerometer
         if (input.isGesture(Gesture.FreeFall)) {
@@ -1128,7 +1146,7 @@ class RobotPu {
             if (Math.abs(this.bodyRoll2) > 75 || Math.abs(this.bodyPitch2) > 75) {
                 this.balanceParam(); // Recalculate IMU data
                 this.fellCount++;
-                this.wk.numSteps = 0; // Reset step count on fall
+                this.pcb.numSteps = 0; // Reset step count on fall
 
                 if (this.fellCount > 16) {
                     this.gst = -3; // Enter "Help me" recovery state
@@ -1153,7 +1171,7 @@ class RobotPu {
     public rest(): number {
         this.balanceParam();
         for (let i = 0; i < this.pr.dof; i++) {
-            this.pr.servoCtrl[i] *= 0.99;
+            this.pcb.servoCtrl[i] *= 0.99;
         }
         let rl = Math.min(35.0, Math.max(-35.0, this.bodyRoll2));
         if (Math.abs(rl) > 5) {
@@ -1164,20 +1182,20 @@ class RobotPu {
         }
         let sl = input.soundLevel();
         this.pr.stateTargets[this.restState][5] = 90 - sl * 0.3;
-        return this.wk.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + sl * 0.001, [], 0.5);
+        return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + sl * 0.001, [], 0.5);
     }
 
     public trim(): void {
-        this.wk.servoMove(25, this.pr);
+        this.pcb.servoMove(this.pr.stateTargets[25]);
     }
 
     /**
- * Handles the robot's behavior when it has fallen and cannot recover.
- * Ported from fall() in Python.
- */
+     * Handles the robot's behavior when it has fallen and cannot recover.
+     * Ported from fall() in Python.
+     */
     public fall(): void {
         // 1. Trigger the "Knight Rider" style eye flash effect
-        this.wk.flash();
+        this.pcb.flash();
 
         // 2. Randomly trigger a voice request for help (approx 1 in 500 cycles)
         if (Math.randomRange(0, 500) == 0) {
@@ -1190,12 +1208,12 @@ class RobotPu {
     }
 
     /**
- * Set the robot to a compact fetal position for protection or power saving.
- * Ported from fetal() in Python.
- */
+     * Set the robot to a compact fetal position for protection or power saving.
+     * Ported from fetal() in Python.
+     */
     public fetal(): void {
         // 1. Trigger the eye pulsing animation
-        this.wk.flash();
+        this.pcb.flash();
 
         // 2. 0.5% chance to shout for help (random.randint(0, 200) == 0)
         if (Math.randomRange(0, 200) == 0) {
@@ -1204,13 +1222,13 @@ class RobotPu {
 
         // 3. Move to the Fetal State (Index 1)
         // states: [1], sync_list: all servos [0-5], speed: 2.0, async: none, async_sp: 0.5
-        this.wk.move(this.pr, [1], [0, 1, 2, 3, 4, 5], 2.0, [], 0.5);
+        this.pcb.move(this.pr, [1], [0, 1, 2, 3, 4, 5], 2.0, [], 0.5);
     }
 
     /**
- * Publishes a status or error code via radio.
- * @param code The status/error code string (e.g., "E2", "OK", "BATT").
- */
+     * Publishes a status or error code via radio.
+     * @param code The status/error code string (e.g., "E2", "OK", "BATT").
+     */
     public sendStatusCode(code: string): void {
         // 1. Construct the message string
         // Python equivalent: f"#puc:{self.sn}:{code}"
@@ -1226,9 +1244,9 @@ class RobotPu {
     }
 
     /**
- * Calculates exploration speed and direction based on sonar point-cloud.
- * Ported from set_explore_param() in Python.
- */
+     * Calculates exploration speed and direction based on sonar point-cloud.
+     * Ported from set_explore_param() in Python.
+     */
     private setExploreParam(): void {
         // 1. Check for obstacles in the "middle" view of the point cloud
         let mid_view = [this.pr.exploreDistance[this.pr.exploreMid1], this.pr.exploreDistance[this.pr.exploreMid2]];
@@ -1280,11 +1298,11 @@ class RobotPu {
     }
 
     /**
- * Map sonar distance readings to a steering direction for auto-pilot.
- * @param ep_dis List of sonar distance readings from left to right
- * @param turn_gain Scaling factor for turn intensity (default: 1.5)
- * @returns Steering direction between -1.0 (left) and 1.0 (right)
- */
+     * Map sonar distance readings to a steering direction for auto-pilot.
+     * @param ep_dis List of sonar distance readings from left to right
+     * @param turn_gain Scaling factor for turn intensity (default: 1.5)
+     * @returns Steering direction between -1.0 (left) and 1.0 (right)
+     */
     public getTurnFromSonar(distances: number[], turnGain: number = 1.5): number {
         // 1. Guard against empty arrays
         if (distances.length == 0) {
@@ -1327,8 +1345,8 @@ class RobotPu {
     }
 
     public sonarScan(): void {
-        let targetIndex = this.wk.pos < 2 ? 1 : 3;
-        let angleValue = this.pr.servoTarget[targetIndex];
+        let targetIndex = this.pcb.pos < 2 ? 1 : 3;
+        let angleValue = this.pcb.servoTarget[targetIndex];
 
         let d_i = angleValue > 110 ? 0 :
             angleValue > 90 ? 1 :
@@ -1339,9 +1357,9 @@ class RobotPu {
     }
 
     /**
- * Autonomous exploration with obstacle point-cloud mapping.
- * Updates the distance array and adjusts movement parameters.
- */
+     * Autonomous exploration with obstacle point-cloud mapping.
+     * Updates the distance array and adjusts movement parameters.
+     */
     public explore(): number {
         this.sonarScan();
 
@@ -1353,8 +1371,8 @@ class RobotPu {
     }
 
     /**
- * Walks to a target compass heading while maintaining obstacle avoidance.
- */
+     * Walks to a target compass heading while maintaining obstacle avoidance.
+     */
     public walkByCompass(targetHeadingDeg: number, kp: number = 0.02, maxDi: number = 1.0): number {
         // Keep the point-cloud updated so obstacle avoidance stays responsive.
         this.sonarScan();
@@ -1402,15 +1420,15 @@ class RobotPu {
     }
 
     /**
- * Executes a specific jumping sequence and manages the auxiliary jump servo.
- * Ported from jump() in Python.
- */
+     * Executes a specific jumping sequence and manages the auxiliary jump servo.
+     * Ported from jump() in Python.
+     */
     public jump(): number {
         // 1. Execute the move sequence
         // states: [24, 14, 0, 0]
         // sync_servos (legs): [0, 1, 2, 3] at speed 3
         // async_servos (waist/head): [4, 5] at speed 2
-        let md = this.wk.move(
+        let md = this.pcb.move(
             this.pr,
             [24, 14, 0, 0],
             [0, 1, 2, 3],
@@ -1420,28 +1438,28 @@ class RobotPu {
         );
 
         // 2. Check if move completed (md == 0) and gait is at the end (pos == 3)
-        if (md == 0 && this.wk.pos == 3) {
+        if (md == 0 && this.pcb.pos == 3) {
             // Transition to Joystick/Manual state
             this.gst = 5;
 
             // Retract/Reset auxiliary servo 6
-            this.wk.servo(6, 0);
+            this.pcb.servo(6, 0);
         } else {
             // Extend/Activate auxiliary servo 6 during the jump
-            this.wk.servo(6, 100);
+            this.pcb.servo(6, 100);
         }
 
         return md;
     }
 
     /**
-  * Executes a kick by accelerating the forward walking gait.
-  * Returns to joystick mode when the kick completes at specific gait positions.
-  */
+     * Executes a kick by accelerating the forward walking gait.
+     * Returns to joystick mode when the kick completes at specific gait positions.
+     */
     public kick(): number {
         // 1. Execute the forward walk states at high speed
         // legs: [0, 1, 2, 3] at speed 3, body/head: [4, 5] at speed 2
-        let md = this.wk.move(
+        let md = this.pcb.move(
             this.pr,
             this.pr.walkFwdStates,
             [0, 1, 2, 3],
@@ -1452,7 +1470,7 @@ class RobotPu {
 
         // 2. Check if the movement step is finished (md == 0)
         // and ensure the gait has reached index 0 or 2 (strike positions)
-        if (md == 0 && (this.wk.pos == 0 || this.wk.pos == 2)) {
+        if (md == 0 && (this.pcb.pos == 0 || this.pcb.pos == 2)) {
             // Switch back to Joystick/Manual control state
             this.gst = 5;
         }
@@ -1461,9 +1479,9 @@ class RobotPu {
     }
 
     /**
- * Set the robot to a neutral standing position.
- * Ported from stand() in Python.
- */
+     * Set the robot to a neutral standing position.
+     * Ported from stand() in Python.
+     */
     public stand(): number {
         // 1. Execute transition to neutral state (Index 0)
         // states: [0]
@@ -1471,7 +1489,7 @@ class RobotPu {
         // sync_speed: 2.0 (moderate speed)
         // async_list: [] (none)
         // async_speed: 0.5
-        return this.wk.move(
+        return this.pcb.move(
             this.pr,
             [0],
             [0, 1, 2, 3, 4, 5],
@@ -1482,9 +1500,9 @@ class RobotPu {
     }
 
     /**
- * Monitors sensors to determine if the robot should exit sleep mode.
- * @returns 1 if the robot should wake up, 0 otherwise.
- */
+     * Monitors sensors to determine if the robot should exit sleep mode.
+     * @returns 1 if the robot should wake up, 0 otherwise.
+     */
     public checkWakeup(): number {
         // 1. Calculate tilt deltas (current vs filtered)
         let roll_delta = Math.abs(this.bodyRoll - this.bodyRoll2);
@@ -1512,16 +1530,16 @@ class RobotPu {
     }
 
     /**
- * Puts the robot into a low-power standby mode.
- * Ported from sleep() in Python.
- */
+     * Puts the robot into a low-power standby mode.
+     * Ported from sleep() in Python.
+     */
     public sleepMode(): void {
         // 1. Refresh IMU data and return to a neutral standing pose
         this.balanceParam();
         this.stand();
 
         // 2. Turn off the 5x5 LED matrix eyes
-        this.wk.eyesCtl(0);
+        this.pcb.eyesCtl(0);
 
         // 3. Clear the NeoPixel strip to save battery
         this.np.clear();
@@ -1548,9 +1566,9 @@ class RobotPu {
         }
 
         // 2. Handle blinking and state tracking
-        if (this.gst >= 0 && this.gst<=5) {
+        if (this.gst >= 0 && this.gst <= 5) {
             // Update eye blink animation based on alert level (alertLevel)
-            this.wk.blink(this.alertLevel);
+            this.pcb.blink(this.alertLevel);
 
             // Remember last normal state for recovery (e.g., after a fall)
             this.lastState = this.gst;
@@ -1586,10 +1604,10 @@ class RobotPu {
      * @param i The amount to adjust the group ID by (positive or negative).
      */
     public incrGroupId(i: number): void {
-      this.setGroupId(this.radioGroupID + i);
+        this.setGroupId(this.radioGroupID + i);
     }
 
-     /**
+    /**
      * Set the radio group ID and updates the hardware settings.
      * @param channel The channel to set the radio group ID to.
      */
@@ -1644,9 +1662,9 @@ class RobotPu {
         this.bwdSpeed = v;
     }
     /**
- * Generates a random LED light show on the robot's NeoPixel strip.
- * Ported from random_light() in Python.
- */
+     * Generates a random LED light show on the robot's NeoPixel strip.
+     * Ported from random_light() in Python.
+     */
     private randomLight(): void {
         // 1. Loop through the 4 pixels on the robot's strip
         for (let p = 0; p < 4; p++) {
@@ -1664,8 +1682,8 @@ class RobotPu {
         this.np.show();
     }
     /**
- * Makes the robot dance with self-balance based on sound analysis.
- */
+     * Makes the robot dance with self-balance based on sound analysis.
+     */
     public dance(): number {
         let ts = control.millis();
         let ms = input.soundLevel();
@@ -1674,11 +1692,11 @@ class RobotPu {
         let il = this.music.isABeat(ts, ms, 1.005);
 
         // 2. High-beat logic: Pulse LEDs and flip wiggle direction
-        if (ts - this.lastHIghBeat > this.music.period * 0.5) {
+        if (ts - this.lastHighBeat > this.music.period * 0.5) {
             this.danceYawWiggle *= -1;
             this.dancePitchWiggle *= -1;
             this.randomLight(); // Trigger NeoPixel animation
-            this.lastHIghBeat = ts;
+            this.lastHighBeat = ts;
         }
 
         // 3. Low-beat logic: Change the dance move routine
@@ -1707,8 +1725,8 @@ class RobotPu {
             this.danceSpeed *= 0.9;
         }
 
-        // 7. Execute the movement via the WK instance
-        return this.wk.move(this.pr, this.danceState, [0, 1, 2, 3], this.danceSpeed, [4, 5], this.danceSpeed);
+        // 7. Execute the movement via the PCB instance
+        return this.pcb.move(this.pr, this.danceState, [0, 1, 2, 3], this.danceSpeed, [4, 5], this.danceSpeed);
     }
 
     // Command Handlers
@@ -1727,7 +1745,7 @@ class RobotPu {
     public roll(v: number) { this.headYawBias = (v + this.headYawBias) * 0.5; }
     public pitch(v: number) { this.headPitchBias = (v * -1 + this.headPitchBias) * 0.5; }
     public button(v: number) {
-        this.pr.servoCtrl = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        this.pcb.servoCtrl = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
         if (v == 0) {
             this.gst = 0;
             this.headPitchBias = 0;
@@ -1772,19 +1790,24 @@ class RobotPu {
     public pose(v: number) { this.restState = v; this.gst = 0; }
 
     public setTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number) {
-        this.pr.servoTrim = [leftFoot, leftLeg, rightFoot, rightLeg, headYaw, headPitch];
+        this.pcb.servoTrim[0] = leftFoot
+        this.pcb.servoTrim[1] = leftLeg
+        this.pcb.servoTrim[2] = rightFoot
+        this.pcb.servoTrim[3] = rightLeg
+        this.pcb.servoTrim[4] = headYaw
+        this.pcb.servoTrim[5] = headPitch
     }
 
     public setTrimIndex(index: number): void {
-        this.trimIndex = index % this.pr.dof;
-        if (this.trimIndex < 0) this.trimIndex = this.pr.dof -1;
+        this.trimIndex = index % this.pcb.dof;
+        if (this.trimIndex < 0) this.trimIndex = this.pcb.dof - 1;
         this.showTrimIndex();
     }
 
     public adjustTrim(delta: number): void {
-        this.pr.servoTrim[this.trimIndex] += delta;
+        this.pcb.servoTrim[this.trimIndex] += delta;
         this.showTrimIndex();
-        this.wk.servoMove(25, this.pr);
+        this.trim();
     }
 
     public beginTrimCalibration(): void {
@@ -1793,10 +1816,9 @@ class RobotPu {
     }
 
     public toggleServoTrim(): void {
-        if(this.gst == -4) {
+        if (this.gst == -4) {
             this.saveTrimCalibration();
-        } else
-        {
+        } else {
             this.beginTrimCalibration();
         }
         basic.pause(1000)
@@ -1819,17 +1841,17 @@ class RobotPu {
          * Run the robot's calibration routine.
          */
         // 1. Move to calibration position
-        this.wk.servoMove(25, this.pr);
+        this.pcb.servoMove(this.pr.stateTargets[25]);
 
         // 2. Flashes the eyes three times for visual feedback
         for (let i = 0; i < 3; i++) {
-            this.wk.flash(1020);  // Bright flash
+            this.pcb.flash(1020);  // Bright flash
             basic.pause(500); // In MakeCode, sleep(500) is basic.pause(500)
         }
 
         // 3. Turn eyes on and return to neutral position
-        this.wk.eyesCtl(1);
-        this.wk.servoMove(0, this.pr);
+        this.pcb.eyesCtl(1);
+        this.pcb.servoMove(this.pr.stateTargets[0]);
         basic.pause(2000);
     }
 

@@ -185,7 +185,7 @@ namespace robotPu {
     //% group="Setup"
     //% weight=94
     export function eyeBrightness(): number {
-        return ensureRobot().wk.eyeBrightness;
+        return ensureRobot().pcb.eyeBrightness;
     }
 
     /** Set the max brightness of the eyes */
@@ -197,7 +197,7 @@ namespace robotPu {
     //% weight=94
     export function setEyeBrightness(brightness: number): void {
         brightness = Math.min(1, Math.max(0, brightness));
-        ensureRobot().wk.eyeBrightness = brightness;
+        ensureRobot().pcb.eyeBrightness = brightness;
     }
 
     /** Robot PU introduce itself  */
@@ -459,7 +459,7 @@ namespace robotPu {
     //% weight=49 blockGap=8
     export function servo(joint: ServoJoint, angle: number): void {
         const r = getRobotAPI();
-        r.wk.servo(joint as number, angle);
+        r.pcb.servo(joint as number, angle);
     }
 
     /** Move a Robot PU servo/joint toward a target angle using progressive stepping. */
@@ -471,7 +471,7 @@ namespace robotPu {
     //% weight=49 blockGap=8
     export function servoStep(joint: ServoJoint, target: number, stepSize: number): void {
         const r = getRobotAPI();
-        r.wk.servoStep(target, stepSize, joint as number, r.pr);
+        r.pcb.servoStep(target, stepSize, joint as number);
     }
 
     /** Move a Robot PU servo/joint toward a target angle and return a status (0=arrived, 1=moving). */
@@ -483,7 +483,20 @@ namespace robotPu {
     //% weight=48 blockGap=8
     export function servoStepStatus(joint: ServoJoint, target: number, stepSize: number): number {
         const r = getRobotAPI();
-        return r.wk.servoStep(target, stepSize, joint as number, r.pr);
+        return r.pcb.servoStep(target, stepSize, joint as number);
+    }
+
+    /** Move multiple Robot PU servos with separate synchronous and asynchronous speed control. */
+    //% blockId=robotpu_move_servos block="move servos targets %targets speeds %speeds sync indexes %syncList sync gain %syncSpeedGain async indexes %asyncList async gain %asyncSpeedGain"
+    //% subcategory="Actuators"
+    //% group="Actuators"
+    //% targets.shadow=lists_create_with speeds.shadow=lists_create_with syncList.shadow=lists_create_with asyncList.shadow=lists_create_with
+    //% syncSpeedGain.defl=1 syncSpeedGain.min=-10 syncSpeedGain.max=10
+    //% asyncSpeedGain.defl=1 asyncSpeedGain.min=-10 asyncSpeedGain.max=10
+    //% weight=48 blockGap=8
+    export function moveServos(targets: number[], speeds: number[], syncList: number[], syncSpeedGain: number, asyncList: number[], asyncSpeedGain: number): boolean {
+        const r = getRobotAPI();
+        return r.pcb.moveServos(targets, speeds, syncList, syncSpeedGain, asyncList, asyncSpeedGain);
     }
 
     /** Set servo control offsets for feedback/feedforward control. Indexes are servo IDs; values are angle offsets added to motion targets. */
@@ -517,7 +530,7 @@ namespace robotPu {
         const r = ensureRobot();
         brightness = Math.min(1, Math.max(0, brightness));
         const b = Math.min(1023, Math.max(0, Math.round(brightness * 1023)));
-        r.wk.leftEyeBright(b);
+        r.pcb.leftEyeBright(b);
     }
 
     /** Set right eye brightness (0 to 1). */
@@ -530,7 +543,7 @@ namespace robotPu {
         const r = ensureRobot();
         brightness = Math.min(1, Math.max(0, brightness));
         const b = Math.min(1023, Math.max(0, Math.round(brightness * 1023)));
-        r.wk.rightEyeBright(b);
+        r.pcb.rightEyeBright(b);
     }
 
     /** Return sonar distance in centimeters. */
@@ -575,7 +588,7 @@ namespace robotPu {
     //% group="Sensors"
     //% weight=36 blockGap=8
     export function ServoTargets(): number[] {
-        return ensureRobot().pr.servoTarget;
+        return ensureRobot().pcb.servoTarget;
     }
 
     /** ServoControls array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
@@ -584,7 +597,7 @@ namespace robotPu {
     //% group="Sensors"
     //% weight=35 blockGap=8
     export function ServoControls(): number[] {
-        return ensureRobot().pr.servoCtrl;
+        return ensureRobot().pcb.servoCtrl;
     }
 
     /** ServoTrim array items: left foot, left leg, right foot, right leg, head yaw, head pitch */
@@ -593,7 +606,7 @@ namespace robotPu {
     //% group="Sensors"
     //% weight=34 blockGap=8
     export function ServoTrims(): number[] {
-        return ensureRobot().pr.servoTrim;
+        return ensureRobot().pcb.servoTrim;
     }
 
     /** front distance array items: left, middle left, middle, middle right, right */
