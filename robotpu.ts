@@ -48,12 +48,12 @@ class Parameters {
         this.stateTargets = [
             [90, 90, 90, 90, 90, 90, 90, 90, 90, 90],                  // 0: stand
             [10, 150, 170, 30, 40, 125, 90, 90, 90, 90],               // 1: duck
-            [90 - w_t, 90 + 35, 90 - j_t, 90 + 30, 90 - l_s - 8, 80, 90 - l_s, 90 - l_s, 90 + l_s, 90 - l_s], // 2: walk1
-            [93, 90 + l_s, 93, 90 + l_s, 90 - l_s - 8, 80, 90 - l_s, 90 - l_s, 90 + l_s, 90 - l_s],           // 3: w2
-            [90 + j_t, 90 - 30, 90 + w_t, 90 - 35, 90 + l_s + 8, 80, 90 + l_s, 90 + l_s, 90 - l_s, 90 + l_s], // 4: w3
+            [90 - w_t, 90 + 35, 90 - j_t, 90 + 30, 90 - l_s - 8, 80, 90 - l_s, 90 - l_s, 90, 90], // 2: walk1
+            [93, 90 + l_s, 93, 90 + l_s, 90 - l_s - 8, 80, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],           // 3: w2
+            [90 + j_t, 90 - 30, 90 + w_t, 90 - 35, 90 + l_s + 8, 80, 90 + l_s, 90 + l_s, 90, 90], // 4: w3
             [87, 90 - l_s, 87, 90 - l_s, 90 + l_s + 8, 80, 90 + l_s, 90 + l_s, 90 - l_s, 90 + l_s],           // 5: w4
-            [90 - w_t, 90 - 25, 90 - j_t, 90 - 45, 90 + l_s, 80, 90, 90, 90, 90],     // 6: w5
-            [90 + j_t, 90 + 45, 90 + w_t, 90 + 25, 90 - l_s, 80, 90, 90, 90, 90],     // 7: w6
+            [90 - w_t, 90 - 25, 90 - j_t, 90 - 45, 90 + l_s, 80, 90 - l_s, 90 - l_s, 90, 90],     // 6: w5
+            [90 + j_t, 90 + 45, 90 + w_t, 90 + 25, 90 - l_s, 80, 90 + l_s, 90 + l_s, 90, 90],     // 7: w6
             [90 - w_t + 5, 90 + 35, 90 - w_t, 90 + 10, 90 + 35, 90 + 5, 90, 90, 90, 90], // 8: skate 1
             [90 + w_t - 5, 90 + 35, 90 + w_t - 5, 90 + 25, 90 - 20, 90 - 15, 90, 90, 90, 90], // 9: s2
             [90 + w_t, 90 - 10, 90 + w_t - 5, 90 - 35, 90 - 35, 90 + 5, 90, 90, 90, 90], // 10: s3
@@ -437,14 +437,20 @@ class PCB {
         this.servoErr = [];
         this.servoCtrl = [];
         this.servoTarget = [];
+        this.servoTrim = []
         for (let i = 0; i < this.dof; i++) {
             this.servoErr.push(0.0);
             this.servoCtrl.push(0.0);
             this.servoTarget.push(0.0);
+            this.servoTrim.push(0.0)
         }
 
         // Servo trim
-        this.servoTrim = [4.0, 4.0, 0.0, -8.0, 0.0, 0.0, 0.0, 0.0]
+        this.servoTrim[0] = 4.0;
+        this.servoTrim[0] =4.0;
+        this.servoTrim[0] = 0.0;
+        this.servoTrim[0] = -8.0;
+
         // I2C is initialized automatically in MakeCode
     }
 
