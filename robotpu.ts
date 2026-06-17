@@ -22,7 +22,7 @@ class Parameters {
         this.walkTilt = 16;
         this.jumpTilt = 27;
         this.legSize = 45;
-        this.dof = 6;
+        this.dof = 10;
 
         // Turning directions
         this.exploreDirection = [-1.0, -0.7, 0.7, 1.0];
@@ -43,34 +43,36 @@ class Parameters {
         let j_t = this.jumpTilt;
 
         // Servo targets for each pose
+        // 10 DOF. servo index:
+        // left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm
         this.stateTargets = [
-            [90, 90, 90, 90, 90, 80],                  // 0: stand
-            [10, 150, 170, 30, 40, 125],               // 1: duck
-            [90 - w_t, 90 + 35, 90 - j_t, 90 + 30, 90 - l_s - 8, 80], // 2: walk1
-            [93, 90 + l_s, 93, 90 + l_s, 90 - l_s - 8, 80],           // 3: w2
-            [90 + j_t, 90 - 30, 90 + w_t, 90 - 35, 90 + l_s + 8, 80], // 4: w3
-            [87, 90 - l_s, 87, 90 - l_s, 90 + l_s + 8, 80],           // 5: w4
-            [90 - w_t, 90 - 25, 90 - j_t, 90 - 45, 90 + l_s, 80],     // 6: w5
-            [90 + j_t, 90 + 45, 90 + w_t, 90 + 25, 90 - l_s, 80],     // 7: w6
-            [90 - w_t + 5, 90 + 35, 90 - w_t, 90 + 10, 90 + 35, 90 + 5], // 8: skate 1
-            [90 + w_t - 5, 90 + 35, 90 + w_t - 5, 90 + 25, 90 - 20, 90 - 15], // 9: s2
-            [90 + w_t, 90 - 10, 90 + w_t - 5, 90 - 35, 90 - 35, 90 + 5], // 10: s3
-            [90 - w_t + 5, 90 - 25, 90 - w_t + 5, 90 - 35, 90 + 20, 90 - 15], // 11: s4
-            [90 - w_t + 5, 90 - 20, 90 - j_t, 90 - 20, 90 + 20, 90],  // 12: s5
-            [90 + j_t, 90 + 20, 90 + w_t - 5, 90 + 20, 90 - 20, 90],  // 13: s6
-            [130, 90, 50, 90, 90, 90],                 // 14: jump
-            [0, 85, 180, 95, 90, 90],                  // 15
-            [85, 90, 95, 90, 45, 65],                  // 16: dance
-            [85, 90, 95, 90, 135, 65],                 // 17
-            [75, 90, 30, 90, 135, 105],                // 18: side move
-            [150, 90, 105, 90, 45, 105],               // 19
-            [75, 90, 30, 90, 45, 75],                  // 20
-            [150, 90, 105, 90, 135, 75],               // 21
-            [75, 90, 75, 90, 90, 90],                  // 22
-            [105, 90, 105, 90, 90, 90],                // 23
-            [130, 90, 50, 90, 90, 55],                 // 24: soccer
-            [90, 60, 90, 120, 90, 90],                 // 25: calibrate
-            [90, 90, 90, 90, 90, 90]                   // 26: rest
+            [90, 90, 90, 90, 90, 90, 90, 90, 90, 90],                  // 0: stand
+            [10, 150, 170, 30, 40, 125, 90, 90, 90, 90],               // 1: duck
+            [90 - w_t, 90 + 35, 90 - j_t, 90 + 30, 90 - l_s - 8, 80, 90 - l_s, 90 - l_s, 90 + l_s, 90 - l_s], // 2: walk1
+            [93, 90 + l_s, 93, 90 + l_s, 90 - l_s - 8, 80, 90 - l_s, 90 - l_s, 90 + l_s, 90 - l_s],           // 3: w2
+            [90 + j_t, 90 - 30, 90 + w_t, 90 - 35, 90 + l_s + 8, 80, 90 + l_s, 90 + l_s, 90 - l_s, 90 + l_s], // 4: w3
+            [87, 90 - l_s, 87, 90 - l_s, 90 + l_s + 8, 80, 90 + l_s, 90 + l_s, 90 - l_s, 90 + l_s],           // 5: w4
+            [90 - w_t, 90 - 25, 90 - j_t, 90 - 45, 90 + l_s, 80, 90, 90, 90, 90],     // 6: w5
+            [90 + j_t, 90 + 45, 90 + w_t, 90 + 25, 90 - l_s, 80, 90, 90, 90, 90],     // 7: w6
+            [90 - w_t + 5, 90 + 35, 90 - w_t, 90 + 10, 90 + 35, 90 + 5, 90, 90, 90, 90], // 8: skate 1
+            [90 + w_t - 5, 90 + 35, 90 + w_t - 5, 90 + 25, 90 - 20, 90 - 15, 90, 90, 90, 90], // 9: s2
+            [90 + w_t, 90 - 10, 90 + w_t - 5, 90 - 35, 90 - 35, 90 + 5, 90, 90, 90, 90], // 10: s3
+            [90 - w_t + 5, 90 - 25, 90 - w_t + 5, 90 - 35, 90 + 20, 90 - 15, 90, 90, 90, 90], // 11: s4
+            [90 - w_t + 5, 90 - 20, 90 - j_t, 90 - 20, 90 + 20, 90, 90, 90, 90, 90],  // 12: s5
+            [90 + j_t, 90 + 20, 90 + w_t - 5, 90 + 20, 90 - 20, 90, 90, 90, 90, 90],  // 13: s6
+            [130, 90, 50, 90, 90, 90, 90, 90, 90, 90],                 // 14: jump
+            [0, 85, 180, 95, 90, 90, 90, 90, 90, 90],                  // 15
+            [85, 90, 95, 90, 45, 65, 90, 90, 90, 90],                  // 16: dance
+            [85, 90, 95, 90, 135, 65, 90, 90, 90, 90],                 // 17
+            [75, 90, 30, 90, 135, 105, 90, 90, 90, 90],                // 18: side move
+            [150, 90, 105, 90, 45, 105, 90, 90, 90, 90],               // 19
+            [75, 90, 30, 90, 45, 75, 90, 90, 90, 90],                  // 20
+            [150, 90, 105, 90, 135, 75, 90, 90, 90, 90],               // 21
+            [75, 90, 75, 90, 90, 90, 90, 90, 90, 90],                  // 22
+            [105, 90, 105, 90, 90, 90, 90, 90, 90, 90],                // 23
+            [130, 90, 50, 90, 90, 55, 90, 90, 90, 90],                 // 24: soccer
+            [90, 60, 90, 120, 90, 90, 90, 90, 90, 90],                 // 25: calibrate
+            [90, 90, 90, 90, 90, 90, 90, 90, 90, 90]                   // 26: rest
         ];
 
         // Mapping dictionary
@@ -78,17 +80,17 @@ class Parameters {
 
         // Control speed vectors
         this.speedCandidates = [
-            [1, 1, 1, 1, 1, 1],             // 0
-            [1, 1, 1, 1, 0.5, 0.5],         // 1
-            [2, 1, 1, 1, 1.2, 0.4],         // 2
-            [1, 1, 2, 1, 1.2, 0.4],         // 3
-            [1, 1, 1, 1, 1.2, 0.4],         // 4
-            [5, 1, 5, 1, 1, 5],             // 5
-            [0.55, 1, 0.55, 1, 1, 1],       // 6
-            [2, 1, 1, 1, 1, 1],             // 7
-            [5, 1, 5, 1, 1, 3],             // 8
-            [1, 1, 2, 1, 1, 1],             // 9
-            [6, 2, 6, 2, 1, 1]              // 10
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],             // 0
+            [1, 1, 1, 1, 0.5, 0.5, 1, 1, 1, 1],         // 1
+            [2, 1, 1, 1, 1.2, 0.4, 2, 2, 2, 2],         // 2
+            [1, 1, 2, 1, 1.2, 0.4, 2, 2, 2, 2],         // 3
+            [1, 1, 1, 1, 1.2, 0.4, 1, 1, 1, 1],         // 4
+            [5, 1, 5, 1, 1, 5, 1, 1, 1, 1],             // 5
+            [0.55, 1, 0.55, 1, 1, 1, 1, 1, 1, 1],       // 6
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1],             // 7
+            [5, 1, 5, 1, 1, 3, 1, 1, 1, 1],             // 8
+            [1, 1, 2, 1, 1, 1, 1, 1, 1, 1],             // 9
+            [6, 2, 6, 2, 1, 1, 1, 1, 1, 1]              // 10
         ];
     }
 }
@@ -410,7 +412,7 @@ class PCB {
     private blinkG: number;
     private idle: boolean;
     public currentState: number;
-    public dof: number = 8
+    public dof: number = 10
     servoErr: number[];
     public servoCtrl: number[];
     public servoTarget: number[];
@@ -473,6 +475,12 @@ class PCB {
             buf2.setNumber(NumberFormat.UInt8LE, 2, 0);
             buf2.setNumber(NumberFormat.UInt8LE, 3, 0);
             pins.i2cWriteBuffer(this.i2cAddress, buf2);
+        } else if (sr == 8) {
+            // use pin 14 as servo
+            pins.servoWritePin(AnalogPin.P14, a);
+        } else if (sr == 9) {
+            // use pin 15 as servo
+            pins.servoWritePin(AnalogPin.P15, a);
         }
     }
 
@@ -1118,7 +1126,7 @@ class RobotPu {
             [o_t, lf - o_t, o_t, -lf - o_t, -40 * di - o_t, Math.min(25.0, -2.0 * this.bodyPitch2)]);
 
         // Call internal servo move
-        return this.pcb.move(this.pr, sts, [0, 1, 2, 3], sp, [4, 5], sp);
+        return this.pcb.move(this.pr, sts, [0, 1, 2, 3], sp, [4, 5, 6, 7, 8, 9], sp);
     }
 
     /**
@@ -1182,7 +1190,8 @@ class RobotPu {
         }
         let sl = input.soundLevel();
         this.pr.stateTargets[this.restState][5] = 90 - sl * 0.3;
-        return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + sl * 0.001, [], 0.5);
+        return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + sl * 0.001,
+            [6, 7, 8, 9], 0.5);
     }
 
     public trim(): void {
@@ -1222,7 +1231,7 @@ class RobotPu {
 
         // 3. Move to the Fetal State (Index 1)
         // states: [1], sync_list: all servos [0-5], speed: 2.0, async: none, async_sp: 0.5
-        this.pcb.move(this.pr, [1], [0, 1, 2, 3, 4, 5], 2.0, [], 0.5);
+        this.pcb.move(this.pr, [1], [0, 1, 2, 3, 4, 5], 2.0, [6, 7, 8, 9], 0.5);
     }
 
     /**
@@ -1433,7 +1442,7 @@ class RobotPu {
             [24, 14, 0, 0],
             [0, 1, 2, 3],
             3,
-            [4, 5],
+            [4, 5, 6, 7, 8, 9],
             2
         );
 
@@ -1441,12 +1450,6 @@ class RobotPu {
         if (md == 0 && this.pcb.pos == 3) {
             // Transition to Joystick/Manual state
             this.gst = 5;
-
-            // Retract/Reset auxiliary servo 6
-            this.pcb.servo(6, 0);
-        } else {
-            // Extend/Activate auxiliary servo 6 during the jump
-            this.pcb.servo(6, 100);
         }
 
         return md;
@@ -1464,7 +1467,7 @@ class RobotPu {
             this.pr.walkFwdStates,
             [0, 1, 2, 3],
             3,
-            [4, 5],
+            [4, 5, 6, 7, 8, 9],
             2
         );
 
@@ -1494,7 +1497,7 @@ class RobotPu {
             [0],
             [0, 1, 2, 3, 4, 5],
             2.0,
-            [],
+            [6, 7, 8, 9],
             0.5
         );
     }
@@ -1726,7 +1729,8 @@ class RobotPu {
         }
 
         // 7. Execute the movement via the PCB instance
-        return this.pcb.move(this.pr, this.danceState, [0, 1, 2, 3], this.danceSpeed, [4, 5], this.danceSpeed);
+        return this.pcb.move(this.pr, this.danceState, [0, 1, 2, 3],
+            this.danceSpeed, [4, 5, 6, 7, 8, 9], this.danceSpeed);
     }
 
     // Command Handlers
