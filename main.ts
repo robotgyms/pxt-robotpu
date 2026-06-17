@@ -39,10 +39,14 @@ namespace robotPu {
         HeadYaw = 4,
         //% block="head pitch"
         HeadPitch = 5,
-        //% block="Reserve 1"
-        Reserve1 = 6,
-        //% block="Reserve 2"
-        Reserve2 = 7
+        //% block="left shoulder"
+        LeftShoulder = 6,
+        //% block="left arm"
+        LeftArm = 7,
+        //% block="right shoulder"
+        RightShoulder = 8,
+        //% block="right arm"
+        RightArm = 9
     }
 
     function ensureRobot(): RobotPu {
