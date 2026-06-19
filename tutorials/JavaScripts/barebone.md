@@ -42,13 +42,27 @@ After that, the editor will recognize calls like `robotPu.setChannel(...)` and `
 ## Code (copy into MakeCode JavaScript)
 
 ```typescript
-radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+robotPu.setServoTrim(-5, -2, -5, 7, -8, 0)
+radio.onReceivedValue(function(name: string, value: number) {
+  robotPu.runKeyValueCommand(name,value)
 })
-radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+
+radio.onReceivedString(function(receivedString: string) {
+  robotPu.runStringCommand(receivedString)
 })
-robotPu.setChannel(166)
+
+input.onLogoEvent(TouchButtonEvent.Pressed, function() {
+  robotPu.toggleServoTrim()
+})
+
+input.onButtonPressed(Button.A, function() {
+  robotPu.changeChannel(1)
+})
+
+input.onButtonPressed(Button.B, function () {
+  robotPu.changeChannel(-1)
+})
+
 ```
 
 ---
