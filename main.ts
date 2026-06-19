@@ -504,8 +504,8 @@ namespace robotPu {
     }
 
     /**
-     * Speak text aloud using the Billy voice synthesizer.
-     * @param text the text to speak, eg: "Hello!"
+     * Speak text aloud as a melodic robotic voice. If the text contains only morse characters (. - / space) it is played as morse code instead.
+     * @param text the text to speak or morse code string, eg: "Hello!"
      */
     //% blockId=robotpu_talk block="talk %text"
     //% text.shadow=text
@@ -517,9 +517,9 @@ namespace robotPu {
     }
 
     /**
-     * Sing a musical note sequence or phonetic string using the Billy voice synthesizer.
+     * Sing a musical note sequence using the built-in music engine.
      * Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use '-' for a rest.
-     * @param song the note sequence or phonetic string to sing, eg: "C5 B G - E F E G "
+     * @param song the note sequence string to sing, eg: "C5 B G - E F E G "
      */
     //% blockId=robotpu_sing block="sing %song"
     //% song.shadow=text
@@ -528,6 +528,55 @@ namespace robotPu {
     //% weight=75
     export function sing(song: string): void {
         ensureRobot().sing(song);
+    }
+
+    /**
+     * Play a morse code string using ITU-standard timing.
+     * Use '.' for dit, '-' for dah, ' ' to separate letters, '  ' (double space) to separate words, '/' as an alternative letter separator.
+     * @param code morse code string to play, eg: "... --- ..."
+     * @param unitMs duration of one dit in milliseconds, eg: 80
+     */
+    //% blockId=robotpu_morse block="morse %code|| speed %unitMs ms"
+    //% code.shadow=text
+    //% unitMs.min=30 unitMs.max=300 unitMs.defl=80
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=74 blockGap=8
+    //% helpUrl="https://robotgyms.com/pu"
+    export function morse(code: string, unitMs: number = 80): void {
+        ensureRobot().voice.morse(code, unitMs);
+    }
+
+    /**
+     * Translate plain text into a morse code string using the ITU morse alphabet.
+     * The returned string can be passed to the morse block or displayed on the LED matrix.
+     * @param text plain text to translate, eg: "SOS"
+     */
+    //% blockId=robotpu_to_morse block="translate %text to morse"
+    //% text.shadow=text
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=73 blockGap=8
+    //% helpUrl="https://robotgyms.com/pu"
+    export function toMorse(text: string): string {
+        return RoboVoice.toMorse(text);
+    }
+
+    /**
+     * Translate plain text to morse code and play it immediately.
+     * Combines the translate and morse blocks in one step.
+     * @param text plain text to translate and play as morse, eg: "Hello"
+     * @param unitMs duration of one dit in milliseconds, eg: 80
+     */
+    //% blockId=robotpu_morse_text block="say %text in morse|| speed %unitMs ms"
+    //% text.shadow=text
+    //% unitMs.min=30 unitMs.max=300 unitMs.defl=80
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=72 blockGap=8
+    //% helpUrl="https://robotgyms.com/pu"
+    export function morseText(text: string, unitMs: number = 80): void {
+        ensureRobot().voice.morse(RoboVoice.toMorse(text), unitMs);
     }
 
     /**

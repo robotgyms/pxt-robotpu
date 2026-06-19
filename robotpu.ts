@@ -780,6 +780,417 @@ class Odometry {
 }
 
 /**
+ * RoboVoice: converts any printable text to a pleasant robotic melody.
+ *
+ * Five algorithm layers:
+ *   1. A-pentatonic pitch set    — 13 pitches (A2→A5), no dissonant intervals possible.
+ *   2. Frequency-rank mapping    — top English letters map to A-family notes (440/880/220 Hz).
+ *   3. Markov pitch smoothing    — output = prev×0.6 + target×0.4, prevents jarring leaps.
+ *   4. Pitch contour             — vowels push pitch up; word boundaries pull it back to A4.
+ *   5. Duration weighting        — vowels 140ms, frequent consonants 80ms, stops 45ms.
+ *
+ * Full printable ASCII coverage:
+ *   Letters  → frequency-ranked pentatonic indices (see LETTER_INDEX).
+ *   Digits   → descending scale 0(high)…9(low) — robotic counting feel.
+ *   Punctuation → emotional effects:
+ *     '!' → sharp A5 accent + contour reset (excitement)
+ *     '?' → rising E4→A5 two-note glide (question intonation)
+ *     '.' → low A3 + full contour reset (sentence end / calm)
+ *     ',' → short rest + slight dip (brief pause)
+ *     ';' ':' → medium rest + neutral (softer pause)
+ *     '-' '—' → medium rest (em-dash / hyphen pause)
+ *     '\'' → tiny glide, no reset (contraction — keep flow)
+ *     '(' ')' → low G3 bracket tone (parenthetical aside)
+ *     '@' '#' '$' '%' '&' '*' → sharp high accent (special char emphasis)
+ *     '+' '=' → neutral mid C4 tone
+ *     ' '     → rest + drift to A4 (word boundary)
+ *   Remaining printable ASCII → mid default tone (C4).
+ */
+class RoboVoice {
+    // A-pentatonic scale across 3 octaves, A-note heavy.
+    // Intervals: Root(A), min3(C), M3(E), P5(G) — no tritones, all consonant.
+    // prettier-ignore
+    private static readonly SCALE: number[] = [
+        110,  // [0]  A2
+        131,  // [1]  C3
+        165,  // [2]  E3
+        196,  // [3]  G3
+        220,  // [4]  A3  ← A-family
+        262,  // [5]  C4
+        330,  // [6]  E4
+        392,  // [7]  G4
+        440,  // [8]  A4  ← A-family · default neutral pitch
+        523,  // [9]  C5
+        659,  // [10] E5
+        784,  // [11] G5
+        880   // [12] A5  ← A-family · excitement peak
+    ];
+
+    // Letters → scale index by English frequency rank.
+    // Rank 1-6 (E T A O I N, ~60% of all letters) → A-family indices {4,8,12}.
+    // prettier-ignore
+    private static readonly LETTER_INDEX: { [ch: string]: number } = {
+        "e": 8,  "t": 8,  "a": 12, "o": 4,  "i": 8,  "n": 6,   // rank  1-6  → A-family
+        "s": 9,  "h": 7,  "r": 10, "d": 9,  "l": 7,  "c": 10,  // rank  7-12 → C5/G4/E5
+        "u": 9,  "m": 7,                                          // rank 13-14
+        "w": 5,  "f": 6,  "g": 5,  "y": 6,  "p": 3,  "b": 5,   // rank 15-20 → C4/E4/G3
+        "v": 3,  "k": 6,  "j": 2,  "x": 3,  "q": 1,  "z": 0    // rank 21-26 → low tones
+    };
+
+    // Digits → descending scale indices: '0'=high, '9'=low (robotic counting feel).
+    // prettier-ignore
+    private static readonly DIGIT_INDEX: { [ch: string]: number } = {
+        "0": 12, "1": 11, "2": 10, "3": 9, "4": 8,
+        "5": 7,  "6": 6,  "7": 5,  "8": 4, "9": 3
+    };
+
+    // Duration buckets (ms)
+    private static readonly DUR_VOWEL  = 140;  // a e i o u — voiced, sustained
+    private static readonly DUR_COMMON = 80;   // n s r l m h — frequent consonants
+    private static readonly DUR_STOP   = 45;   // p b t k d g — short percussive stops
+    private static readonly DUR_DIGIT  = 100;  // digits — deliberate robotic count
+    private static readonly DUR_REST   = 90;   // space / word boundary
+
+    private static readonly VOWELS  = "aeiou";
+    private static readonly STOPS   = "pbtkdg";
+    private static readonly COMMONS = "nsrlmh";
+
+    // Markov pitch state (fractional scale index)
+    private smoothIdx: number;
+    // Intonation contour: rises on vowels, falls at boundaries
+    private contourBias: number;
+
+    constructor() {
+        this.smoothIdx = 8;   // start at A4
+        this.contourBias = 0;
+    }
+
+    /** Reset pitch state to neutral A4 (call before a new unrelated utterance). */
+    public reset(): void {
+        this.smoothIdx = 8;
+        this.contourBias = 0;
+    }
+
+    private clamp(v: number, lo: number, hi: number): number {
+        return v < lo ? lo : v > hi ? hi : v;
+    }
+
+    /**
+     * Advance Markov state toward targetIdx and return the rounded output index.
+     * Contour bias is updated based on vowel/consonant type.
+     */
+    private nextIdx(targetIdx: number, isVowel: boolean): number {
+        if (isVowel) {
+            this.contourBias = this.clamp(this.contourBias + 0.5, -2, 2);
+        } else {
+            this.contourBias *= 0.7;
+        }
+        this.smoothIdx = this.smoothIdx * 0.6 + (targetIdx + this.contourBias) * 0.4;
+        return this.clamp(Math.round(this.smoothIdx), 0, RoboVoice.SCALE.length - 1);
+    }
+
+    /** Play one scale tone via the Markov smoother. */
+    private playSmoothed(targetIdx: number, dur: number, isVowel: boolean = false): void {
+        const idx = this.nextIdx(targetIdx, isVowel);
+        music.playTone(RoboVoice.SCALE[idx], dur);
+    }
+
+    /** Play a direct (unsmoothed) tone at a fixed scale index. */
+    private playDirect(scaleIdx: number, dur: number): void {
+        this.smoothIdx = scaleIdx; // snap Markov state to this pitch
+        music.playTone(RoboVoice.SCALE[scaleIdx], dur);
+    }
+
+    /** Drift Markov state back toward neutral A4 (index 8). */
+    private driftToNeutral(weight: number = 0.3): void {
+        this.smoothIdx = this.smoothIdx * (1 - weight) + 8 * weight;
+        this.contourBias = this.clamp(this.contourBias - 1, -2, 2);
+    }
+
+    /** Duration for a letter character. */
+    private letterDuration(ch: string): number {
+        if (RoboVoice.VOWELS.indexOf(ch) >= 0)  return RoboVoice.DUR_VOWEL;
+        if (RoboVoice.STOPS.indexOf(ch) >= 0)   return RoboVoice.DUR_STOP;
+        if (RoboVoice.COMMONS.indexOf(ch) >= 0) return RoboVoice.DUR_COMMON;
+        return 65;
+    }
+
+    /**
+     * Speak text as a pleasant robotic melody.
+     * Every printable ASCII character produces a musical event.
+     * Plays synchronously (blocks until complete).
+     */
+    public say(text: string): void {
+        const s = text.toLowerCase();
+        for (let i = 0; i < s.length; i++) {
+            const ch = s.charAt(i);
+
+            // ── Letters ────────────────────────────────────────────
+            const letterIdx = RoboVoice.LETTER_INDEX[ch];
+            if (letterIdx !== undefined) {
+                const isVowel = RoboVoice.VOWELS.indexOf(ch) >= 0;
+                this.playSmoothed(letterIdx, this.letterDuration(ch), isVowel);
+                continue;
+            }
+
+            // ── Digits ─────────────────────────────────────────────
+            const digitIdx = RoboVoice.DIGIT_INDEX[ch];
+            if (digitIdx !== undefined) {
+                this.playSmoothed(digitIdx, RoboVoice.DUR_DIGIT, false);
+                continue;
+            }
+
+            // ── Punctuation & Symbols ──────────────────────────────
+            if (ch === "!") {
+                // Excitement: sharp accent at A5, snap Markov up, then reset
+                this.playDirect(12, 180);           // A5 — peak excitement
+                music.rest(40);
+                this.driftToNeutral(0.5);
+
+            } else if (ch === "?") {
+                // Question: rising two-note glide E4 → A5
+                this.playDirect(6, 80);             // E4
+                this.playDirect(12, 160);           // A5
+                this.driftToNeutral(0.4);
+
+            } else if (ch === ".") {
+                // Full stop: low A3, full contour reset
+                this.playDirect(4, 150);            // A3 — calm, low
+                music.rest(60);
+                this.contourBias = 0;
+                this.smoothIdx = 8;                 // hard reset to A4
+
+            } else if (ch === ",") {
+                // Comma: brief dip rest
+                this.driftToNeutral(0.2);
+                music.rest(60);
+
+            } else if (ch === ";" || ch === ":") {
+                // Semi-colon / colon: medium neutral pause
+                this.driftToNeutral(0.3);
+                music.rest(75);
+
+            } else if (ch === "-" || ch === "\u2014") {
+                // Hyphen / em-dash: deliberate pause
+                this.driftToNeutral(0.2);
+                music.rest(100);
+
+            } else if (ch === "'") {
+                // Apostrophe: tiny glide, keep flow (contraction)
+                this.playSmoothed(this.clamp(Math.round(this.smoothIdx) + 1, 0, 12), 30, false);
+
+            } else if (ch === "(" || ch === "[" || ch === "{") {
+                // Open bracket: drop to parenthetical low G3
+                this.playDirect(3, 60);             // G3
+
+            } else if (ch === ")" || ch === "]" || ch === "}") {
+                // Close bracket: rise back to A4
+                this.playDirect(8, 60);             // A4
+
+            } else if (ch === "@" || ch === "#" || ch === "$" ||
+                       ch === "%" || ch === "&" || ch === "*") {
+                // Special symbols: sharp high accent C5
+                this.playDirect(9, 55);             // C5
+
+            } else if (ch === "+" || ch === "=") {
+                // Neutral operators: plain C4
+                this.playSmoothed(5, 60, false);    // C4
+
+            } else if (ch === "/" || ch === "\\") {
+                // Slash: quick ascending glide C4→E4
+                this.playDirect(5, 40);
+                this.playDirect(6, 40);
+
+            } else if (ch === "<" || ch === ">") {
+                // Angle brackets: descending two-note G4→E4
+                this.playDirect(7, 50);
+                this.playDirect(6, 50);
+
+            } else if (ch === "_") {
+                // Underscore: low sustained G3 (like a bass note)
+                this.playSmoothed(3, 100, false);
+
+            } else if (ch === "^" || ch === "~") {
+                // Caret / tilde: gentle wobble G4→A4
+                this.playDirect(7, 50);
+                this.playDirect(8, 50);
+
+            } else if (ch === "`") {
+                // Backtick: short low C3 accent
+                this.playDirect(1, 40);
+
+            } else if (ch === "\"") {
+                // Double quote: two-note A4→A5 (opening/closing emphasis)
+                this.playDirect(8, 50);
+                this.playDirect(12, 50);
+
+            } else if (ch === " ") {
+                // Word boundary: rest + drift toward A4
+                this.driftToNeutral(0.3);
+                music.rest(RoboVoice.DUR_REST);
+
+            } else {
+                // Any remaining printable ASCII: neutral C4 tap
+                this.playSmoothed(5, 55, false);
+            }
+        }
+    }
+
+    /**
+     * Translate a plain text string into ITU morse code notation.
+     *
+     * Output format:
+     *   - Letters/digits are encoded as sequences of '.' and '-'.
+     *   - Codes within a word are separated by a single space.
+     *   - Words are separated by '  ' (double space).
+     *   - Unrecognised characters are silently skipped.
+     *
+     * Example:
+     *   toMorse("SOS")        → "... --- ..."
+     *   toMorse("Hello")      → ".... . .-.. .-.. ---"
+     *   toMorse("Hi 73")      → ".... ..  --... ...--"
+     *
+     * @param text  Plain text to encode (case-insensitive).
+     * @returns     Morse code string ready to pass to morse() or talk().
+     */
+    public static toMorse(text: string): string {
+        // ITU morse code table (A-Z, 0-9, common punctuation)
+        // prettier-ignore
+        const TABLE: { [ch: string]: string } = {
+            "a": ".-",    "b": "-...",  "c": "-.-.",  "d": "-..",
+            "e": ".",     "f": "..-.",  "g": "--.",   "h": "....",
+            "i": "..",    "j": ".---",  "k": "-.-",   "l": ".-..",
+            "m": "--",    "n": "-.",    "o": "---",   "p": ".--.",
+            "q": "--.-",  "r": ".-.",   "s": "...",   "t": "-",
+            "u": "..-",   "v": "...-",  "w": ".--",   "x": "-..-",
+            "y": "-.--",  "z": "--..",
+            "0": "-----", "1": ".----", "2": "..---", "3": "...--",
+            "4": "....-", "5": ".....", "6": "-....",  "7": "--...",
+            "8": "---..", "9": "----.",
+            ".": ".-.-.-", ",": "--..--", "?": "..--..",
+            "!": "-.-.--", "/": "-..-.", "-": "-....-",
+            "(": "-.--.",  ")": "-.--.-", "&": ".-...",
+            ":": "---...", ";": "-.-.-.", "=": "-...-",
+            "+": ".-.-.",  "_": "..--.-", "\"": ".-..-.",
+            "$": "...-..-","@": ".--.-.", "'": ".----."
+        };
+
+        const words = text.toLowerCase().split(" ");
+        const encodedWords: string[] = [];
+
+        for (let w = 0; w < words.length; w++) {
+            const word = words[w];
+            const encodedChars: string[] = [];
+            for (let c = 0; c < word.length; c++) {
+                const code = TABLE[word.charAt(c)];
+                if (code) encodedChars.push(code);
+            }
+            if (encodedChars.length > 0) {
+                encodedWords.push(encodedChars.join(" "));
+            }
+        }
+
+        // Words joined by double space (ITU word gap marker)
+        return encodedWords.join("  ");
+    }
+
+    /**
+     * Detect whether a string is a morse code sequence.
+     * A morse string contains only '.', '-', '/', ' ', and newline.
+     * Must contain at least one '.' or '-' to qualify.
+     */
+    public static isMorse(text: string): boolean {
+        let hasMorse = false;
+        for (let i = 0; i < text.length; i++) {
+            const ch = text.charAt(i);
+            if (ch === "." || ch === "-") {
+                hasMorse = true;
+            } else if (ch !== "/" && ch !== " " && ch !== "\n" && ch !== "\r") {
+                return false;  // non-morse character found
+            }
+        }
+        return hasMorse;
+    }
+
+    /**
+     * Play a morse code string using ITU-standard timing ratios.
+     *
+     * Timing (1 unit = unitMs, default 80ms):
+     *   '.'  dit  → A5 tone for 1 unit
+     *   '-'  dah  → A5 tone for 3 units
+     *   (between symbols in same letter) → 1 unit rest
+     *   '/'  or single ' ' (letter gap) → 3 unit rest
+     *   '  ' double space (word gap)    → 7 unit rest
+     *
+     * Example: "... --- ..." plays SOS.
+     * Example: ".--.--.".   plays a pattern directly.
+     *
+     * @param code  Morse string of '.', '-', '/', ' ' characters.
+     * @param unitMs  Duration of one dit in milliseconds (default 80).
+     */
+    public morse(code: string, unitMs: number = 80): void {
+        const DIT  = unitMs;          // 1 unit
+        const DAH  = unitMs * 3;      // 3 units
+        const SYM  = unitMs;          // inter-symbol gap (1 unit)
+        const LET  = unitMs * 3;      // inter-letter gap (3 units)
+        const WRD  = unitMs * 7;      // inter-word gap (7 units)
+        const FREQ = 880;             // A5 — classic morse tone
+
+        let i = 0;
+        while (i < code.length) {
+            const ch = code.charAt(i);
+
+            if (ch === ".") {
+                music.playTone(FREQ, DIT);
+                // inter-symbol rest unless next char is a letter boundary
+                const next = i + 1 < code.length ? code.charAt(i + 1) : "";
+                if (next === "." || next === "-") music.rest(SYM);
+                i++;
+
+            } else if (ch === "-") {
+                music.playTone(FREQ, DAH);
+                const next = i + 1 < code.length ? code.charAt(i + 1) : "";
+                if (next === "." || next === "-") music.rest(SYM);
+                i++;
+
+            } else if (ch === "/") {
+                // explicit letter/word separator
+                music.rest(LET);
+                i++;
+
+            } else if (ch === " ") {
+                // single space = letter gap, double space = word gap
+                if (i + 1 < code.length && code.charAt(i + 1) === " ") {
+                    music.rest(WRD);
+                    i += 2;  // consume both spaces
+                } else {
+                    music.rest(LET);
+                    i++;
+                }
+
+            } else {
+                i++;  // skip unrecognised characters
+            }
+        }
+    }
+
+    /**
+     * Smart dispatcher: plays morse if the text looks like a morse sequence,
+     * otherwise plays it as a melodic speech utterance via say().
+     *
+     * @param text  Any string — morse (e.g. "... --- ...") or natural language.
+     * @param unitMs  Morse dit duration in ms (ignored for non-morse text).
+     */
+    public speak(text: string, unitMs: number = 80): void {
+        if (RoboVoice.isMorse(text)) {
+            this.morse(text, unitMs);
+        } else {
+            this.say(text);
+        }
+    }
+}
+
+/**
  * RobotPu Class for MakeCode
  * Optimized with internal PCB and Parameters instances.
  */
@@ -792,6 +1203,7 @@ class RobotPu {
     public content: Content;
     public music: MusicLib;
     public odom: Odometry;
+    public voice: RoboVoice;
 
     // Basic identification
     public name: string;
@@ -899,10 +1311,10 @@ class RobotPu {
         this.content = new Content();
         this.music = new MusicLib();
         this.odom = new Odometry(25.0);
+        this.voice = new RoboVoice();
 
         // Audio & Radio Setup
         radio.setGroup(this.radioGroupID);
-        billy.voicePreset(BillyVoicePreset.LittleRobot);
         music.setVolume(255);
 
         // Initialize Command Dictionary
@@ -1049,8 +1461,9 @@ class RobotPu {
         }
     }
 
-    public talk(text: string) {
-        billy.say(text);
+    public talk(text: string): void {
+        this.voice.reset();
+        this.voice.speak(text);
     }
 
     /**
@@ -1577,8 +1990,8 @@ class RobotPu {
         }
     }
     /**
-     * Executes singing logic using the pxt-billy engine.
-     * @param s The phonetic or musical string to be synthesized.
+     * Sing a note sequence string using the built-in music engine.
+     * @param s The note sequence string, e.g. "C5 D E F G".
      */
     public sing(s: string): void {
         music.play(music.stringPlayable(s, 120), music.PlaybackMode.InBackground)
