@@ -62,7 +62,7 @@ class Parameters {
             [87, 90 - l_s, 87, 90 - l_s, 90 + l_s + 8, 80,           90 - l_s, 180, 90, 80],           // 11: b4
             [90 - w_t, 90 - 25, 90 - j_t, 90 - 45, 90 + l_s, 80,     90, 180, 90, 90],     // 12: b5
             [90 + j_t, 90 + 45, 90 + w_t, 90 + 25, 90 - l_s, 80,     90 - l_s, 90, 0, 45],     // 13: b6
-            [130, 90, 50, 90, 90, 90, 0, 0, 100, 80],                 // 14: jump
+            [130, 90, 50, 90, 90, 90, 0, 0, 135, 45],                 // 14: jump
             [0, 85, 180, 95, 90, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],                  // 15
             [85, 90, 95, 90, 45, 65, 90, 90 + l_s, 90 + l_s, 90],                  // 16: dance
             [85, 90, 95, 90, 135, 65, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],                 // 17
@@ -72,7 +72,7 @@ class Parameters {
             [150, 90, 105, 90, 135, 75, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],               // 21
             [75, 90, 75, 90, 90, 90, 90 + l_s, 90 + l_s, 90, 90],                  // 22
             [105, 90, 105, 90, 90, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],                // 23
-            [130, 90, 50, 90, 90, 55, 0, 180, 90, 90],                 // 24: soccer
+            [130, 90, 50, 90, 90, 55, 0, 180, 135, 45],                 // 24: soccer
             [90, 60, 90, 120, 90, 90, 90, 90, 90, 90],                 // 25: calibrate
             [90, 90, 90, 90, 90, 90, 90, 90, 90, 90]                   // 26: rest
         ];
@@ -533,15 +533,15 @@ class PCB {
      * Move robot through state sequences. If moving down, return 0
      */
     public move(p: Parameters, states: number[],
-                sync_list: number[], sp: number,
-                async_list: number[], async_sp: number): number {
+                syncList: number[], sp: number,
+                asyncList: number[], asyncSp: number): number {
         if (sp == 0) return 0;
         this.pos = Math.min(this.pos, states.length - 1);
         this.currentState = states[this.pos];
         let targets = p.stateTargets[this.currentState];
-        let sp_idx = p.stateSpeedIndices[this.currentState] || 0;
-        let speeds = p.speedCandidates[sp_idx];
-        if (this.moveServos(targets, speeds, sync_list, sp, async_list, async_sp)) {
+        let spIdx = p.stateSpeedIndices[this.currentState] || 0;
+        let speeds = p.speedCandidates[spIdx];
+        if (this.moveServos(targets, speeds, syncList, sp, asyncList, asyncSp)) {
             this.lastPos = this.pos;
             this.pos = (this.pos + 1) % states.length;
             this.numSteps += 1;
@@ -554,21 +554,21 @@ class PCB {
      *
      * @param targets. A list of servo targets.
      * @param speeds. A list of servo speeds.
-     * @param sync_list. Servo indexes that move synchronously.
-     * @param sync_speed_gain. Synchronous speed gain
-     * @param async_list. Servo indexes that move aynchronously
-     * @param async_speed_gain. Asynchronous speed gain
+     * @param syncList. Servo indexes that move synchronously.
+     * @param syncSpeedGain. Synchronous speed gain
+     * @param asyncList. Servo indexes that move asynchronously
+     * @param asyncSpeedGain. Asynchronous speed gain
      */
     public moveServos(targets: number[], speeds: number[],
-                      sync_list: number[], sync_speed_gain: number,
-                      async_list: number[], async_speed_gain: number): boolean {
-        for (let q of sync_list) {
-            this.servoStep(targets[q] + this.servoTrim[q] + this.servoCtrl[q], sync_speed_gain * speeds[q], q);
+                      syncList: number[], syncSpeedGain: number,
+                      asyncList: number[], asyncSpeedGain: number): boolean {
+        for (let q of syncList) {
+            this.servoStep(targets[q] + this.servoTrim[q] + this.servoCtrl[q], syncSpeedGain * speeds[q], q);
         }
-        for (let r of async_list) {
-            this.servoStep(targets[r] + this.servoTrim[r] + this.servoCtrl[r], async_speed_gain * speeds[r], r);
+        for (let r of asyncList) {
+            this.servoStep(targets[r] + this.servoTrim[r] + this.servoCtrl[r], asyncSpeedGain * speeds[r], r);
         }
-        return this.isServoIdle(sync_list)
+        return this.isServoIdle(syncList)
     }
 
     /**
@@ -612,20 +612,20 @@ class PCB {
     /**
      * Blink animation logic.
      */
-    public blink(alert_l: number): void {
-        let ts_diff = control.millis() - this.lastBlinkTS;
+    public blink(alertLevel: number): void {
+        let tsDiff = control.millis() - this.lastBlinkTS;
 
         if (this.eyeIsOn) {
-            if (ts_diff > this.blinkInterval) {
+            if (tsDiff > this.blinkInterval) {
                 this.eyesCtl(0);
             } else {
-                this.blinkG = alert_l * 400;
-                let brightness = Math.min(1023, alert_l * 102 * this.eyeBrightness);
+                this.blinkG = alertLevel * 400;
+                let brightness = Math.min(1023, alertLevel * 102 * this.eyeBrightness);
                 this.leftEyeBright(brightness);
                 this.rightEyeBright(brightness);
             }
         } else {
-            if (ts_diff > Math.randomRange(100, 250)) {
+            if (tsDiff > Math.randomRange(100, 250)) {
                 this.eyesCtl(1);
                 if (Math.randomRange(0, 4) == 0) {
                     this.blinkInterval = Math.randomRange(100, 250);
@@ -844,8 +844,8 @@ class RobotPu {
     private dancePitchWiggle: number = 15;     // Up/down wiggle angle (degrees)
 
     // Balance & Tilt Offsets
-    private l_o_t: number = 0;         // Left tilt offset
-    private r_o_t: number = 0;         // Right tilt offset
+    private leftTiltOffset: number = 0;         // Left tilt offset
+    private rightTiltOffset: number = 0;         // Right tilt offset
     private maxRollCtrl: number = 15.0; // Max roll control authority
 
     /** Current exploration direction bias (-1.0 to 1.0) */
@@ -860,13 +860,13 @@ class RobotPu {
     private headingPid: PID = new PID();
 
     /** Index in the ep_dis array representing the clearest path */
-    private ep_max_i: number = 0;
+    private epMaxI: number = 0;
 
     /** Distance threshold: Consider an obstacle "hit" if closer than this (cm) */
     private exploreDangerDistance: number = 7.5;
 
     /** Tilt offset applied during exploration maneuvers */
-    private ep_ot: number = 0;
+    private epOt: number = 0;
 
     /** Far threshold: Begin slowing down or planning turns if obstacle is within this (cm) */
     private exploreCautionDistance: number = 20;
@@ -1008,7 +1008,7 @@ class RobotPu {
         let movementSpeed = di * this.fwdSpeed * 0.68;
 
         // 4. Execute the movement via the PCB engine
-        // Parameters: states, sync_servos (0-3), sync_speed, async_servos (4-5), async_speed
+        // Parameters: states, syncList (0-3), syncSpeed, asyncList (4-5), asyncSpeed
         return this.pcb.move(
             this.pr,
             sts,
@@ -1116,23 +1116,23 @@ class RobotPu {
         let sts = sp > 0 ? forwardStates : backwardStates;
         this.balanceParam();
 
-        let l_o_t = 0;
-        let r_o_t = 0;
+        let leftTiltOffset = 0;
+        let rightTiltOffset = 0;
         let lf = 0;
 
         if (this.pcb.pos < 2 || this.pcb.pos == 6) { // Reference internal PCB
-            l_o_t = Math.min(this.maxRollCtrl, Math.max(0.0, this.bodyRoll * 0.8 - this.pr.walkTilt));
+            leftTiltOffset = Math.min(this.maxRollCtrl, Math.max(0.0, this.bodyRoll * 0.8 - this.pr.walkTilt));
             lf = -12 * di;
         } else {
-            r_o_t = Math.max(-this.maxRollCtrl, Math.min(0.0, this.bodyRoll * 0.8 + this.pr.walkTilt));
+            rightTiltOffset = Math.max(-this.maxRollCtrl, Math.min(0.0, this.bodyRoll * 0.8 + this.pr.walkTilt));
             lf = 12 * di;
         }
 
-        let o_t = l_o_t + r_o_t;
-        sp /= 1.0 + 0.01 * (Math.abs(this.bodyRoll) + Math.abs(this.bodyPitch)) + Math.sqrt(Math.abs(o_t * 0.5));
+        let tiltOffset = leftTiltOffset + rightTiltOffset;
+        sp /= 1.0 + 0.01 * (Math.abs(this.bodyRoll) + Math.abs(this.bodyPitch)) + Math.sqrt(Math.abs(tiltOffset * 0.5));
 
         this.setCt([0, 1, 2, 3, 4, 5],
-            [o_t, lf - o_t, o_t, -lf - o_t, -40 * di - o_t, Math.min(25.0, -2.0 * this.bodyPitch2)]);
+            [tiltOffset, lf - tiltOffset, tiltOffset, -lf - tiltOffset, -40 * di - tiltOffset, Math.min(25.0, -2.0 * this.bodyPitch2)]);
 
         // Call internal servo move
         return this.pcb.move(this.pr, sts, [0, 1, 2, 3], sp, [4, 5, 6, 7, 8, 9], sp);
@@ -1239,7 +1239,7 @@ class RobotPu {
         }
 
         // 3. Move to the Fetal State (Index 1)
-        // states: [1], sync_list: all servos [0-5], speed: 2.0, async: none, async_sp: 0.5
+        // states: [1], syncList: all servos [0-5], speed: 2.0, asyncList: none, asyncSp: 0.5
         this.pcb.move(this.pr, [1], [0, 1, 2, 3, 4, 5], 2.0, [6, 7, 8, 9], 0.5);
     }
 
@@ -1358,20 +1358,17 @@ class RobotPu {
         return Math.max(-1.0, Math.min(1.0, d));
     }
 
-    public get_turn_from_sonar(ep_dis: number[], turn_gain: number = 1.5): number {
-        return this.getTurnFromSonar(ep_dis, turn_gain);
-    }
 
     public sonarScan(): void {
         let targetIndex = this.pcb.pos < 2 ? 1 : 3;
         let angleValue = this.pcb.servoTarget[targetIndex];
 
-        let d_i = angleValue > 110 ? 0 :
+        let distanceIndex = angleValue > 110 ? 0 :
             angleValue > 90 ? 1 :
                 angleValue > 70 ? 2 : 3;
 
         let currentSonar = this.sonar.distanceCm();
-        this.pr.exploreDistance[d_i] = (this.pr.exploreDistance[d_i] + currentSonar) * 0.5;
+        this.pr.exploreDistance[distanceIndex] = (this.pr.exploreDistance[distanceIndex] + currentSonar) * 0.5;
     }
 
     /**
@@ -1490,10 +1487,10 @@ class RobotPu {
     public stand(): number {
         // 1. Execute transition to neutral state (Index 0)
         // states: [0]
-        // sync_list: all servos [0, 1, 2, 3, 4, 5]
-        // sync_speed: 2.0 (moderate speed)
-        // async_list: [] (none)
-        // async_speed: 0.5
+        // syncList: all servos [0, 1, 2, 3, 4, 5]
+        // syncSpeed: 2.0 (moderate speed)
+        // asyncList: [] (none)
+        // asyncSpeed: 0.5
         return this.pcb.move(
             this.pr,
             [0],
