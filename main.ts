@@ -7,7 +7,7 @@
 //% block="Robot PU"
 //% groups='["Setup", "Sensors", "Actuators", "Actions", "Remote Control"]'
 //% helpUrl="https://robotgyms.com/pu"
-namespace robotPu {
+namespace robotPuPro {
     let robot: RobotPu;
 
     /**
@@ -136,7 +136,7 @@ namespace robotPu {
 
     /**
      * Set Robot PU's behavior mode. Robot PU will keep running that mode until you change it.
-     * @param mode the behavior mode to switch to, eg: robotPu.Mode.Walk
+     * @param mode the behavior mode to switch to, eg: robotPuPro.Mode.Walk
      */
     //% blockId=robotpu_set_mode_var block="set mode to %mode"
     //% subcategory="Setup"
@@ -279,7 +279,7 @@ namespace robotPu {
 
     /**
      * Set Robot PU's behavior mode directly.
-     * @param mode the behavior mode to switch to, eg: robotPu.Mode.Walk
+     * @param mode the behavior mode to switch to, eg: robotPuPro.Mode.Walk
      */
     //% blockId=robotpu_setMode block="set mode %mode"
     //% weight=86 blockGap=8
@@ -581,7 +581,7 @@ namespace robotPu {
 
     /**
      * Move a servo joint directly to an angle.
-     * @param joint the servo joint to move, eg: robotPu.ServoJoint.HeadYaw
+     * @param joint the servo joint to move, eg: robotPuPro.ServoJoint.HeadYaw
      * @param angle target angle from 0 to 180 degrees, eg: 90
      */
     //% blockId=robotpu_servo block="move %joint servo to %angle"
@@ -596,7 +596,7 @@ namespace robotPu {
 
     /**
      * Move a servo joint toward a target angle one step at a time, for smooth motion.
-     * @param joint the servo joint to move, eg: robotPu.ServoJoint.HeadYaw
+     * @param joint the servo joint to move, eg: robotPuPro.ServoJoint.HeadYaw
      * @param target target angle from 0 to 180 degrees, eg: 90
      * @param stepSize maximum degrees to move per call, eg: 2
      */
@@ -613,7 +613,7 @@ namespace robotPu {
 
     /**
      * Move a servo joint toward a target angle one step at a time. Returns 1 while moving, 0 when arrived.
-     * @param joint the servo joint to move, eg: robotPu.ServoJoint.HeadYaw
+     * @param joint the servo joint to move, eg: robotPuPro.ServoJoint.HeadYaw
      * @param target target angle from 0 to 180 degrees, eg: 90
      * @param stepSize maximum degrees to move per call, eg: 2
      */

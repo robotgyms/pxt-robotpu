@@ -1,3 +1,5 @@
+namespace robotPuPro {
+
 class Parameters {
     walkTilt: number;
     jumpTilt: number;
@@ -2320,3 +2322,4 @@ class RobotPu {
     }
 }
 
+} // namespace robotPuPro

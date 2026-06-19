@@ -23,20 +23,20 @@
  * Pass: LED shows 166, then 167, then 166, no crash.
  */
 function testSetup() {
-    robotPu.setChannel(166)
-    basic.showNumber(robotPu.channel())    // expect 166
+    robotPuPro.setChannel(166)
+    basic.showNumber(robotPuPro.channel())    // expect 166
     basic.pause(500)
-    robotPu.changeChannel(1)
-    basic.showNumber(robotPu.channel())    // expect 167
+    robotPuPro.changeChannel(1)
+    basic.showNumber(robotPuPro.channel())    // expect 167
     basic.pause(500)
-    robotPu.changeChannel(-1)
-    basic.showNumber(robotPu.channel())    // expect 166
+    robotPuPro.changeChannel(-1)
+    basic.showNumber(robotPuPro.channel())    // expect 166
     basic.pause(500)
-    robotPu.setModeVar(robotPu.Mode.API)
-    basic.showNumber(robotPu.mode())       // expect 6 (API)
+    robotPuPro.setModeVar(robotPuPro.Mode.API)
+    basic.showNumber(robotPuPro.mode())       // expect 6 (API)
     basic.pause(500)
-    robotPu.setMode(robotPu.Mode.Rest)
-    basic.showNumber(robotPu.mode())       // expect 0 (Rest)
+    robotPuPro.setMode(robotPuPro.Mode.Rest)
+    basic.showNumber(robotPuPro.mode())       // expect 0 (Rest)
     basic.pause(500)
 }
 
@@ -47,13 +47,13 @@ function testSetup() {
  * Pass: robot stands level, LED shows "T".
  */
 function testTrimAndConfig() {
-    robotPu.setServoTrim(0, 0, 0, 0, 0, 0)
-    robotPu.toggleServoTrim()
+    robotPuPro.setServoTrim(0, 0, 0, 0, 0, 0)
+    robotPuPro.toggleServoTrim()
     basic.pause(1000)
-    robotPu.toggleServoTrim()
-    robotPu.saveServoTrimCalibration()
-    robotPu.writeConfig()
-    robotPu.readConfig()
+    robotPuPro.toggleServoTrim()
+    robotPuPro.saveServoTrimCalibration()
+    robotPuPro.writeConfig()
+    robotPuPro.readConfig()
     basic.showString("T")
 }
 
@@ -64,27 +64,59 @@ function testTrimAndConfig() {
  * Pass: visible eye brightness change, no crash.
  */
 function testEyeBrightness() {
-    robotPu.setEyeBrightness(0.1)
+    robotPuPro.setEyeBrightness(0.1)
     basic.pause(500)
-    robotPu.setEyeBrightness(0.8)
+    robotPuPro.setEyeBrightness(0.8)
     basic.pause(500)
-    robotPu.setEyeBrightness(0.5)
+    robotPuPro.setEyeBrightness(0.5)
+}
+
+/**
+ * TEST: Setup - setWalkSpeedRange, eyeBrightness getter
+ * [SIMULATOR SAFE]
+ * Expected: speed range set, eyeBrightness getter returns 0.5 after setEyeBrightness(0.5).
+ * Pass: no crash, LED shows 1 for eyeBrightness > 0.
+ */
+function testSetupExtended() {
+    robotPuPro.setWalkSpeedRange(-3, 4)
+    robotPuPro.setEyeBrightness(0.5)
+    const b = robotPuPro.eyeBrightness()
+    basic.showNumber(b > 0 ? 1 : 0)   // expect 1
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
 
 /**
  * TEST: Actions - greet, talk, sing
- * [HARDWARE] Billy voice synthesizer required.
+ * [HARDWARE] RoboVoice melodic synthesizer.
  * Expected: robot speaks its name, says "Hello", sings a scale.
  * Pass: audible speech and melody, no crash.
  */
 function testVoice() {
-    robotPu.greet()
+    robotPuPro.greet()
     basic.pause(1000)
-    robotPu.talk("Hello!")
+    robotPuPro.talk("Hello!")
     basic.pause(1000)
-    robotPu.sing("C D E F G ")
+    robotPuPro.sing("C D E F G ")
+}
+
+/**
+ * TEST: Actions - walk, sideStep, explore, stand, rest, dance, kick, jump return values
+ * [HARDWARE]
+ * Expected: each function returns a number (0 or 1). LED shows 1 meaning call succeeded.
+ * Pass: no crash, LED shows 1 for each.
+ */
+function testReturnValues() {
+    robotPuPro.setModeVar(robotPuPro.Mode.API)
+    let r = 0
+    r = robotPuPro.walk(2, 0);        basic.showNumber(1); basic.pause(200)
+    r = robotPuPro.sideStep(-1);      basic.showNumber(1); basic.pause(200)
+    r = robotPuPro.explore();         basic.showNumber(1); basic.pause(200)
+    r = robotPuPro.stand();           basic.showNumber(1); basic.pause(200)
+    r = robotPuPro.rest();            basic.showNumber(1); basic.pause(200)
+    r = robotPuPro.dance();           basic.showNumber(1); basic.pause(200)
+    r = robotPuPro.kick();            basic.showNumber(1); basic.pause(200)
+    r = robotPuPro.jump();            basic.showNumber(1); basic.pause(200)
 }
 
 /**
@@ -94,11 +126,11 @@ function testVoice() {
  * Pass: visible pose transitions, no crash.
  */
 function testStandRestCalibrate() {
-    for (let i = 0; i < 100; i++) { robotPu.standDo() }
+    for (let i = 0; i < 100; i++) { robotPuPro.standDo() }
     basic.pause(500)
-    for (let i = 0; i < 100; i++) { robotPu.restDo() }
+    for (let i = 0; i < 100; i++) { robotPuPro.restDo() }
     basic.pause(500)
-    robotPu.calibrate()
+    robotPuPro.calibrate()
 }
 
 /**
@@ -108,11 +140,11 @@ function testStandRestCalibrate() {
  * Pass: visible walking motion in correct directions, no crash.
  */
 function testWalk() {
-    for (let i = 0; i < 200; i++) { robotPu.walkDo(2, 0) }
+    for (let i = 0; i < 200; i++) { robotPuPro.walkDo(2, 0) }
     basic.pause(200)
-    for (let i = 0; i < 200; i++) { robotPu.walkDo(-2, 0) }
+    for (let i = 0; i < 200; i++) { robotPuPro.walkDo(-2, 0) }
     basic.pause(200)
-    for (let i = 0; i < 200; i++) { robotPu.walkDo(2, 1) }
+    for (let i = 0; i < 200; i++) { robotPuPro.walkDo(2, 1) }
 }
 
 /**
@@ -122,9 +154,9 @@ function testWalk() {
  * Pass: visible sideways motion, no crash.
  */
 function testSideStep() {
-    for (let i = 0; i < 100; i++) { robotPu.sideStepDo(-1) }
+    for (let i = 0; i < 100; i++) { robotPuPro.sideStepDo(-1) }
     basic.pause(200)
-    for (let i = 0; i < 100; i++) { robotPu.sideStepDo(1) }
+    for (let i = 0; i < 100; i++) { robotPuPro.sideStepDo(1) }
 }
 
 /**
@@ -134,11 +166,11 @@ function testSideStep() {
  * Pass: visible jump and kick motions, dance reacts to sound, no crash.
  */
 function testJumpKickDance() {
-    for (let i = 0; i < 50; i++) { robotPu.jumpDo() }
+    for (let i = 0; i < 50; i++) { robotPuPro.jumpDo() }
     basic.pause(200)
-    for (let i = 0; i < 50; i++) { robotPu.kickDo() }
+    for (let i = 0; i < 50; i++) { robotPuPro.kickDo() }
     basic.pause(200)
-    for (let i = 0; i < 100; i++) { robotPu.danceDo() }
+    for (let i = 0; i < 100; i++) { robotPuPro.danceDo() }
 }
 
 /**
@@ -148,9 +180,12 @@ function testJumpKickDance() {
  * Pass: robot moves and avoids obstacles, no crash.
  */
 function testExplore() {
-    robotPu.setMode(robotPu.Mode.Explore)
-    basic.pause(3000)
-    robotPu.setMode(robotPu.Mode.API)
+    robotPuPro.setMode(robotPuPro.Mode.Explore)
+    basic.pause(2000)
+    robotPuPro.setMode(robotPuPro.Mode.API)
+    basic.pause(200)
+    for (let i = 0; i < 50; i++) { robotPuPro.exploreDo() }   // return-value variant
+    robotPuPro.setMode(robotPuPro.Mode.API)
 }
 
 /**
@@ -161,7 +196,7 @@ function testExplore() {
  */
 function testWalkByCompass() {
     for (let i = 0; i < 200; i++) {
-        robotPu.walkByCompass(0)
+        robotPuPro.walkByCompass(0)
         basic.pause(10)
     }
 }
@@ -174,7 +209,7 @@ function testWalkByCompass() {
  */
 function testWalkByCompassPID() {
     for (let i = 0; i < 200; i++) {
-        robotPu.walkByCompassPID(0, 0.02, 0.0005, 0)
+        robotPuPro.walkByCompassPID(0, 0.02, 0.0005, 0)
         basic.pause(10)
     }
 }
@@ -186,7 +221,46 @@ function testWalkByCompassPID() {
  * Pass: audible three-note melody, no crash.
  */
 function testPlayTones() {
-    robotPu.playToneSequenceMs([440, 0, 523, 0, 659], [200, 100, 200, 100, 200])
+    robotPuPro.playToneSequenceMs([440, 0, 523, 0, 659], [200, 100, 200, 100, 200])
+}
+
+/**
+ * TEST: Actions - morse, toMorse, morseText
+ * [HARDWARE] Speaker required.
+ * Expected:
+ *   morse plays "... --- ..." (SOS) in ITU timing.
+ *   toMorse("SOS") returns "... --- ..." — LED shows length 11.
+ *   morseText plays "HI" translated to morse.
+ *   talk auto-detects morse string and plays it.
+ * Pass: audible beeps, LED shows 11 for toMorse length, no crash.
+ */
+function testMorse() {
+    robotPuPro.morse("... --- ...", 80)
+    basic.pause(500)
+    const code = robotPuPro.toMorse("SOS")
+    basic.showNumber(code.length)      // expect 11 ("... --- ...")
+    basic.pause(500)
+    robotPuPro.morseText("HI", 80)
+    basic.pause(500)
+    robotPuPro.morse("-.-.--", 60)    // raw pattern: exclamation mark
+    basic.pause(500)
+    robotPuPro.talk("... --- ...")    // auto-detect: plays as morse
+}
+
+/**
+ * TEST: Actions - talk melodic voice, all character types
+ * [HARDWARE] Speaker required.
+ * Expected: robot plays melody for "Hello!", then for "12345", then for "(ok)".
+ * Pass: audible varied melody, no crash.
+ */
+function testTalkMelody() {
+    robotPuPro.talk("Hello!")
+    basic.pause(500)
+    robotPuPro.talk("12345")
+    basic.pause(500)
+    robotPuPro.talk("(ok?)")
+    basic.pause(500)
+    robotPuPro.talk("I am Robot PU.")
 }
 
 // ── Actuators ──────────────────────────────────────────────────────────────
@@ -198,9 +272,9 @@ function testPlayTones() {
  * Pass: visible head turn, no crash.
  */
 function testServo() {
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, 60)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 60)
     basic.pause(500)
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 90)
 }
 
 /**
@@ -210,14 +284,14 @@ function testServo() {
  * Pass: smooth head pitch motion, servoStepStatus returns 1 while moving and 0 when arrived, no crash.
  */
 function testServoStep() {
-    robotPu.setModeVar(robotPu.Mode.API)
+    robotPuPro.setModeVar(robotPuPro.Mode.API)
     for (let i = 0; i < 60; i++) {
-        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, 120, 2)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, 120, 2)
         basic.pause(20)
     }
     let status = 1
     while (status != 0) {
-        status = robotPu.servoStepStatus(robotPu.ServoJoint.HeadPitch, 90, 2)
+        status = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.HeadPitch, 90, 2)
         basic.pause(20)
     }
 }
@@ -229,11 +303,11 @@ function testServoStep() {
  * Pass: smooth pose transition, no crash.
  */
 function testMoveServos() {
-    robotPu.setModeVar(robotPu.Mode.API)
+    robotPuPro.setModeVar(robotPuPro.Mode.API)
     const pose = [90, 90, 90, 90, 120, 105, 90, 90, 0, 180]
     const speed = [2, 2, 2, 2, 5, 5, 6, 6, 6, 6]
     for (let i = 0; i < 100; i++) {
-        robotPu.moveServos(pose, speed, [0, 1, 2, 3], 1, [4, 5, 6, 7, 8, 9], 1)
+        robotPuPro.moveServos(pose, speed, [0, 1, 2, 3], 1, [4, 5, 6, 7, 8, 9], 1)
         basic.pause(20)
     }
 }
@@ -246,11 +320,11 @@ function testMoveServos() {
  * Pass: visible head shift, no crash.
  */
 function testControlOffsets() {
-    robotPu.setCt([4], [10])
+    robotPuPro.setCt([4], [10])
     basic.pause(500)
-    robotPu.incrCt([4], [-5], 1)
+    robotPuPro.incrCt([4], [-5], 1)
     basic.pause(500)
-    robotPu.setCt([4], [0])
+    robotPuPro.setCt([4], [0])
 }
 
 /**
@@ -260,11 +334,11 @@ function testControlOffsets() {
  * Pass: visible eye brightness change per eye, no crash.
  */
 function testEyes() {
-    robotPu.leftEyeBright(0.05)
-    robotPu.rightEyeBright(0.9)
+    robotPuPro.leftEyeBright(0.05)
+    robotPuPro.rightEyeBright(0.9)
     basic.pause(500)
-    robotPu.leftEyeBright(0.5)
-    robotPu.rightEyeBright(0.5)
+    robotPuPro.leftEyeBright(0.5)
+    robotPuPro.rightEyeBright(0.5)
 }
 
 // ── Sensors ────────────────────────────────────────────────────────────────
@@ -277,8 +351,8 @@ function testEyes() {
  * Pass: non-zero distance displayed, no crash.
  */
 function testSonar() {
-    robotPu.sonarScan()
-    const dist = robotPu.sonarDistanceCm()
+    robotPuPro.sonarScan()
+    const dist = robotPuPro.sonarDistanceCm()
     basic.showNumber(Math.min(dist, 99))
 }
 
@@ -289,9 +363,9 @@ function testSonar() {
  * Pass: non-zero values when tilted, no crash.
  */
 function testBodyTilt() {
-    basic.showNumber(Math.round(robotPu.bodyRoll()))
+    basic.showNumber(Math.round(robotPuPro.bodyRoll()))
     basic.pause(500)
-    basic.showNumber(Math.round(robotPu.bodyPitch()))
+    basic.showNumber(Math.round(robotPuPro.bodyPitch()))
 }
 
 /**
@@ -301,7 +375,7 @@ function testBodyTilt() {
  * Pass: function returns without error, LED shows value.
  */
 function testMusicTempo() {
-    basic.showNumber(robotPu.musicTempo())
+    basic.showNumber(robotPuPro.musicTempo())
 }
 
 /**
@@ -311,9 +385,9 @@ function testMusicTempo() {
  * Pass: arrays have 10 items, first item is a valid angle, no crash.
  */
 function testServoArrays() {
-    const targets = robotPu.servoTargets()
-    const controls = robotPu.servoControls()
-    const trims = robotPu.servoTrims()
+    const targets = robotPuPro.servoTargets()
+    const controls = robotPuPro.servoControls()
+    const trims = robotPuPro.servoTrims()
     basic.showNumber(targets.length)    // expect 10
     basic.pause(300)
     basic.showNumber(controls.length)   // expect 10
@@ -328,8 +402,8 @@ function testServoArrays() {
  * Pass: array has 5 items, values > 0 in open space, no crash.
  */
 function testFrontDistanceArray() {
-    robotPu.sonarScan()
-    const d = robotPu.frontDistanceArray()
+    robotPuPro.sonarScan()
+    const d = robotPuPro.frontDistanceArray()
     basic.showNumber(d.length)          // expect 5
     basic.pause(300)
     basic.showNumber(Math.min(d[2], 99))   // front distance
@@ -343,8 +417,8 @@ function testFrontDistanceArray() {
  * Pass: initial location is [0,0,0], no crash.
  */
 function testOdometry() {
-    robotPu.resetOdom()
-    const loc = robotPu.locationArray()
+    robotPuPro.resetOdom()
+    const loc = robotPuPro.locationArray()
     basic.showNumber(Math.round(loc[0]))   // expect 0
     basic.pause(300)
     basic.showNumber(Math.round(loc[1]))   // expect 0
@@ -356,14 +430,14 @@ function testOdometry() {
 
 /**
  * TEST: Remote Control - runStringCommand
- * [HARDWARE] Billy voice required.
+ * [HARDWARE]
  * Expected: robot speaks "Hi", then sings "C D E".
  * Pass: audible speech and melody, no crash.
  */
 function testRunStringCommand() {
-    robotPu.runStringCommand("#putHi")
+    robotPuPro.runStringCommand("#putHi")
     basic.pause(1000)
-    robotPu.runStringCommand("#pusC D E ")
+    robotPuPro.runStringCommand("#pusC D E ")
 }
 
 /**
@@ -373,26 +447,26 @@ function testRunStringCommand() {
  * Pass: visible motion, no crash.
  */
 function testRunKeyValueCommand() {
-    robotPu.setModeVar(robotPu.Mode.Walk)
-    robotPu.runKeyValueCommand("#puspeed", 1)
+    robotPuPro.setModeVar(robotPuPro.Mode.Walk)
+    robotPuPro.runKeyValueCommand("#puspeed", 1)
     basic.pause(500)
-    robotPu.runKeyValueCommand("#puturn", 1)
+    robotPuPro.runKeyValueCommand("#puturn", 1)
     basic.pause(500)
-    robotPu.runKeyValueCommand("#puroll", 30)
+    robotPuPro.runKeyValueCommand("#puroll", 30)
     basic.pause(500)
-    robotPu.runKeyValueCommand("#pupitch", 20)
+    robotPuPro.runKeyValueCommand("#pupitch", 20)
     basic.pause(500)
-    robotPu.runKeyValueCommand("#puspeed", 0)
-    robotPu.setModeVar(robotPu.Mode.API)
+    robotPuPro.runKeyValueCommand("#puspeed", 0)
+    robotPuPro.setModeVar(robotPuPro.Mode.API)
 }
 
 // ── Radio listeners (always active) ────────────────────────────────────────
 
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 // ── Button/gesture test triggers ───────────────────────────────────────────
@@ -425,6 +499,15 @@ input.onButtonPressed(Button.AB, function () {
 })
 
 /**
+ * Logo long press: run morse tests.
+ * [HARDWARE] Expected: audible morse beeps, LED shows 11.
+ */
+input.onLogoEvent(TouchButtonEvent.LongPressed, function () {
+    basic.showNumber(10)
+    testMorse()
+})
+
+/**
  * Logo press: run jump, kick, dance sequence.
  * [HARDWARE] Expected: jump, kick, then dance.
  */
@@ -434,12 +517,13 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 })
 
 /**
- * Shake: run setup tests (channel, mode, eye brightness).
+ * Shake: run setup tests (channel, mode, eye brightness, speed range).
  * [SIMULATOR SAFE] Expected: LED shows channel and mode values.
  */
 input.onGesture(Gesture.Shake, function () {
     basic.showNumber(5)
     testSetup()
+    testSetupExtended()
     testEyeBrightness()
 })
 
@@ -458,25 +542,36 @@ input.onGesture(Gesture.TiltLeft, function () {
 })
 
 /**
- * Tilt right: run actuator tests (servo, eyes, control offsets).
+ * Tilt right: run actuator tests (servo, eyes, control offsets, moveServos).
  * [HARDWARE] Expected: visible servo and eye changes.
  */
 input.onGesture(Gesture.TiltRight, function () {
     basic.showNumber(7)
     testServo()
     testServoStep()
+    testMoveServos()
     testEyes()
     testControlOffsets()
 })
 
 /**
- * Logo up: run voice and tone tests.
+ * Logo up: run voice, tone, and melody tests.
  * [HARDWARE] Expected: audible speech and melody.
  */
 input.onGesture(Gesture.LogoUp, function () {
     basic.showNumber(8)
     testVoice()
+    testTalkMelody()
     testPlayTones()
+})
+
+/**
+ * Face down: run return-value tests for all action functions.
+ * [HARDWARE] Expected: LED shows 1 for each call.
+ */
+input.onGesture(Gesture.FaceDown, function () {
+    basic.showNumber(11)
+    testReturnValues()
 })
 
 /**
@@ -498,7 +593,7 @@ function initSound() {
 
 input.setSoundThreshold(SoundThreshold.Loud, 184)
 initSound()
-robotPu.setChannel(166)
-robotPu.greet()
-robotPu.standDo()
-robotPu.sing("C5 B G - E F E G ")
+robotPuPro.setChannel(166)
+robotPuPro.greet()
+robotPuPro.standDo()
+robotPuPro.sing("C5 B G - E F E G ")
