@@ -1,6 +1,6 @@
 namespace robotPuPro {
 
-class Parameters {
+export class Parameters {
     walkTilt: number;
     jumpTilt: number;
     legSize: number;
@@ -99,7 +99,7 @@ class Parameters {
     }
 }
 
-class PID {
+export class PID {
     public kp: number;
     public ki: number;
     public kd: number;
@@ -159,7 +159,7 @@ class PID {
     }
 }
 
-class MusicLib {
+export class MusicLib {
     loudThreshold: number;
     loud: number;
     bufferSize: number;
@@ -251,7 +251,7 @@ class MusicLib {
         return isABeatResult;
     }
 }
-class Content {
+export class Content {
     notes: string[];
     chord: number[][];
     pattern: number[][];
@@ -338,7 +338,7 @@ class Content {
             this.choice(this.loc) + ".";
     }
 }
-class HCSR04 {
+export class HCSR04 {
     timeoutUS: number;
     trig: DigitalPin;
     echo: DigitalPin;
@@ -400,7 +400,7 @@ class HCSR04 {
 }
 // Configuration Constants
 
-class PCB {
+export class PCB {
     public i2cAddress: number;
     private lastBlinkTS: number;
     private eyeIsOn: boolean;
@@ -667,7 +667,7 @@ function rot2(thetaRad: number): number[][] {
     ];
 }
 
-class Odometry {
+export class Odometry {
     public axisHalfDistanceMm: number;
     public currentTransformation: number[][];
 
@@ -808,7 +808,7 @@ class Odometry {
  *     ' '     → rest + drift to A4 (word boundary)
  *   Remaining printable ASCII → mid default tone (C4).
  */
-class RoboVoice {
+export class RoboVoice {
     // A-pentatonic scale across 3 octaves, A-note heavy.
     // Intervals: Root(A), min3(C), M3(E), P5(G) — no tritones, all consonant.
     // prettier-ignore
@@ -1196,7 +1196,7 @@ class RoboVoice {
  * RobotPu Class for MakeCode
  * Optimized with internal PCB and Parameters instances.
  */
-class RobotPu {
+export class RobotPu {
     // Component Instances
     public pr: Parameters;
     public pcb: PCB;
