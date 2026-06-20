@@ -30,13 +30,13 @@ A professional sonar operator needs to react differently based on how close a ta
 
 ## 4. Implementation
 
-### Step A: Add the Extension
+### Step A: Voice options
 
-To make PU talk, you must add the speech library:
+`robotPuPro.talk(text)` plays a **melodic robotic tune** using the built-in RoboVoice engine — no extra library needed.
 
-1. Open **Extensions** in the MakeCode editor.
-2. Search for: `https://github.com/adamish/pxt-billy`.
-3. Select **billy** to add it to your project.
+> **Real human speech:** If you prefer spoken words, add the **[pxt-billy](https://github.com/adamish/pxt-billy)** extension and replace `robotPuPro.talk(...)` calls with `robotPuPro.talk(...)  // or: billy.say(...) with pxt-billy`.
+
+The code below uses `robotPuPro.talk()` (no extra extension needed). The commented alternatives show the `billy.say()` equivalent.
 
 ### Step B: The Operator Script
 
@@ -64,7 +64,7 @@ class HCSR04 {
 
 // 1. Setup the Hardware and Voice
 let sonarDevice = new HCSR04(DigitalPin.P2, DigitalPin.P8);
-billy.voicePreset(BillyVoicePreset.LittleRobot);
+// No extra extension needed — RoboVoice is built in
 music.setVolume(150);
 
 basic.forever(function () {
@@ -83,13 +83,13 @@ basic.forever(function () {
         music.setVolume(255); // Max Volume for emergency!
         basic.showIcon(IconNames.Skull);
         music.playMelody("C5 P C5 P C5 P C5 P", 500);
-        billy.say("Danger, stop!");
+        robotPuPro.talk("Danger, stop!")  // or: robotPuPro.talk("Danger, stop!")  // or: billy.say("Danger, stop!") with pxt-billy with pxt-billy;
     }
     // --- CASE 2: DETECTION ZONE (Reporting Distance) ---
     else if (distance >= 6 && distance < 20) {
         music.setVolume(220); // Normal reporting volume
         basic.showIcon(IconNames.Target);
-        billy.say("Distance " + distance);
+        robotPuPro.talk("Distance " + distance)  // or: robotPuPro.talk(...)  // or: billy.say(...) with pxt-billy with pxt-billy;
         basic.pause(500);
     }
     // --- CASE 3: CLEAR SKIES ---
@@ -160,12 +160,12 @@ basic.forever(function () {
         // The skull icon will temporarily override the bar graph
         basic.showIcon(IconNames.Skull); 
         music.playMelody("C5 P C5 P C5 P C5 P", 500);
-        billy.say("Danger, stop!");
+        robotPuPro.talk("Danger, stop!")  // or: robotPuPro.talk("Danger, stop!")  // or: billy.say("Danger, stop!") with pxt-billy with pxt-billy;
     }
     // --- CASE 2: DETECTION ZONE (6cm - 20cm) ---
     else if (distance >= 6 && distance < 20) {
         music.setVolume(220);
-        billy.say("Distance " + distance);
+        robotPuPro.talk("Distance " + distance)  // or: robotPuPro.talk(...)  // or: billy.say(...) with pxt-billy with pxt-billy;
         basic.pause(500);
     }
     // --- CASE 3: CLEAR SKIES ---
@@ -275,22 +275,22 @@ basic.forever(function () {
         mode = 3
         basic.showIcon(IconNames.Skull)
         radio.sendString("torpedo warning")
-        billy.say("Torpedo warning")
-        billy.say("Contact in " + Math.round(ttc) + " seconds")
+        robotPuPro.talk("Torpedo warning")  // or: robotPuPro.talk(...)  // or: billy.say(...) with pxt-billy with pxt-billy
+        robotPuPro.talk("Contact in " + Math.round(ttc) + " seconds")  // or: robotPuPro.talk(...)  // or: billy.say(...) with pxt-billy with pxt-billy
         music.playMelody("C5 P C5 P C5 P C5 P", 500)
         basic.pause(200)
     } else if (distance > 0 && distance < STOP_CM) {
         mode = 2
         music.setVolume(255)
         basic.showIcon(IconNames.Skull)
-        billy.say("Danger, stop!")
+        robotPuPro.talk("Danger, stop!")  // or: robotPuPro.talk("Danger, stop!")  // or: billy.say("Danger, stop!") with pxt-billy with pxt-billy
         basic.pause(200)
     } else if (distance >= 6 && distance < 30 && closingSpeed > 5) {
         mode = 1
         music.setVolume(220)
         basic.showIcon(IconNames.Target)
-        billy.say("Closing")
-        billy.say("Time " + Math.round(ttc) + " seconds")
+        robotPuPro.talk("Closing")  // or: robotPuPro.talk(...)  // or: billy.say(...) with pxt-billy with pxt-billy
+        robotPuPro.talk("Time " + Math.round(ttc) + " seconds")  // or: robotPuPro.talk(...)  // or: billy.say(...) with pxt-billy with pxt-billy
         basic.pause(300)
     } else {
         mode = 0

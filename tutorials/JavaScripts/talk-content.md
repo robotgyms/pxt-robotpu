@@ -1,15 +1,19 @@
 
-# 🤖 Robot PU: Dynamic Talk Content (Cute Speech with Billy) Project Wiki
+# 🤖 Robot PU: Dynamic Talk Content Project Wiki
 
-Welcome to the official project repository for **Robot PU (Pair Up)**. Robot PU can speak using the **Billy** voice engine (via the Robot PU MakeCode extension).
+Welcome to the official project repository for **Robot PU (Pair Up)**. Robot PU expresses itself using its built-in **RoboVoice** melodic music engine — no extra library required.
+
+> **Want a real human voice?** `robotPuPro.talk()` plays a *melodic musical utterance* using the micro:bit speaker — it is **not** text-to-speech. If you need real synthesized speech, add the **[pxt-billy](https://github.com/adamish/pxt-billy)** extension to your project and call `billy.say(text)` instead.
 
 In this tutorial you will learn how to:
 
 1. Build a **talk content generator** (random + templated phrases)
 2. Associate talk content with **Robot PU mode** and **robot status**
-3. Speak it using:
-   1. `robotPuPro.talk(text)` (Billy text-to-speech)
-   2. `robotPuPro.sing(text)` (phonetic singing strings)
+3. Express it using:
+   1. `robotPuPro.talk(text)` — plays text as a melodic robotic tune (RoboVoice)
+   2. `robotPuPro.sing(text)` — plays a note-letter sequence (e.g. `"C D E F G "`)
+   3. `robotPuPro.morseText(text)` — translates plain text to morse and plays it
+   4. `billy.say(text)` *(optional, requires pxt-billy)* — real synthesized speech
 
 ---
 
@@ -17,11 +21,17 @@ In this tutorial you will learn how to:
 
 From the `pxt-robotpu` extension:
 
-* `robotPuPro.talk(text)`
-* `robotPuPro.sing(text)`
+* `robotPuPro.talk(text)` — melodic robotic voice (RoboVoice); auto-detects and plays morse strings
+* `robotPuPro.sing(text)` — note-letter sequence player (e.g. `"C D E F G "`)
+* `robotPuPro.morse(code, unitMs?)` — play ITU morse code beeps directly
+* `robotPuPro.morseText(text, unitMs?)` — translate plain text to morse and play it
 * `robotPuPro.mode()` → returns the current behavior mode
 * `robotPuPro.sonarDistanceCm()` → distance to obstacles
 * `robotPuPro.walk(...)`, `robotPuPro.explore()`, `robotPuPro.dance()`, etc.
+
+Optional (requires **pxt-billy** extension):
+
+* `billy.say(text)` — real synthesized human speech (SAM engine)
 
 From MakeCode:
 
@@ -153,11 +163,10 @@ function generateLine(intent: TalkIntent, distCm: number, loud: number): string 
     return pick(thinking) + " what should we do next, " + who + "?"
 }
 
-// Optional: tiny “sing tag” that makes speech feel musical
-function maybeSing(now: number, loud: number): void {
+// Optional: play a short morse exclamation when the robot is excited
+function maybeMorse(now: number, loud: number): void {
     if (loud > LOUD_LEVEL && Math.randomRange(0, 10) == 0) {
-        // This is not real pitch detection; it’s just a fun vocalization string.
-        robotPuPro.sing("#70REYY #62MIYY #58FAOR")
+        robotPuPro.morseText("HI", 60)   // plays .... ..
         lastTalkMs = now
     }
 }
@@ -178,7 +187,7 @@ basic.forever(function () {
     if (canTalk(now)) {
         const line = generateLine(intent, distCm, loud)
         say(now, line)
-        maybeSing(now, loud)
+        maybeMorse(now, loud)
     }
 
     basic.pause(50)

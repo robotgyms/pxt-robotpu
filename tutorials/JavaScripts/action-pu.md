@@ -40,9 +40,13 @@
  ### Non-motion actions (usually synchronous)
  
  - `robotPuPro.greet()`
- - `robotPuPro.talk(text)`
- - `robotPuPro.sing(text)`
+ - `robotPuPro.talk(text)` — plays text as a **melodic robotic tune** (RoboVoice); auto-detects morse strings
+ - `robotPuPro.sing(text)` — plays a note-letter sequence
+ - `robotPuPro.morse(code, unitMs?)` — plays ITU morse code beeps
+ - `robotPuPro.morseText(text, unitMs?)` — translates text to morse and plays it
  - `robotPuPro.setMode(mode)` (switch the internal behavior state machine)
+
+> **Real human speech:** `talk()` is a musical voice, not text-to-speech. For spoken words, add **[pxt-billy](https://github.com/adamish/pxt-billy)** and use `billy.say(text)`.
  
  ---
  

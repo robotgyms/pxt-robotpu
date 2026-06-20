@@ -300,7 +300,7 @@ function logUpdate(reward: number, efficiency: number, stability: number): void 
 // transition gst to -3 ("Help me") and interrupt the learning session.
 function waitForRecovery(): void {
     paused = true
-    robotPuPro.talk("I fell")
+    robotPuPro.talk("I fell")   // melodic voice; use billy.say() for real speech
     // pin API mode to block the internal state machine from taking over
     robotPuPro.setModeVar(robotPuPro.Mode.API)
     // wait until both tilt angles are safely upright

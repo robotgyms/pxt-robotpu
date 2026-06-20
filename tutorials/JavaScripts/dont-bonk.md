@@ -11,7 +11,7 @@ Welcome to the official project repository for **Robot PU (Pair Up)**. In this c
 
 * **Advanced Movement**: Walking, sidestepping, exploring, and performing motion sequences.
 * **Autopilot Intelligence**: Using sensors to navigate and avoid obstacles.
-* **Interactive AI**: Expressing behavior through motion, sounds, and speech.
+* **Interactive AI**: Expressing behavior through motion, sounds, and melodic voice (`robotPuPro.talk()` uses RoboVoice; add pxt-billy for real speech).
 
 ---
 

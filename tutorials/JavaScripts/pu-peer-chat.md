@@ -162,7 +162,7 @@ control.inBackground(function () {
 })
 
 robotPuPro.setChannel(166)
-robotPuPro.talk("Peer chat on!")
+robotPuPro.talk("Peer chat on!")   // melodic voice; use billy.say() with pxt-billy for real speech
 
 radio.onReceivedString(function (receivedString: string) {
     // Text API: isEmpty
