@@ -79,7 +79,7 @@ The MakeCode program uses three `basic.forever(...)` loops that run cooperativel
 
 - **Service refresh loop**: Re-enables image capture and soccer detection about every `30 s`. This helps recover if the camera firmware restarts.
 - **Detection loop**: Reads one `18` byte I2C packet and updates tracking state such as `yaw`, `pitch`, `walkSpeed`, and `walkTurn`.
-- **Action loop**: Continuously calls `robotPu.walk(walkSpeed, walkTurn)` using the latest computed command.
+- **Action loop**: Continuously calls `robotPuPro.walk(walkSpeed, walkTurn)` using the latest computed command.
 - **Talk loop**: Speaks a short phrase about the current soccer state every `5 s`.
 
 This separation is important because the robot must keep walking smoothly even when an I2C read is delayed or a camera packet is missing.
@@ -116,7 +116,7 @@ This is a simple low-pass filter. It mixes the previous turn command with the ne
 
 ## Head control
 
-The camera gives yaw and pitch errors, not absolute servo angles. The code adds a small correction to the current head target with `robotPu.servoStep`.
+The camera gives yaw and pitch errors, not absolute servo angles. The code adds a small correction to the current head target with `robotPuPro.servoStep`.
 
 The gain `0.6` controls how aggressively the head moves toward the ball in the validated program.
 
@@ -139,7 +139,7 @@ The search pattern moves the head through several yaw and pitch offsets. Each ti
 
 ## Fun factor: Robot PU talks
 
-To make the soccer behavior feel more alive, the program uses `robotPu.talk(...)` in two ways.
+To make the soccer behavior feel more alive, the program uses `robotPuPro.talk(...)` in two ways.
 
 - **State-change phrases**: When the camera first finds the ball, PU says `Soccer Ball`. When the ball has been lost long enough to start searching, PU says `Where is the ball?`.
 - **Looping soccer chatter**: A separate talk loop runs every `5 s`. If the ball is found, PU says `Kick and go go Goal`. If the ball is not found, PU says `Searching`.
@@ -259,11 +259,11 @@ function searchBall(searchPattern: { y: number, p: number }[]) {
         //     serial.writeLine("" + (`yawSearch: ${targetOffset.y * search_gain}`))
         //     serial.writeLine("" + (`pitchSearch: ${targetOffset.p * search_gain}`))
         // }
-        robotPu.setModeVar(robotPu.Mode.API)
-        robotPu.servoStep(robotPu.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
-        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
-        robotPu.leftEyeBright(0.002)
-        robotPu.rightEyeBright(0.002)
+        robotPuPro.setModeVar(robotPuPro.Mode.API)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
+        robotPuPro.leftEyeBright(0.002)
+        robotPuPro.rightEyeBright(0.002)
         return
     }
 
@@ -324,14 +324,14 @@ const SEARCH_PATTERN: { y: number, p: number }[] = [
     { y: 0, p: 0 }
 ]
 
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 // set servo trim to help robot balancing
-robotPu.setServoTrim(-5, 0, -5, 0, -9, 0)
+robotPuPro.setServoTrim(-5, 0, -5, 0, -9, 0)
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -342,7 +342,7 @@ input.onButtonPressed(Button.B, function () {
 })
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     // allow gamepad to trim servos to improve balancing
-    robotPu.toggleServoTrim()
+    robotPuPro.toggleServoTrim()
     basic.pause(500)
 })
 function i16(buf: Buffer, offset: number): number {
@@ -380,19 +380,19 @@ function trackBall(p: Buffer) {
             yaw = i8(p[16])
             pitch = i8(p[17])
             if (DEBUG_FLAG) {
-                // serial.writeLine(`head yaw: ${robotPu.ServoTargets()[4]}`)
+                // serial.writeLine(`head yaw: ${robotPuPro.ServoTargets()[4]}`)
                 //serial.writeLine(`yawLock ${yaw}`)
-                // serial.writeLine(`head pitch: ${robotPu.ServoTargets()[5]}`)
+                // serial.writeLine(`head pitch: ${robotPuPro.ServoTargets()[5]}`)
                 //serial.writeLine(`pitchLock: ${pitch}`)
                 serial.writeLine(`ball x: ${x_mm}`)
                 serial.writeLine(`ball y: ${y_mm}`)
             }
             // move head to look at the ball
-            robotPu.setModeVar(robotPu.Mode.API)
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.2, 8)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.2, 8)
-            robotPu.leftEyeBright(0.01)
-            robotPu.rightEyeBright(0.01)
+            robotPuPro.setModeVar(robotPuPro.Mode.API)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 8)
+            robotPuPro.leftEyeBright(0.01)
+            robotPuPro.rightEyeBright(0.01)
             // compute the speed and direction to walk toward the ball 
             // (simple method: forward based on range, turn based on yaw)
             // Note: tune these gains for your field and camera.
@@ -401,15 +401,15 @@ function trackBall(p: Buffer) {
             walkSpeed = Math.max(-3, Math.min(3, (y_mm - 100) * 0.015))
             walkTurn = Math.max(-0.7, Math.min(0.7, (walkTurn * 4 + yaw * -0.05) * 0.2))
             // cache head pitch/yaw
-            currentYaw = robotPu.ServoTargets()[4]
-            currentPitch = robotPu.ServoTargets()[5]
+            currentYaw = robotPuPro.ServoTargets()[4]
+            currentPitch = robotPuPro.ServoTargets()[5]
             if (DEBUG_FLAG) {
                 serial.writeLine(`walkSpeed: ${walkSpeed}`)
                 serial.writeLine(`walkTurn: ${walkTurn}`)
             }
             if (soccerFound == 0){
                 soccerFound = 1
-                robotPu.talk("Soccer Ball")
+                robotPuPro.talk("Soccer Ball")
             }
         } else if (currentTime - lastBallSeenTime < LOST_TIMEOUT_MS) {
             // follow through with decay for a short moment if the ball is lost from view
@@ -417,11 +417,11 @@ function trackBall(p: Buffer) {
             pitch *= 0.7
             walkSpeed *= 0.7
             walkTurn *= 0.7
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.2, 5)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 5)
             // cache head pitch/yaw
-            currentYaw = robotPu.ServoTargets()[4]
-            currentPitch = robotPu.ServoTargets()[5]
+            currentYaw = robotPuPro.ServoTargets()[4]
+            currentPitch = robotPuPro.ServoTargets()[5]
             if (DEBUG_FLAG) {
                 serial.writeLine(`walkSpeed: ${walkSpeed}`)
                 serial.writeLine(`walkTurn: ${walkTurn}`)
@@ -434,7 +434,7 @@ function trackBall(p: Buffer) {
             searchBall(SEARCH_PATTERN)
             if (soccerFound == 1){
                 soccerFound = 0
-                robotPu.talk("Where is the ball?")
+                robotPuPro.talk("Where is the ball?")
             }
         }
     }
@@ -471,8 +471,8 @@ basic.forever(function () {
 })
 
 // cache the head pitch and yaw angle
-currentYaw = robotPu.ServoTargets()[4]
-currentPitch = robotPu.ServoTargets()[5]
+currentYaw = robotPuPro.ServoTargets()[4]
+currentPitch = robotPuPro.ServoTargets()[5]
 
 // Soccer ball detection loop
 basic.forever(function () {
@@ -489,15 +489,15 @@ basic.forever(function () {
 // robot action loop
 basic.forever(function () {
     // use the computed walk speed and turn to move the robot
-    robotPu.walk(walkSpeed, walkTurn)
+    robotPuPro.walk(walkSpeed, walkTurn)
     basic.pause(5)
 })
 
 basic.forever(function(){
     if (soccerFound == 1) {
-        robotPu.talk("Kick and go go Goal")
+        robotPuPro.talk("Kick and go go Goal")
     } else {
-        robotPu.talk("Searching")
+        robotPuPro.talk("Searching")
     }
     basic.pause(5000)
 })

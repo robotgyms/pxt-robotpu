@@ -90,12 +90,12 @@ function act(fn: () => void, ms: number): BTNode {
 const DANGER_CM = 12
 
 const obstacleClose = cond(function () {
-    const d = robotPu.sonarDistanceCm()
+    const d = robotPuPro.sonarDistanceCm()
     return d > 0 && d < DANGER_CM
 })
 
-const backUp = act(function () { robotPu.back() }, 400)
-const walk = act(function () { robotPu.walk() }, 200)
+const backUp = act(function () { robotPuPro.back() }, 400)
+const walk = act(function () { robotPuPro.walk() }, 200)
 
 const root = selector([
     sequence([obstacleClose, backUp]),

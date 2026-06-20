@@ -8,8 +8,8 @@ In this tutorial you will learn how to:
 1. Build a **talk content generator** (random + templated phrases)
 2. Associate talk content with **Robot PU mode** and **robot status**
 3. Speak it using:
-   1. `robotPu.talk(text)` (Billy text-to-speech)
-   2. `robotPu.sing(text)` (phonetic singing strings)
+   1. `robotPuPro.talk(text)` (Billy text-to-speech)
+   2. `robotPuPro.sing(text)` (phonetic singing strings)
 
 ---
 
@@ -17,11 +17,11 @@ In this tutorial you will learn how to:
 
 From the `pxt-robotpu` extension:
 
-* `robotPu.talk(text)`
-* `robotPu.sing(text)`
-* `robotPu.mode()` → returns the current behavior mode
-* `robotPu.sonarDistanceCm()` → distance to obstacles
-* `robotPu.walk(...)`, `robotPu.explore()`, `robotPu.dance()`, etc.
+* `robotPuPro.talk(text)`
+* `robotPuPro.sing(text)`
+* `robotPuPro.mode()` → returns the current behavior mode
+* `robotPuPro.sonarDistanceCm()` → distance to obstacles
+* `robotPuPro.walk(...)`, `robotPuPro.explore()`, `robotPuPro.dance()`, etc.
 
 From MakeCode:
 
@@ -99,7 +99,7 @@ function canTalk(now: number): boolean {
 
 function say(now: number, text: string): void {
     lastTalkMs = now
-    robotPu.talk(text)
+    robotPuPro.talk(text)
 }
 
 // --- map robot state -> “intent” ---
@@ -112,12 +112,12 @@ enum TalkIntent {
     Idle
 }
 
-function intentFromState(mode: robotPu.Mode, distCm: number, loud: number): TalkIntent {
+function intentFromState(mode: robotPuPro.Mode, distCm: number, loud: number): TalkIntent {
     // Priority first
     if (distCm > 0 && distCm < VERY_NEAR_CM) return TalkIntent.Obstacle
-    if (mode == robotPu.Mode.Dance || loud > LOUD_LEVEL) return TalkIntent.Dancing
-    if (mode == robotPu.Mode.Explore) return TalkIntent.Exploring
-    if (mode == robotPu.Mode.Rest) return TalkIntent.Resting
+    if (mode == robotPuPro.Mode.Dance || loud > LOUD_LEVEL) return TalkIntent.Dancing
+    if (mode == robotPuPro.Mode.Explore) return TalkIntent.Exploring
+    if (mode == robotPuPro.Mode.Rest) return TalkIntent.Resting
     return TalkIntent.Idle
 }
 
@@ -157,7 +157,7 @@ function generateLine(intent: TalkIntent, distCm: number, loud: number): string 
 function maybeSing(now: number, loud: number): void {
     if (loud > LOUD_LEVEL && Math.randomRange(0, 10) == 0) {
         // This is not real pitch detection; it’s just a fun vocalization string.
-        robotPu.sing("#70REYY #62MIYY #58FAOR")
+        robotPuPro.sing("#70REYY #62MIYY #58FAOR")
         lastTalkMs = now
     }
 }
@@ -166,8 +166,8 @@ function maybeSing(now: number, loud: number): void {
 basic.forever(function () {
     const now = control.millis()
 
-    const mode = robotPu.mode()
-    const distCm = robotPu.sonarDistanceCm()
+    const mode = robotPuPro.mode()
+    const distCm = robotPuPro.sonarDistanceCm()
     const loud = input.soundLevel()
 
     const intent = intentFromState(mode, distCm, loud)

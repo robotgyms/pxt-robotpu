@@ -183,8 +183,8 @@ This gamepad controller uses a small “protocol” based on radio keys:
 
 On the Robot PU program, you typically listen with:
 
-- `radio.onReceivedValue((name, value) => robotPu.runKeyValueCommand(name, value))`
-- `radio.onReceivedString((s) => robotPu.runStringCommand(s))`
+- `radio.onReceivedValue((name, value) => robotPuPro.runKeyValueCommand(name, value))`
+- `radio.onReceivedString((s) => robotPuPro.runStringCommand(s))`
 
 ### B. Continuous steering (20ms loop)
 

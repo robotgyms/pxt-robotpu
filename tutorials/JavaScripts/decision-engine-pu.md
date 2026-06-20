@@ -234,11 +234,11 @@ return targetSpeed / 50
 basic.forever(function () {
 
     // Read center sonar bin
-    let d = robotPu.frontDistanceArray()[2]
+    let d = robotPuPro.frontDistanceArray()[2]
 
     // 1) Emergency stop
     if (d > 0 && d < EMERGENCY_STOP_CM) {
-        robotPu.walk(0, 0)
+        robotPuPro.walk(0, 0)
         basic.showIcon(IconNames.No)
         return
     }
@@ -246,7 +246,7 @@ basic.forever(function () {
     // 2) Obstacle avoidance override
     if (d > 0 && d < AVOID_CM) {
         // Turn away from obstacle (turn right)
-        robotPu.walk(1.0, AVOID_TURN)
+        robotPuPro.walk(1.0, AVOID_TURN)
         return
     }
 
@@ -254,7 +254,7 @@ basic.forever(function () {
     let fwd = computeFollowSpeed()
     let turn = computeFollowTurn()
 
-    robotPu.walk(fwd, turn)
+    robotPuPro.walk(fwd, turn)
     basic.pause(20)
 })
 ```
@@ -296,7 +296,7 @@ basic.forever(function () {
 
     // 2. Joystick Y speed (-100..100)
     // Forward = positive, backward = negative
-    let speed = robotPu.joystickY()
+    let speed = robotPuPro.joystickY()
 
     // 3. Pack into a simple string: "heading,speed"
     let msg = heading + "," + speed
@@ -342,8 +342,8 @@ Slow enough to avoid radio congestion
 - **Avoidance direction**
   - Current example always turns right.
   - If you want smarter avoidance, read left vs right bins:
-    - `robotPu.frontDistanceArray()[1]` (left-ish)
-    - `robotPu.frontDistanceArray()[3]` (right-ish)
+    - `robotPuPro.frontDistanceArray()[1]` (left-ish)
+    - `robotPuPro.frontDistanceArray()[3]` (right-ish)
     - Turn toward the side with more space.
 
 ## Troubleshooting

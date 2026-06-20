@@ -5,7 +5,7 @@ Robot PU can communicate “emotions” using:
 
 - **Eye brightness + blink patterns**
 - **Body language** (rest / stand / walk / explore / dance / head gestures)
-- Optional **speech** (`robotPu.talk(...)`)
+- Optional **speech** (`robotPuPro.talk(...)`)
 
 In this tutorial you will build a simple pipeline:
 
@@ -29,7 +29,7 @@ In this tutorial you will build a simple pipeline:
 
 Robot PU projects typically have access to these signals:
 
-* **Distance to obstacles**: `robotPu.sonarDistanceCm()`
+* **Distance to obstacles**: `robotPuPro.sonarDistanceCm()`
 * **Sound / noise level**: `input.soundLevel()`
 * **Falls / instability**: `input.isGesture(Gesture.FreeFall)`
 * **Time**: `control.millis()`
@@ -59,8 +59,8 @@ Important idea:
 
 Robot PU exposes public eye controls:
 
-* `robotPu.leftEyeBright(brightness)` where `brightness` is `0..1`
-* `robotPu.rightEyeBright(brightness)` where `brightness` is `0..1`
+* `robotPuPro.leftEyeBright(brightness)` where `brightness` is `0..1`
+* `robotPuPro.rightEyeBright(brightness)` where `brightness` is `0..1`
 
 We’ll implement blinks using brightness pulses.
 
@@ -78,11 +78,11 @@ Examples:
 
 We’ll map emotions to actions such as:
 
-* `robotPu.rest()` / `robotPu.stand()`
-* `robotPu.explore()` (slow wandering)
-* `robotPu.dance()` (high-energy)
-* Head gestures using `robotPu.servo(robotPu.ServoJoint.HeadYaw, angle)` / `HeadPitch`
-* Optional voice: `robotPu.talk("...")`
+* `robotPuPro.rest()` / `robotPuPro.stand()`
+* `robotPuPro.explore()` (slow wandering)
+* `robotPuPro.dance()` (high-energy)
+* Head gestures using `robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, angle)` / `HeadPitch`
+* Optional voice: `robotPuPro.talk("...")`
 
 Note:
 
@@ -122,8 +122,8 @@ let lastBlinkMs = 0
 let blinkPhase = 0
 
 function setEyes(b: number): void {
-    robotPu.leftEyeBright(b)
-    robotPu.rightEyeBright(b)
+    robotPuPro.leftEyeBright(b)
+    robotPuPro.rightEyeBright(b)
 }
 
 function blinkPattern(now: number): void {
@@ -204,22 +204,22 @@ function chooseEmotion(now: number, distCm: number, loud: number, fell: boolean)
 function applyBodyLanguage(now: number, distCm: number, loud: number): void {
     // Emotion -> actions
     if (emotion == Emotion.Calm) {
-        robotPu.rest()
+        robotPuPro.rest()
     } else if (emotion == Emotion.Curious) {
         // Look left/right while staying mostly still
         const yaw = 90 + Math.round(20 * Math.sin(now / 500))
-        robotPu.servo(robotPu.ServoJoint.HeadYaw, yaw)
-        robotPu.stand()
+        robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, yaw)
+        robotPuPro.stand()
     } else if (emotion == Emotion.Scared) {
         // Back away / turn away from obstacle
-        robotPu.walk(-1.2, 0)
+        robotPuPro.walk(-1.2, 0)
     } else if (emotion == Emotion.Excited) {
         // Dance when the crowd is loud
-        robotPu.dance()
+        robotPuPro.dance()
     } else if (emotion == Emotion.Sad) {
         // “Low energy” posture + small head droop
-        robotPu.servo(robotPu.ServoJoint.HeadPitch, 120)
-        robotPu.rest()
+        robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 120)
+        robotPuPro.rest()
     }
 }
 
@@ -227,7 +227,7 @@ basic.forever(function () {
     const now = control.millis()
 
     // Environment signals
-    const distCm = robotPu.sonarDistanceCm()
+    const distCm = robotPuPro.sonarDistanceCm()
     const loud = input.soundLevel()
     const fell = input.isGesture(Gesture.FreeFall)
 
@@ -243,7 +243,7 @@ basic.forever(function () {
         lastEmotionChange = now
 
         // Optional: say the emotion
-        // robotPu.talk("" + emotion)
+        // robotPuPro.talk("" + emotion)
     }
 
     // Express emotion

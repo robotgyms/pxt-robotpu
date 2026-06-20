@@ -54,8 +54,8 @@ The most important rule is:
 
 Use the Robot PU servo controller outputs:
 
-- `robotPu.ServoJoint.Reserve1`
-- `robotPu.ServoJoint.Reserve2`
+- `robotPuPro.ServoJoint.Reserve1`
+- `robotPuPro.ServoJoint.Reserve2`
 
 These are typically powered from the board’s servo supply (**often 5V**), which is why they usually feel stronger.
 
@@ -100,37 +100,37 @@ Paste this into the **JavaScript** tab in MakeCode.
 
 ```javascript
 function ArmUp () {
-    robotPu.servo(robotPu.ServoJoint.Reserve1, 0)
-    robotPu.servo(robotPu.ServoJoint.Reserve2, 180)
+    robotPuPro.servo(robotPuPro.ServoJoint.Reserve1, 0)
+    robotPuPro.servo(robotPuPro.ServoJoint.Reserve2, 180)
     pins.servoWritePin(AnalogPin.P14, 135)
     pins.servoWritePin(AnalogPin.P15, 45)
-    robotPu.talk("Up Up Up!")
+    robotPuPro.talk("Up Up Up!")
 }
 
 function ArmDown () {
-    robotPu.servo(robotPu.ServoJoint.Reserve1, 180)
-    robotPu.servo(robotPu.ServoJoint.Reserve2, 0)
+    robotPuPro.servo(robotPuPro.ServoJoint.Reserve1, 180)
+    robotPuPro.servo(robotPuPro.ServoJoint.Reserve2, 0)
     pins.servoWritePin(AnalogPin.P14, 45)
     pins.servoWritePin(AnalogPin.P15, 135)
-    robotPu.talk("Done Done Done!")
+    robotPuPro.talk("Done Done Done!")
 }
 
 function RestArm () {
-    robotPu.servo(robotPu.ServoJoint.Reserve1, 90)
-    robotPu.servo(robotPu.ServoJoint.Reserve2, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.Reserve1, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.Reserve2, 90)
     pins.servoWritePin(AnalogPin.P14, 0)
     pins.servoWritePin(AnalogPin.P15, 180)
 }
 
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
-robotPu.setServoTrim(
+robotPuPro.setServoTrim(
     0,
     0,
     0,
@@ -182,7 +182,7 @@ basic.forever(function () {
   - Avoid `0`/`180` if your linkage is near a hard stop.
 - **Nothing moves**
   - Double-check that the correct joints are used:
-    - I2C: `robotPu.ServoJoint.Reserve1` / `Reserve2`
+    - I2C: `robotPuPro.ServoJoint.Reserve1` / `Reserve2`
     - Pins: `AnalogPin.P14` / `AnalogPin.P15`
 
 ---

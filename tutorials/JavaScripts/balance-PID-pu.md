@@ -6,7 +6,7 @@ This tutorial explains feedback control (P/PI/PD/PID) and shows how to apply a l
 
 - micro:bit tilt sensing (`input.rotation(...)`)
 - Robot PU control bias keys: `#puroll` and `#pupitch`
-- normal behaviors: `robotPu.walk(...)` and `robotPu.dance()`
+- normal behaviors: `robotPuPro.walk(...)` and `robotPuPro.dance()`
 
 ## Feedback control: the idea
 
@@ -119,11 +119,11 @@ basic.forever(function () {
     uPitch = Math.constrain(uPitch, -OUT_LIMIT, OUT_LIMIT)
 
     // Apply bias into the stabilizer
-    robotPu.runKeyValueCommand("#puroll", uRoll)
-    robotPu.runKeyValueCommand("#pupitch", uPitch)
+    robotPuPro.runKeyValueCommand("#puroll", uRoll)
+    robotPuPro.runKeyValueCommand("#pupitch", uPitch)
 
     // Gentle walking command (avoid sharp turns on uneven ground)
-    robotPu.walk(0.9, 0.10)
+    robotPuPro.walk(0.9, 0.10)
     basic.pause(20)
 })
 ```
@@ -151,8 +151,8 @@ basic.forever(function () {
 
     // Safety guard
     if (Math.max(Math.abs(roll), Math.abs(pitch)) >= TILT_RECOVER) {
-        robotPu.walk(0, 0)
-        robotPu.rest()
+        robotPuPro.walk(0, 0)
+        robotPuPro.rest()
         basic.pause(150)
         return
     }
@@ -163,10 +163,10 @@ basic.forever(function () {
     uRoll = Math.constrain(uRoll, -OUT_LIMIT, OUT_LIMIT)
     uPitch = Math.constrain(uPitch, -OUT_LIMIT, OUT_LIMIT)
 
-    robotPu.runKeyValueCommand("#puroll", uRoll)
-    robotPu.runKeyValueCommand("#pupitch", uPitch)
+    robotPuPro.runKeyValueCommand("#puroll", uRoll)
+    robotPuPro.runKeyValueCommand("#pupitch", uPitch)
 
-    robotPu.dance()
+    robotPuPro.dance()
     basic.pause(20)
 })
 ```

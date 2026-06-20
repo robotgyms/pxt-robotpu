@@ -6,7 +6,7 @@ Use reinforcement learning to make robot PU learn skating.
 ## Reward function
 
 - Reward forward momentum by accumulating positive Y acceleration from the IMU.
-- Penalize falling down when `robotPu.bodyPitch()` or `robotPu.bodyRoll()` exceeds 60 degrees.
+- Penalize falling down when `robotPuPro.bodyPitch()` or `robotPuPro.bodyRoll()` exceeds 60 degrees.
 
 ## Parameters to tune
 
@@ -130,7 +130,7 @@ spsaPhase 2  →  run candidate params,    collect r_new,    keep or revert
 After phase 2, a new random `delta` is drawn and phase resets to 0.
 
 ```javascript
-robotPu.setServoTrim(-6, -5, -6, -5, -8, 0)
+robotPuPro.setServoTrim(-6, -5, -6, -5, -8, 0)
 
 // --- Gait parameters [w_t, l_t, s_t, h_t, speedGain] ---
 let params =     [18,  45,  15,  35,  2.0]
@@ -173,25 +173,25 @@ function rebuildGaits(): void {
 function skate(speedGain: number): void {
     switch (gaitState) {
         case 0:
-            if (robotPu.moveServos(skates1, skateSpeed1, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
+            if (robotPuPro.moveServos(skates1, skateSpeed1, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
                 gaitState += 1
                 gaitState = gaitState % 4
             }
             break
         case 1:
-            if (robotPu.moveServos(skates2, skateSpeed1, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
+            if (robotPuPro.moveServos(skates2, skateSpeed1, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
                 gaitState += 1
                 gaitState = gaitState % 4
             }
             break
         case 2:
-            if (robotPu.moveServos(skates3, skateSpeed2, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
+            if (robotPuPro.moveServos(skates3, skateSpeed2, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
                 gaitState += 1
                 gaitState = gaitState % 4
             }
             break
         case 3:
-            if (robotPu.moveServos(skates4, skateSpeed2, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
+            if (robotPuPro.moveServos(skates4, skateSpeed2, [0, 1, 2, 3], speedGain, [4, 5], speedGain) == true) {
                 gaitState += 1
                 gaitState = gaitState % 4
             }
@@ -300,18 +300,18 @@ function logUpdate(reward: number, efficiency: number, stability: number): void 
 // transition gst to -3 ("Help me") and interrupt the learning session.
 function waitForRecovery(): void {
     paused = true
-    robotPu.talk("I fell")
+    robotPuPro.talk("I fell")
     // pin API mode to block the internal state machine from taking over
-    robotPu.setModeVar(robotPu.Mode.API)
+    robotPuPro.setModeVar(robotPuPro.Mode.API)
     // wait until both tilt angles are safely upright
-    while (Math.abs(robotPu.bodyPitch()) > 20 || Math.abs(robotPu.bodyRoll()) > 20) {
+    while (Math.abs(robotPuPro.bodyPitch()) > 20 || Math.abs(robotPuPro.bodyRoll()) > 20) {
         basic.pause(200)
-        robotPu.setModeVar(robotPu.Mode.API)  // re-pin each poll in case it got reset
+        robotPuPro.setModeVar(robotPuPro.Mode.API)  // re-pin each poll in case it got reset
     }
     // small extra pause to let the robot settle after being placed
     basic.pause(1000)
     paused = false
-    robotPu.talk("Ready")
+    robotPuPro.talk("Ready")
 }
 
 // --- Loop 1: gait execution + per-tick reward sampling ---
@@ -346,7 +346,7 @@ basic.forever(function () {
     rewardAcc += effTick + stabTick
 
     // fall detection: add penalty to stability and signal Loop 2 to stop and recover
-    if (Math.abs(robotPu.bodyPitch()) > 45 || Math.abs(robotPu.bodyRoll()) > 45) {
+    if (Math.abs(robotPuPro.bodyPitch()) > 45 || Math.abs(robotPuPro.bodyRoll()) > 45) {
         stabilityAcc -= 500
         rewardAcc -= 500
         fell = true
@@ -418,7 +418,7 @@ control.inBackground(function () {
             if (rNew > bestReward) {
                 bestReward = rNew
                 for (let i = 0; i < 5; i++) bestParams[i] = params[i]
-                robotPu.talk("Better")
+                robotPuPro.talk("Better")
             } else {
                 for (let i = 0; i < 5; i++) params[i] = bestParams[i]
                 rebuildGaits()
@@ -440,5 +440,5 @@ control.inBackground(function () {
 // Print CSV header so the serial log is self-labelled.
 // Columns: step, reward, efficiency, stability, w_t, l_t, s_t, h_t, speedGain*100
 serial.writeLine("step,reward,efficiency,stability,w_t,l_t,s_t,h_t,speedGain100")
-robotPu.talk("Learning to skate")
+robotPuPro.talk("Learning to skate")
 ```

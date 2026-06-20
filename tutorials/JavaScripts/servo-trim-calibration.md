@@ -86,22 +86,22 @@
  This program:
  
  - Forwards radio commands to Robot PU (`runStringCommand` / `runKeyValueCommand`).
- - Pressing the micro:bit **logo button on Robot PU’s head** (not the gamepad) toggles trim mode (`robotPu.toggleServoTrim()`).
+ - Pressing the micro:bit **logo button on Robot PU’s head** (not the gamepad) toggles trim mode (`robotPuPro.toggleServoTrim()`).
  - Prints the trim array over serial so you can record your final numbers.
  
  ```javascript
  radio.onReceivedString(function (receivedString) {
-     robotPu.runStringCommand(receivedString)
+     robotPuPro.runStringCommand(receivedString)
  })
  radio.onReceivedValue(function (name, value) {
-     robotPu.runKeyValueCommand(name, value)
+     robotPuPro.runKeyValueCommand(name, value)
  })
  input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-     robotPu.toggleServoTrim()
+     robotPuPro.toggleServoTrim()
  })
- robotPu.setChannel(166)
+ robotPuPro.setChannel(166)
  basic.forever(function () {
-     serial.writeLine("Servo Trim = " + robotPu.ServoTrims().join(", "))
+     serial.writeLine("Servo Trim = " + robotPuPro.ServoTrims().join(", "))
      basic.pause(500)
  })
  ```

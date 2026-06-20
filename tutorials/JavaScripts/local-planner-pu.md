@@ -10,7 +10,7 @@ This tutorial uses a simple **scoring function** over a small set of candidate a
 
 ## Prerequisites
 
-- Basic sensor usage (`robotPu.sonarDistanceCm()` or `robotPu.frontDistanceArray()`)
+- Basic sensor usage (`robotPuPro.sonarDistanceCm()` or `robotPuPro.frontDistanceArray()`)
 
 ---
 
@@ -45,7 +45,7 @@ function scoreTurn(d: number): number {
 }
 
 basic.forever(function () {
-    const d = robotPu.sonarDistanceCm()
+    const d = robotPuPro.sonarDistanceCm()
 
     const sF = scoreForward(d)
     const sL = scoreTurn(d)
@@ -59,10 +59,10 @@ basic.forever(function () {
     if (sR > best) { best = sR; action = 2 }
     if (sB > best) { best = sB; action = 3 }
 
-    if (action == 0) robotPu.walk()
-    else if (action == 1) robotPu.left()
-    else if (action == 2) robotPu.right()
-    else robotPu.back()
+    if (action == 0) robotPuPro.walk()
+    else if (action == 1) robotPuPro.left()
+    else if (action == 2) robotPuPro.right()
+    else robotPuPro.back()
 
     basic.pause(80)
 })

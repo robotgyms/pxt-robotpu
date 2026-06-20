@@ -210,15 +210,15 @@ Note: The `configure` function usually takes four arguments: (`pitch`, `speed`, 
 
 ```typescript
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 let pulseDelay = 0
 let pitch = 0
 let distance = 0
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 billy.configureVoice(
 80,
 95,
@@ -253,8 +253,8 @@ basic.forever(function () {
     basic.pause(2000)
 })
 basic.forever(function () {
-    distance = robotPu.sonarDistanceCm()
-    robotPu.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    distance = robotPuPro.sonarDistanceCm()
+    robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
     basic.pause(10)
 })
 

@@ -461,12 +461,12 @@ function onBeatMotion(): void {
 
     // Big accent move
     for (let i = 0; i < 120; i++) {
-        robotPu.jump()
+        robotPuPro.jump()
     }
 
     // Change style every 8 beats
     if (beatCount % 8 == 0) {
-        robotPu.talk("yeah")
+        robotPuPro.talk("yeah")
     }
 }
 
@@ -479,14 +479,14 @@ basic.forever(function () {
         onBeatMotion()
     } else {
         // Between beats: continuous motion
-        robotPu.dance()
+        robotPuPro.dance()
     }
 })
 ```
 
 Notes:
 
-- `robotPu.dance()` is already music-reactive internally, but adding your own beat clock lets you design choreography.
+- `robotPuPro.dance()` is already music-reactive internally, but adding your own beat clock lets you design choreography.
 - If jump is too aggressive, replace it with short bursts of `walk(...)`, `sideStep(...)`, or `stand()`.
 
 ## Testing

@@ -62,7 +62,7 @@ let cy = 4
 const DANGER_CM = 20
 
 basic.forever(function () {
-    const d = robotPu.sonarDistanceCm()
+    const d = robotPuPro.sonarDistanceCm()
     const heading = input.compassHeading()
 
     // Very rough "forward direction" into 4 bins
@@ -79,9 +79,9 @@ basic.forever(function () {
     // Mark obstacle cell if close
     if (d > 0 && d < DANGER_CM) {
         setCell(cx + dx, cy + dy, 2)
-        robotPu.back()
+        robotPuPro.back()
     } else {
-        robotPu.walk()
+        robotPuPro.walk()
     }
 
     // Render a 5x5 window centered on (cx,cy)

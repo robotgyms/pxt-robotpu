@@ -30,7 +30,7 @@ This lesson explains how Robot PU moves using multiple servos, why it uses an **
 
 When your robot program gets bigger, “raw motor commands” become hard to read:
 
-- lots of repeated `robotPu.servo(...)` calls
+- lots of repeated `robotPuPro.servo(...)` calls
 - lots of magic numbers (angles, delays)
 - easy to accidentally move joints in the wrong order
 
@@ -45,18 +45,18 @@ Goals for a good motor API:
 
 ### 0.1) Joint list helper
 
-Robot PU public API controls individual joints with `robotPu.servo(joint, angle)`.
+Robot PU public API controls individual joints with `robotPuPro.servo(joint, angle)`.
 
 Define a single canonical joint order and reuse it everywhere.
 
 ```typescript
-const JOINTS: robotPu.ServoJoint[] = [
-    robotPu.ServoJoint.LeftFoot,
-    robotPu.ServoJoint.LeftLeg,
-    robotPu.ServoJoint.RightFoot,
-    robotPu.ServoJoint.RightLeg,
-    robotPu.ServoJoint.HeadYaw,
-    robotPu.ServoJoint.HeadPitch
+const JOINTS: robotPuPro.ServoJoint[] = [
+    robotPuPro.ServoJoint.LeftFoot,
+    robotPuPro.ServoJoint.LeftLeg,
+    robotPuPro.ServoJoint.RightFoot,
+    robotPuPro.ServoJoint.RightLeg,
+    robotPuPro.ServoJoint.HeadYaw,
+    robotPuPro.ServoJoint.HeadPitch
 ]
 ```
 
@@ -73,7 +73,7 @@ function applyPose(angles: number[]): void {
     const n = Math.min(JOINTS.length, angles.length)
     for (let i = 0; i < n; i++) {
         const a = clampInt(Math.round(angles[i]), 0, 180)
-        robotPu.servo(JOINTS[i], a)
+        robotPuPro.servo(JOINTS[i], a)
     }
 }
 ```
@@ -263,38 +263,38 @@ Here is an example to make the robot go to positions one by one.
 
 Key ideas:
 
-- `robotPu.setMode(robotPu.Mode.API)` tells the robot you are directly commanding joints (instead of running walk/dance state machines).
-- The `radio.onReceived...` handlers are optional. They are only needed if you want to also control the robot from a gamepad/remote using `robotPu.runStringCommand(...)` and `robotPu.runKeyValueCommand(...)`.
-- `robotPu.setChannel(166)` must match your controller/gamepad radio channel.
-- use `robotPu.servo()` to move each servo
+- `robotPuPro.setMode(robotPuPro.Mode.API)` tells the robot you are directly commanding joints (instead of running walk/dance state machines).
+- The `radio.onReceived...` handlers are optional. They are only needed if you want to also control the robot from a gamepad/remote using `robotPuPro.runStringCommand(...)` and `robotPuPro.runKeyValueCommand(...)`.
+- `robotPuPro.setChannel(166)` must match your controller/gamepad radio channel.
+- use `robotPuPro.servo()` to move each servo
 - use `pause()` to allow time for the movement to happen
 
 ```typescript
 function pos1 () {
-    robotPu.setMode(robotPu.Mode.API)
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, 90)
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
-    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadPitch, 90)
+    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 90)
 }
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 function pos2 () {
-    robotPu.setMode(robotPu.Mode.API)
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, 71)
-    robotPu.servo(robotPu.ServoJoint.RightFoot, 70)
-    robotPu.servo(robotPu.ServoJoint.RightLeg, 71)
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, 70)
-    robotPu.servo(robotPu.ServoJoint.HeadPitch, 72)
+    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 70)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 71)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 70)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightLeg, 71)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 70)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 72)
 }
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 basic.forever(function () {
     pos1()
     basic.pause(500)
@@ -487,12 +487,12 @@ function pos1 () {
     basic.showNumber(1)
     resetErr()
     while (!(allErrZero())) {
-        leftFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftFoot, 90, 2)
-        leftLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftLeg, 90, 4)
-        rightFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightFoot, 90, 2)
-        rightLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 90, 4)
-        headPitchErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadPitch, 90, 3)
-        headYawErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadYaw, 90, 1)
+        leftFeetErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.LeftFoot, 90, 2)
+        leftLegErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.LeftLeg, 90, 4)
+        rightFeetErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightFoot, 90, 2)
+        rightLegErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightLeg, 90, 4)
+        headPitchErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.HeadPitch, 90, 3)
+        headYawErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.HeadYaw, 90, 1)
         basic.pause(20)
     }
 }
@@ -503,12 +503,12 @@ function pos2 () {
     basic.showNumber(2)
     resetErr()
     while (!(allErrZero())) {
-        leftFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftFoot, 70, 4)
-        leftLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftLeg, 71, 2)
-        rightFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightFoot, 70, 4)
-        rightLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 71, 2)
-        headPitchErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadPitch, 70, 1)
-        headYawErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadYaw, 72, 3)
+        leftFeetErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.LeftFoot, 70, 4)
+        leftLegErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.LeftLeg, 71, 2)
+        rightFeetErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightFoot, 70, 4)
+        rightLegErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightLeg, 71, 2)
+        headPitchErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.HeadPitch, 70, 1)
+        headYawErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.HeadYaw, 72, 3)
         basic.pause(20)
     }
 }
@@ -526,7 +526,7 @@ let rightLegErr = 0
 let rightFeetErr = 0
 let leftLegErr = 0
 let leftFeetErr = 0
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 basic.forever(function () {
     pos1()
     pos2()
@@ -539,12 +539,12 @@ function pose(target: number [], step: number [], pauseMS: number) {
     basic.showNumber(1)
     resetErr()
     while (!(allErrZero())) {
-        leftFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftFoot, target[0], step[0])
-        leftLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.LeftLeg, target[1], step[1])
-        rightFeetErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightFoot, target[2], step[2])
-        rightLegErr = robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, target[3], step[3])
-        headPitchErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadPitch, target[4], step[4])
-        headYawErr = robotPu.servoStepStatus(robotPu.ServoJoint.HeadYaw, target[5], step[5])
+        leftFeetErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.LeftFoot, target[0], step[0])
+        leftLegErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.LeftLeg, target[1], step[1])
+        rightFeetErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightFoot, target[2], step[2])
+        rightLegErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightLeg, target[3], step[3])
+        headPitchErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.HeadPitch, target[4], step[4])
+        headYawErr = robotPuPro.servoStepStatus(robotPuPro.ServoJoint.HeadYaw, target[5], step[5])
         basic.pause(pauseMS)
     }
 }
@@ -566,7 +566,7 @@ let rightLegErr = 0
 let rightFeetErr = 0
 let leftLegErr = 0
 let leftFeetErr = 0
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 let targets : number [][] = [[90,90,90,90,90,90], [70,72,70,72,71,75]]
 let stepSizes: number [][] = [[1,1,1,1,1,1],[1,2,1,2,1,1]]
 basic.forever(function () {
@@ -746,12 +746,12 @@ This example shows how to create **slow, steady, “flowing” motions** (Kungfu
 
 You’ll typically combine 3 APIs:
 
-1. **`robotPu.servo(joint, angle)`**
+1. **`robotPuPro.servo(joint, angle)`**
    - Sets a joint immediately to an angle (good for resetting to a known starting pose).
-2. **`robotPu.servoStep(joint, targetAngle, speed)`**
+2. **`robotPuPro.servoStep(joint, targetAngle, speed)`**
    - Moves the joint gradually toward `targetAngle`.
    - Smaller `speed` values produce slower / smoother motion.
-3. **`robotPu.servoStepStatus(joint, targetAngle, speed)`**
+3. **`robotPuPro.servoStepStatus(joint, targetAngle, speed)`**
    - Returns `0` when the joint has reached the target, otherwise non‑zero.
    - Useful for building “move-until-finished” loops while you simultaneously step other joints.
 
@@ -775,46 +775,46 @@ https://makecode.microbit.org/#pub:40302-28555-29408-09924
 
 ```javascript
 function Stand () {
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, 90)
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
-    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadPitch, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 90)
 }
 function Yoga3 () {
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
-    while (robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 170, 0.05) != 0) {
-        robotPu.servoStep(robotPu.ServoJoint.HeadYaw, 135, 0.05)
-        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, 60, 0.05)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 70)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 90)
+    while (robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightLeg, 170, 0.05) != 0) {
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, 135, 0.05)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, 60, 0.05)
     }
 }
 function Yoga () {
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.RightFoot, 0)
-    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadPitch, 30)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 70)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 0)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 30)
 }
 function Yoga2 () {
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, 70)
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.RightFoot, 90)
-    while (robotPu.servoStepStatus(robotPu.ServoJoint.RightLeg, 20, 0.05) != 0) {
-        robotPu.servoStep(robotPu.ServoJoint.HeadYaw, 45, 0.05)
-        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, 90, 0.05)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 70)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 90)
+    while (robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightLeg, 20, 0.05) != 0) {
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, 45, 0.05)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, 90, 0.05)
     }
 }
 function Jump () {
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, 100)
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.RightFoot, 45)
-    robotPu.servo(robotPu.ServoJoint.RightLeg, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, 90)
-    robotPu.servo(robotPu.ServoJoint.HeadPitch, 30)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 100)
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 45)
+    robotPuPro.servo(robotPuPro.ServoJoint.RightLeg, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 90)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 30)
 }
 basic.forever(function () {
     Stand()

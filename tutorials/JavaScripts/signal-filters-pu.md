@@ -15,7 +15,7 @@ This tutorial introduces the most useful filter types and then upgrades the **ri
 The extension exposes a 5-bin “front scan”:
 
 ```typescript
-const d = robotPu.frontDistanceArray()
+const d = robotPuPro.frontDistanceArray()
 // d[0] far left
 // d[1] left
 // d[2] center/front
@@ -72,7 +72,7 @@ function movingAverage(x: number): number {
 }
 
 basic.forever(function () {
-    const d = robotPu.frontDistanceArray()
+    const d = robotPuPro.frontDistanceArray()
     const frontRaw = d[2]
     const frontFiltered = movingAverage(frontRaw)
     serial.writeValue("front", frontFiltered)
@@ -98,7 +98,7 @@ function ema(prev: number, x: number, a: number): number {
 }
 
 basic.forever(function () {
-    const d = robotPu.frontDistanceArray()
+    const d = robotPuPro.frontDistanceArray()
     const rightRaw = d[4]
     rightFiltered = ema(rightFiltered, rightRaw, ALPHA)
     serial.writeValue("right", rightFiltered)
@@ -121,11 +121,11 @@ function median3(a: number, b: number, c: number): number {
 
 basic.forever(function () {
     // take 3 readings (spaced slightly) and median-filter the front bin
-    const a = robotPu.frontDistanceArray()[2]
+    const a = robotPuPro.frontDistanceArray()[2]
     basic.pause(10)
-    const b = robotPu.frontDistanceArray()[2]
+    const b = robotPuPro.frontDistanceArray()[2]
     basic.pause(10)
-    const c = robotPu.frontDistanceArray()[2]
+    const c = robotPuPro.frontDistanceArray()[2]
 
     const frontMed = median3(a, b, c)
     serial.writeValue("front_med", frontMed)
@@ -145,7 +145,7 @@ const ALPHA_LPF = 0.75
 const BETA = 0.55
 
 basic.forever(function () {
-    const raw = robotPu.frontDistanceArray()[2]
+    const raw = robotPuPro.frontDistanceArray()[2]
     frontLPF = frontLPF + (1 - ALPHA_LPF) * (raw - frontLPF)
     const blended = BETA * raw + (1 - BETA) * frontLPF
     serial.writeValue("front_blend", blended)
@@ -260,7 +260,7 @@ function max2(a: number, b: number): number {
 function driveFor(ms: number, speed: number, turn: number): void {
     const t0 = control.millis()
     while (control.millis() - t0 < ms) {
-        robotPu.walk(speed, turn)
+        robotPuPro.walk(speed, turn)
         basic.pause(10)
     }
 }
@@ -285,11 +285,11 @@ function turnAround(): void {
 
 function filteredBins(): number[] {
     // sample 3 frames for median
-    const a = robotPu.frontDistanceArray()
+    const a = robotPuPro.frontDistanceArray()
     basic.pause(5)
-    const b = robotPu.frontDistanceArray()
+    const b = robotPuPro.frontDistanceArray()
     basic.pause(5)
-    const c = robotPu.frontDistanceArray()
+    const c = robotPuPro.frontDistanceArray()
 
     const out: number[] = [0, 0, 0, 0, 0]
     for (let i = 0; i < 5; i++) {

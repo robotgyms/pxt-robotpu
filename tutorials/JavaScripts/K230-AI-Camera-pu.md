@@ -116,7 +116,7 @@ function clamp(x: number, lo: number, hi: number): number {
 function updateInteraction(): void {
     if (!humanSeen) {
         greeted = false
-        robotPu.explore()
+        robotPuPro.explore()
         return
     }
 
@@ -131,11 +131,11 @@ function updateInteraction(): void {
     else if (humanSize < 0.7) speed = 0.6
     else speed = 0
 
-    robotPu.walk(speed, turn)
+    robotPuPro.walk(speed, turn)
 
     // If we are roughly centered and close enough, greet once
     if (!greeted && Math.abs(humanX) < 0.2 && humanSize > 0.6) {
-        robotPu.greet()
+        robotPuPro.greet()
         greeted = true
     }
 }
@@ -189,7 +189,7 @@ Ideas that work well on Robot PU:
 - **Turn-to-face**: always turn toward the detected human (small turn gain)
 - **Approach-with-personal-space**: move forward until `humanSize` crosses a “comfortable” limit
 - **Recognize-and-greet**: if the model provides IDs, greet differently per ID
-- **Attention idle**: if no person is seen for N seconds, switch to `robotPu.explore()`
+- **Attention idle**: if no person is seen for N seconds, switch to `robotPuPro.explore()`
 
 ---
 

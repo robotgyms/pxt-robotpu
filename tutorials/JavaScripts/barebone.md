@@ -24,7 +24,7 @@ You will program PU’s micro:bit to:
 
 ## Load the Robot PU MakeCode Extension
 
-To use the `robotPu.*` blocks/APIs, you must add the Robot PU extension into your MakeCode project.
+To use the `robotPuPro.*` blocks/APIs, you must add the Robot PU extension into your MakeCode project.
 
 1. Open the MakeCode editor: https://makecode.microbit.org/
 2. Create a **New Project** (or open your existing one).
@@ -35,32 +35,32 @@ To use the `robotPu.*` blocks/APIs, you must add the Robot PU extension into you
 
 5. Select the extension to add it to your project.
 
-After that, the editor will recognize calls like `robotPu.setChannel(...)` and `robotPu.runStringCommand(...)`.
+After that, the editor will recognize calls like `robotPuPro.setChannel(...)` and `robotPuPro.runStringCommand(...)`.
 
 ---
 
 ## Code (copy into MakeCode JavaScript)
 
 ```typescript
-robotPu.setServoTrim(-5, -2, -5, 7, -8, 0)
+robotPuPro.setServoTrim(-5, -2, -5, 7, -8, 0)
 radio.onReceivedValue(function(name: string, value: number) {
-  robotPu.runKeyValueCommand(name,value)
+  robotPuPro.runKeyValueCommand(name,value)
 })
 
 radio.onReceivedString(function(receivedString: string) {
-  robotPu.runStringCommand(receivedString)
+  robotPuPro.runStringCommand(receivedString)
 })
 
 input.onLogoEvent(TouchButtonEvent.Pressed, function() {
-  robotPu.toggleServoTrim()
+  robotPuPro.toggleServoTrim()
 })
 
 input.onButtonPressed(Button.A, function() {
-  robotPu.changeChannel(1)
+  robotPuPro.changeChannel(1)
 })
 
 input.onButtonPressed(Button.B, function () {
-  robotPu.changeChannel(-1)
+  robotPuPro.changeChannel(-1)
 })
 
 ```
@@ -69,15 +69,15 @@ input.onButtonPressed(Button.B, function () {
 
 ## How it works
 
-- `robotPu.setChannel(166)`
+- `robotPuPro.setChannel(166)`
   - Sets the radio channel/group.
   - Your sender micro:bit must use the **same** channel number.
 - `radio.onReceivedString(...)`
   - Runs whenever this micro:bit receives a radio **string**.
-  - The string is forwarded into `robotPu.runStringCommand(...)`.
+  - The string is forwarded into `robotPuPro.runStringCommand(...)`.
 - `radio.onReceivedValue(...)`
   - Runs whenever this micro:bit receives a radio **name/value** message.
-  - The pair is forwarded into `robotPu.runKeyValueCommand(name, value)`.
+  - The pair is forwarded into `robotPuPro.runKeyValueCommand(name, value)`.
 
 ---
 
@@ -86,7 +86,7 @@ input.onButtonPressed(Button.B, function () {
 On a second micro:bit, set the same channel and send something simple:
 
 ```typescript
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 input.onButtonPressed(Button.A, function () {
     radio.sendString("wave")
 })
