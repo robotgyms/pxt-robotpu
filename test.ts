@@ -566,10 +566,10 @@ input.onGesture(Gesture.LogoUp, function () {
 })
 
 /**
- * Face down: run return-value tests for all action functions.
+ * Screen up: run return-value tests for all action functions.
  * [HARDWARE] Expected: LED shows 1 for each call.
  */
-input.onGesture(Gesture.FaceDown, function () {
+input.onGesture(Gesture.ScreenUp, function () {
     basic.showNumber(11)
     testReturnValues()
 })
