@@ -1,4 +1,10 @@
-# 🗣️ Lesson: Giving Robot PU a Voice
+# 🗣️ Lesson: Giving Robot PU a Real Human Voice (pxt-billy)
+
+> **Built-in voice vs real speech:**
+> - `robotPuPro.talk(text)` — built-in **RoboVoice** melodic music engine, no extra library needed.
+> - `billy.say(text)` — **real synthesized human speech** (SAM engine). Requires the **[pxt-billy](https://github.com/adamish/pxt-billy)** extension.
+>
+> This lesson covers the **pxt-billy** approach for when you want an actual spoken voice.
 
 In this lesson, we will transform **Robot PU** from a silent dancer into a talking companion! You will learn how to install a "speech engine," generate long descriptive sentences, and create a "Mood Switcher" using the micro:bit buttons.
 

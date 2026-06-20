@@ -5,7 +5,7 @@ Robot PU can communicate “emotions” using:
 
 - **Eye brightness + blink patterns**
 - **Body language** (rest / stand / walk / explore / dance / head gestures)
-- Optional **speech** (`robotPuPro.talk(...)`)
+- Optional **speech** (`robotPuPro.talk(...)` — melodic RoboVoice; or `billy.say(...)` with pxt-billy for real voice)
 
 In this tutorial you will build a simple pipeline:
 
@@ -82,7 +82,7 @@ We’ll map emotions to actions such as:
 * `robotPuPro.explore()` (slow wandering)
 * `robotPuPro.dance()` (high-energy)
 * Head gestures using `robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, angle)` / `HeadPitch`
-* Optional voice: `robotPuPro.talk("...")`
+* Optional voice: `robotPuPro.talk("...")` — plays a melodic tune; for real speech add **pxt-billy** and use `billy.say("...")` instead
 
 Note:
 
@@ -243,7 +243,8 @@ basic.forever(function () {
         lastEmotionChange = now
 
         // Optional: say the emotion
-        // robotPuPro.talk("" + emotion)
+        // robotPuPro.talk("" + emotion)   // melodic voice
+        // billy.say("" + emotion)           // real speech (requires pxt-billy)
     }
 
     // Express emotion
