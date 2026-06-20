@@ -18,7 +18,7 @@ test: build
 release: build
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=*.*.**" && exit 1)
 	python3 -c 'import json; p="pxt.json"; data=json.load(open(p)); data["version"]="$(VERSION)"; open(p,"w").write(json.dumps(data, indent=4) + "\n")'
-	git add pxt.json robotpu.ts main.ts Makefile
+	git add pxt.json robotpu.ts main.ts test.ts Makefile tutorials/
 	git diff --cached --quiet --exit-code || git commit -m "Release $(VERSION)"
 	git push
 	$(MAKE) push-tag VERSION=$(VERSION)
