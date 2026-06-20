@@ -40,8 +40,8 @@
  
  - run the algorithm in your own program loop
  - send small “bias” corrections into Robot PU using:
-   - `robotPu.runKeyValueCommand("#puroll", value)`
-   - `robotPu.runKeyValueCommand("#pupitch", value)`
+   - `robotPuPro.runKeyValueCommand("#puroll", value)`
+   - `robotPuPro.runKeyValueCommand("#pupitch", value)`
  
  Then keep your main behavior running (walk/dance/rest).
  
@@ -111,8 +111,8 @@
      rollOut = Math.constrain(rollOut, -MAX_OUT, MAX_OUT)
      pitchOut = Math.constrain(pitchOut, -MAX_OUT, MAX_OUT)
  
-     robotPu.runKeyValueCommand("#puroll", rollOut)
-     robotPu.runKeyValueCommand("#pupitch", pitchOut)
+     robotPuPro.runKeyValueCommand("#puroll", rollOut)
+     robotPuPro.runKeyValueCommand("#pupitch", pitchOut)
  }
  
  // Example usage: assist while walking on uneven ground
@@ -124,7 +124,7 @@
      balanceAssist(roll, pitch, 0, 0)
  
      // Keep behavior gentle on uneven ground
-     robotPu.walk(0.9, 0.10)
+     robotPuPro.walk(0.9, 0.10)
      basic.pause(20)
  })
  ```
@@ -157,5 +157,5 @@
  
  ## Next steps
  
- - Apply the same `balanceAssist(...)` loop while running `robotPu.dance()`.
- - Add a tilt guard (if tilt > threshold: `robotPu.rest()` and pause briefly).
+ - Apply the same `balanceAssist(...)` loop while running `robotPuPro.dance()`.
+ - Add a tilt guard (if tilt > threshold: `robotPuPro.rest()` and pause briefly).

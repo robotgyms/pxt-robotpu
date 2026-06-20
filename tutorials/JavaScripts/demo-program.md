@@ -11,8 +11,8 @@ Goal:
 Key idea:
 
 - keep the two radio handlers:
-  - `radio.onReceivedString(...)` → `robotPu.runStringCommand(...)`
-  - `radio.onReceivedValue(...)` → `robotPu.runKeyValueCommand(...)`
+  - `radio.onReceivedString(...)` → `robotPuPro.runStringCommand(...)`
+  - `radio.onReceivedValue(...)` → `robotPuPro.runKeyValueCommand(...)`
 - then add any extra behaviors you want as local events and helper functions
 
 ---
@@ -23,7 +23,7 @@ In the code below, the “remote control core” is:
 
 - `radio.onReceivedString(...)` (string commands like `#putHello!`, `#punName`)
 - `radio.onReceivedValue(...)` (key/value commands like `#puturn`, `#puspeed`)
-- `robotPu.setChannel(166)` (pairing channel)
+- `robotPuPro.setChannel(166)` (pairing channel)
 
 If you delete everything else and keep only those pieces, you are back to the minimal receiver.
 
@@ -39,7 +39,7 @@ Use one (or both) of these patterns:
   - `input.onLogoEvent(...)`
 
 - **Your own helper functions**
-  - write a function like `scare()` that calls `robotPu.*` blocks
+  - write a function like `scare()` that calls `robotPuPro.*` blocks
   - trigger it from a button/gesture or even from a custom radio command
 
 ---
@@ -49,9 +49,9 @@ Use one (or both) of these patterns:
 ```typescript
 // press button A to walk forward in circles
 input.onButtonPressed(Button.A, function () {
-    robotPu.talk("Move forward!")
+    robotPuPro.talk("Move forward!")
     for (let index = 0; index < 400; index++) {
-        robotPu.walk(3, -0.5)
+        robotPuPro.walk(3, -0.5)
     }
 })
 function init_sound () {
@@ -108,33 +108,33 @@ function init_sound () {
     ), music.PlaybackMode.InBackground)
 }
 function scare () {
-    robotPu.talk("What is it?")
+    robotPuPro.talk("What is it?")
     music.play(music.createSoundExpression(WaveShape.Sine, 5000, 0, 255, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
     for (let index = 0; index < 50; index++) {
-        robotPu.jumpDo()
+        robotPuPro.jumpDo()
     }
     basic.pause(5000)
 }
 // press button A+B to do autopilot
 input.onButtonPressed(Button.AB, function () {
-    robotPu.talk("Autopilot")
+    robotPuPro.talk("Autopilot")
     for (let index = 0; index < 4000; index++) {
-        robotPu.explore()
+        robotPuPro.explore()
     }
 })
 // Register the event listener for incoming string messages
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 // press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
-    robotPu.talk("Move backward!")
+    robotPuPro.talk("Move backward!")
     for (let index = 0; index < 400; index++) {
-        robotPu.walk(-1, -0.5)
+        robotPuPro.walk(-1, -0.5)
     }
 })
 input.onGesture(Gesture.Shake, function () {
-    robotPu.talk("I am here")
+    robotPuPro.talk("I am here")
     if (randint(0, 1) == 0) {
         music.play(music.createSoundExpression(
         WaveShape.Square,
@@ -161,20 +161,20 @@ input.onGesture(Gesture.Shake, function () {
 })
 // listen to radio messages for commands of key value pairs
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 // press logo button to dance using set mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    robotPu.talk("Dance!")
-    robotPu.setMode(robotPu.Mode.Dance)
+    robotPuPro.talk("Dance!")
+    robotPuPro.setMode(robotPuPro.Mode.Dance)
 })
 input.setSoundThreshold(SoundThreshold.Loud, 184)
 init_sound()
 // Initialize robot by ask it to greet
-robotPu.greet()
-robotPu.standDo()
-robotPu.setChannel(166)
-robotPu.sing("C5 B G - E F E G ")
+robotPuPro.greet()
+robotPuPro.standDo()
+robotPuPro.setChannel(166)
+robotPuPro.sing("C5 B G - E F E G ")
 ```
 
 ### Initialization and Setup
@@ -189,16 +189,16 @@ Here are safe extensions that do not break compatibility with the retail gamepad
 
 - **Add a safety timeout**
   - record `lastControlMs` inside the two radio handlers
-  - if no messages arrive for ~500ms, call `robotPu.walkDo(0, 0)`
+  - if no messages arrive for ~500ms, call `robotPuPro.walkDo(0, 0)`
 
 - **Add custom radio commands (optional)**
   - intercept a new key in `radio.onReceivedValue`, handle it, then `return`
-  - otherwise, fall back to `robotPu.runKeyValueCommand(name, value)`
+  - otherwise, fall back to `robotPuPro.runKeyValueCommand(name, value)`
 
 Example custom command ideas:
 
-- `#pueyes` → call `robotPu.leftEyeBright(...)` / `robotPu.rightEyeBright(...)`
+- `#pueyes` → call `robotPuPro.leftEyeBright(...)` / `robotPuPro.rightEyeBright(...)`
 - `#puscare` → call your `scare()` helper
-- `#pusing` → call `robotPu.sing(...)` with a fixed phrase
+- `#pusing` → call `robotPuPro.sing(...)` with a fixed phrase
 
 If you want to keep everything “controller compatible”, avoid changing how `#puspeed` / `#puturn` are forwarded.

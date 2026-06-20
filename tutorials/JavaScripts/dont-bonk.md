@@ -64,22 +64,22 @@ Robot PU uses a **front-facing ultrasonic sonar sensor**.
 
 | API | Meaning |
 | --- | --- |
-| `robotPu.sonarDistanceCm()` | Read the current sonar distance in centimeters. |
-| `robotPu.walk(speed, turn)` | Walk with forward speed and turning bias. |
+| `robotPuPro.sonarDistanceCm()` | Read the current sonar distance in centimeters. |
+| `robotPuPro.walk(speed, turn)` | Walk with forward speed and turning bias. |
 
 The basic code is to get distance and walk, do not add any other code to slow down the observe-think-action loop.
 ```typescript
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 let distance = 0
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 basic.forever(function () {
-    distance = robotPu.sonarDistanceCm()
-    robotPu.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    distance = robotPuPro.sonarDistanceCm()
+    robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
     basic.pause(10)
 })
 
@@ -107,7 +107,7 @@ function ema(prev: number, next: number, alpha: number): number {
     return prev * (1 - alpha) + next * alpha
 }
 
-let filteredCm = robotPu.sonarDistanceCm()
+let filteredCm = robotPuPro.sonarDistanceCm()
 
 // Tunable parameters (adjust during calibration)
 const FAR_CM = 80          // far away: go faster
@@ -119,7 +119,7 @@ const TURN = 0             // keep straight; adjust if your PU drifts
 
 basic.forever(function () {
     // 1) Read sensor
-    const rawCm = robotPu.sonarDistanceCm()
+    const rawCm = robotPuPro.sonarDistanceCm()
 
     // 2) Smooth sensor to reduce noise/jitter
     // If your readings are very jumpy, reduce alpha (e.g., 0.2)
@@ -149,10 +149,10 @@ basic.forever(function () {
     // 4) Command motion
     // Once speed hits 0, the run is “over” per the rules (no inching forward after stop).
     if (speed == 0) {
-        robotPu.walk(0, 0)
+        robotPuPro.walk(0, 0)
         basic.pause(1000)
     } else {
-        robotPu.walk(speed, TURN)
+        robotPuPro.walk(speed, TURN)
         basic.pause(30) // control loop rate (faster loop = more responsive braking)
     }
 })
@@ -206,7 +206,7 @@ function sort5(a: number[]): void {
 function sonarMedian5Cm(): number {
     const s: number[] = []
     for (let i = 0; i < 5; i++) {
-        s.push(robotPu.sonarDistanceCm())
+        s.push(robotPuPro.sonarDistanceCm())
         basic.pause(5)
     }
     sort5(s)
@@ -214,7 +214,7 @@ function sonarMedian5Cm(): number {
 }
 
 // In your loop, replace:
-// const rawCm = robotPu.sonarDistanceCm()
+// const rawCm = robotPuPro.sonarDistanceCm()
 // with:
 // const rawCm = sonarMedian5Cm()
 ```
@@ -228,7 +228,7 @@ If PU consistently veers, use a small constant `TURN` bias.
 const TURN = -0.08
 
 // keep calling:
-robotPu.walk(speed, TURN)
+robotPuPro.walk(speed, TURN)
 ```
 
 If PU veers more at higher speed, you can scale turn bias with speed:
@@ -237,7 +237,7 @@ If PU veers more at higher speed, you can scale turn bias with speed:
 const TURN_BIAS = -0.06
 let turn = TURN_BIAS
 if (speed > 1.5) turn = TURN_BIAS * 1.3
-robotPu.walk(speed, turn)
+robotPuPro.walk(speed, turn)
 ```
 
 ### 8.3 “Speed Demon” Optimization: faster far, stronger braking near
@@ -281,18 +281,18 @@ This example does two things at the same time:
 
 ```typescript
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 let pulseDelay = 0
 let pitch = 0
 let distance = 0
-robotPu.setChannel(166)
-robotPu.setWalkSpeedRange(-3, 4)
+robotPuPro.setChannel(166)
+robotPuPro.setWalkSpeedRange(-3, 4)
 basic.forever(function () {
-    distance = robotPu.sonarDistanceCm()
+    distance = robotPuPro.sonarDistanceCm()
     if (distance > 2 && distance < 100) {
         // Map 2cm->2000Hz and 100cm->200Hz
         pitch = Math.map(distance, 2, 100, 2000, 200)
@@ -306,7 +306,7 @@ basic.forever(function () {
     }
 })
 basic.forever(function () {
-    robotPu.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
     basic.pause(10)
 })
 
@@ -315,24 +315,24 @@ basic.forever(function () {
 What each part is doing:
 
 1. `radio.onReceivedString(...)` and `radio.onReceivedValue(...)`
-   - Any incoming radio message is forwarded into `robotPu.runStringCommand(...)` or `robotPu.runKeyValueCommand(...)`.
+   - Any incoming radio message is forwarded into `robotPuPro.runStringCommand(...)` or `robotPuPro.runKeyValueCommand(...)`.
    - This lets a second micro:bit send higher-level “commands” (strings or named values) while this program is also running its autonomous sonar logic.
-2. `robotPu.setChannel(166)`
+2. `robotPuPro.setChannel(166)`
    - Sets the radio group/channel so only devices on the same channel talk to each other.
-3. `robotPu.setWalkSpeedRange(-3, 4)`
+3. `robotPuPro.setWalkSpeedRange(-3, 4)`
    - Defines the allowed walking speed range. The negative minimum is important if you want to ever walk backward.
 4. Sonar “beep” block
    - When distance is between `2` and `100` cm, the code maps distance into:
      - `pitch`: closer = higher frequency.
      - `pulseDelay`: closer = shorter delay (faster beeps).
    - Outside that range, it waits longer to avoid annoying noise when the reading is out-of-range.
-5. `robotPu.walkDo(Math.map(distance, 8, 20, 0, 4), 0)`
+5. `robotPuPro.walkDo(Math.map(distance, 8, 20, 0, 4), 0)`
    - Converts distance into forward walking speed: when the wall is close, speed approaches `0`; when farther, speed approaches `4`.
 
 To allow PU to **back up** when it gets too close, tweak the mapping so very small distances produce a **negative speed**:
 
 ```typescript
-robotPu.walkDo(Math.map(distance, 7, 20, -1, 4), 0)
+robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 4), 0)
 ```
 
 ---

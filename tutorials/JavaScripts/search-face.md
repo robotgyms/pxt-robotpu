@@ -185,11 +185,11 @@ function searchFace() {
             serial.writeLine("" + (`yawSearch: ${targetOffset.y * search_gain}`))
             serial.writeLine("" + (`pitchSearch: ${targetOffset.p * search_gain}`))
         }
-        robotPu.setModeVar(robotPu.Mode.API)
-        robotPu.servoStep(robotPu.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
-        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
-        robotPu.leftEyeBright(0.002)
-        robotPu.rightEyeBright(0.002)
+        robotPuPro.setModeVar(robotPuPro.Mode.API)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
+        robotPuPro.leftEyeBright(0.002)
+        robotPuPro.rightEyeBright(0.002)
     } else {
         scanFrameCounter = SCAN_WAIT_FRAMES
         scanStepIndex += 1
@@ -201,13 +201,13 @@ function searchFace() {
     }
 }
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
-robotPu.setChannel(164)
+robotPuPro.setChannel(164)
 
 function trackFace(p: Buffer) {
     // Get the current system time
@@ -240,25 +240,25 @@ function trackFace(p: Buffer) {
             yaw = i8(p[16])
             pitch = i8(p[17])
             if (DEBUG_FLAG) {
-                // serial.writeLine(`head yaw: ${robotPu.ServoTargets()[4]}`)
+                // serial.writeLine(`head yaw: ${robotPuPro.ServoTargets()[4]}`)
                 serial.writeLine(`yawLock ${yaw}`)
-                // serial.writeLine(`head pitch: ${robotPu.ServoTargets()[5]}`)
+                // serial.writeLine(`head pitch: ${robotPuPro.ServoTargets()[5]}`)
                 serial.writeLine(`pitchLock: ${pitch}`)
             }
-            robotPu.setModeVar(robotPu.Mode.API)
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.08, 8)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.08, 8)
-            robotPu.leftEyeBright(0.01)
-            robotPu.rightEyeBright(0.01)
+            robotPuPro.setModeVar(robotPuPro.Mode.API)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.08, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.08, 8)
+            robotPuPro.leftEyeBright(0.01)
+            robotPuPro.rightEyeBright(0.01)
         } else if (currentTime - lastFaceSeenTime < LOST_TIMEOUT_MS) {
             // lock on face 
             yaw *= 0.7
             pitch *= 0.7
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.2, 5)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 5)
             // Read the current absolute head target angles
-            currentYaw = robotPu.ServoTargets()[4]
-            currentPitch = robotPu.ServoTargets()[5]
+            currentYaw = robotPuPro.ServoTargets()[4]
+            currentPitch = robotPuPro.ServoTargets()[5]
         } else {
             // lost the face, search for face
             searchFace()
@@ -283,8 +283,8 @@ pins.i2cWriteNumber(
 )
 basic.pause(3000)
 // Read the current absolute head target angles
-currentYaw = robotPu.ServoTargets()[4]
-currentPitch = robotPu.ServoTargets()[5]
+currentYaw = robotPuPro.ServoTargets()[4]
+currentPitch = robotPuPro.ServoTargets()[5]
 
 basic.forever(function () {
     if (DEBUG_FLAG) {
@@ -340,7 +340,7 @@ The helpers `i16`, `u16`, and `i8` decode signed/unsigned values from the raw `B
 When `count > 0`, the code:
 
 - records `lastFaceSeenTime`
-- uses `robotPu.servoStep(...)` on head yaw/pitch to reduce the camera-provided `yaw` / `pitch` offsets
+- uses `robotPuPro.servoStep(...)` on head yaw/pitch to reduce the camera-provided `yaw` / `pitch` offsets
 
 That’s the “trace” behavior.
 

@@ -94,7 +94,7 @@ The program follows an observe-transform-map-act loop:
    - It extracts `x_mm` and `y_mm`.
 
 3. **Store detection with odometry**
-   - `getPoseO()` reads `robotPu.locationArray()`.
+   - `getPoseO()` reads `robotPuPro.locationArray()`.
    - The code stores the object position and the robot pose at detection time.
 
 4. **Transform into the current frame**
@@ -130,7 +130,7 @@ const rel_O = [obj_O[0] - pose_now_O[0], obj_O[1] - pose_now_O[1]]
 const rel_now = rot(-pose_now_O[2], rel_O[0], rel_O[1])
 ```
 
-Before testing, verify the units returned by `robotPu.locationArray()` in your firmware. This code assumes:
+Before testing, verify the units returned by `robotPuPro.locationArray()` in your firmware. This code assumes:
 
 - **`x` and `y`**: meters.
 - **`theta`**: radians.
@@ -179,7 +179,7 @@ This is the key idea of the tutorial: **turn continuous camera detections into d
 - **Start with debug enabled**: Keep `DEBUG_FLAG = true` so serial output shows detected positions.
 - **Verify I2C packets**: If you see `i2c read error`, check Smart Hat power, I2C wiring, and the multiplexer setup.
 - **Check detection coordinates**: Move the ball left/right and forward/back while watching `ball x` and `ball y`.
-- **Check odometry units**: Print `robotPu.locationArray()` and confirm whether it is meters/radians or millimeters/degrees.
+- **Check odometry units**: Print `robotPuPro.locationArray()` and confirm whether it is meters/radians or millimeters/degrees.
 - **Check grid bounds**: If objects are not marked, they may be outside the `0.5 m x 0.5 m` local map.
 - **Tune resolution**: Increase `GRID_N` or `GRID_RES_M` if the map is too small.
 - **Tune turning**: If the robot turns the wrong way, flip the sign of `TURN_GAIN`.
@@ -329,11 +329,11 @@ function searchBall(searchPattern: { y: number, p: number }[]) {
             serial.writeLine("" + (`yawSearch: ${targetOffset.y * search_gain}`))
             serial.writeLine("" + (`pitchSearch: ${targetOffset.p * search_gain}`))
         }
-        robotPu.setModeVar(robotPu.Mode.API)
-        robotPu.servoStep(robotPu.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
-        robotPu.servoStep(robotPu.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
-        robotPu.leftEyeBright(0.002)
-        robotPu.rightEyeBright(0.002)
+        robotPuPro.setModeVar(robotPuPro.Mode.API)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
+        robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
+        robotPuPro.leftEyeBright(0.002)
+        robotPuPro.rightEyeBright(0.002)
         return
     }
 
@@ -410,14 +410,14 @@ const SEARCH_PATTERN: { y: number, p: number }[] = [
     { y: 0, p: 0 }
 ]
 
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 // set your servo trim here for better walking control
-robotPu.setServoTrim(-5, 0, -5, 0, -8, 0)
+robotPuPro.setServoTrim(-5, 0, -5, 0, -8, 0)
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -428,7 +428,7 @@ input.onButtonPressed(Button.B, function () {
 })
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     // allow gamepad to trim servos to improve balancing
-    robotPu.toggleServoTrim()
+    robotPuPro.toggleServoTrim()
     basic.pause(500)
 })
 function i16(buf: Buffer, offset: number): number {
@@ -456,7 +456,7 @@ let goal_rx_ms = 0
 function getPoseO(): number[] {
     // locationArray(): [x, y, theta] in odometry frame (units depend on implementation; assumed meters + radians here)
     // If your odom uses different units, scale here.
-    const loc = robotPu.locationArray()
+    const loc = robotPuPro.locationArray()
     return [loc[0], loc[1], loc[2]]
 }
 
@@ -545,19 +545,19 @@ function trackBall(p: Buffer) {
             yaw = i8(p[16])
             pitch = i8(p[17])
             if (DEBUG_FLAG) {
-                // serial.writeLine(`head yaw: ${robotPu.ServoTargets()[4]}`)
+                // serial.writeLine(`head yaw: ${robotPuPro.ServoTargets()[4]}`)
                 //serial.writeLine(`yawLock ${yaw}`)
-                // serial.writeLine(`head pitch: ${robotPu.ServoTargets()[5]}`)
+                // serial.writeLine(`head pitch: ${robotPuPro.ServoTargets()[5]}`)
                 //serial.writeLine(`pitchLock: ${pitch}`)
                 serial.writeLine(`ball x: ${x_mm}`)
                 serial.writeLine(`ball y: ${y_mm}`)
             }
             // move head to look at the ball
-            robotPu.setModeVar(robotPu.Mode.API)
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.08, 8)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.08, 8)
-            robotPu.leftEyeBright(0.01)
-            robotPu.rightEyeBright(0.01)
+            robotPuPro.setModeVar(robotPuPro.Mode.API)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.08, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.08, 8)
+            robotPuPro.leftEyeBright(0.01)
+            robotPuPro.rightEyeBright(0.01)
 
             // Save the ball measurement (ground-plane projection) for mapping/planning.
             // Convention used here: y_mm is forward distance, x_mm is left/right.
@@ -570,11 +570,11 @@ function trackBall(p: Buffer) {
             // follow through for a short mement if lost the ball in the view  
             yaw *= 0.7
             pitch *= 0.7
-            robotPu.servoStep(robotPu.ServoJoint.HeadYaw, robotPu.ServoTargets()[4] + yaw * 0.2, 5)
-            robotPu.servoStep(robotPu.ServoJoint.HeadPitch, robotPu.ServoTargets()[5] + pitch * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 5)
             // read current head pitch yaw
-            currentYaw = robotPu.ServoTargets()[4]
-            currentPitch = robotPu.ServoTargets()[5]
+            currentYaw = robotPuPro.ServoTargets()[4]
+            currentPitch = robotPuPro.ServoTargets()[5]
         } else {
             // lost the ball, search for ball
             searchBall(SEARCH_PATTERN)
@@ -611,8 +611,8 @@ basic.pause(10)
 setService(SERVICE_FACE_DETECTION, false)
 basic.pause(10)
 
-currentYaw = robotPu.ServoTargets()[4]
-currentPitch = robotPu.ServoTargets()[5]
+currentYaw = robotPuPro.ServoTargets()[4]
+currentPitch = robotPuPro.ServoTargets()[5]
 
 if (DEBUG_FLAG) {
     setService(SERVICE_WIFI, true)
@@ -673,7 +673,7 @@ basic.forever(function () {
         // Approach kick point
         if (distKick > KICK_DIST_M) {
             const speed = distKick > APPROACH_SLOW_M ? 2.5 : 1.5
-            robotPu.walk(speed, turn)
+            robotPuPro.walk(speed, turn)
             if (DEBUG_FLAG){
                 serial.writeLine(`speed: ${speed}`)
                 serial.writeLine(`turn: ${turn}`)
@@ -683,9 +683,9 @@ basic.forever(function () {
             const headingGoal = desiredHeadingTo(goal_now[0], goal_now[1])
             const turnGoal = clamp(TURN_GAIN * headingGoal, -0.8, 0.8)
             if (Math.abs(headingGoal) > 0.25) {
-                robotPu.walk(1.0, turnGoal)
+                robotPuPro.walk(1.0, turnGoal)
             } else {
-                robotPu.kick() // need to keep calling kick to make it kicking
+                robotPuPro.kick() // need to keep calling kick to make it kicking
             }
         }
     }

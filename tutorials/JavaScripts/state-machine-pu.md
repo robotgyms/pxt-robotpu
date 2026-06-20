@@ -116,8 +116,8 @@ function abs(x: number): number {
 }
 
 function isSafe(): boolean {
-    const r = abs(robotPu.bodyRoll())
-    const p = abs(robotPu.bodyPitch())
+    const r = abs(robotPuPro.bodyRoll())
+    const p = abs(robotPuPro.bodyPitch())
     return r < SAFE_ROLL && p < SAFE_PITCH
 }
 
@@ -161,7 +161,7 @@ basic.forever(function () {
     }
 
     if (sm == DanceSM.Idle) {
-        robotPu.stand()
+        robotPuPro.stand()
 
         if (beat && safe) {
             // Start dancing on beat
@@ -172,7 +172,7 @@ basic.forever(function () {
     }
     else if (sm == DanceSM.Dancing) {
         // Keep calling dance() so the internal routine can run
-        robotPu.dance()
+        robotPuPro.dance()
 
         // Switch to next "gait state" on beat if:
         // - safe
@@ -194,7 +194,7 @@ basic.forever(function () {
     else {
         // Recover
         // Safety concern: stop dancing and return to stable pose
-        robotPu.stand()
+        robotPuPro.stand()
 
         // When safe again, go back to idle
         if (safe) {

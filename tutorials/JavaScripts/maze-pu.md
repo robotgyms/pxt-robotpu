@@ -25,15 +25,15 @@ Robot PU doesn’t need a full map for this approach. It just needs to decide �
 
 ## What you will build
 
-- A simple autonomous maze solver using `robotPu.walk(speed, turn)`
+- A simple autonomous maze solver using `robotPuPro.walk(speed, turn)`
 - A choice of **right-hand** or **left-hand** wall following
 
 ## Robot PU APIs used
 
 Robot PU is an interactive STEM buddy controlled by a micro:bit. In this maze project, we rely on:
 
-* **Movement**: `robotPu.walk(speed, turn)`
-* **Sonar scan**: `robotPu.frontDistanceArray()`
+* **Movement**: `robotPuPro.walk(speed, turn)`
+* **Sonar scan**: `robotPuPro.frontDistanceArray()`
 
 ---
 
@@ -58,7 +58,7 @@ Robot PU’s sonar faces ~35° downward. While walking, PU naturally sways, and 
 
 In this updated tutorial we use:
 
-* **Front scan array**: `robotPu.frontDistanceArray()`
+* **Front scan array**: `robotPuPro.frontDistanceArray()`
 
 It returns **5 distance bins** from **left to right**:
 
@@ -139,11 +139,11 @@ function hysteresisUpdate(isOpen: boolean, d: number, openOn: number, openOff: n
 }
 
 function filteredBins(): number[] {
-    const a = robotPu.frontDistanceArray()
+    const a = robotPuPro.frontDistanceArray()
     basic.pause(5)
-    const b = robotPu.frontDistanceArray()
+    const b = robotPuPro.frontDistanceArray()
     basic.pause(5)
-    const c = robotPu.frontDistanceArray()
+    const c = robotPuPro.frontDistanceArray()
 
     const out: number[] = [0, 0, 0, 0, 0]
     for (let i = 0; i < 5; i++) {
@@ -164,7 +164,7 @@ function updateWallRef(prev: number, d: number, a: number): number {
     return prev
 }
 
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 basic.forever(function () {
     const d = filteredBins()
 
@@ -187,13 +187,13 @@ basic.forever(function () {
     const safeSpeed = Math.map(Math.max(dRight, dLeft), 7, 25, 0, 3)
 
     if (dFront > 0 && dFront < TOO_CLOSE_CM) {
-        robotPu.walk(1.6, -0.9)
+        robotPuPro.walk(1.6, -0.9)
     } else if (rightOpen) {
-        robotPu.walk(safeSpeed, 0.35)
+        robotPuPro.walk(safeSpeed, 0.35)
     } else if (frontOpen) {
-        robotPu.walk(safeSpeed, 0)
+        robotPuPro.walk(safeSpeed, 0)
     } else {
-        robotPu.walk(1.6, -0.9)
+        robotPuPro.walk(1.6, -0.9)
     }
 
     radio.sendValue("fd0", d[0])

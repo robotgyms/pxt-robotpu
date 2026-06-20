@@ -6,15 +6,15 @@ Validated MakeCode:
 
 ```typescript
 radio.onReceivedNumber(function (receivedNumber) {
-    robotPu.runStringCommand("")
+    robotPuPro.runStringCommand("")
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 let location: number[] = []
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 basic.forever(function () {
-    location = robotPu.locationArray()
+    location = robotPuPro.locationArray()
     serial.writeLine("x:" + location[0])
     serial.writeLine("y:" + location[1])
     serial.writeLine("theta:" + location[2])
@@ -22,7 +22,7 @@ basic.forever(function () {
 })
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     // allow gamepad to trim servos to improve balancing
-    robotPu.toggleServoTrim()
+    robotPuPro.toggleServoTrim()
     basic.pause(500)
 })
 ```
@@ -35,10 +35,10 @@ Robot PU already includes odometry in `robotpu.ts`. The public MakeCode blocks u
 
 ## What the MakeCode does
 
-- **Receive number commands**: `radio.onReceivedNumber(...)` passes remote commands to `robotPu.runStringCommand("")`.
-- **Receive key-value commands**: `radio.onReceivedValue(...)` passes remote control values to `robotPu.runKeyValueCommand(name, value)`.
-- **Set the radio channel**: `robotPu.setChannel(166)` keeps the robot on channel `166`.
-- **Read the pose**: `robotPu.locationArray()` returns `[x, y, theta]`.
+- **Receive number commands**: `radio.onReceivedNumber(...)` passes remote commands to `robotPuPro.runStringCommand("")`.
+- **Receive key-value commands**: `radio.onReceivedValue(...)` passes remote control values to `robotPuPro.runKeyValueCommand(name, value)`.
+- **Set the radio channel**: `robotPuPro.setChannel(166)` keeps the robot on channel `166`.
+- **Read the pose**: `robotPuPro.locationArray()` returns `[x, y, theta]`.
 - **Print telemetry**: `serial.writeLine(...)` sends pose values to the serial console.
 
 The `x` and `y` values are in millimeters. The `theta` value is in degrees.
@@ -95,7 +95,7 @@ let yMm = T[1][2]
 let thetaDeg = Math.atan2(T[1][0], T[0][0]) * 180 / Math.PI
 ```
 
-This is exactly what `RobotPUOdometry.getPosition()` does before `robotPu.locationArray()` returns `[x, y, theta]`.
+This is exactly what `RobotPUOdometry.getPosition()` does before `robotPuPro.locationArray()` returns `[x, y, theta]`.
 
 ---
 

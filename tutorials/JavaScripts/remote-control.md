@@ -2,8 +2,8 @@
 
 This lesson shows how to control **Robot PU** using a second micro:bit (or any radio sender) by forwarding radio messages into:
 
-- `robotPu.runKeyValueCommand(key, value)`
-- `robotPu.runStringCommand(text)`
+- `robotPuPro.runKeyValueCommand(key, value)`
+- `robotPuPro.runStringCommand(text)`
 
 You can use this for:
 
@@ -28,16 +28,16 @@ Put this in your Robot PU MakeCode project. It registers radio handlers and forw
 ```typescript
 // Register the event listener for incoming string messages
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 
 // listen to radio messages for commands of key value pairs
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 // Choose a channel 0..255. Both sides must match.
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 ```
 
 Notes:
@@ -66,7 +66,7 @@ Radio messages are only received if **both micro:bits use the same radio group**
 
 Robot side:
 
-- `robotPu.setChannel(166)`
+- `robotPuPro.setChannel(166)`
 
 Controller side:
 
@@ -128,13 +128,13 @@ radio.onReceivedValue(function (name, value) {
         lastSteerMs = control.millis()
     }
 
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 basic.forever(function () {
     if (control.millis() - lastSteerMs > 500) {
         // No steering updates for 0.5s → stop
-        robotPu.walkDo(0, 0)
+        robotPuPro.walkDo(0, 0)
     }
     basic.pause(20)
 })
@@ -145,7 +145,7 @@ basic.forever(function () {
 ## 7. Troubleshooting
 
 - **No response at all**
-  - confirm both sides use the same radio group (`robotPu.setChannel(...)` vs `radio.setGroup(...)`).
+  - confirm both sides use the same radio group (`robotPuPro.setChannel(...)` vs `radio.setGroup(...)`).
   - confirm the receiver program actually registered `radio.onReceivedValue` / `radio.onReceivedString`.
 
 - **Robot moves but feels laggy**

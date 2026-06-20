@@ -48,9 +48,9 @@ radio.onReceivedString(function (msg) {
 })
 
 function safetyStop(reasonId: number) {
-    robotPu.rest()
-    robotPu.leftEyeBright(0)
-    robotPu.rightEyeBright(0)
+    robotPuPro.rest()
+    robotPuPro.leftEyeBright(0)
+    robotPuPro.rightEyeBright(0)
 }
 
 const CMD_TIMEOUT_MS = 1500
@@ -58,7 +58,7 @@ const DANGER_CM = 12
 
 basic.forever(function () {
     const now = control.millis()
-    const d = robotPu.sonarDistanceCm()
+    const d = robotPuPro.sonarDistanceCm()
 
     const cmdTimedOut = now - lastCmdMs > CMD_TIMEOUT_MS
     const tooClose = d > 0 && d < DANGER_CM
@@ -71,7 +71,7 @@ basic.forever(function () {
     }
 
     // Normal behavior goes here
-    robotPu.walk()
+    robotPuPro.walk()
     basic.pause(20)
 })
 ```

@@ -61,7 +61,7 @@ basic.forever(function () {
 
         // Basic signals
         txKV("t", now)
-        txKV("d", robotPu.sonarDistanceCm())
+        txKV("d", robotPuPro.sonarDistanceCm())
         txKV("s", input.soundLevel())
 
         // Example "state" (replace with your own state machine)

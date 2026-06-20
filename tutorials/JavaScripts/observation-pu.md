@@ -42,7 +42,7 @@
  
  In this extension, you can read it using:
  
- - `robotPu.sonarDistanceCm()`
+ - `robotPuPro.sonarDistanceCm()`
  
  Wiring note (default pins used by the extension):
  
@@ -55,7 +55,7 @@
  
  ```typescript
  basic.forever(function () {
-     const cm = robotPu.sonarDistanceCm()
+     const cm = robotPuPro.sonarDistanceCm()
      basic.showNumber(Math.round(cm))
      basic.pause(200)
  })
@@ -72,26 +72,26 @@
  
  ```typescript
  basic.forever(function () {
-     const cm = robotPu.sonarDistanceCm()
+     const cm = robotPuPro.sonarDistanceCm()
  
      if (cm > 0 && cm < 20) {
          // Too close: turn away
          for (let i = 0; i < 200; i++) {
-             robotPu.walk(-2, 0)
+             robotPuPro.walk(-2, 0)
          }
          for (let i = 0; i < 200; i++) {
-             robotPu.walk(2, 0.8)
+             robotPuPro.walk(2, 0.8)
          }
      } else {
          // Clear: walk forward
-         robotPu.walk(2, 0)
+         robotPuPro.walk(2, 0)
      }
  })
  ```
  
  Notes:
  
- - `robotPu.walk(...)` is an action that advances when you call it repeatedly.
+ - `robotPuPro.walk(...)` is an action that advances when you call it repeatedly.
  - Sonar readings can be noisy; consider averaging if you see jitter.
  
  ---
@@ -107,10 +107,10 @@
      if (input.isGesture(Gesture.FreeFall)) {
          // Try to stop motion and recover pose
          for (let i = 0; i < 200; i++) {
-             robotPu.stand()
+             robotPuPro.stand()
          }
      } else {
-         robotPu.walk(2, 0)
+         robotPuPro.walk(2, 0)
      }
  })
  ```
@@ -125,7 +125,7 @@
      if (s > 140) {
          // One jump (call repeatedly until you see completion boundaries)
          for (let i = 0; i < 200; i++) {
-             robotPu.jump()
+             robotPuPro.jump()
          }
      }
  })
@@ -146,29 +146,29 @@
  
  ```typescript
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 let d: number[] = []
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 basic.forever(function () {
-    d = robotPu.frontDistanceArray()
+    d = robotPuPro.frontDistanceArray()
     radio.sendValue("fd0", d[0])
     radio.sendValue("fd1", d[1])
     radio.sendValue("fd2", d[2])
     radio.sendValue("fd3", d[3])
     radio.sendValue("fd4", d[4])
-    radio.sendValue("broll", robotPu.bodyRoll())
-    radio.sendValue("bpitch", robotPu.bodyPitch())
+    radio.sendValue("broll", robotPuPro.bodyRoll())
+    radio.sendValue("bpitch", robotPuPro.bodyPitch())
     basic.pause(100)
 })
  ```
  
  Notes:
  
- - `robotPu.frontDistanceArray()` returns 5 bins from left-to-right across the front view.
+ - `robotPuPro.frontDistanceArray()` returns 5 bins from left-to-right across the front view.
  - If you’re already using a specific radio group/channel elsewhere, keep them consistent on both devices.
  
  ### B. Receiver (Gamepad) code
@@ -238,7 +238,7 @@ ffunction drawDistances () {
  
  ## 7. Summary
  
- - Use `robotPu.sonarDistanceCm()` to measure distance in cm.
+ - Use `robotPuPro.sonarDistanceCm()` to measure distance in cm.
  - Use `input.isGesture(...)` and `input.rotation(...)` for motion sensing.
  - Use `input.soundLevel()` for sound-reactive behaviors.
  - Use buttons for simple manual triggers during testing.

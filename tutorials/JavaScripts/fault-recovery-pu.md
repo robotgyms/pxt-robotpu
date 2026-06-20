@@ -37,18 +37,18 @@ const NEAR_CM = 20
 const RECOVER_COOLDOWN_MS = 4000
 
 function recover() {
-    robotPu.back()
+    robotPuPro.back()
     basic.pause(400)
 
     const dir = Math.randomRange(0, 1)
-    if (dir == 0) robotPu.left()
-    else robotPu.right()
+    if (dir == 0) robotPuPro.left()
+    else robotPuPro.right()
     basic.pause(350)
 }
 
 basic.forever(function () {
     const now = control.millis()
-    const d = robotPu.sonarDistanceCm()
+    const d = robotPuPro.sonarDistanceCm()
 
     if (d > 0 && d < DANGER_CM) {
         nearCount += 2
@@ -63,7 +63,7 @@ basic.forever(function () {
         nearCount = 0
         recover()
     } else {
-        robotPu.walk()
+        robotPuPro.walk()
     }
 
     basic.pause(50)

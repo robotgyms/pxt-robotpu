@@ -115,7 +115,7 @@ let steps = [50, 80, 50, 80]
 for (let s of steps) {
     // Use each value from the array
     // (Example uses a generic variable; replace with your own robot call)
-    // robotPu.walk(s, 0)
+    // robotPuPro.walk(s, 0)
     basic.pause(200)
 }
 

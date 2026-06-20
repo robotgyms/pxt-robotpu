@@ -167,7 +167,7 @@
  ```typescript
  basic.forever(function () {
      // Observation
-     const cm = robotPu.sonarDistanceCm()
+     const cm = robotPuPro.sonarDistanceCm()
  
      // Thinking
      let speed = 2
@@ -178,7 +178,7 @@
      }
  
      // Action
-     robotPu.walk(speed, turn)
+     robotPuPro.walk(speed, turn)
  })
  ```
  

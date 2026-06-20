@@ -59,7 +59,7 @@ let dist = parseFloat(parts[3])
 let empty = "".isEmpty()
 
 // Now let Robot PU speak a summary
-robotPu.talk(
+robotPuPro.talk(
     "tag " + tag +
     ", dance " + hasDance +
     ", dist " + dist +
@@ -88,7 +88,7 @@ PU|pu-123456789|Explore|42.0|88|123456
 
 Requirements:
 
-* All Robot PU units must share the same radio channel: `robotPu.setChannel(166)` (or your chosen channel).
+* All Robot PU units must share the same radio channel: `robotPuPro.setChannel(166)` (or your chosen channel).
 * Each robot periodically broadcasts its own status.
 * When a robot receives another robot’s status, it:
   1. Says: `<other name> + activity`
@@ -104,7 +104,7 @@ This program can live in your `test.ts`.
 Key pieces:
 
 * `radio.onReceivedString(...)` parses status strings using the Text APIs.
-* It still supports Robot PU command strings by forwarding `#...` messages into `robotPu.runStringCommand(...)`.
+* It still supports Robot PU command strings by forwarding `#...` messages into `robotPuPro.runStringCommand(...)`.
 
 Copy/paste example:
 
@@ -133,7 +133,7 @@ const cuteTalks = [
 let lastReplyMs = 0
 const replyCooldownMs = 1500
 
-function modeToText(m: robotPu.Mode): string {
+function modeToText(m: robotPuPro.Mode): string {
     // Use compare() here (Text API)
     const s = "" + m
     if (s.compare("3") == 0) return "Dance"
@@ -143,8 +143,8 @@ function modeToText(m: robotPu.Mode): string {
 }
 
 function makeStatusString(): string {
-    const mode = modeToText(robotPu.mode())
-    const dist = robotPu.sonarDistanceCm()
+    const mode = modeToText(robotPuPro.mode())
+    const dist = robotPuPro.sonarDistanceCm()
     const loud = input.soundLevel()
     const ts = control.millis()
     return "PU|" + myName + "|" + mode + "|" + dist + "|" + loud + "|" + ts
@@ -161,8 +161,8 @@ control.inBackground(function () {
     }
 })
 
-robotPu.setChannel(166)
-robotPu.talk("Peer chat on!")
+robotPuPro.setChannel(166)
+robotPuPro.talk("Peer chat on!")
 
 radio.onReceivedString(function (receivedString: string) {
     // Text API: isEmpty
@@ -171,7 +171,7 @@ radio.onReceivedString(function (receivedString: string) {
     // Preserve remote command feature: allow "#putHello" etc.
     // Text API: substr + compare
     if (receivedString.substr(0, 1).compare("#") == 0) {
-        robotPu.runStringCommand(receivedString)
+        robotPuPro.runStringCommand(receivedString)
         return
     }
 
@@ -202,13 +202,13 @@ radio.onReceivedString(function (receivedString: string) {
     const first = otherName.charAt(0)
     const firstCode = otherName.charCodeAt(0)
 
-    robotPu.talk(otherName + " is " + otherMode + ". " + pick(cuteTalks))
-    robotPu.talk("I heard " + first + " code " + firstCode)
+    robotPuPro.talk(otherName + " is " + otherMode + ". " + pick(cuteTalks))
+    robotPuPro.talk("I heard " + first + " code " + firstCode)
 
     const now = control.millis()
     if (now - lastReplyMs > replyCooldownMs) {
         lastReplyMs = now
-        robotPu.talk("I am " + myName + ", " + modeToText(robotPu.mode()))
+        robotPuPro.talk("I am " + myName + ", " + modeToText(robotPuPro.mode()))
         sendStatus()
     }
 })

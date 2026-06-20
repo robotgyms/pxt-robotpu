@@ -60,7 +60,7 @@ A **speed profile** is also a 10-element array. Each number is the maximum step 
 
 ### D. `moveServos` — the motion engine
 
-`robotPu.moveServos(targets, speeds, syncList, syncGain, asyncList, asyncGain)` moves all servos toward their targets simultaneously:
+`robotPuPro.moveServos(targets, speeds, syncList, syncGain, asyncList, asyncGain)` moves all servos toward their targets simultaneously:
 
 - **`syncList`** — servo indices that block (wait until they arrive) before returning `true`
 - **`asyncList`** — servo indices that move in the background (non-blocking)
@@ -70,7 +70,7 @@ The action engine calls this repeatedly in `basic.forever` so the servos keep st
 
 ### E. API mode
 
-`robotPu.setModeVar(robotPu.Mode.API)` puts Robot PU in **API mode**. In this mode:
+`robotPuPro.setModeVar(robotPuPro.Mode.API)` puts Robot PU in **API mode**. In this mode:
 
 - the internal state machine (walk, explore, dance, etc.) is disabled
 - only your code drives the servos
@@ -82,33 +82,33 @@ Flash this program to **Robot PU's micro:bit**.
 
 ```typescript
 // set servo trims
-robotPu.setServoTrim(4, 4, 0, 0, -8, 0)
+robotPuPro.setServoTrim(4, 4, 0, 0, -8, 0)
 
 // allow gamepad remote control
 radio.onReceivedValue(function(name: string, value: number) {
-    robotPu.runKeyValueCommand(name,value)
+    robotPuPro.runKeyValueCommand(name,value)
 })
 
 // allow robots to exchange information for group activities
 radio.onReceivedString(function(receivedString: string) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 // trigger servo calibration by gamepad 
 input.onLogoEvent(TouchButtonEvent.Pressed, function() {
-    robotPu.toggleServoTrim()
+    robotPuPro.toggleServoTrim()
 })
 
 // increase radio channel
 input.onButtonPressed(Button.A, function() {
-    robotPu.changeChannel(1)
+    robotPuPro.changeChannel(1)
 })
 // decrease radio channel 
 input.onButtonPressed(Button.B, function () {
-    robotPu.changeChannel(-1)
+    robotPuPro.changeChannel(-1)
 })
 
 // set robot to API mode to avoid autonomous actions and AI Actions
-robotPu.setModeVar(robotPu.Mode.API)
+robotPuPro.setModeVar(robotPuPro.Mode.API)
 
 // set Kungfu Gaits. Each array item is a gait with 10 servo angles, with range of 0-180
 // Servos: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm.
@@ -129,7 +129,7 @@ let currentSpeed = kungfuSpeed[0] // pick the 1st speed as starting speed
 
 // action engine. It runs the gait and the gait speed you pick
 basic.forever(function () {
-    robotPu.moveServos(currentGait, currentSpeed, [0, 1, 2, 3], 1, [4, 5, 6, 7, 8, 9], 1)
+    robotPuPro.moveServos(currentGait, currentSpeed, [0, 1, 2, 3], 1, [4, 5, 6, 7, 8, 9], 1)
     basic.pause(10)
 })
 
@@ -160,7 +160,7 @@ basic.forever(function () {
 ### A. Servo trim
 
 ```typescript
-robotPu.setServoTrim(4, 4, 0, 0, -8, 0)
+robotPuPro.setServoTrim(4, 4, 0, 0, -8, 0)
 ```
 
 These six numbers are **trim offsets** (degrees) for: left foot, left leg, right foot, right leg, head yaw, head pitch. They compensate for physical assembly tolerances so the robot stands straight. You will have different values for your own robot.
@@ -192,7 +192,7 @@ Because Loop 1 runs so frequently, the servos smoothly track any change Loop 2 m
 ### E. Sync vs async servo groups in `moveServos`
 
 ```typescript
-robotPu.moveServos(currentGait, currentSpeed, [0, 1, 2, 3], 1, [4, 5, 6, 7, 8, 9], 1)
+robotPuPro.moveServos(currentGait, currentSpeed, [0, 1, 2, 3], 1, [4, 5, 6, 7, 8, 9], 1)
 ```
 
 - **Sync group** `[0, 1, 2, 3]` — foot and leg servos. The function waits for these before returning `true`.
@@ -241,7 +241,7 @@ Even while the Kungfu sequence plays, the radio listeners remain active:
 - **Add a button trigger**
     - Use `input.onButtonPressed(Button.AB, ...)` to jump to a specific gait immediately.
 - **Add sound**
-    - Call `robotPu.playToneSequenceMs([440, 550, 660], [100, 100, 200])` when a dramatic pose is reached.
+    - Call `robotPuPro.playToneSequenceMs([440, 550, 660], [100, 100, 200])` when a dramatic pose is reached.
 - **Sync multiple robots**
     - Use `radio.sendString(...)` from a coordinator robot to trigger the same gait on all robots simultaneously.
 - **Try different speed gains**

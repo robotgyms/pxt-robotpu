@@ -292,7 +292,7 @@ function setCellLocal(x: number, y: number, v: number) {
 }
 
 basic.forever(function () {
-    const d = robotPu.sonarDistanceCm()
+    const d = robotPuPro.sonarDistanceCm()
     const heading = input.compassHeading()
 
     let dx = 0
@@ -315,9 +315,9 @@ basic.forever(function () {
 
     if (d > 0 && d < DANGER_CM) {
         setCellLocal(CX + dx, CY + dy, 2)
-        robotPu.back()
+        robotPuPro.back()
     } else {
-        robotPu.walk()
+        robotPuPro.walk()
     }
 
     basic.pause(100)

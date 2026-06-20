@@ -5,7 +5,7 @@ Robot PU can navigate using an ultrasonic **sonar distance sensor**. The extensi
 This lesson explains:
 
 - what sonar data Robot PU uses
-- how `robotPu.explore()` works internally
+- how `robotPuPro.explore()` works internally
 - how to use it safely in your own programs
 
 ---
@@ -16,7 +16,7 @@ Robot PU uses an **HCSR04**-style ultrasonic sensor.
 
 In this extension:
 
-- Read distance (cm): `robotPu.sonarDistanceCm()`
+- Read distance (cm): `robotPuPro.sonarDistanceCm()`
 - Default wiring pins used by the extension:
   - Trigger: `P2`
   - Echo: `P8`
@@ -25,11 +25,11 @@ In this extension:
 
 ## 2. The simplest autopilot: call `explore()` repeatedly
 
-`robotPu.explore()` is an **action** (it advances when called repeatedly). The simplest “autopilot” loop is:
+`robotPuPro.explore()` is an **action** (it advances when called repeatedly). The simplest “autopilot” loop is:
 
 ```typescript
 basic.forever(function () {
-    robotPu.explore()
+    robotPuPro.explore()
 })
 ```
 
@@ -103,9 +103,9 @@ input.onButtonPressed(Button.A, function () {
 
 basic.forever(function () {
     if (enabled) {
-        robotPu.explore()
+        robotPuPro.explore()
     } else {
-        robotPu.stand()
+        robotPuPro.stand()
     }
 })
 ```
@@ -118,15 +118,15 @@ Even when using autopilot, it can be helpful to add your own “emergency stop�
 
 ```typescript
 basic.forever(function () {
-    const cm = robotPu.sonarDistanceCm()
+    const cm = robotPuPro.sonarDistanceCm()
 
     if (cm > 0 && cm < 8) {
         // Too close: stop and stand for a moment
         for (let i = 0; i < 200; i++) {
-            robotPu.stand()
+            robotPuPro.stand()
         }
     } else {
-        robotPu.explore()
+        robotPuPro.explore()
     }
 })
 ```
@@ -135,8 +135,8 @@ basic.forever(function () {
 
 ## 6. Summary
 
-- `robotPu.sonarDistanceCm()` gives distance in cm.
-- `robotPu.explore()` implements a sonar-based autopilot:
+- `robotPuPro.sonarDistanceCm()` gives distance in cm.
+- `robotPuPro.explore()` implements a sonar-based autopilot:
   - builds a 4-bin distance “point cloud”
   - computes steering using a weighted center-of-mass
   - computes speed from obstacle distance

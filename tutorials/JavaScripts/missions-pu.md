@@ -43,22 +43,22 @@ let danceUntil = 0
 
 basic.forever(function () {
     const now = control.millis()
-    const d = robotPu.sonarDistanceCm()
+    const d = robotPuPro.sonarDistanceCm()
 
     if (input.soundLevel() > 70) {
         danceUntil = now + 3000
     }
 
     if (now < danceUntil) {
-        robotPu.dance()
+        robotPuPro.dance()
         basic.pause(40)
         return
     }
 
     if (d > 0 && d < 12) {
-        robotPu.back()
+        robotPuPro.back()
     } else {
-        robotPu.walk()
+        robotPuPro.walk()
     }
 
     basic.pause(40)

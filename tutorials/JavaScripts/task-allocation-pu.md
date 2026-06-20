@@ -56,9 +56,9 @@ basic.forever(function () {
     }
 
     if (iAmLeader()) {
-        robotPu.walk()
+        robotPuPro.walk()
     } else {
-        robotPu.rest()
+        robotPuPro.rest()
     }
 
     basic.pause(100)

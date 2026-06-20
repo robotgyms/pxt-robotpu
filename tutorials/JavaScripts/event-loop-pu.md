@@ -43,7 +43,7 @@
  
  Read sensors:
  
- - `robotPu.sonarDistanceCm()`
+ - `robotPuPro.sonarDistanceCm()`
  - `input.isGesture(Gesture.FreeFall)`
  - `input.rotation(Rotation.Roll)` / `input.rotation(Rotation.Pitch)`
  - `input.soundLevel()`
@@ -60,9 +60,9 @@
  
  Send one small action update:
  
- - `robotPu.walk(speed, turn)`
- - `robotPu.explore()`
- - `robotPu.stand()`
+ - `robotPuPro.walk(speed, turn)`
+ - `robotPuPro.explore()`
+ - `robotPuPro.stand()`
  
  Then loop back.
  
@@ -120,7 +120,7 @@
  ```typescript
  basic.forever(function () {
      // 1) Observation
-     const cm = robotPu.sonarDistanceCm()
+     const cm = robotPuPro.sonarDistanceCm()
  
      // 2) Thinking
      let speed = 2
@@ -132,7 +132,7 @@
      }
  
      // 3) Action (one small update)
-     robotPu.walk(speed, turn)
+     robotPuPro.walk(speed, turn)
  })
  ```
  
@@ -165,11 +165,11 @@
  
  basic.forever(function () {
      if (mode == Mode.Stand) {
-         robotPu.stand()
+         robotPuPro.stand()
      } else if (mode == Mode.Explore) {
-         robotPu.explore()
+         robotPuPro.explore()
      } else {
-         robotPu.walk(2, 0)
+         robotPuPro.walk(2, 0)
      }
  })
  ```

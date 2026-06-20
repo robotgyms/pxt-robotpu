@@ -15,34 +15,34 @@
  
  ### Motion actions (return status `number`)
  
- - `robotPu.walk(speed, turn)`
- - `robotPu.sideStep(direction)`
- - `robotPu.explore()`
- - `robotPu.dance()`
- - `robotPu.kick()`
- - `robotPu.jump()`
- - `robotPu.rest()`
- - `robotPu.stand()`
+ - `robotPuPro.walk(speed, turn)`
+ - `robotPuPro.sideStep(direction)`
+ - `robotPuPro.explore()`
+ - `robotPuPro.dance()`
+ - `robotPuPro.kick()`
+ - `robotPuPro.jump()`
+ - `robotPuPro.rest()`
+ - `robotPuPro.stand()`
  
  ### Motion actions (statement versions, return `void`)
  
  These are the same actions but **do not return a code**, so they are harder to sequence precisely:
  
- - `robotPu.walkDo(speed, turn)`
- - `robotPu.sideStepDo(direction)`
- - `robotPu.exploreDo()`
- - `robotPu.danceDo()`
- - `robotPu.kickDo()`
- - `robotPu.jumpDo()`
- - `robotPu.restDo()`
- - `robotPu.standDo()`
+ - `robotPuPro.walkDo(speed, turn)`
+ - `robotPuPro.sideStepDo(direction)`
+ - `robotPuPro.exploreDo()`
+ - `robotPuPro.danceDo()`
+ - `robotPuPro.kickDo()`
+ - `robotPuPro.jumpDo()`
+ - `robotPuPro.restDo()`
+ - `robotPuPro.standDo()`
  
  ### Non-motion actions (usually synchronous)
  
- - `robotPu.greet()`
- - `robotPu.talk(text)`
- - `robotPu.sing(text)`
- - `robotPu.setMode(mode)` (switch the internal behavior state machine)
+ - `robotPuPro.greet()`
+ - `robotPuPro.talk(text)`
+ - `robotPuPro.sing(text)`
+ - `robotPuPro.setMode(mode)` (switch the internal behavior state machine)
  
  ---
  
@@ -68,8 +68,8 @@
  
  ```typescript
  // (Concept only) A blocking API would look like this.
- // robotPu.walkBlocking(3)
- // robotPu.sideStepBlocking(-1)
+ // robotPuPro.walkBlocking(3)
+ // robotPuPro.sideStepBlocking(-1)
  ```
  
  ### B. Asynchronous (recommended)
@@ -77,7 +77,7 @@
  You call the action many times. Each call advances the motion.
  
  ```typescript
- let rc = robotPu.walk(2, 0)
+ let rc = robotPuPro.walk(2, 0)
  if (rc == 0) {
      // A completion boundary happened (a gait state finished)
  }
@@ -93,7 +93,7 @@
 
  ```typescript
  for (let i = 0; i < 100; i++) {
-     robotPu.walk(2, 0) // ignore rc
+     robotPuPro.walk(2, 0) // ignore rc
  }
  ```
 
@@ -107,7 +107,7 @@
  
  ```typescript
  function myAction(): number {
-     return robotPu.walk(2, 0)
+     return robotPuPro.walk(2, 0)
  }
  
  function do400Times(run: () => number): void {
@@ -122,13 +122,13 @@
  do400Times(myAction)
  
  // Or pass an inline anonymous function (arrow function)
- do400Times(() => robotPu.walk(2, 0))
+ do400Times(() => robotPuPro.walk(2, 0))
  ```
  
  Key idea:
  
- - `robotPu.walk(2, 0)` calls the function immediately and produces a `number`.
- - `() => robotPu.walk(2, 0)` produces a function that we can call later, many times.
+ - `robotPuPro.walk(2, 0)` calls the function immediately and produces a `number`.
+ - `() => robotPuPro.walk(2, 0)` produces a function that we can call later, many times.
  
  ---
  
@@ -190,15 +190,15 @@ function doCompletions(run: () => number, completions: number): void {
 
 // 1) Walk forward: 3 steps
 // If your gait uses 2 states per step, count 0 six times
-doCompletions(() => robotPu.walk(2, 0), 6)
+doCompletions(() => robotPuPro.walk(2, 0), 6)
 
 // 2) Side step left: 3 steps
 // direction: negative = left, positive = right
-doCompletions(() => robotPu.sideStep(-0.2), 6)
+doCompletions(() => robotPuPro.sideStep(-0.2), 6)
 
 // 3) Jump one time
-doCompletions(() => robotPu.jump(), 4)
+doCompletions(() => robotPuPro.jump(), 4)
 
 // 4) Stand (return to neutral)
-doCompletions(() => robotPu.stand(), 1)
+doCompletions(() => robotPuPro.stand(), 1)
  ```

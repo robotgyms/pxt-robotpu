@@ -101,7 +101,7 @@ Goal:
 - micro:bit compass heading:
   - `0 = North`, `90 = East`, `180 = South`, `270 = West`
 - Robot PU motion API:
-  - `robotPu.walk(speed, turn)`
+  - `robotPuPro.walk(speed, turn)`
   - `turn` is `-1..1` (left..right)
 
 ---
@@ -207,12 +207,12 @@ control.onEvent(SRC_FOLLOW, EVT_CMD_UPDATED, function () {
 basic.forever(function () {
     // Fail-safe: if signal is stale, stop
     if (control.millis() - lastCmdMs > 1000) {
-        robotPu.walk(0, 0)
+        robotPuPro.walk(0, 0)
         basic.pause(20)
         return
     }
 
-    robotPu.walk(targetSpeed, targetTurn)
+    robotPuPro.walk(targetSpeed, targetTurn)
     basic.pause(20)
 })
 ```

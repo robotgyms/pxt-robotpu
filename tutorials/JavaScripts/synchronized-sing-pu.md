@@ -21,7 +21,7 @@
  - **4 tracks**: implement `track1()`, `track2()`, `track3()`, `track4()`.
  - **Channel → track mapping**: use:
  
-   `trackIndex = robotPu.channel() % 4`
+   `trackIndex = robotPuPro.channel() % 4`
  
    which maps channels to tracks like:
  
@@ -41,7 +41,7 @@
  - Button **A** increments channel.
  - Button **B** decrements channel.
  - **Logo** starts the singing track selected by `channel % 4`.
- - `robotPu.greet()` initializes Robot PU.
+ - `robotPuPro.greet()` initializes Robot PU.
  
  ```typescript
 function track3 () {
@@ -484,15 +484,15 @@ function track2 () {
 })
 // press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
-    robotPu.changeChannel(-1)
+    robotPuPro.changeChannel(-1)
 })
 // listen to radio messages for commands of key value pairs
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 // press logo button to dance using set mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    track = robotPu.channel() % 4
+    track = robotPuPro.channel() % 4
     if (track == 0) {
         track1()
     } else if (track == 1) {
@@ -506,7 +506,7 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 let track = 0
 let started = 0
 // Initialize robot by ask it to greet
-robotPu.greet()
+robotPuPro.greet()
 ```
 Example program can be downloaded from https://makecode.microbit.org/S24031-00421-18959-80697
 
@@ -542,7 +542,7 @@ Continue transcription workflow (repeatable):
 - Use frequency `0` for rests.
 
 ```typescript
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 // Set your tempo here. The MIDI-extraction script below uses this BPM to convert ticks -> milliseconds.
 music.setTempo(120)
 music.setVolume(255)
@@ -604,11 +604,11 @@ radio.onReceivedString(function (receivedString) {
         playSelectedTrack()
         return
     }
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -647,7 +647,7 @@ then, copy and paste the code from Copilot outputs to replace the code above.
 here is am example.
 
 ```typescript
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 // Set your tempo here. The MIDI-extraction script below uses this BPM to convert ticks -> milliseconds.
 music.setTempo(120)
 music.setVolume(255)
@@ -902,11 +902,11 @@ radio.onReceivedString(function (receivedString) {
     if (receivedString == "#puChorus") {
         playSelectedTrack(track)
     }
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -926,7 +926,7 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 ```
 Another example:
 ```typescript
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 // Set your tempo here. The MIDI-extraction script below uses this BPM to convert ticks -> milliseconds.
 music.setTempo(120)
 music.setVolume(255)
@@ -1181,11 +1181,11 @@ radio.onReceivedString(function (receivedString) {
     if (receivedString == "#puChorus") {
         playSelectedTrack(track)
     }
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -1303,7 +1303,7 @@ Notes:
 
 ### A. Why “channel % 4” works
 
-`robotPu.channel()` returns the current radio group ID.
+`robotPuPro.channel()` returns the current radio group ID.
 
 Using modulo:
 
@@ -1317,7 +1317,7 @@ This is a common technique for distributing roles among identical devices.
 
 The code triggers tracks only when you press the **logo button**:
 
-- read `robotPu.channel()`
+- read `robotPuPro.channel()`
 - compute `track = channel % 4`
 - call `track1..track4()` based on the value
 
@@ -1327,8 +1327,8 @@ Buttons A/B only change the channel; they do not start singing.
 
 This program also registers:
 
-- `radio.onReceivedString(...)` → `robotPu.runStringCommand(...)`
-- `radio.onReceivedValue(...)` → `robotPu.runKeyValueCommand(name, value)`
+- `radio.onReceivedString(...)` → `robotPuPro.runStringCommand(...)`
+- `radio.onReceivedValue(...)` → `robotPuPro.runKeyValueCommand(name, value)`
 
 So you can control Robot PU over radio while preparing the quartet.
 
@@ -1362,7 +1362,7 @@ Tip:
   - have all robots start their track when they receive it
 
 - **Add choreography**
-  - on beat boundaries, call `robotPu.dance()` / `robotPu.walk(...)` to make the chorus look alive
+  - on beat boundaries, call `robotPuPro.dance()` / `robotPuPro.walk(...)` to make the chorus look alive
 
 - **Add a conductor UI**
   - a separate micro:bit to assign channels and broadcast start/stop commands
@@ -1404,7 +1404,7 @@ radio.setGroup(166)
 radio.onReceivedString(function (msg: string) {
     if (msg == "START") {
         // pick role and start immediately
-        track = robotPu.channel() % 4
+        track = robotPuPro.channel() % 4
         if (track == 0) track1()
         else if (track == 1) track2()
         else if (track == 2) track3()
@@ -1448,7 +1448,7 @@ radio.onReceivedValue(function (name: string, value: number) {
             while (control.millis() < startAt) {
                 basic.pause(5)
             }
-            track = robotPu.channel() % 4
+            track = robotPuPro.channel() % 4
             if (track == 0) track1()
             else if (track == 1) track2()
             else if (track == 2) track3()
@@ -1570,7 +1570,7 @@ If you want one robot to act as a “leader” instead of a separate conductor m
 
 Leader can be chosen by channel, for example:
 
-- if `robotPu.channel() % 4 == 0` then leader
+- if `robotPuPro.channel() % 4 == 0` then leader
 
 **Leader snippet (broadcast)**
 
@@ -1579,7 +1579,7 @@ radio.setGroup(166)
 let bpm = 120
 
 function amLeader(): boolean {
-    return (robotPu.channel() % 4) == 0
+    return (robotPuPro.channel() % 4) == 0
 }
 
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
@@ -1598,7 +1598,7 @@ Followers use the same receiver logic shown above in method C/D.
 In this pattern:
 
 - All Robot PUs run the same quartet code.
-- Each robot selects its part using `track = robotPu.channel() % 4`.
+- Each robot selects its part using `track = robotPuPro.channel() % 4`.
 - A conductor micro:bit starts all robots together.
 
 ### A. Conductor micro:bit code (broadcast tempo + startAt)
@@ -1639,7 +1639,7 @@ let bpm = 120
 
 radio.onReceivedValue(function (name: string, value: number) {
     // keep existing:
-    // robotPu.runKeyValueCommand(name, value)
+    // robotPuPro.runKeyValueCommand(name, value)
 
     if (name == "bpm") {
         bpm = value
@@ -1655,7 +1655,7 @@ radio.onReceivedValue(function (name: string, value: number) {
             }
 
             // select the role and start that part
-            track = robotPu.channel() % 4
+            track = robotPuPro.channel() % 4
             if (track == 0) track1()
             else if (track == 1) track2()
             else if (track == 2) track3()
@@ -1669,7 +1669,7 @@ Notes:
 
 - `control.inBackground(...)` prevents the radio callback from blocking.
 - Using `startAt` is more reliable than “start immediately on receive”.
-- If you already use `radio.onReceivedValue` for `robotPu.runKeyValueCommand(...)`, merge the logic into one handler.
+- If you already use `radio.onReceivedValue` for `robotPuPro.runKeyValueCommand(...)`, merge the logic into one handler.
 
 ---
 

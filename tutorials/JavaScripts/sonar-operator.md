@@ -208,15 +208,15 @@ Here is the version to make robot PU take actions to react with torpedo:
 
 ```typescript
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
-robotPu.setChannel(166)
+robotPuPro.setChannel(166)
 
 let distance = 0
-let lastDistance = Math.round(robotPu.sonarDistanceCm())
+let lastDistance = Math.round(robotPuPro.sonarDistanceCm())
 let lastMs = control.millis()
 
 let closingSpeed = 0
@@ -232,22 +232,22 @@ const FAST_CM_PER_S = 5
 
 basic.forever(function () {
     if (mode == 1) {
-        robotPu.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0.6)
+        robotPuPro.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0.6)
     } else if (mode == 2) {
-        robotPu.restDo()
+        robotPuPro.restDo()
     } else if (mode == 3) {
         // use loop to make robot PU jump for a while to escape from the torpedo
         for (let index = 0; index < 100; index++) {
-            robotPu.jumpDo()
+            robotPuPro.jumpDo()
         }
     } else {
-        robotPu.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0)
+        robotPuPro.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0)
     }
     basic.pause(20)
 })
 basic.forever(function () {
     const nowMs = control.millis()
-    distance = Math.round(robotPu.sonarDistanceCm())
+    distance = Math.round(robotPuPro.sonarDistanceCm())
     // dt in seconds (avoid divide-by-zero)
     const dt = Math.max(0.05, (nowMs - lastMs) / 1000)
     // Closing speed in cm/s

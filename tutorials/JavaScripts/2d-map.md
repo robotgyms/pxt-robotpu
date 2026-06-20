@@ -15,9 +15,9 @@ We represent the map as a **5×5 matrix** where:
 
 **Robot PU** is an interactive STEM buddy controlled by a micro:bit. He is known for his:
 
-* **Advanced Movement**: Walking with `robotPu.walk(speed, turn)`.
-* **Sensor Awareness**: Reading distance with `robotPu.sonarDistanceCm()`.
-* **Actuation**: Controlling head servos with `robotPu.servo(...)`.
+* **Advanced Movement**: Walking with `robotPuPro.walk(speed, turn)`.
+* **Sensor Awareness**: Reading distance with `robotPuPro.sonarDistanceCm()`.
+* **Actuation**: Controlling head servos with `robotPuPro.servo(...)`.
 
 ---
 
@@ -55,9 +55,9 @@ Each sonar reading updates:
 
 ### Sensors / Actuators used
 
-* `robotPu.sonarDistanceCm()` for distance.
+* `robotPuPro.sonarDistanceCm()` for distance.
 * `input.compassHeading()` for heading (0–359°).
-* `robotPu.servo(robotPu.ServoJoint.HeadYaw, angle)` to sweep/track yaw.
+* `robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, angle)` to sweep/track yaw.
 
 ### Geometry model (simple but useful)
 
@@ -196,7 +196,7 @@ let commandedTurn = 0
 
 basic.forever(function () {
     // 1) Command movement (this is the “speed time series”)
-    robotPu.walk(commandedSpeed, commandedTurn)
+    robotPuPro.walk(commandedSpeed, commandedTurn)
 
     // 2) Time series inputs
     const t = control.millis()
@@ -205,9 +205,9 @@ basic.forever(function () {
 
     // Optional: actively drive the head yaw to match the scan model
     const headYawServo = clampInt(90 + yawDeg, 0, 180)
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, headYawServo)
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, headYawServo)
 
-    const distCm = robotPu.sonarDistanceCm()
+    const distCm = robotPuPro.sonarDistanceCm()
     if (distCm <= 0 || distCm > MAX_USE_CM) {
         decayGrid()
         drawGrid()

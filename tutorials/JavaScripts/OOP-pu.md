@@ -19,7 +19,7 @@ A follower robot that:
 
 ## Prerequisites
 
-- Robot PU extension available (you will use `robotPu.walk()` and `robotPu.frontDistanceArray()`)
+- Robot PU extension available (you will use `robotPuPro.walk()` and `robotPuPro.frontDistanceArray()`)
 - All robots use the same `radio` group
 - Compass calibrated (leader and followers)
 
@@ -115,7 +115,7 @@ class ObstacleAvoidance {
 
     constructor() {
         basic.forever(() => {
-            let d = robotPu.frontDistanceArray()[2]
+            let d = robotPuPro.frontDistanceArray()[2]
 
             let nextMode = 0
             if (d > 0 && d < this.EMERGENCY) nextMode = EVT_EMERGENCY
@@ -166,20 +166,20 @@ class SmartFollower {
         this.lastCmdMs = control.millis()
         let fwd = this.nav.computeSpeed(this.radio.speed)
         let turn = this.nav.computeTurn(this.radio.heading)
-        robotPu.walk(fwd, turn)
+        robotPuPro.walk(fwd, turn)
     }
 
     avoidObstacle() {
-        robotPu.walk(1.0, 0.9)
+        robotPuPro.walk(1.0, 0.9)
     }
 
     emergencyStop() {
-        robotPu.walk(0, 0)
+        robotPuPro.walk(0, 0)
         basic.showIcon(IconNames.No)
     }
 
     timeoutStop() {
-        robotPu.walk(0, 0)
+        robotPuPro.walk(0, 0)
     }
 }
 ```
@@ -204,7 +204,7 @@ radio.setGroup(42)
 
 basic.forever(function () {
     let heading = input.compassHeading()
-    let speed = robotPu.joystickY()
+    let speed = robotPuPro.joystickY()
     radio.sendString(heading + "," + speed)
     basic.pause(80)
 })

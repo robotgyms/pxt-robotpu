@@ -1,6 +1,6 @@
 # Dance tutorial (Robot PU)
 
-This tutorial teaches you how to make Robot PU dance in MakeCode, starting from the built-in `robotPu.dance()` behavior and progressing to a **beat-synced choreography**.
+This tutorial teaches you how to make Robot PU dance in MakeCode, starting from the built-in `robotPuPro.dance()` behavior and progressing to a **beat-synced choreography**.
 
 The final section includes an optional **advanced** project: a Q-learning gait sequencer.
 
@@ -12,11 +12,11 @@ The final section includes an optional **advanced** project: a Q-learning gait s
 
 ## Part 1: Quick start (built-in dance)
 
-The easiest way to dance is to call `robotPu.dance()` in a loop.
+The easiest way to dance is to call `robotPuPro.dance()` in a loop.
 
 ```typescript
 basic.forever(function () {
-    robotPu.dance()
+    robotPuPro.dance()
     basic.pause(20)
 })
 ```
@@ -48,12 +48,12 @@ let gaits: number[][] = [
 let currentAngles = [90, 90, 90, 90, 90, 80]
 
 function setPose(angles: number[]): void {
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, angles[0])
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, angles[1])
-    robotPu.servo(robotPu.ServoJoint.RightFoot, angles[2])
-    robotPu.servo(robotPu.ServoJoint.RightLeg, angles[3])
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, angles[4])
-    robotPu.servo(robotPu.ServoJoint.HeadPitch, angles[5])
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, angles[0])
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, angles[1])
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, angles[2])
+    robotPuPro.servo(robotPuPro.ServoJoint.RightLeg, angles[3])
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, angles[4])
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, angles[5])
 }
 
 function interpolateTo(target: number[], steps: number, stepMs: number): void {
@@ -208,12 +208,12 @@ let currentAngles = [90, 90, 90, 90, 90, 80]
 let currentGait = 0
 
 function setPose(angles: number[]): void {
-    robotPu.servo(robotPu.ServoJoint.LeftFoot, angles[0])
-    robotPu.servo(robotPu.ServoJoint.LeftLeg, angles[1])
-    robotPu.servo(robotPu.ServoJoint.RightFoot, angles[2])
-    robotPu.servo(robotPu.ServoJoint.RightLeg, angles[3])
-    robotPu.servo(robotPu.ServoJoint.HeadYaw, angles[4])
-    robotPu.servo(robotPu.ServoJoint.HeadPitch, angles[5])
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, angles[0])
+    robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, angles[1])
+    robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, angles[2])
+    robotPuPro.servo(robotPuPro.ServoJoint.RightLeg, angles[3])
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, angles[4])
+    robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, angles[5])
 }
 
 function interpAndWiggle(target: number[], steps: number, stepMs: number): void {
