@@ -6,7 +6,7 @@ This repository is a MakeCode extension for BBC micro:bit, and contributions typ
 
 - Bug fixes and reliability improvements
 - New Blocks / API surface (in `main.ts` and supporting code)
-- Tutorials and documentation (especially `tutorials/JavaScripts/*.md`)
+- Tutorials and documentation (especially `tutorials/*.md`)
 - Examples and remote-control protocols
 
 ---
@@ -39,7 +39,7 @@ MakeCode supports importing extensions by URL.
   - User-facing **Blocks** wrapper (MakeCode `//%` annotations)
 - `robotpu.ts`
   - Core Robot PU implementation (behaviors, state machine, sensors)
-- `tutorials/JavaScripts/`
+- `tutorials/`
   - JavaScript / TypeScript tutorials and learning path
 - `assets/`
   - Images used in READMEs
@@ -50,7 +50,7 @@ MakeCode supports importing extensions by URL.
 
 ### Documentation and tutorials
 
-- Tutorials live in `tutorials/JavaScripts/*.md`.
+- Tutorials live in `tutorials/*.md`.
 - Prefer a **tutorial style**:
   - clear goals
   - prerequisites
@@ -118,4 +118,4 @@ If you’re unsure where a change should live:
 
 - Blocks/API surface: `main.ts`
 - Robot behavior implementation: `robotpu.ts`
-- Learning materials: `tutorials/JavaScripts/`
+- Learning materials: `tutorials/`

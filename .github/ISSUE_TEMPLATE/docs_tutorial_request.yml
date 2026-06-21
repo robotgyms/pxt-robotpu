@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use this template for documentation improvements or new tutorials (especially under tutorials/JavaScripts).
+        Use this template for documentation improvements or new tutorials (especially under tutorials).
 
   - type: dropdown
     id: doc_area
@@ -15,7 +15,7 @@ body:
       label: Documentation area
       options:
         - Main README
-        - Tutorials/JavaScripts learning path
+        - Tutorials learning path
         - New tutorial
         - Fix or clarify existing tutorial
         - Other

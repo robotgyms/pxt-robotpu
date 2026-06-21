@@ -32,7 +32,7 @@ Purchase links:
 - 2 × micro:bit compatible board
 - Gamepad (remote control and distributed computation)
 - [Manual](https://robotgyms.com/courses/the-story-of-pu-book-1-pair-up/)
-- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/JavaScripts/README.md)
+- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/README.md)
 - [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/)
 - [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth)
 - [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
@@ -102,14 +102,14 @@ Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
 The JavaScript tutorial set includes **knowledge graphs** (mindmaps) that show how topics connect and suggest a learning path.
 
 - The knowledge graphs are maintained in:
-  - `tutorials/JavaScripts/README.md`
+  - `tutorials/README.md`
 - They include:
   - a general tutorial mindmap (`mindmap.png` + Mermaid source)
   - an advanced, ROS-inspired mindmap (`advanced-ros-mindmap.png` + Mermaid source)
 
-![JavaScript Tutorials Knowledge Graph](tutorials/JavaScripts/mindmap.png)
+![JavaScript Tutorials Knowledge Graph](tutorials/mindmap.png)
 
-![Advanced ROS Topics Knowledge Graph](tutorials/JavaScripts/advanced-ros-mindmap.png)
+![Advanced ROS Topics Knowledge Graph](tutorials/advanced-ros-mindmap.png)
 
 Use these graphs to:
 
