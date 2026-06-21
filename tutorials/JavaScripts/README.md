@@ -91,6 +91,28 @@ mindmap
 ```mermaid
 mindmap
   root((Robot PU Advanced Topics - ROS inspired))
+    ROS concepts
+      Nodes
+        ros-nodes.md
+        Perception node
+        Planner node
+        Controller node
+        Safety node
+      Topics
+        ros-topics.md
+        odom
+          slam-odometry-pu.md
+        scan
+          scan-topic.md
+        cmd_vel
+          cmd-vel-topic.md
+        diagnostics
+          diagnostics-topic.md
+      Tools
+        visualization
+        logging
+          telemetry-logging-pu.md
+        debugging
     Tooling and Observability
       Telemetry logging
       Base station dashboard
@@ -151,6 +173,11 @@ Teachers can cherry-pick from the pool using these age/grade bands. The level is
 - **Custom events and handlers**: [event-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-pu.md)
 - **State machines**: [state-machine-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/state-machine-pu.md)
 - **OOP architecture**: [OOP-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/OOP-pu.md)
+- **ROS nodes as roles**: [ros-nodes.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/ros-nodes.md)
+- **ROS topics**: [ros-topics.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/ros-topics.md)
+- **ROS /cmd_vel topic**: [cmd-vel-topic.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/cmd-vel-topic.md)
+- **ROS /scan topic**: [scan-topic.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/scan-topic.md)
+- **ROS /diagnostics topic**: [diagnostics-topic.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/diagnostics-topic.md)
 - **Kungfu pose sequence**: [kungfu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/kungfu.md)
 - **Peer chat over radio**: [pu-peer-chat.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/pu-peer-chat.md)
 - **Sonar operator**: [sonar-operator.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/sonar-operator.md)
@@ -273,6 +300,14 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **Path following** ⭐⭐⭐: [path-following-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/path-following-pu.md)
 - **Local planner** ⭐⭐⭐: [local-planner-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/local-planner-pu.md)
 
+### ROS concepts
+
+- **ROS nodes as roles** ⭐⭐: [ros-nodes.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/ros-nodes.md)
+- **ROS topics on micro:bit** ⭐⭐: [ros-topics.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/ros-topics.md)
+- **ROS /cmd_vel topic** ⭐⭐: [cmd-vel-topic.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/cmd-vel-topic.md)
+- **ROS /scan topic** ⭐⭐: [scan-topic.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/scan-topic.md)
+- **ROS /diagnostics topic** ⭐⭐: [diagnostics-topic.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/diagnostics-topic.md)
+
 ### ROS-inspired robotics architecture
 
 - **Telemetry logging** ⭐⭐⭐: [telemetry-logging-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/telemetry-logging-pu.md)
@@ -310,9 +345,11 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **barebone.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/barebone.md
 - **base-station-dashboard-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/base-station-dashboard-pu.md
 - **behavior-tree-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/behavior-tree-pu.md
+- **cmd-vel-topic.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/cmd-vel-topic.md
 - **dance-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dance-pu.md
 - **decision-engine-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/decision-engine-pu.md
 - **demo-program.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/demo-program.md
+- **diagnostics-topic.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/diagnostics-topic.md
 - **dont-bonk.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/dont-bonk.md
 - **emotion-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/emotion-pu.md
 - **event-loop-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/event-loop-pu.md
@@ -338,7 +375,10 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **pu-peer-chat.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/pu-peer-chat.md
 - **remote-control.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/remote-control.md
 - **robotvoice.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/robotvoice.md
+- **ros-nodes.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/ros-nodes.md
+- **ros-topics.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/ros-topics.md
 - **safety-watchdog-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/safety-watchdog-pu.md
+- **scan-topic.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/scan-topic.md
 - **search-face.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/search-face.md
 - **servo-trim-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/servo-trim-calibration.md
 - **shared-map-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/JavaScripts/shared-map-pu.md
@@ -362,5 +402,5 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 
 ## Folder contents quick reference
 
-- **Markdown tutorials**: `53` `.md` files, including this `README.md`.
+- **Markdown tutorials**: `63` `.md` files, including this `README.md`.
 - **Compiled examples**: `.hex` files are included for selected complete projects.
