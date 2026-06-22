@@ -10,7 +10,7 @@ The retail kit includes a gamepad built from the second micro:bit for radio-base
 
 Learn more about The Story of PU, which shows robot PU's activities, hardware, software, tutorials, and upgrade projects at:
 
-- **Website**: [robotgyms.com/pu](https://robotgyms.com/pu)
+- **Product Website**: [robotgyms.com/pu](https://robotgyms.com/pu)
 - **YouTube**: [The Story of PU](https://www.youtube.com/@TheStoryofPu-yw8tr)
 - **TikTok**: [@thestoryofpu](https://www.tiktok.com/@thestoryofpu)
 - **Quick Start**： [How to use this library](https://youtu.be/aBw55nYjWDg)
@@ -48,7 +48,7 @@ The retail kit includes a **gamepad that uses the second micro:bit**. For the be
 
 - **Little AI friend**: walk, dance, navigate, maze solving, chat, generate songs, sing
 - **Games**: soccer, hide-and-seek, group dance/chorus
-- **Learn-then-create**: programming, electronics, mechanics, 3D printing accessories
+- 60+ **Learn-then-create** projects: programming, electronics, mechanics, 3D printing accessories
 - **Community**: share code and parts, collaborate, coordinate multiple robots
 
 ## What’are in the optional parts
