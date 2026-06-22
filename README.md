@@ -226,7 +226,6 @@ make push-tag VERSION=1.0.42
 Before running a release, make sure your GitHub authentication is configured for pushing to the repository.
 
 ## Blocks / API
-
 This extension auto-initializes the robot on the first call to any `robotPu.*` API:
 
 - **Creates** an internal `RobotPu` instance
@@ -237,20 +236,262 @@ Because of this, there is **no separate `init` block** in the current API.
 
 The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and are organized into groups:
 
-- **Variables**
 - **Setup**
 - **Sensors**
 - **Actuators**
 - **Actions**
 - **Remote Control**
 
+### Setup
+
+#### `channel(): number`
+
+- **Block**: `channel`
+- **What it does**: Returns the current radio group/channel used for communication.
+- **Return**: `0 .. 255`
+
+#### `setChannel(channel: number): void`
+
+- **Block**: `set channel to %channel`
+- **What it does**: Sets the radio group/channel used for communication.
+- **Parameter**:
+  - `channel`: `0 .. 255`
+
+#### `changeChannel(delta: number): void`
+
+- **Block**: `change channel by %delta`
+- **What it does**: Adjusts the radio group/channel by `delta`.
+- **Notes**:
+  - Values wrap into `0..255`.
+
+#### `mode(): Mode`
+
+- **Block**: `mode`
+- **What it does**: Returns the current robot behavior mode.
+
+#### `setModeVar(mode: Mode): void`
+
+- **Block**: `set mode to %mode`
+- **What it does**: Sets the robot behavior mode (state machine mode).
+
+#### `setServoTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number): void`
+
+- **Block**: `set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch`
+- **What it does**: Sets persistent trim offsets (in degrees) added to the target servo angles.
+- **When to use**: If your robot does not stand level, walks crooked, or the head is not centered.
+- **Notes**:
+  - Trims are applied immediately and remain active until changed.
+
+#### Servo calibration / trim mode
+
+Use servo calibration / trim mode to align the robot's feet, legs, neck yaw, and head pitch into a neutral standing position.
+
+- **Enter trim mode**: Press the micro:bit logo button.
+- **Robot pose**: The robot moves into calibration stand mode so the foot heels can be aligned.
+- **Select servo**:
+  - Press gamepad `B2` to decrease servo index.
+  - Press gamepad `B3` to increase servo index.
+  - The selected servo index is shown on the micro:bit display.
+- **Adjust trim**:
+  - Press gamepad `B1` to move the selected servo one trim step in one direction.
+  - Press gamepad `B4` to move the selected servo one trim step in the other direction.
+  - Adjust until the robot's feet, legs, neck yaw, and head pitch are in a neutral stand position.
+- **Save and exit**: Press the micro:bit logo button again.
+- **Saved configuration**:
+  - Servo trim values are saved.
+  - The current radio channel number is saved.
+  - When the robot boots again, it remembers the saved servo trim and radio channel.
+
+The servo index order is:
+
+1. Left foot
+2. Left leg
+3. Right foot
+4. Right leg
+5. Head yaw
+6. Head pitch
+
+#### `toggleServoTrim(): void`
+
+- **Block**: `toggle servo trim calibration mode`
+- **What it does**: Toggles servo trim calibration mode on or off. Use the gamepad to select and adjust each servo while in calibration mode.
+
+#### `saveServoTrimCalibration(): void`
+
+- **Block**: `save servo trim calibration`
+- **What it does**: Saves the current servo trim values and radio channel, exits trim calibration mode, and returns to normal operation.
+
+#### `readConfig(): void`
+
+- **Block**: `read config`
+- **What it does**: Loads saved robot configuration, including servo trim values and radio channel.
+
+#### `writeConfig(): void`
+
+- **Block**: `write config`
+- **What it does**: Saves current robot configuration, including servo trim values and radio channel.
+
+#### `setWalkSpeedRange(min: number, max: number): void`
+
+- **Block**: `set walk speed range min %min max %max`
+- **What it does**: Sets the robot's internal maximum speed scalars used by autonomous behaviors and remote control.
+- **Parameters**:
+  - `min`: backward max speed (typically negative)
+  - `max`: forward max speed (typically positive)
+- **Notes**:
+  - This affects `explore()` speed planning and remote-control mapping.
+
+#### `eyeBrightness(): number`
+
+- **Block**: `eye brightness`
+- **What it does**: Returns the maximum brightness of Robot PU's eye LEDs.
+- **Return**: `0 .. 1`
+
+#### `setEyeBrightness(brightness: number): void`
+
+- **Block**: `set eye brightness to %brightness`
+- **What it does**: Sets the maximum brightness of Robot PU's eye LEDs.
+- **Parameters**:
+  - `brightness`: `0 .. 1`
+
+### Sensors
+
+#### `sonarDistanceCm(): number`
+
+- **Block**: `sonar distance (cm)`
+- **What it does**: Returns the current ultrasonic distance reading in centimeters.
+
+#### `frontDistanceArray(): number[]`
+
+- **Block**: `front distance array`
+- **What it does**: Returns a 5-element array describing the forward "distance profile" used by explore:
+  - `[left, leftFront, front, rightFront, right]`
+
+#### `bodyRoll(): number`
+
+- **Block**: `body roll`
+- **What it does**: Returns current body roll estimate.
+
+#### `bodyPitch(): number`
+
+- **Block**: `body pitch`
+- **What it does**: Returns current body pitch estimate.
+
+#### `musicTempo(): number`
+
+- **Block**: `music tempo`
+- **What it does**: Returns the internal beat tracker tempo estimate.
+
+#### `servoTargets(): number[]`
+
+- **Block**: `servo targets`
+- **What it does**: Returns the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm.
+
+#### `servoControls(): number[]`
+
+- **Block**: `servo controls`
+- **What it does**: Returns the servo control output angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm.
+
+#### `servoTrims(): number[]`
+
+- **Block**: `servo trims`
+- **What it does**: Returns the servo trim offsets array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm.
+
+#### `resetOdom(): void`
+
+- **Block**: `reset robot location`
+- **What it does**: Resets the odometry so Robot PU's position is (0, 0) and heading is 0 degrees (north).
+
+#### `locationArray(): number[]`
+
+- **Block**: `robot location array`
+- **What it does**: Returns Robot PU's estimated location as `[x, y, heading]`. x and y are in millimeters, heading is in degrees.
+
+### Actuators
+
+#### `servo(joint: ServoJoint, angle: number): void`
+
+- **Block**: `move %joint servo to %angle`
+- **Parameters**:
+  - `joint`: one of the `ServoJoint` values
+  - `angle`: `0 .. 180`
+- **What it does**: Directly moves a selected joint servo to the given angle.
+
+#### `servoStep(joint: ServoJoint, target: number, stepSize: number): void`
+
+- **Block**: `move %joint servo to %target with step size %stepSize`
+- **Parameters**:
+  - `target`: `0 .. 180`
+  - `stepSize`: `1 .. 20`
+- **What it does**: Moves a servo toward a target using progressive stepping (useful for smoother gestures).
+
+#### `servoStepStatus(joint: ServoJoint, target: number, stepSize: number): number`
+
+- **Block**: `servo step %joint to %target step size %stepSize`
+- **Parameters**:
+  - `target`: `0 .. 180`
+  - `stepSize`: `1 .. 20`
+- **What it does**: Moves a servo toward a target using progressive stepping and returns `1` while moving, `0` when arrived.
+
+#### `moveServos(targets: number[], speeds: number[], syncList: number[], syncSpeedGain: number, asyncList: number[], asyncSpeedGain: number): boolean`
+
+- **Block**: `move servos targets %targets speeds %speeds synchronous indexes %syncList synchronous gain %syncSpeedGain asynchronous indexes %asyncList asynchronous gain %asyncSpeedGain`
+- **What it does**: Moves multiple servos toward target angles simultaneously, with separate synchronous and asynchronous servo groups.
+- **Parameters**:
+  - `targets`: array of 10 target angles (0 to 180)
+  - `speeds`: array of 10 maximum step sizes
+  - `syncList`: array of servo joint indices that must arrive before returning
+  - `syncSpeedGain`: speed multiplier for the synchronous group
+  - `asyncList`: array of servo joint indices that move in the background
+  - `asyncSpeedGain`: speed multiplier for the asynchronous group
+- **Return**: `boolean` true when the synchronous servos have arrived
+
+#### `setCt(indexes: number[], values: number[]): void`
+
+- **Block**: `set control offsets indexes %indexes values %values`
+- **What it does**: Sets servo control offsets for feedback or feedforward control. Each value is an angle offset added to the servo motion target.
+
+#### `incrCt(indexes: number[], values: number[], gain: number): void`
+
+- **Block**: `increment control offsets indexes %indexes values %values gain %gain`
+- **What it does**: Increments servo control offsets smoothly. Each value is multiplied by gain and added to the current offset.
+
+#### `leftEyeBright(brightness: number): void`
+
+- **Block**: `set left eye brightness %brightness`
+- **Parameters**:
+  - `brightness`: `0 .. 1`
+- **What it does**: Sets left eye LED brightness.
+
+#### `rightEyeBright(brightness: number): void`
+
+- **Block**: `set right eye brightness %brightness`
+- **Parameters**:
+  - `brightness`: `0 .. 1`
+- **What it does**: Sets right eye LED brightness.
+
 ### Actions
 
-#### `greet()`
+#### `setMode(mode: Mode): void`
+
+- **Block**: `set mode %mode`
+- **What it does**: Sets Robot PU's behavior mode directly.
+
+#### `greet(): void`
 
 - **Block**: `greet`
 - **What it does**: Speaks an introduction using Billy voice (includes the robot serial string and name).
 - **Return**: `void`
+
+#### `sonarScan(): void`
+
+- **Block**: `sonar scan`
+- **What it does**: Takes one sonar reading and updates the internal front distance array. Call this before reading the front distance array.
+
+#### `playToneSequenceMs(frequencies: number[], durations: number[]): void`
+
+- **Block**: `play tones frequencies %frequencies durations (ms) %durations`
+- **What it does**: Plays a sequence of tones using arrays of frequencies in Hz and durations in milliseconds. Use frequency `0` for a rest.
 
 #### `walk(speed: number, turn: number): number`
 
@@ -276,6 +517,25 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 - **Block**: `walk speed %speed turn %turn` (statement form)
 - **What it does**: Same as `walk(...)` but discards the return value.
 
+#### `walkByCompass(headingDeg: number): number`
+
+- **Block**: `walk by compass %headingDeg`
+- **What it does**: Walks toward a target compass heading while avoiding obstacles.
+- **Parameters**:
+  - `headingDeg`: target heading in degrees (0 = north, 90 = east)
+- **Return**: `number` motion status
+
+#### `walkByCompassPID(headingDeg: number, kp: number, ki: number, kd: number): number`
+
+- **Block**: `walk by compass PID %headingDeg proportional gain %kp integral gain %ki derivative gain %kd`
+- **What it does**: Walks toward a target compass heading using PID control while avoiding obstacles.
+- **Parameters**:
+  - `headingDeg`: target heading in degrees
+  - `kp`: proportional gain
+  - `ki`: integral gain
+  - `kd`: derivative gain
+- **Return**: `number` motion status
+
 #### `explore(): number`
 
 - **Block**: `explore`
@@ -287,6 +547,9 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
   - The explore speed range is influenced by `setWalkSpeedRange(min, max)`.
 
 #### `exploreDo(): void`
+
+- **Block**: `explore` (statement form)
+- **What it does**: Same as `explore()` but discards the return value.
 
 #### `stand(): number`
 
@@ -312,9 +575,6 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 - **Block**: `side step %direction` (statement form)
 - **What it does**: Same as `sideStep()` but discards the return value.
 
-- **Block**: `explore` (statement form)
--- **What it does**: Same as `explore()` but discards the return value.
-
 #### `dance(): number`
 
 - **Block**: `dance`
@@ -326,7 +586,7 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 #### `danceDo(): void`
 
 - **Block**: `dance` (statement form)
--- **What it does**: Same as `dance()` but discards the return value.
+- **What it does**: Same as `dance()` but discards the return value.
 
 #### `kick(): number`
 
@@ -338,7 +598,7 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 #### `kickDo(): void`
 
 - **Block**: `kick` (statement form)
--- **What it does**: Same as `kick()` but discards the return value.
+- **What it does**: Same as `kick()` but discards the return value.
 
 #### `jump(): number`
 
@@ -351,7 +611,7 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 #### `jumpDo(): void`
 
 - **Block**: `jump` (statement form)
--- **What it does**: Same as `jump()` but discards the return value.
+- **What it does**: Same as `jump()` but discards the return value.
 
 #### `rest(): number`
 
@@ -363,22 +623,15 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 
 #### `restDo(): void`
 
-#### `leftEyeBright(brightness: number): void`
-
-- **Block**: `set left eye brightness %brightness`
-- **Parameters**:
-  - `brightness`: `0 .. 1`
-- **What it does**: Sets left eye LED brightness.
-
-#### `rightEyeBright(brightness: number): void`
-
-- **Block**: `set right eye brightness %brightness`
-- **Parameters**:
-  - `brightness`: `0 .. 1`
-- **What it does**: Sets right eye LED brightness.
-
 - **Block**: `rest` (statement form)
--- **What it does**: Same as `rest()` but discards the return value.
+- **What it does**: Same as `rest()` but discards the return value.
+
+#### `calibrate(): void`
+
+- **Block**: `calibrate`
+- **What it does**: Moves to a calibration pose and flashes the eyes.
+- **Notes**:
+  - Calibration is already run once automatically on first use; call this again if you changed trim or hardware.
 
 #### `talk(text: string): void`
 
@@ -390,150 +643,31 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 #### `sing(s: string): void`
 
 - **Block**: `sing %s`
-- **What it does**: Sings a Billy phonetic / song-string.
+- **What it does**: Sings a musical note sequence using the built-in music engine.
 - **Parameters**:
-  - `s`: Phonetic/song string supported by Billy.
+  - `s`: Note sequence string. Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use `-` for a rest.
 
-### Setup
+#### `morse(code: string, unitMs: number): void`
 
-#### `setServoTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number): void`
+- **Block**: `morse %code|| speed %unitMs ms`
+- **What it does**: Plays a morse code string using ITU-standard timing.
 
-- **Block**: `set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch`
-- **What it does**: Sets persistent trim offsets (in degrees) added to the target servo angles.
-- **When to use**: If your robot does not stand level, walks crooked, or the head is not centered.
-- **Notes**:
-  - Trims are applied immediately and remain active until changed.
+#### `toMorse(text: string): string`
 
-#### Servo calibration / trim mode
+- **Block**: `translate %text to morse`
+- **What it does**: Translates plain text into a morse code string.
+- **Return**: `string` morse code
 
-Use servo calibration / trim mode to align the robot’s feet, legs, neck yaw, and head pitch into a neutral standing position.
+#### `morseText(text: string, unitMs: number): void`
 
-- **Enter trim mode**: Press the micro:bit logo button.
-- **Robot pose**: The robot moves into calibration stand mode so the foot heels can be aligned.
-- **Select servo**:
-  - Press gamepad `B2` to decrease servo index.
-  - Press gamepad `B3` to increase servo index.
-  - The selected servo index is shown on the micro:bit display.
-- **Adjust trim**:
-  - Press gamepad `B1` to move the selected servo one trim step in one direction.
-  - Press gamepad `B4` to move the selected servo one trim step in the other direction.
-  - Adjust until the robot’s feet, legs, neck yaw, and head pitch are in a neutral stand position.
-- **Save and exit**: Press the micro:bit logo button again.
-- **Saved configuration**:
-  - Servo trim values are saved.
-  - The current radio channel number is saved.
-  - When the robot boots again, it remembers the saved servo trim and radio channel.
-
-The servo index order is:
-
-1. Left foot
-2. Left leg
-3. Right foot
-4. Right leg
-5. Head yaw
-6. Head pitch
-
-#### `beginServoTrimCalibration(): void`
-
-- **Block**: `begin servo trim calibration`
-- **What it does**: Enters servo trim calibration mode from code or blocks.
-
-#### `selectTrimServo(servo: ServoJoint): void`
-
-- **Block**: `select trim servo %servo`
-- **What it does**: Selects which servo trim value will be adjusted.
-
-#### `adjustSelectedServoTrim(delta: number): void`
-
-- **Block**: `adjust selected servo trim by %delta`
-- **What it does**: Changes the selected servo trim by `delta` degrees and moves the robot to the calibration pose.
-
-#### `saveServoTrimCalibration(): void`
-
-- **Block**: `save servo trim calibration`
-- **What it does**: Saves the current servo trim values and radio channel, exits trim calibration mode, and returns to normal operation.
-
-#### `readConfig(): void`
-
-- **Block**: `read config`
-- **What it does**: Loads saved robot configuration, including servo trim values and radio channel.
-
-#### `writeConfig(): void`
-
-- **Block**: `write config`
-- **What it does**: Saves current robot configuration, including servo trim values and radio channel.
-
-#### `calibrate(): void`
-
-- **Block**: `calibrate`
-- **What it does**: Runs a calibration routine.
-  - Moves to a calibration pose.
-  - Flashes the eyes for feedback.
-  - Returns to neutral pose.
-- **Notes**:
-  - Calibration is already run once automatically on first use; call this again if you changed trim or hardware.
-
-#### `setWalkSpeedRange(min: number, max: number): void`
-
-- **Block**: `set walk speed range min %min max %max`
-- **What it does**: Sets the robot’s internal maximum speed scalars used by autonomous behaviors and remote control.
-- **Parameters**:
-  - `min`: backward max speed (typically negative)
-  - `max`: forward max speed (typically positive)
-- **Notes**:
-  - This affects `explore()` speed planning and remote-control mapping.
-
-### Sensors
-
-#### `sonarDistanceCm(): number`
-
-- **Block**: `sonar distance (cm)`
-- **What it does**: Returns the current ultrasonic distance reading in centimeters.
-
-#### `frontDistanceArray(): number[]`
-
-- **Block**: `front distance array`
-- **What it does**: Returns a 5-element array describing the forward “distance profile” used by explore:
-  - `[left, leftFront, front, rightFront, right]`
-
-#### `bodyRoll(): number`
-
-- **Block**: `body roll`
-- **What it does**: Returns current body roll estimate.
-
-#### `bodyPitch(): number`
-
-- **Block**: `body pitch`
-- **What it does**: Returns current body pitch estimate.
-
-#### `musicTempo(): number`
-
-- **Block**: `music tempo`
-- **What it does**: Returns the internal beat tracker tempo estimate.
-
-### Actuators
-
-#### `servo(joint: ServoJoint, angle: number): void`
-
-- **Block**: `move %joint servo to %angle`
-- **Parameters**:
-  - `joint`: one of `left foot`, `left leg`, `right foot`, `right leg`, `head yaw`, `head pitch`
-  - `angle`: `0 .. 180`
-- **What it does**: Directly moves a selected joint servo to the given angle.
-
-#### `servoStep(joint: ServoJoint, target: number, stepSize: number): void`
-
-- **Block**: `move %joint servo to %target with step size %stepSize`
-- **Parameters**:
-  - `target`: `0 .. 180`
-  - `stepSize`: `1 .. 20`
-- **What it does**: Moves a servo toward a target using progressive stepping (useful for smoother gestures).
+- **Block**: `say %text in morse|| speed %unitMs ms`
+- **What it does**: Translates plain text to morse code and plays it immediately.
 
 ### Remote Control
 
 These APIs are intended for advanced integrations (custom gamepads / phone apps / another micro:bit sending commands).
 
-If you have the retail Robot PU gamepad, use the official gamepad program (it is designed to be compatible with Robot PU’s command keys and message formats).
+If you have the retail Robot PU gamepad, use the official gamepad program (it is designed to be compatible with Robot PU's command keys and message formats).
 
 #### Radio control protocol (micro:bit radio, including BLE-to-radio bridges)
 
@@ -550,10 +684,10 @@ Robot PU can be controlled over the micro:bit radio protocol by sending either:
 
 **Important note about `radio.sendValue`**:
 
-- micro:bit radio “value” packets are transmitted as integers.
+- micro:bit radio "value" packets are transmitted as integers.
 - For **movement control** (`#puspeed`, `#puturn`), Robot PU expects a value roughly in `-1 .. 1`.
   - If your controller sends a different scale (for example `-100 .. 100`), scale it on the receiver before calling `robotPu.runKeyValueCommand`.
-- For **gesture head control** (`#puroll`, `#pupitch`), values are treated as angles (degrees) to yaw/pitch PU’s head.
+- For **gesture head control** (`#puroll`, `#pupitch`), values are treated as angles (degrees) to yaw/pitch PU's head.
 
 **Channel / pairing**:
 
@@ -588,7 +722,7 @@ radio.sendString("#putHello!")
 
 **Gesture remote control (gamepad)**:
 
-- The retail gamepad program reads the gamepad micro:bit’s tilt:
+- The retail gamepad program reads the gamepad micro:bit's tilt:
   - **Roll** (left/right tilt) → sends `#puroll`
   - **Pitch** (forward/back tilt) → sends `#pupitch`
 - Robot PU uses these values to control its head orientation:
@@ -624,7 +758,7 @@ If your controller is a phone/app over BLE, the typical architecture is:
 - **Supported command formats**:
   - `#put<text>`: speak `<text>` (text-to-speech)
   - `#pus<song>`: sing `<song>`
-  - `#puhi<name>`: speak “My friend <name> is here”
+  - `#puhi<name>`: speak "My friend <name> is here"
   - `#pun<sn>`: set the robot serial/name string to `<sn>` and then `greet()`
 
 #### `runKeyValueCommand(key: string, v: number): void`
@@ -650,43 +784,6 @@ If your controller is a phone/app over BLE, the typical architecture is:
   - `#pulogo`: speak serial/name (advanced).
   - `#purs`: set rest pose index (advanced).
     - Example: send `26` for the rest pose.
-
-### Variables
-
-#### `mode(): Mode`
-
-- **Block**: `mode`
-- **What it does**: Returns the current robot behavior mode.
-
-#### `setMode(mode: Mode): void`
-
-- **Block**: `set mode %mode`
-- **What it does**: Sets the robot behavior mode (state machine mode).
-
-#### `setModeVar(mode: Mode): void`
-
-- **Block**: `set mode to %mode`
-- **What it does**: Alias of `setMode(...)` (provided as a variable-style block).
-
-#### `channel(): number`
-
-- **Block**: `channel`
-- **What it does**: Returns the current radio group/channel used for communication.
-- **Return**: `0 .. 255`
-
-#### `setChannel(channel: number): void`
-
-- **Block**: `set channel to %channel`
-- **What it does**: Sets the radio group/channel used for communication.
-- **Parameter**:
-  - `channel`: `0 .. 255`
-
-#### `changeChannel(delta: number): void`
-
-- **Block**: `change channel by %delta`
-- **What it does**: Adjusts the radio group/channel by `delta`.
-- **Notes**:
-  - Values wrap into `0..255`.
 
 ## Example (JavaScript)
 
