@@ -1,6 +1,6 @@
 {
     "name": "pxt-robotpu-pro",
-    "version": "1.0.60",
+    "version": "1.0.61",
     "description": "Robot PU MakeCode extension exposing walk, autopilot, dance, kick, jump, rest, talk, sing.",
     "license": "MIT",
     "dependencies": {
