@@ -10,6 +10,7 @@
  
  Robot PU’s walking is self-balancing using IMU feedback (roll/pitch). If the legs/feet are mechanically biased (slightly off-center), the controller must constantly correct even when you want a neutral pose. Calibrating trims reduces that baseline bias.
  
+ Refer to YouTube https://youtu.be/nAJljRopqxY for more details.
  ---
  
  ## What is “servo trim”?
