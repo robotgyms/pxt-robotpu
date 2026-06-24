@@ -1,1 +1,12 @@
 tutorials/hex/*.hex
+
+# Dependencies and build output
+node_modules/
+pxt_modules/
+built/
+package-lock.json
+
+# IDE and system files
+.idea/
+.DS_Store
+

@@ -90,7 +90,7 @@ radio.onReceivedString(function (msg) {
 })
 
 basic.forever(function () {
-    robotPuPro.moveArcade(linear, angular)
+    robotPuPro.walkDo(linear / 100, angular / 100)
     basic.pause(100)
 })
 ```

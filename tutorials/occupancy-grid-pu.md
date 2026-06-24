@@ -79,9 +79,9 @@ basic.forever(function () {
     // Mark obstacle cell if close
     if (d > 0 && d < DANGER_CM) {
         setCell(cx + dx, cy + dy, 2)
-        robotPuPro.back()
+        robotPuPro.walkDo(-2, 0)
     } else {
-        robotPuPro.walk()
+        robotPuPro.walkDo(2, 0)
     }
 
     // Render a 5x5 window centered on (cx,cy)

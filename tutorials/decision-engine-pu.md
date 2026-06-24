@@ -296,7 +296,7 @@ basic.forever(function () {
 
     // 2. Joystick Y speed (-100..100)
     // Forward = positive, backward = negative
-    let speed = robotPuPro.joystickY()
+    let speed = input.rotation(Rotation.Pitch)
 
     // 3. Pack into a simple string: "heading,speed"
     let msg = heading + "," + speed

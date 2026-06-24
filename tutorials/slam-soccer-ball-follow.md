@@ -380,17 +380,17 @@ function trackBall(p: Buffer) {
             yaw = i8(p[16])
             pitch = i8(p[17])
             if (DEBUG_FLAG) {
-                // serial.writeLine(`head yaw: ${robotPuPro.ServoTargets()[4]}`)
+                // serial.writeLine(`head yaw: ${robotPuPro.servoTargets()[4]}`)
                 //serial.writeLine(`yawLock ${yaw}`)
-                // serial.writeLine(`head pitch: ${robotPuPro.ServoTargets()[5]}`)
+                // serial.writeLine(`head pitch: ${robotPuPro.servoTargets()[5]}`)
                 //serial.writeLine(`pitchLock: ${pitch}`)
                 serial.writeLine(`ball x: ${x_mm}`)
                 serial.writeLine(`ball y: ${y_mm}`)
             }
             // move head to look at the ball
             robotPuPro.setModeVar(robotPuPro.Mode.API)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 8)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.2, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.2, 8)
             robotPuPro.leftEyeBright(0.01)
             robotPuPro.rightEyeBright(0.01)
             // compute the speed and direction to walk toward the ball 
@@ -401,8 +401,8 @@ function trackBall(p: Buffer) {
             walkSpeed = Math.max(-3, Math.min(3, (y_mm - 100) * 0.015))
             walkTurn = Math.max(-0.7, Math.min(0.7, (walkTurn * 4 + yaw * -0.05) * 0.2))
             // cache head pitch/yaw
-            currentYaw = robotPuPro.ServoTargets()[4]
-            currentPitch = robotPuPro.ServoTargets()[5]
+            currentYaw = robotPuPro.servoTargets()[4]
+            currentPitch = robotPuPro.servoTargets()[5]
             if (DEBUG_FLAG) {
                 serial.writeLine(`walkSpeed: ${walkSpeed}`)
                 serial.writeLine(`walkTurn: ${walkTurn}`)
@@ -417,11 +417,11 @@ function trackBall(p: Buffer) {
             pitch *= 0.7
             walkSpeed *= 0.7
             walkTurn *= 0.7
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 5)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.2, 5)
             // cache head pitch/yaw
-            currentYaw = robotPuPro.ServoTargets()[4]
-            currentPitch = robotPuPro.ServoTargets()[5]
+            currentYaw = robotPuPro.servoTargets()[4]
+            currentPitch = robotPuPro.servoTargets()[5]
             if (DEBUG_FLAG) {
                 serial.writeLine(`walkSpeed: ${walkSpeed}`)
                 serial.writeLine(`walkTurn: ${walkTurn}`)
@@ -471,8 +471,8 @@ basic.forever(function () {
 })
 
 // cache the head pitch and yaw angle
-currentYaw = robotPuPro.ServoTargets()[4]
-currentPitch = robotPuPro.ServoTargets()[5]
+currentYaw = robotPuPro.servoTargets()[4]
+currentPitch = robotPuPro.servoTargets()[5]
 
 // Soccer ball detection loop
 basic.forever(function () {

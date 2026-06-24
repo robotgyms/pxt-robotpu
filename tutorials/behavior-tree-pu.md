@@ -94,8 +94,8 @@ const obstacleClose = cond(function () {
     return d > 0 && d < DANGER_CM
 })
 
-const backUp = act(function () { robotPuPro.back() }, 400)
-const walk = act(function () { robotPuPro.walk() }, 200)
+const backUp = act(function () { robotPuPro.walkDo(-2, 0) }, 400)
+const walk = act(function () { robotPuPro.walkDo(2, 0) }, 200)
 
 const root = selector([
     sequence([obstacleClose, backUp]),
