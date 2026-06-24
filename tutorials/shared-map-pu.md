@@ -315,9 +315,9 @@ basic.forever(function () {
 
     if (d > 0 && d < DANGER_CM) {
         setCellLocal(CX + dx, CY + dy, 2)
-        robotPuPro.back()
+        robotPuPro.walkDo(-2, 0)
     } else {
-        robotPuPro.walk()
+        robotPuPro.walkDo(2, 0)
     }
 
     basic.pause(100)

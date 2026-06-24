@@ -55,7 +55,7 @@ let isStopped = false
 // --- Perception node ---
 basic.forever(function () {
     obstacleDistance = robotPuPro.sonarDistanceCm()
-    heading = robotPuPro.compassHeading()
+    heading = input.compassHeading()
     radio.sendString("scan," + obstacleDistance)
     radio.sendString("odom," + heading)
     basic.pause(200)
@@ -75,11 +75,11 @@ basic.forever(function () {
 // --- Controller node ---
 basic.forever(function () {
     if (isStopped) {
-        robotPuPro.stopAllMotors()
+        robotPuPro.restDo()
     } else if (goalDistance > 0) {
-        robotPuPro.moveStraight(50)
+        robotPuPro.walkDo(2, 0)
     } else {
-        robotPuPro.stopAllMotors()
+        robotPuPro.restDo()
     }
     radio.sendString("cmd,straight")
     basic.pause(100)
@@ -89,7 +89,7 @@ basic.forever(function () {
 basic.forever(function () {
     if (obstacleDistance < 10) {
         isStopped = true
-        robotPuPro.stopAllMotors()
+        robotPuPro.restDo()
         radio.sendString("estop,1")
     } else {
         isStopped = false

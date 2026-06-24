@@ -56,9 +56,9 @@ basic.forever(function () {
     }
 
     if (d > 0 && d < 12) {
-        robotPuPro.back()
+        robotPuPro.walkDo(-2, 0)
     } else {
-        robotPuPro.walk()
+        robotPuPro.walkDo(2, 0)
     }
 
     basic.pause(40)

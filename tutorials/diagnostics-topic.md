@@ -52,7 +52,7 @@ let heartbeat = 0
 
 basic.forever(function () {
     let d = robotPuPro.sonarDistanceCm()
-    let h = robotPuPro.compassHeading()
+    let h = input.compassHeading()
 
     if (d < 0) {
         radio.sendString("diag,err,sonar")

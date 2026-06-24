@@ -56,7 +56,7 @@ basic.forever(function () {
     }
 
     if (iAmLeader()) {
-        robotPuPro.walk()
+        robotPuPro.walkDo(2, 0)
     } else {
         robotPuPro.rest()
     }

@@ -313,18 +313,18 @@ function testMoveServos() {
 }
 
 /**
- * TEST: Actuators - setCt and incrCt (control offsets)
+ * TEST: Actuators - setControlOffsets and incrementControlOffsets (control offsets)
  * [HARDWARE]
  * Expected: applies a +10 degree offset to head yaw, then increments by -5.
  *           Head should visibly shift. Offsets reset to 0 after test.
  * Pass: visible head shift, no crash.
  */
 function testControlOffsets() {
-    robotPuPro.setCt([4], [10])
+    robotPuPro.setControlOffsets([4], [10])
     basic.pause(500)
-    robotPuPro.incrCt([4], [-5], 1)
+    robotPuPro.incrementControlOffsets([4], [-5], 1)
     basic.pause(500)
-    robotPuPro.setCt([4], [0])
+    robotPuPro.setControlOffsets([4], [0])
 }
 
 /**

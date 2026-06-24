@@ -1,4 +1,4 @@
-# Robot PU MakeCode Extension
+# pxt-robotpu-pro — Robot PU MakeCode Extension
 
 ## Overview
 
@@ -446,12 +446,12 @@ The servo index order is:
   - `asyncSpeedGain`: speed multiplier for the asynchronous group
 - **Return**: `boolean` true when the synchronous servos have arrived
 
-#### `setCt(indexes: number[], values: number[]): void`
+#### `setControlOffsets(indexes: number[], values: number[]): void`
 
 - **Block**: `set control offsets indexes %indexes values %values`
 - **What it does**: Sets servo control offsets for feedback or feedforward control. Each value is an angle offset added to the servo motion target.
 
-#### `incrCt(indexes: number[], values: number[], gain: number): void`
+#### `incrementControlOffsets(indexes: number[], values: number[], gain: number): void`
 
 - **Block**: `increment control offsets indexes %indexes values %values gain %gain`
 - **What it does**: Increments servo control offsets smoothly. Each value is multiplied by gain and added to the current offset.

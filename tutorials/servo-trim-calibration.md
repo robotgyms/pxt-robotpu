@@ -102,7 +102,7 @@
  })
  robotPuPro.setChannel(166)
  basic.forever(function () {
-     serial.writeLine("Servo Trim = " + robotPuPro.ServoTrims().join(", "))
+     serial.writeLine("Servo Trim = " + robotPuPro.servoTrims().join(", "))
      basic.pause(500)
  })
  ```

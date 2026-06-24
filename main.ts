@@ -655,13 +655,13 @@ namespace robotPuPro {
      * @param indexes array of servo joint indices to set offsets for
      * @param values array of angle offsets in degrees to apply to each indexed servo
      */
-    //% blockId=robotpu_set_ct block="set control offsets indexes %indexes values %values"
+    //% blockId=robotpu_set_control_offsets block="set control offsets indexes %indexes values %values"
     //% subcategory="Actuators"
     //% group="Actuators"
     //% indexes.shadow=lists_create_with values.shadow=lists_create_with
     //% weight=47 blockGap=8
-    export function setCt(indexes: number[], values: number[]): void {
-        getRobotAPI().setCt(indexes, values);
+    export function setControlOffsets(indexes: number[], values: number[]): void {
+        getRobotAPI().setControlOffsets(indexes, values);
     }
 
     /**
@@ -670,14 +670,14 @@ namespace robotPuPro {
      * @param values array of offset increments in degrees
      * @param gain multiplier applied to each value before adding, eg: 1
      */
-    //% blockId=robotpu_incr_ct block="increment control offsets indexes %indexes values %values gain %gain"
+    //% blockId=robotpu_increment_control_offsets block="increment control offsets indexes %indexes values %values gain %gain"
     //% subcategory="Actuators"
     //% group="Actuators"
     //% indexes.shadow=lists_create_with values.shadow=lists_create_with
     //% gain.defl=1 gain.min=-1 gain.max=1
     //% weight=47 blockGap=8
-    export function incrCt(indexes: number[], values: number[], gain: number): void {
-        getRobotAPI().incrCt(indexes, values, gain);
+    export function incrementControlOffsets(indexes: number[], values: number[], gain: number): void {
+        getRobotAPI().incrementControlOffsets(indexes, values, gain);
     }
 
     /**

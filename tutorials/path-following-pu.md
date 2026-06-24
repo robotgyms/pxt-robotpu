@@ -39,8 +39,8 @@ function turnToDir(dir: number) {
         const err = angleDiffDeg(target, h)
         if (Math.abs(err) < 15) return
 
-        if (err > 0) robotPuPro.right()
-        else robotPuPro.left()
+        if (err > 0) robotPuPro.sideStepDo(1)
+        else robotPuPro.sideStepDo(-1)
         basic.pause(80)
     }
 }
@@ -48,7 +48,7 @@ function turnToDir(dir: number) {
 basic.forever(function () {
     for (let i = 0; i < path.length; i++) {
         turnToDir(path[i])
-        robotPuPro.walk()
+        robotPuPro.walkDo(2, 0)
         basic.pause(CELL_MS)
         robotPuPro.rest()
         basic.pause(80)

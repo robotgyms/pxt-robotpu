@@ -37,12 +37,12 @@ const NEAR_CM = 20
 const RECOVER_COOLDOWN_MS = 4000
 
 function recover() {
-    robotPuPro.back()
+    robotPuPro.walkDo(-2, 0)
     basic.pause(400)
 
     const dir = Math.randomRange(0, 1)
-    if (dir == 0) robotPuPro.left()
-    else robotPuPro.right()
+    if (dir == 0) robotPuPro.sideStepDo(-1)
+    else robotPuPro.sideStepDo(1)
     basic.pause(350)
 }
 
@@ -63,7 +63,7 @@ basic.forever(function () {
         nearCount = 0
         recover()
     } else {
-        robotPuPro.walk()
+        robotPuPro.walkDo(2, 0)
     }
 
     basic.pause(50)

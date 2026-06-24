@@ -240,25 +240,25 @@ function trackFace(p: Buffer) {
             yaw = i8(p[16])
             pitch = i8(p[17])
             if (DEBUG_FLAG) {
-                // serial.writeLine(`head yaw: ${robotPuPro.ServoTargets()[4]}`)
+                // serial.writeLine(`head yaw: ${robotPuPro.servoTargets()[4]}`)
                 serial.writeLine(`yawLock ${yaw}`)
-                // serial.writeLine(`head pitch: ${robotPuPro.ServoTargets()[5]}`)
+                // serial.writeLine(`head pitch: ${robotPuPro.servoTargets()[5]}`)
                 serial.writeLine(`pitchLock: ${pitch}`)
             }
             robotPuPro.setModeVar(robotPuPro.Mode.API)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.08, 8)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.08, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.08, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.08, 8)
             robotPuPro.leftEyeBright(0.01)
             robotPuPro.rightEyeBright(0.01)
         } else if (currentTime - lastFaceSeenTime < LOST_TIMEOUT_MS) {
             // lock on face 
             yaw *= 0.7
             pitch *= 0.7
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 5)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.2, 5)
             // Read the current absolute head target angles
-            currentYaw = robotPuPro.ServoTargets()[4]
-            currentPitch = robotPuPro.ServoTargets()[5]
+            currentYaw = robotPuPro.servoTargets()[4]
+            currentPitch = robotPuPro.servoTargets()[5]
         } else {
             // lost the face, search for face
             searchFace()
@@ -283,8 +283,8 @@ pins.i2cWriteNumber(
 )
 basic.pause(3000)
 // Read the current absolute head target angles
-currentYaw = robotPuPro.ServoTargets()[4]
-currentPitch = robotPuPro.ServoTargets()[5]
+currentYaw = robotPuPro.servoTargets()[4]
+currentPitch = robotPuPro.servoTargets()[5]
 
 basic.forever(function () {
     if (DEBUG_FLAG) {

@@ -1416,7 +1416,7 @@ export class RobotPu {
 
         // 2. Reset the Control Vector to neutral
         // This clears any persistent tilt or pitch offsets
-        this.setCt([0, 1, 2, 3, 4, 5], [0, 0, 0, 0, 0, 0]);
+        this.setControlOffsets([0, 1, 2, 3, 4, 5], [0, 0, 0, 0, 0, 0]);
 
         // 3. Calculate movement speed based on forward speed multiplier
         let movementSpeed = di * this.fwdSpeed * 0.68;
@@ -1513,14 +1513,14 @@ export class RobotPu {
         this.bodyPitch2 = (this.bodyPitch + 9 * this.bodyPitch2) * 0.1;
     }
 
-    public setCt(indexList: number[], valueList: number[]) {
+    public setControlOffsets(indexList: number[], valueList: number[]) {
         let le = Math.min(indexList.length, valueList.length);
         for (let i = 0; i < le; i++) {
             this.pcb.servoCtrl[indexList[i]] = valueList[i]; // Reference internal pr
         }
     }
 
-    public incrCt(indexList: number[], valueList: number[], gain = 1.0) {
+    public incrementControlOffsets(indexList: number[], valueList: number[], gain = 1.0) {
         let le = Math.min(indexList.length, valueList.length);
         for (let i = 0; i < le; i++) {
             this.pcb.servoCtrl[indexList[i]] += valueList[i] * gain; // Reference internal pr
@@ -1546,7 +1546,7 @@ export class RobotPu {
         let tiltOffset = leftTiltOffset + rightTiltOffset;
         sp /= 1.0 + 0.01 * (Math.abs(this.bodyRoll) + Math.abs(this.bodyPitch)) + Math.sqrt(Math.abs(tiltOffset * 0.5));
 
-        this.setCt([0, 1, 2, 3, 4, 5],
+        this.setControlOffsets([0, 1, 2, 3, 4, 5],
             [tiltOffset, lf - tiltOffset, tiltOffset, -lf - tiltOffset, -40 * di - tiltOffset, Math.min(25.0, -2.0 * this.bodyPitch2)]);
 
         // Call internal servo move
@@ -1607,10 +1607,10 @@ export class RobotPu {
         }
         let rl = Math.min(35.0, Math.max(-35.0, this.bodyRoll2));
         if (Math.abs(rl) > 5) {
-            this.setCt([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5]);
+            this.setControlOffsets([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5]);
         }
         if (Math.abs(this.bodyPitch2) > 10) {
-            this.setCt([5], [-this.bodyPitch2]);
+            this.setControlOffsets([5], [-this.bodyPitch2]);
         }
         let sl = input.soundLevel();
         this.pr.stateTargets[this.restState][5] = 90 - sl * 0.3;
@@ -2133,7 +2133,7 @@ export class RobotPu {
 
         // 5. Apply control vectors to servos
         // Servo 5 (head/body pitch) reacts to sound volume
-        this.setCt([0, 1, 2, 3, 4, 5],
+        this.setControlOffsets([0, 1, 2, 3, 4, 5],
             [ft, lt, ft, lt, this.rl, this.dancePitchWiggle - ms * 0.001]);
 
         // 6. Dynamic speed adjustment

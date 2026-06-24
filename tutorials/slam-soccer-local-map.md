@@ -545,17 +545,17 @@ function trackBall(p: Buffer) {
             yaw = i8(p[16])
             pitch = i8(p[17])
             if (DEBUG_FLAG) {
-                // serial.writeLine(`head yaw: ${robotPuPro.ServoTargets()[4]}`)
+                // serial.writeLine(`head yaw: ${robotPuPro.servoTargets()[4]}`)
                 //serial.writeLine(`yawLock ${yaw}`)
-                // serial.writeLine(`head pitch: ${robotPuPro.ServoTargets()[5]}`)
+                // serial.writeLine(`head pitch: ${robotPuPro.servoTargets()[5]}`)
                 //serial.writeLine(`pitchLock: ${pitch}`)
                 serial.writeLine(`ball x: ${x_mm}`)
                 serial.writeLine(`ball y: ${y_mm}`)
             }
             // move head to look at the ball
             robotPuPro.setModeVar(robotPuPro.Mode.API)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.08, 8)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.08, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.08, 8)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.08, 8)
             robotPuPro.leftEyeBright(0.01)
             robotPuPro.rightEyeBright(0.01)
 
@@ -570,11 +570,11 @@ function trackBall(p: Buffer) {
             // follow through for a short mement if lost the ball in the view  
             yaw *= 0.7
             pitch *= 0.7
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.ServoTargets()[4] + yaw * 0.2, 5)
-            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.ServoTargets()[5] + pitch * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.2, 5)
+            robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.2, 5)
             // read current head pitch yaw
-            currentYaw = robotPuPro.ServoTargets()[4]
-            currentPitch = robotPuPro.ServoTargets()[5]
+            currentYaw = robotPuPro.servoTargets()[4]
+            currentPitch = robotPuPro.servoTargets()[5]
         } else {
             // lost the ball, search for ball
             searchBall(SEARCH_PATTERN)
@@ -611,8 +611,8 @@ basic.pause(10)
 setService(SERVICE_FACE_DETECTION, false)
 basic.pause(10)
 
-currentYaw = robotPuPro.ServoTargets()[4]
-currentPitch = robotPuPro.ServoTargets()[5]
+currentYaw = robotPuPro.servoTargets()[4]
+currentPitch = robotPuPro.servoTargets()[5]
 
 if (DEBUG_FLAG) {
     setService(SERVICE_WIFI, true)

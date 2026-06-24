@@ -19,7 +19,7 @@ A follower robot that:
 
 ## Prerequisites
 
-- Robot PU extension available (you will use `robotPuPro.walk()` and `robotPuPro.frontDistanceArray()`)
+- Robot PU extension available (you will use `robotPuPro.walk(...)` and `robotPuPro.frontDistanceArray()`)
 - All robots use the same `radio` group
 - Compass calibrated (leader and followers)
 
@@ -204,7 +204,7 @@ radio.setGroup(42)
 
 basic.forever(function () {
     let heading = input.compassHeading()
-    let speed = robotPuPro.joystickY()
+    let speed = input.rotation(Rotation.Pitch)
     radio.sendString(heading + "," + speed)
     basic.pause(80)
 })
