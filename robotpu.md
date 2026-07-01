@@ -1,6 +1,6 @@
 # Robot PU — The Playful, Programmable micro:bit Robot with an ESP32-S3 Smart Hat
 
-**Robot PU** is a complete, classroom-ready robot built on the BBC micro:bit (V2 Only) — and powered even further by an optional **ESP32-S3 Smart Hat**. It walks, talks, dances, plays soccer, explores autonomously, and runs real SLAM-style navigation and AI-camera perception — all programmable with MakeCode blocks, JavaScript/TypeScript, or Python. From elementary classrooms to college robotics labs, Robot PU turns abstract STEM concepts into hands-on, creative projects.
+**Robot PU** is a complete, classroom-ready robot built on the BBC micro:bit V2. Add the optional **ESP32-S3 Smart Hat** (sold separately) to unlock AI-camera perception, robot soccer, and SLAM-style navigation. Robot PU walks, talks, dances, plays soccer, explores autonomously, and runs real SLAM — all programmable with MakeCode blocks, JavaScript/TypeScript, or Python. From elementary classrooms to college robotics labs, Robot PU turns abstract STEM concepts into hands-on, creative projects.
 
 ![Robot PU](https://raw.githubusercontent.com/robotgyms/pxt-robotpu/main/assets/robotpu.png)
 
@@ -88,7 +88,10 @@ The full tutorial index is maintained in the [tutorials/README.md](tutorials/REA
 - Gamepad for radio remote control and distributed computation
 - Printed manual and quick-start guide
 - Access to 60+ online tutorials, games, classes, and upgrade projects
-- Optional Smart Hat (built around an ESP32-S3) for AI camera, voice commands, SLAM, and robot soccer autonomy
+
+## Optional add-ons (sold separately)
+
+- **Smart Hat (ESP32-S3)** — adds AI camera, voice commands, SLAM navigation, and robot soccer autonomy.
 
 ---
 
