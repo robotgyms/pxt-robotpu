@@ -748,7 +748,7 @@ namespace robotPuPro {
         return ensureRobot().getMusicTempo();
     }
 
-    /** Return the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm. */
+    /** Return the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm. */
     //% blockId=robotpu_servo_targets block="servo targets"
     //% subcategory="Sensors"
     //% group="Sensors"
@@ -757,7 +757,7 @@ namespace robotPuPro {
         return ensureRobot().pcb.servoTarget;
     }
 
-    /** Return the servo control output angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm. */
+    /** Return the servo control output angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm. */
     //% blockId=robotpu_servo_controls block="servo controls"
     //% subcategory="Sensors"
     //% group="Sensors"
@@ -766,7 +766,7 @@ namespace robotPuPro {
         return ensureRobot().pcb.servoCtrl;
     }
 
-    /** Return the servo trim offsets array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm. */
+    /** Return the servo trim offsets array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm. */
     //% blockId=robotpu_servo_trims block="servo trims"
     //% subcategory="Sensors"
     //% group="Sensors"

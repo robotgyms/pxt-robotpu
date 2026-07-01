@@ -2,7 +2,9 @@
 
 Thanks for your interest in contributing to **pxt-robotpu**.
 
-This repository is a MakeCode extension for BBC micro:bit, and contributions typically fall into these areas:
+This extension supports a commercially available micro:bit accessory or sensor, and/or is intended for use in education and is in alignment with the Foundation's mission statement https://microbit.org/about/#mission-statement
+
+Contributions typically fall into these areas (micro:bit (V2) only):
 
 - Bug fixes and reliability improvements
 - New Blocks / API surface (in `main.ts` and supporting code)

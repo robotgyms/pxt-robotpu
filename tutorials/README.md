@@ -18,6 +18,27 @@ These lessons are written for the **micro:bit MakeCode editor**:
 
 ---
 
+## Hardware reference: servo wiring
+
+Robot PU supports **10 servos**. The first 8 servos are driven through the I2C servo controller; the optional arm servos are driven directly from micro:bit PWM pins.
+
+| Servo index | Joint | Driver / Pin | Notes |
+|-------------|-------|--------------|-------|
+| 0 | Left foot | I2C servo driver | Core leg |
+| 1 | Left leg | I2C servo driver | Core leg |
+| 2 | Right foot | I2C servo driver | Core leg |
+| 3 | Right leg | I2C servo driver | Core leg |
+| 4 | Head yaw | I2C servo driver | Core head |
+| 5 | Head pitch | I2C servo driver | Core head |
+| 6 | Left shoulder | I2C servo driver | Optional arms |
+| 7 | Right shoulder | I2C servo driver | Optional arms |
+| 8 | Left arm | micro:bit **P14** | Optional arms |
+| 9 | Right arm | micro:bit **P15** | Optional arms |
+
+For the full servo trim and calibration guide, see the main [README.md](../README.md).
+
+---
+
 ## Knowledge graph
 
 ```mermaid

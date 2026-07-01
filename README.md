@@ -2,6 +2,8 @@
 
 ## Overview
 
+This repository is a MakeCode extension for BBC micro:bit (V2 only) to program Robot PU. Using this extension requires the micro:bit V2 hardware. micro:bit V1 will display the 927 error code.
+
 Robot PU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode. This software package was ported from [Python Version](https://github.com/NovaSeq/RobotPu.git).
 
 PU can walk, autopilot, dance, kick, jump, rest, talk, and sing. It reacts to music, balances using its IMU, and navigates with an ultrasonic sensor.
@@ -51,10 +53,9 @@ The retail kit includes a **gamepad that uses the second micro:bit**. For the be
 - 60+ **Learn-then-create** projects: programming, electronics, mechanics, 3D printing accessories
 - **Community**: share code and parts, collaborate, coordinate multiple robots
 
-## What’are in the optional parts
-- Smart Hat, enable robot PU to see, listen, and do SLAM navigation
+## What’s in the optional parts (sold separately)
 
-- [AI Camera](https://robotgyms.com/courses/the-story-of-pu-book-5-ai-camera)
+- **Smart Hat (ESP32-S3)** — adds AI camera, voice interaction, and SLAM navigation to Robot PU. The Smart Hat is an optional upgrade and is **not included in the main Robot PU kit**.
 
 ## What you can learn with Robot PU
 
@@ -304,12 +305,20 @@ Use servo calibration / trim mode to align the robot's feet, legs, neck yaw, and
 
 The servo index order is:
 
-1. Left foot
-2. Left leg
-3. Right foot
-4. Right leg
-5. Head yaw
-6. Head pitch
+| Servo index | Joint | Driver / Pin | Notes |
+|-------------|-------|--------------|-------|
+| 0 | Left foot | I2C servo driver | Core leg |
+| 1 | Left leg | I2C servo driver | Core leg |
+| 2 | Right foot | I2C servo driver | Core leg |
+| 3 | Right leg | I2C servo driver | Core leg |
+| 4 | Head yaw | I2C servo driver | Core head |
+| 5 | Head pitch | I2C servo driver | Core head |
+| 6 | Left shoulder | I2C servo driver | Optional arms |
+| 7 | Right shoulder | I2C servo driver | Optional arms |
+| 8 | Left arm | micro:bit **P14** | Optional arms |
+| 9 | Right arm | micro:bit **P15** | Optional arms |
+
+Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C servo controller. The optional arm servos 8 and 9 are driven directly from micro:bit PWM pins P14 (left arm) and P15 (right arm).
 
 #### `toggleServoTrim(): void`
 
@@ -385,17 +394,17 @@ The servo index order is:
 #### `servoTargets(): number[]`
 
 - **Block**: `servo targets`
-- **What it does**: Returns the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm.
+- **What it does**: Returns the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm.
 
 #### `servoControls(): number[]`
 
 - **Block**: `servo controls`
-- **What it does**: Returns the servo control output angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm.
+- **What it does**: Returns the servo control output angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm.
 
 #### `servoTrims(): number[]`
 
 - **Block**: `servo trims`
-- **What it does**: Returns the servo trim offsets array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, left arm, right shoulder, right arm.
+- **What it does**: Returns the servo trim offsets array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm.
 
 #### `resetOdom(): void`
 
