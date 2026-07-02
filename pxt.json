@@ -13,7 +13,6 @@
     "files": [
         "robotpu.ts",
         "main.ts",
-        "test.ts",
         "README.md"
     ],
     "testFiles": [
