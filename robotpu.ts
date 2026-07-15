@@ -1277,7 +1277,7 @@ export class RobotPu {
     private epMaxI: number = 0;
 
     /** Distance threshold: Consider an obstacle "hit" if closer than this (cm) */
-    private exploreDangerDistance: number = 7.5;
+    private exploreDangerDistance: number = 6.8;
 
     /** Tilt offset applied during exploration maneuvers */
     private epOt: number = 0;
