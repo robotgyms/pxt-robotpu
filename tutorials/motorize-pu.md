@@ -232,9 +232,9 @@ When you “walk”, “dance”, “kick”, etc., Robot PU isn’t sending jus
 
 ---
 
-## 1.1) Servo map: left foot / left leg / right foot / right leg / head
+## 1.1) Servo map: left foot / left leg / right foot / right leg / head / shoulders / arms
 
-Inside the extension, Robot PU treats its servos as 6 channels (indices `0..5`). You’ll see this ordering reflected in `setTrim(...)`:
+Inside the extension, Robot PU treats its servos as 10 channels (indices `0..9`). You’ll see this ordering reflected in `setTrim(...)` and the `ServoJoint` enum:
 
 1. `0`: left foot
 2. `1`: left leg
@@ -242,11 +242,16 @@ Inside the extension, Robot PU treats its servos as 6 channels (indices `0..5`).
 4. `3`: right leg
 5. `4`: head yaw (turn left/right)
 6. `5`: head pitch (look up/down)
+7. `6`: left shoulder
+8. `7`: left arm
+9. `8`: right shoulder
+10. `9`: right arm
 
 This is also why many gaits treat:
 
 1. The **legs** as `[0, 1, 2, 3]`
 2. The **head/body** as `[4, 5]`
+3. The **arms** as `[6, 7, 8, 9]`
 
 | Robot Position | Left Foot | Left Leg | Right Foot | Right Leg | Neck (Yaw) | Head (Pitch) | Notes |
 |---|---:|---:|---:|---:|---:|---:|---|

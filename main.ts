@@ -147,21 +147,17 @@ namespace robotPuPro {
     }
 
     /**
-     * Set servo trim offsets to correct physical assembly differences. Values are added to each servo target angle.
-     * @param leftFoot trim offset for the left foot servo in degrees, eg: 0
-     * @param leftLeg trim offset for the left leg servo in degrees, eg: 0
-     * @param rightFoot trim offset for the right foot servo in degrees, eg: 0
-     * @param rightLeg trim offset for the right leg servo in degrees, eg: 0
-     * @param headYaw trim offset for the head yaw servo in degrees, eg: 0
-     * @param headPitch trim offset for the head pitch servo in degrees, eg: 0
+     * Set a servo trim offset to correct physical assembly differences. The value is added to the servo target angle.
+     * @param joint the servo joint to trim, eg: robotPuPro.ServoJoint.LeftFoot
+     * @param value trim offset in degrees, eg: 0
      */
-    //% blockId=robotpu_setServoTrim block="set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch"
+    //% blockId=robotpu_setServoTrim block="set servo trim %joint to %value"
     //% subcategory="Setup"
     //% group="Setup"
-    //% leftFoot.defl=0 leftLeg.defl=0 rightFoot.defl=0 rightLeg.defl=0 headYaw.defl=0 headPitch.defl=0
+    //% value.defl=0
     //% weight=97 blockGap=8
-    export function setServoTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number): void {
-        ensureRobot().setTrim(leftFoot, leftLeg, rightFoot, rightLeg, headYaw, headPitch);
+    export function setServoTrim(joint: ServoJoint, value: number): void {
+        ensureRobot().setTrim(joint as number, value);
     }
 
     /** Toggle servo trim calibration mode on or off. Use the gamepad to select and adjust each servo while in calibration mode. */

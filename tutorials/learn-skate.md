@@ -130,7 +130,12 @@ spsaPhase 2  →  run candidate params,    collect r_new,    keep or revert
 After phase 2, a new random `delta` is drawn and phase resets to 0.
 
 ```javascript
-robotPuPro.setServoTrim(-6, -5, -6, -5, -8, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, -6)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftLeg, -5)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, -6)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, -5)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
 
 // --- Gait parameters [w_t, l_t, s_t, h_t, speedGain] ---
 let params =     [18,  45,  15,  35,  2.0]

@@ -82,7 +82,12 @@ Flash this program to **Robot PU's micro:bit**.
 
 ```typescript
 // set servo trims
-robotPuPro.setServoTrim(4, 4, 0, 0, -8, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, 4)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftLeg, 4)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
 
 // allow gamepad remote control
 radio.onReceivedValue(function(name: string, value: number) {
@@ -160,10 +165,15 @@ basic.forever(function () {
 ### A. Servo trim
 
 ```typescript
-robotPuPro.setServoTrim(4, 4, 0, 0, -8, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, 4)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftLeg, 4)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
 ```
 
-These six numbers are **trim offsets** (degrees) for: left foot, left leg, right foot, right leg, head yaw, head pitch. They compensate for physical assembly tolerances so the robot stands straight. You will have different values for your own robot.
+Each `setServoTrim` call sets the **trim offset** (degrees) for one servo joint. The joints are: left foot, left leg, right foot, right leg, head yaw, head pitch. They compensate for physical assembly tolerances so the robot stands straight. You will have different values for your own robot.
 
 ### B. How two `basic.forever` loops work together
 

@@ -412,7 +412,12 @@ const SEARCH_PATTERN: { y: number, p: number }[] = [
 
 robotPuPro.setChannel(166)
 // set your servo trim here for better walking control
-robotPuPro.setServoTrim(-5, 0, -5, 0, -8, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, -5)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, -5)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
 radio.onReceivedString(function (receivedString) {
     robotPuPro.runStringCommand(receivedString)
 })
