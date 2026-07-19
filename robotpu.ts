@@ -2206,13 +2206,8 @@ export class RobotPu {
 
     public pose(v: number) { this.restState = v; this.gst = 0; }
 
-    public setTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number) {
-        this.pcb.servoTrim[0] = leftFoot
-        this.pcb.servoTrim[1] = leftLeg
-        this.pcb.servoTrim[2] = rightFoot
-        this.pcb.servoTrim[3] = rightLeg
-        this.pcb.servoTrim[4] = headYaw
-        this.pcb.servoTrim[5] = headPitch
+    public setTrim(index:number, value:number) {
+        this.pcb.servoTrim[index] = value
     }
 
     public setTrimIndex(index: number): void {

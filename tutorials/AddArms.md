@@ -130,14 +130,12 @@ radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
 
-robotPuPro.setServoTrim(
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
 
 RestArm()
 music.setVolume(255)

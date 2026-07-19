@@ -47,7 +47,9 @@ function testSetup() {
  * Pass: robot stands level, LED shows "T".
  */
 function testTrimAndConfig() {
-    robotPuPro.setServoTrim(0, 0, 0, 0, 0, 0)
+    for (let i = 0; i < 10; i++) {
+        robotPuPro.setServoTrim(i as robotPuPro.ServoJoint, 0)
+    }
     robotPuPro.toggleServoTrim()
     basic.pause(1000)
     robotPuPro.toggleServoTrim()
