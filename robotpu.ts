@@ -1502,9 +1502,9 @@ export class RobotPu {
         this.rl = Math.asin(ax / (this.maxG || 1)) * (180 / Math.PI);
 
         // Use this.pr and this.pcb for calculations
-        let bd_p = this.pth + (this.pr.stateTargets[0][5] + this.pcb.servoTrim[5] - this.pcb.servoTarget[5]);
-        let servo_yaw = (this.pcb.servoTarget[4] - this.pr.stateTargets[0][4] - this.pcb.servoTrim[4]) * (Math.PI / 180);
-        // let servo_pitch = (this.pcb.servoTarget[5] - this.pr.stateTargets[0][5] - this.pcb.servoTrim[5]) * (Math.PI / 180);
+        let bd_p = this.pth + (this.pr.stateTargets[0][5] - this.pcb.servoTarget[5]);
+        let servo_yaw = (this.pcb.servoTarget[4] - this.pr.stateTargets[0][4]) * (Math.PI / 180);
+        // let servo_pitch = (this.pcb.servoTarget[5] - this.pr.stateTargets[0][5]) * (Math.PI / 180);
 
         this.bodyRoll = bd_p * Math.sin(servo_yaw) + this.rl * Math.cos(servo_yaw);
         this.bodyRoll2 = (this.bodyRoll + 9 * this.bodyRoll2) * 0.1;
@@ -1527,7 +1527,8 @@ export class RobotPu {
         }
     }
 
-    public moveBalance(sp: number, di: number, forwardStates: number[], backwardStates: number[]) {
+    public moveBalance(sp: number, di: number,
+                       forwardStates: number[], backwardStates: number[]) {
         let sts = sp > 0 ? forwardStates : backwardStates;
         this.balanceParam();
 
