@@ -449,12 +449,6 @@ export class PCB {
             this.servoTrim.push(0.0)
         }
 
-        // Servo trim
-        this.servoTrim[0] = 4.0;
-        this.servoTrim[0] =4.0;
-        this.servoTrim[0] = 0.0;
-        this.servoTrim[0] = -8.0;
-
         // I2C is initialized automatically in MakeCode
     }
 
