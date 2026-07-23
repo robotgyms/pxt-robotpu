@@ -13,7 +13,9 @@
     "files": [
         "robotpu.ts",
         "main.ts",
-        "README.md"
+        "README.md",
+        "_locales/zh-CN/pxt-robotpu-pro-strings.json",
+        "_locales/zh-CN/pxt-robotpu-pro-jsdoc-strings.json"
     ],
     "testFiles": [
         "test.ts"
