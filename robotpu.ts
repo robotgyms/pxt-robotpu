@@ -1702,7 +1702,7 @@ export class RobotPu {
             nd = nd > 0 ? 1 : -1;
             this.exploreDirection = (this.exploreDirection * 9 + nd) * 0.1; // Slow smoothing for escape
 
-            dis -= 12 + Math.randomRange(-5, 0);
+            dis -= 5 + Math.randomRange(-5, 0);
 
             // Low probability to shout for help via radio
             if (Math.randomRange(0, 400) == 0) {
