@@ -202,7 +202,7 @@ This removes the local `built/` directory.
 ### Release example
 Before release, must review everything with BBC MakeCode extension approval requirements.
 
-To release version `1.0.42`, have to a `v`:
+All version numbers must start with a `v`, for example `v1.0.42`.
 
 ```bash
 make release VERSION=v1.0.42
