@@ -270,7 +270,7 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 - **Block**: `mode`
 - **What it does**: Returns the current robot behavior mode.
 
-#### `setModeVar(mode: Mode): void`
+#### `setMode(mode: Mode): void`
 
 - **Block**: `set mode to %mode`
 - **What it does**: Sets the robot behavior mode (state machine mode).

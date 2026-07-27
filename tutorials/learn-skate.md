@@ -307,11 +307,11 @@ function waitForRecovery(): void {
     paused = true
     robotPuPro.talk("I fell")   // melodic voice; use billy.say() for real speech
     // pin API mode to block the internal state machine from taking over
-    robotPuPro.setModeVar(robotPuPro.Mode.API)
+    robotPuPro.setMode(robotPuPro.Mode.API)
     // wait until both tilt angles are safely upright
     while (Math.abs(robotPuPro.bodyPitch()) > 20 || Math.abs(robotPuPro.bodyRoll()) > 20) {
         basic.pause(200)
-        robotPuPro.setModeVar(robotPuPro.Mode.API)  // re-pin each poll in case it got reset
+        robotPuPro.setMode(robotPuPro.Mode.API)  // re-pin each poll in case it got reset
     }
     // small extra pause to let the robot settle after being placed
     basic.pause(1000)

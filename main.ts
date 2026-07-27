@@ -5,10 +5,18 @@
  */
 //% weight=50 color=#e7660b icon="\uf2bd"
 //% block="Robot PU"
-//% groups='["Setup", "Sensors", "Actuators", "Actions", "Remote Control"]'
+//% groups='["Setup", "Sensors", "Actuators", "Actions", "Remote Control", "Advanced"]'
 //% helpUrl="https://robotgyms.com/pu"
 namespace robotPuPro {
     let robot: RobotPu;
+    let lastWalkDone = false;
+    let lastExploreDone = false;
+    let lastSideStepDone = false;
+    let lastDanceDone = false;
+    let lastKickDone = false;
+    let lastJumpDone = false;
+    let lastRestDone = false;
+    let lastStandDone = false;
 
     /**
      * Robot PU behavior modes. Set the mode to switch between built-in behaviors.
@@ -135,23 +143,11 @@ namespace robotPuPro {
     }
 
     /**
-     * Set Robot PU's behavior mode. Robot PU will keep running that mode until you change it.
-     * @param mode the behavior mode to switch to, eg: robotPuPro.Mode.Walk
-     */
-    //% blockId=robotpu_set_mode_var block="set mode to %mode"
-    //% subcategory="Setup"
-    //% group="Setup"
-    //% weight=98
-    export function setModeVar(mode: Mode): void {
-        setMode(mode);
-    }
-
-    /**
      * Set a servo trim offset to correct physical assembly differences. The value is added to the servo target angle.
      * @param joint the servo joint to trim, eg: robotPuPro.ServoJoint.LeftFoot
      * @param value trim offset in degrees, eg: 0
      */
-    //% blockId=robotpu_setServoTrim block="set servo trim %joint to %value"
+    //% blockId=robotpu_setServoTrim block="set %joint servo trim to %value"
     //% subcategory="Setup"
     //% group="Setup"
     //% value.defl=0
@@ -161,16 +157,16 @@ namespace robotPuPro {
     }
 
     /** Toggle servo trim calibration mode on or off. Use the gamepad to select and adjust each servo while in calibration mode. */
-    //% blockId=robotpu_toggle_trim_calibration block="toggle servo trim calibration mode"
+    //% blockId=robotpu_toggle_trim_calibration block="toggle servo trim mode"
     //% subcategory="Setup"
-    //% group="Setup"
+    //% group="Advanced"
     //% weight=97 blockGap=8
     export function toggleServoTrim(): void {
         ensureRobot().toggleServoTrim();
     }
 
     /** Save the current servo trim values to flash storage. Saved trims are restored automatically on next boot. */
-    //% blockId=robotpu_save_trim_calibration block="save servo trim calibration"
+    //% blockId=robotpu_save_trim_calibration block="save servo trims"
     //% subcategory="Setup"
     //% group="Setup"
     //% weight=97 blockGap=8
@@ -179,7 +175,7 @@ namespace robotPuPro {
     }
 
     /** Load saved robot configuration from flash storage, including servo trim values and radio channel. */
-    //% blockId=robotpu_read_config block="read configuration"
+    //% blockId=robotpu_read_config block="load configuration"
     //% subcategory="Setup"
     //% group="Setup"
     //% weight=96 blockGap=8
@@ -188,7 +184,7 @@ namespace robotPuPro {
     }
 
     /** Save current robot configuration to flash storage, including servo trim values and radio channel. */
-    //% blockId=robotpu_write_config block="write configuration"
+    //% blockId=robotpu_write_config block="save configuration"
     //% subcategory="Setup"
     //% group="Setup"
     //% weight=96 blockGap=8
@@ -201,7 +197,7 @@ namespace robotPuPro {
      * @param min maximum backward speed (negative value), eg: -3
      * @param max maximum forward speed (positive value), eg: 4
      */
-    //% blockId=robotpu_setWalkSpeedRange block="set walk speed range min %min max %max"
+    //% blockId=robotpu_setWalkSpeedRange block="set walk speed range from %min to %max"
     //% subcategory="Setup"
     //% group="Setup"
     //% min.defl=-3 max.defl=4
@@ -259,7 +255,7 @@ namespace robotPuPro {
      * @param frequencies array of tone frequencies in Hz, use 0 for a rest, eg: [440, 550, 660]
      * @param durations array of tone durations in milliseconds, eg: [100, 100, 200]
      */
-    //% blockId=robotpu_play_tone_sequence_ms block="play tones frequencies %frequencies durations (ms) %durations"
+    //% blockId=robotpu_play_tone_sequence_ms block="play tones with frequencies %frequencies and durations (ms) %durations"
     //% weight=87 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
@@ -277,7 +273,7 @@ namespace robotPuPro {
      * Set Robot PU's behavior mode directly.
      * @param mode the behavior mode to switch to, eg: robotPuPro.Mode.Walk
      */
-    //% blockId=robotpu_setMode block="set mode %mode"
+    //% blockId=robotpu_setMode block="set mode to %mode"
     //% weight=86 blockGap=8
     //% subcategory="Actions"
     //% group="Actions"
@@ -288,46 +284,36 @@ namespace robotPuPro {
 
     /**
      * Walk with a given speed and turn bias. Call repeatedly in a loop to keep walking.
-     * Returns 1 while a gait step is in progress, 0 when the step completes.
      * @param speed walking speed from -5 (full backward) to 5 (full forward), eg: 2
      * @param turn turn bias from -1 (full left) to 1 (full right), 0 is straight, eg: 0
      */
-    //% blockId=robotpu_walk block="walk speed %speed turn %turn"
+    //% blockId=robotpu_walk block="walk at speed %speed, turning %turn"
     //% subcategory="Actions"
     //% group="Actions"
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=85 blockGap=8
-    export function walk(speed: number, turn: number): number {
+    export function walk(speed: number, turn: number): void {
         const r = getRobotAPI();
         r.walkSpeed = speed;
         r.walkDirection = turn;
-        return r.walk(speed, turn);
+        lastWalkDone = (r.walk(speed, turn) === 0);
     }
 
-    /**
-     * Walk with a given speed and turn bias. Call repeatedly in a loop to keep walking.
-     * @param speed walking speed from -5 (full backward) to 5 (full forward), eg: 2
-     * @param turn turn bias from -1 (full left) to 1 (full right), 0 is straight, eg: 0
-     */
-    //% blockId=robotpu_walk_do block="walk speed %speed turn %turn"
+    /** Return true when the last walk step completed. */
+    //% blockId=robotpu_is_walk_done block="is walk step done?"
     //% subcategory="Actions"
     //% group="Actions"
-    //% speed.min=-5 speed.max=5 speed.defl=2
-    //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=85 blockGap=8
-    export function walkDo(speed: number, turn: number): void {
-        const r = getRobotAPI();
-        r.walkSpeed = speed;
-        r.walkDirection = turn;
-        r.walk(speed, turn);
+    export function isWalkStepDone(): boolean {
+        return lastWalkDone;
     }
 
     /**
      * Walk toward a target compass heading while avoiding obstacles. Call repeatedly in a loop.
      * @param headingDeg target compass heading in degrees (0 = north, 90 = east), eg: 0
      */
-    //% blockId=robotpu_walk_by_compass block="walk by compass %headingDeg"
+    //% blockId=robotpu_walk_by_compass block="walk by compass heading %headingDeg"
     //% subcategory="Actions"
     //% group="Actions"
     //% headingDeg.min=0 headingDeg.max=359 headingDeg.defl=0
@@ -344,9 +330,9 @@ namespace robotPuPro {
      * @param ki integral gain, eg: 0.0005
      * @param kd derivative gain, eg: 0
      */
-    //% blockId=robotpu_walk_by_compass_pid block="walk by compass PID %headingDeg proportional gain %kp integral gain %ki derivative gain %kd"
+    //% blockId=robotpu_walk_by_compass_pid block="walk by compass PID heading %headingDeg with proportional gain %kp integral gain %ki derivative gain %kd"
     //% subcategory="Actions"
-    //% group="Actions"
+    //% group="Advanced"
     //% headingDeg.min=0 headingDeg.max=359 headingDeg.defl=0
     //% kp.min=0 kp.max=0.2 kp.defl=0.02
     //% ki.min=0 ki.max=0.01 ki.defl=0.0005
@@ -356,26 +342,26 @@ namespace robotPuPro {
         return getRobotAPI().walkByCompassPID(headingDeg, kp, ki, kd);
     }
 
-    /** Explore autonomously using the sonar sensor to avoid obstacles. Call repeatedly in a loop. Returns 1 while moving, 0 when a step completes. */
+    /** Explore autonomously using the sonar sensor to avoid obstacles. Call repeatedly in a loop. */
     //% blockId=robotpu_explore block="explore"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=84 blockGap=8
-    export function explore(): number {
-        return getRobotAPI().explore();
+    export function explore(): void {
+        lastExploreDone = (getRobotAPI().explore() === 0);
     }
 
-    /** Explore autonomously using the sonar sensor to avoid obstacles. Call repeatedly in a loop. */
-    //% blockId=robotpu_explore_do block="explore"
+    /** Return true when the last explore step completed. */
+    //% blockId=robotpu_is_explore_done block="is explore done?"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=84 blockGap=8
-    export function exploreDo(): void {
-        getRobotAPI().explore();
+    export function isExploreDone(): boolean {
+        return lastExploreDone;
     }
 
     /**
-     * Move sideways. Returns 0 when the step is complete.
+     * Move sideways.
      * @param direction direction to step: -1 for left, 1 for right, eg: -1
      */
     //% blockId=robotpu_side_step block="side step %direction"
@@ -383,93 +369,89 @@ namespace robotPuPro {
     //% group="Actions"
     //% direction.min=-1 direction.max=1 direction.defl=-1
     //% weight=83 blockGap=8
-    export function sideStep(direction: number): number {
-        return getRobotAPI().sideStep(direction);
+    export function sideStep(direction: number): void {
+        lastSideStepDone = (getRobotAPI().sideStep(direction) === 0);
     }
 
-    /**
-     * Move sideways.
-     * @param direction direction to step: -1 for left, 1 for right, eg: -1
-     */
-    //% blockId=robotpu_side_step_do block="side step %direction"
+    /** Return true when the last side step completed. */
+    //% blockId=robotpu_is_side_step_done block="is side step done?"
     //% subcategory="Actions"
     //% group="Actions"
-    //% direction.min=-1 direction.max=1 direction.defl=-1
     //% weight=83 blockGap=8
-    export function sideStepDo(direction: number): void {
-        getRobotAPI().sideStep(direction);
+    export function isSideStepDone(): boolean {
+        return lastSideStepDone;
     }
 
-    /** Dance to music using the microphone to detect the beat. Returns 0 when one dance move is complete. Call repeatedly in a loop. */
+    /** Dance to music using the microphone to detect the beat. Call repeatedly in a loop. */
     //% blockId=robotpu_dance block="dance"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=82 blockGap=8
-    export function dance(): number {
-        return getRobotAPI().dance();
+    export function dance(): void {
+        lastDanceDone = (getRobotAPI().dance() === 0);
     }
 
-    /** Dance to music using the microphone to detect the beat. Call repeatedly in a loop. */
-    //% blockId=robotpu_dance_do block="dance"
+    /** Return true when the last dance move completed. */
+    //% blockId=robotpu_is_dance_done block="is dance done?"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=82 blockGap=8
-    export function danceDo(): void {
-        getRobotAPI().dance();
+    export function isDanceDone(): boolean {
+        return lastDanceDone;
     }
 
-    /** Perform a kick motion. Returns 0 when the kick is complete. Call repeatedly in a loop until it returns 0. */
+    /** Perform a kick motion. Call repeatedly in a loop to complete the kick. */
     //% blockId=robotpu_kick block="kick"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=81 blockGap=8
-    export function kick(): number {
-        return getRobotAPI().kick();
+    export function kick(): void {
+        lastKickDone = (getRobotAPI().kick() === 0);
     }
 
-    /** Perform a kick motion. Call repeatedly in a loop to complete the kick. */
-    //% blockId=robotpu_kick_do block="kick"
+    /** Return true when the last kick completed. */
+    //% blockId=robotpu_is_kick_done block="is kick done?"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=81 blockGap=8
-    export function kickDo(): void {
-        getRobotAPI().kick();
+    export function isKickDone(): boolean {
+        return lastKickDone;
     }
 
-    /** Perform a jump sequence. Returns 0 when the jump is complete. Call repeatedly in a loop until it returns 0. */
+    /** Perform a jump sequence. Call repeatedly in a loop to complete the jump. */
     //% blockId=robotpu_jump block="jump"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=80 blockGap=8
-    export function jump(): number {
-        return getRobotAPI().jump();
+    export function jump(): void {
+        lastJumpDone = (getRobotAPI().jump() === 0);
     }
 
-    /** Perform a jump sequence. Call repeatedly in a loop to complete the jump. */
-    //% blockId=robotpu_jump_do block="jump"
+    /** Return true when the last jump completed. */
+    //% blockId=robotpu_is_jump_done block="is jump done?"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=80 blockGap=8
-    export function jumpDo(): void {
-        getRobotAPI().jump();
+    export function isJumpDone(): boolean {
+        return lastJumpDone;
     }
 
-    /** Rest in a balanced idle pose. Reacts subtly to sound. Returns 0 when one rest cycle completes. */
+    /** Rest in a balanced idle pose. Reacts subtly to sound. */
     //% blockId=robotpu_rest block="rest"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=78 blockGap=8
-    export function rest(): number {
-        return getRobotAPI().rest();
+    export function rest(): void {
+        lastRestDone = (getRobotAPI().rest() === 0);
     }
 
-    /** Rest in a balanced idle pose. Reacts subtly to sound. */
-    //% blockId=robotpu_rest_do block="rest"
+    /** Return true when the last rest cycle completed. */
+    //% blockId=robotpu_is_rest_done block="is rest done?"
     //% subcategory="Actions"
     //% group="Actions"
-    //% weight=79 blockGap=8
-    export function restDo(): void {
-        getRobotAPI().rest();
+    //% weight=78 blockGap=8
+    export function isRestDone(): boolean {
+        return lastRestDone;
     }
 
     /** Move to the calibration pose and flash the eyes. Useful after changing servo trim values. */
@@ -481,22 +463,22 @@ namespace robotPuPro {
         ensureRobot().calibrate();
     }
 
-    /** Move to the standing pose. Returns 0 when the robot has reached the standing position. */
+    /** Move to the standing pose. */
     //% blockId=robotpu_stand block="stand"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=77 blockGap=8
-    export function stand(): number {
-        return getRobotAPI().stand();
+    export function stand(): void {
+        lastStandDone = (getRobotAPI().stand() === 0);
     }
 
-    /** Move to the standing pose. */
-    //% blockId=robotpu_stand_do block="stand"
+    /** Return true when the robot reached the standing position. */
+    //% blockId=robotpu_is_stand_done block="is stand done?"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=77 blockGap=8
-    export function standDo(): void {
-        getRobotAPI().stand();
+    export function isStandDone(): boolean {
+        return lastStandDone;
     }
 
     /**
@@ -532,7 +514,7 @@ namespace robotPuPro {
      * @param code morse code string to play, eg: "... --- ..."
      * @param unitMs duration of one dit in milliseconds, eg: 80
      */
-    //% blockId=robotpu_morse block="morse %code|| speed %unitMs ms"
+    //% blockId=robotpu_morse block="play morse code %code|| at speed %unitMs ms"
     //% code.shadow=text
     //% unitMs.min=30 unitMs.max=300 unitMs.defl=80
     //% subcategory="Actions"
@@ -564,7 +546,7 @@ namespace robotPuPro {
      * @param text plain text to translate and play as morse, eg: "Hello"
      * @param unitMs duration of one dit in milliseconds, eg: 80
      */
-    //% blockId=robotpu_morse_text block="say %text in morse|| speed %unitMs ms"
+    //% blockId=robotpu_morse_text block="play %text in morse|| at speed %unitMs ms"
     //% text.shadow=text
     //% unitMs.min=30 unitMs.max=300 unitMs.defl=80
     //% subcategory="Actions"
@@ -634,9 +616,9 @@ namespace robotPuPro {
      * @param asyncList array of servo joint indices that move in the background
      * @param asyncSpeedGain speed multiplier for the asynchronous group, eg: 1
      */
-    //% blockId=robotpu_move_servos block="move servos targets %targets speeds %speeds synchronous indexes %syncList synchronous gain %syncSpeedGain asynchronous indexes %asyncList asynchronous gain %asyncSpeedGain"
+    //% blockId=robotpu_move_servos block="move servos to %targets with speeds %speeds sync indexes %syncList gain %syncSpeedGain async indexes %asyncList gain %asyncSpeedGain"
     //% subcategory="Actuators"
-    //% group="Actuators"
+    //% group="Advanced"
     //% targets.shadow=lists_create_with speeds.shadow=lists_create_with syncList.shadow=lists_create_with asyncList.shadow=lists_create_with
     //% syncSpeedGain.defl=1 syncSpeedGain.min=-10 syncSpeedGain.max=10
     //% asyncSpeedGain.defl=1 asyncSpeedGain.min=-10 asyncSpeedGain.max=10
@@ -651,9 +633,9 @@ namespace robotPuPro {
      * @param indexes array of servo joint indices to set offsets for
      * @param values array of angle offsets in degrees to apply to each indexed servo
      */
-    //% blockId=robotpu_set_control_offsets block="set control offsets indexes %indexes values %values"
+    //% blockId=robotpu_set_control_offsets block="set control offsets for indexes %indexes to values %values"
     //% subcategory="Actuators"
-    //% group="Actuators"
+    //% group="Advanced"
     //% indexes.shadow=lists_create_with values.shadow=lists_create_with
     //% weight=47 blockGap=8
     export function setControlOffsets(indexes: number[], values: number[]): void {
@@ -666,9 +648,9 @@ namespace robotPuPro {
      * @param values array of offset increments in degrees
      * @param gain multiplier applied to each value before adding, eg: 1
      */
-    //% blockId=robotpu_increment_control_offsets block="increment control offsets indexes %indexes values %values gain %gain"
+    //% blockId=robotpu_increment_control_offsets block="increment control offsets for indexes %indexes by values %values with gain %gain"
     //% subcategory="Actuators"
-    //% group="Actuators"
+    //% group="Advanced"
     //% indexes.shadow=lists_create_with values.shadow=lists_create_with
     //% gain.defl=1 gain.min=-1 gain.max=1
     //% weight=47 blockGap=8
@@ -680,7 +662,7 @@ namespace robotPuPro {
      * Set the left eye LED brightness.
      * @param brightness brightness from 0 (off) to 1 (full brightness), eg: 0.5
      */
-    //% blockId=robotpu_left_eye_bright block="set left eye brightness %brightness"
+    //% blockId=robotpu_left_eye_bright block="set left eye brightness to %brightness"
     //% weight=46 blockGap=8
     //% subcategory="Actuators"
     //% group="Actuators"
@@ -696,7 +678,7 @@ namespace robotPuPro {
      * Set the right eye LED brightness.
      * @param brightness brightness from 0 (off) to 1 (full brightness), eg: 0.5
      */
-    //% blockId=robotpu_right_eye_bright block="set right eye brightness %brightness"
+    //% blockId=robotpu_right_eye_bright block="set right eye brightness to %brightness"
     //% weight=46 blockGap=8
     //% subcategory="Actuators"
     //% group="Actuators"
@@ -772,7 +754,7 @@ namespace robotPuPro {
     }
 
     /** Return the front distance array in centimeters. Items: left, front-left, front, front-right, right. Call sonar scan first to update the values. */
-    //% blockId=robotpu_explore_distance_array block="front distance array"
+    //% blockId=robotpu_explore_distance_array block="front distances"
     //% subcategory="Sensors"
     //% group="Sensors"
     //% weight=33 blockGap=8
@@ -782,7 +764,7 @@ namespace robotPuPro {
     }
 
     /** Reset the odometry so Robot PU's position is (0, 0) and heading is 0 degrees (north). */
-    //% blockId=robotpu_reset_odom block="reset robot location"
+    //% blockId=robotpu_reset_odom block="reset robot position"
     //% subcategory="Sensors"
     //% group="Sensors"
     //% weight=32 blockGap=8
@@ -791,7 +773,7 @@ namespace robotPuPro {
     }
 
     /** Return Robot PU's estimated location as [x, y, heading]. x and y are in millimeters, heading is in degrees. */
-    //% blockId=robotpu_location_array block="robot location array"
+    //% blockId=robotpu_location_array block="robot position"
     //% subcategory="Sensors"
     //% group="Sensors"
     //% weight=32 blockGap=8
@@ -805,7 +787,7 @@ namespace robotPuPro {
      * Supported commands: #put<text> (speak), #pus<song> (sing), #puhi<name> (greet friend), #pun<name> (set robot name).
      * @param command the command string received from radio, eg: "#putHello!"
      */
-    //% blockId=robotpu_runStrCMD block="execute string command %command"
+    //% blockId=robotpu_runStrCMD block="run string command %command"
     //% command.shadow=text
     //% subcategory="Remote Control"
     //% group="Remote Control"
@@ -820,10 +802,10 @@ namespace robotPuPro {
      * @param key the command key received from radio, eg: "#puspeed"
      * @param value the command value received from radio, eg: 1
      */
-    //% blockId=robotpu_runKeyValueCMD block="execute key value command key %key value %value"
+    //% blockId=robotpu_runKeyValueCMD block="execute command with key %key and value %value"
     //% key.shadow=text
     //% subcategory="Remote Control"
-    //% group="Remote Control"
+    //% group="Advanced"
     //% weight=9 blockGap=8
     export function runKeyValueCommand(key: string, value: number): void {
         ensureRobot().runKeyValueCommand(key, value);

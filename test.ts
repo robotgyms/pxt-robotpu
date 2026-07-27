@@ -16,10 +16,10 @@
 // ── Setup ──────────────────────────────────────────────────────────────────
 
 /**
- * TEST: Setup - channel, setChannel, changeChannel, mode, setModeVar
+ * TEST: Setup - channel, setChannel, changeChannel, mode, setMode
  * [SIMULATOR SAFE]
  * Expected: channel shows 166, then increments to 167, then decrements to 166.
- *           mode returns API after setModeVar(API).
+ *           mode returns API after setMode(API).
  * Pass: LED shows 166, then 167, then 166, no crash.
  */
 function testSetup() {
@@ -32,7 +32,7 @@ function testSetup() {
     robotPuPro.changeChannel(-1)
     basic.showNumber(robotPuPro.channel())    // expect 166
     basic.pause(500)
-    robotPuPro.setModeVar(robotPuPro.Mode.API)
+    robotPuPro.setMode(robotPuPro.Mode.API)
     basic.showNumber(robotPuPro.mode())       // expect 6 (API)
     basic.pause(500)
     robotPuPro.setMode(robotPuPro.Mode.Rest)
@@ -103,22 +103,21 @@ function testVoice() {
 }
 
 /**
- * TEST: Actions - walk, sideStep, explore, stand, rest, dance, kick, jump return values
+ * TEST: Actions - call walk, sideStep, explore, stand, rest, dance, kick, jump commands
  * [HARDWARE]
- * Expected: each function returns a number (0 or 1). LED shows 1 meaning call succeeded.
+ * Expected: each command runs without error. LED shows 1 after each call.
  * Pass: no crash, LED shows 1 for each.
  */
 function testReturnValues() {
-    robotPuPro.setModeVar(robotPuPro.Mode.API)
-    let r = 0
-    r = robotPuPro.walk(2, 0);        basic.showNumber(1); basic.pause(200)
-    r = robotPuPro.sideStep(-1);      basic.showNumber(1); basic.pause(200)
-    r = robotPuPro.explore();         basic.showNumber(1); basic.pause(200)
-    r = robotPuPro.stand();           basic.showNumber(1); basic.pause(200)
-    r = robotPuPro.rest();            basic.showNumber(1); basic.pause(200)
-    r = robotPuPro.dance();           basic.showNumber(1); basic.pause(200)
-    r = robotPuPro.kick();            basic.showNumber(1); basic.pause(200)
-    r = robotPuPro.jump();            basic.showNumber(1); basic.pause(200)
+    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.walk(2, 0);        basic.showNumber(1); basic.pause(200)
+    robotPuPro.sideStep(-1);      basic.showNumber(1); basic.pause(200)
+    robotPuPro.explore();         basic.showNumber(1); basic.pause(200)
+    robotPuPro.stand();           basic.showNumber(1); basic.pause(200)
+    robotPuPro.rest();            basic.showNumber(1); basic.pause(200)
+    robotPuPro.dance();           basic.showNumber(1); basic.pause(200)
+    robotPuPro.kick();            basic.showNumber(1); basic.pause(200)
+    robotPuPro.jump();            basic.showNumber(1); basic.pause(200)
 }
 
 /**
@@ -128,9 +127,9 @@ function testReturnValues() {
  * Pass: visible pose transitions, no crash.
  */
 function testStandRestCalibrate() {
-    for (let i = 0; i < 100; i++) { robotPuPro.standDo() }
+    for (let i = 0; i < 100; i++) { robotPuPro.stand() }
     basic.pause(500)
-    for (let i = 0; i < 100; i++) { robotPuPro.restDo() }
+    for (let i = 0; i < 100; i++) { robotPuPro.rest() }
     basic.pause(500)
     robotPuPro.calibrate()
 }
@@ -142,11 +141,11 @@ function testStandRestCalibrate() {
  * Pass: visible walking motion in correct directions, no crash.
  */
 function testWalk() {
-    for (let i = 0; i < 200; i++) { robotPuPro.walkDo(2, 0) }
+    for (let i = 0; i < 200; i++) { robotPuPro.walk(2, 0) }
     basic.pause(200)
-    for (let i = 0; i < 200; i++) { robotPuPro.walkDo(-2, 0) }
+    for (let i = 0; i < 200; i++) { robotPuPro.walk(-2, 0) }
     basic.pause(200)
-    for (let i = 0; i < 200; i++) { robotPuPro.walkDo(2, 1) }
+    for (let i = 0; i < 200; i++) { robotPuPro.walk(2, 1) }
 }
 
 /**
@@ -156,9 +155,9 @@ function testWalk() {
  * Pass: visible sideways motion, no crash.
  */
 function testSideStep() {
-    for (let i = 0; i < 100; i++) { robotPuPro.sideStepDo(-1) }
+    for (let i = 0; i < 100; i++) { robotPuPro.sideStep(-1) }
     basic.pause(200)
-    for (let i = 0; i < 100; i++) { robotPuPro.sideStepDo(1) }
+    for (let i = 0; i < 100; i++) { robotPuPro.sideStep(1) }
 }
 
 /**
@@ -168,11 +167,11 @@ function testSideStep() {
  * Pass: visible jump and kick motions, dance reacts to sound, no crash.
  */
 function testJumpKickDance() {
-    for (let i = 0; i < 50; i++) { robotPuPro.jumpDo() }
+    for (let i = 0; i < 50; i++) { robotPuPro.jump() }
     basic.pause(200)
-    for (let i = 0; i < 50; i++) { robotPuPro.kickDo() }
+    for (let i = 0; i < 50; i++) { robotPuPro.kick() }
     basic.pause(200)
-    for (let i = 0; i < 100; i++) { robotPuPro.danceDo() }
+    for (let i = 0; i < 100; i++) { robotPuPro.dance() }
 }
 
 /**
@@ -186,7 +185,7 @@ function testExplore() {
     basic.pause(2000)
     robotPuPro.setMode(robotPuPro.Mode.API)
     basic.pause(200)
-    for (let i = 0; i < 50; i++) { robotPuPro.exploreDo() }   // return-value variant
+    for (let i = 0; i < 50; i++) { robotPuPro.explore() }   // return-value variant
     robotPuPro.setMode(robotPuPro.Mode.API)
 }
 
@@ -286,7 +285,7 @@ function testServo() {
  * Pass: smooth head pitch motion, servoStepStatus returns 1 while moving and 0 when arrived, no crash.
  */
 function testServoStep() {
-    robotPuPro.setModeVar(robotPuPro.Mode.API)
+    robotPuPro.setMode(robotPuPro.Mode.API)
     for (let i = 0; i < 60; i++) {
         robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, 120, 2)
         basic.pause(20)
@@ -305,7 +304,7 @@ function testServoStep() {
  * Pass: smooth pose transition, no crash.
  */
 function testMoveServos() {
-    robotPuPro.setModeVar(robotPuPro.Mode.API)
+    robotPuPro.setMode(robotPuPro.Mode.API)
     const pose = [90, 90, 90, 90, 120, 105, 90, 90, 0, 180]
     const speed = [2, 2, 2, 2, 5, 5, 6, 6, 6, 6]
     for (let i = 0; i < 100; i++) {
@@ -449,7 +448,7 @@ function testRunStringCommand() {
  * Pass: visible motion, no crash.
  */
 function testRunKeyValueCommand() {
-    robotPuPro.setModeVar(robotPuPro.Mode.Walk)
+    robotPuPro.setMode(robotPuPro.Mode.Walk)
     robotPuPro.runKeyValueCommand("#puspeed", 1)
     basic.pause(500)
     robotPuPro.runKeyValueCommand("#puturn", 1)
@@ -459,7 +458,7 @@ function testRunKeyValueCommand() {
     robotPuPro.runKeyValueCommand("#pupitch", 20)
     basic.pause(500)
     robotPuPro.runKeyValueCommand("#puspeed", 0)
-    robotPuPro.setModeVar(robotPuPro.Mode.API)
+    robotPuPro.setMode(robotPuPro.Mode.API)
 }
 
 // ── Radio listeners (always active) ────────────────────────────────────────
@@ -597,5 +596,5 @@ input.setSoundThreshold(SoundThreshold.Loud, 184)
 initSound()
 robotPuPro.setChannel(166)
 robotPuPro.greet()
-robotPuPro.standDo()
+robotPuPro.stand()
 robotPuPro.sing("C5 B G - E F E G ")

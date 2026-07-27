@@ -70,7 +70,7 @@ The action engine calls this repeatedly in `basic.forever` so the servos keep st
 
 ### E. API mode
 
-`robotPuPro.setModeVar(robotPuPro.Mode.API)` puts Robot PU in **API mode**. In this mode:
+`robotPuPro.setMode(robotPuPro.Mode.API)` puts Robot PU in **API mode**. In this mode:
 
 - the internal state machine (walk, explore, dance, etc.) is disabled
 - only your code drives the servos
@@ -113,7 +113,7 @@ input.onButtonPressed(Button.B, function () {
 })
 
 // set robot to API mode to avoid autonomous actions and AI Actions
-robotPuPro.setModeVar(robotPuPro.Mode.API)
+robotPuPro.setMode(robotPuPro.Mode.API)
 
 // set Kungfu Gaits. Each array item is a gait with 10 servo angles, with range of 0-180
 // Servos: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm.
