@@ -252,8 +252,8 @@ namespace robotPuPro {
 
     /**
      * Play a sequence of tones using arrays of frequencies in Hz and durations in milliseconds. Use frequency 0 for a rest.
-     * @param frequencies array of tone frequencies in Hz, use 0 for a rest, eg: [440, 550, 660]
-     * @param durations array of tone durations in milliseconds, eg: [100, 100, 200]
+     * @param frequencies array of tone frequencies in Hz, use 0 for a rest, eg: [440], [440, 550, 660]
+     * @param durations array of tone durations in milliseconds, eg: [100], [100, 100, 200]
      */
     //% blockId=robotpu_play_tone_sequence_ms block="play tones with frequencies %frequencies and durations (ms) %durations"
     //% weight=87 blockGap=8
