@@ -2287,25 +2287,25 @@ export class RobotPu {
         this.lastCmdTS = control.millis()
 
         // 2. Process #put: Text-to-Speech
-        if (s.substring(0, 4) == "#put") {
-            this.talk(s.substring(4));
+        if (s.substr(0, 4) == "#put") {
+            this.talk(s.substr(4));
         }
 
         // 3. Process #pus: Buffered Singing (6 segments)
-        else if (s.substring(0, 4) == "#pus") {
+        else if (s.substr(0, 4) == "#pus") {
             // Assume s_list is an array of strings defined in the class
-            this.sing(s.substring(4));
+            this.sing(s.substr(4));
         }
 
         // 4. Process #puhi: Greeting
-        else if (s.substring(0, 5) == "#puhi") {
-            this.talk("My friend " + s.substring(5) + " is here")
+        else if (s.substr(0, 5) == "#puhi") {
+            this.talk("My friend " + s.substr(5) + " is here")
             this.sendStatusCode("ACK")
         }
 
         // 5. Process #pun: Name/Serial Update
-        else if (s.substring(0, 4) == "#pun") {
-            this.sn = s.substring(4);
+        else if (s.substr(0, 4) == "#pun") {
+            this.sn = s.substr(4);
             this.greet();
         }
     }
