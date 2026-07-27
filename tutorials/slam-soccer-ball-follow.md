@@ -327,9 +327,9 @@ const SEARCH_PATTERN: { y: number, p: number }[] = [
 
 robotPuPro.setChannel(166)
 // set servo trim to help robot balancing
-robotPuPro.setServoTrim(0,-5)
-robotPuPro.setServoTrim(2,-5)
-robotPuPro.setServoTrim(4, -9)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, -5)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, -5)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -9)
 radio.onReceivedString(function (receivedString) {
     robotPuPro.runStringCommand(receivedString)
 })
@@ -491,7 +491,7 @@ basic.forever(function () {
 // robot action loop
 basic.forever(function () {
     // move head to look at the ball using trim function
-    robotPuPro.setServoTrim(5, Math.min(maxHeadPitchAllowed, pitch))
+    robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, Math.min(maxHeadPitchAllowed, pitch))
     // use the computed walk speed and turn to move the robot
     robotPuPro.walk(walkSpeed, walkTurn)
     // pause for even loop
