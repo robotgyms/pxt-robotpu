@@ -40,7 +40,7 @@ Purchase links:
 - [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
 - [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW) 
 
-The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPu’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
+The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPuPro’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
 - https://makecode.microbit.org/_JbygU12aCAsU
 
 ## The Story Of Robot PU
@@ -134,8 +134,8 @@ Use these graphs to:
    - In walk mode, pitch gamepad up/down: head move up/down
    - In walk mode, roll gamepad left/right: head move left/right
 4. Ensure both micro:bits use the same radio channel (group):
-   - Use `robotPu.setChannel(...)` in your Robot PU project, or set the same `radio.setGroup(...)` on both devices.
-5. In your Robot PU project, forward radio messages to robotPu (see the Remote Control section for example code).
+   - Use `robotPuPro.setChannel(...)` in your Robot PU project, or set the same `radio.setGroup(...)` on both devices.
+5. In your Robot PU project, forward radio messages to robotPuPro (see the Remote Control section for example code).
 
 ## Installation
 
@@ -227,7 +227,7 @@ make push-tag VERSION=1.0.42
 Before running a release, make sure your GitHub authentication is configured for pushing to the repository.
 
 ## Blocks / API
-This extension auto-initializes the robot on the first call to any `robotPu.*` API:
+This extension auto-initializes the robot on the first call to any `robotPuPro.*` API:
 
 - **Creates** an internal `RobotPu` instance
 - **Runs** `calibrate()` once
@@ -235,13 +235,14 @@ This extension auto-initializes the robot on the first call to any `robotPu.*` A
 
 Because of this, there is **no separate `init` block** in the current API.
 
-The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and are organized into groups:
+The MakeCode blocks are defined in `main.ts` under the `robotPuPro` namespace and are organized into groups:
 
 - **Setup**
 - **Sensors**
 - **Actuators**
 - **Actions**
 - **Remote Control**
+- **Advanced**
 
 ### Setup
 
@@ -270,18 +271,18 @@ The MakeCode blocks are defined in `main.ts` under the `robotPu` namespace and a
 - **Block**: `mode`
 - **What it does**: Returns the current robot behavior mode.
 
-#### `setMode(mode: Mode): void`
+#### `setServoTrim(joint: ServoJoint, value: number): void`
 
-- **Block**: `set mode to %mode`
-- **What it does**: Sets the robot behavior mode (state machine mode).
-
-#### `setServoTrim(leftFoot: number, leftLeg: number, rightFoot: number, rightLeg: number, headYaw: number, headPitch: number): void`
-
-- **Block**: `set servo trim left foot %leftFoot left leg %leftLeg right foot %rightFoot right leg %rightLeg head yaw %headYaw head pitch %headPitch`
-- **What it does**: Sets persistent trim offsets (in degrees) added to the target servo angles.
+- **Block**: `set %joint servo trim to %value`
+- **What it does**: Sets a trim offset (in degrees) for a single servo joint, added to that servo's target angle.
 - **When to use**: If your robot does not stand level, walks crooked, or the head is not centered.
+- **Parameters**:
+  - `joint`: one of the `robotPuPro.ServoJoint` values
+  - `value`: trim offset in degrees
 - **Notes**:
+  - Call once for each joint you need to trim.
   - Trims are applied immediately and remain active until changed.
+  - Use with the `ServoJoint` enum: `LeftFoot`, `LeftLeg`, `RightFoot`, `RightLeg`, `HeadYaw`, `HeadPitch`, `LeftShoulder`, `LeftArm`, `RightShoulder`, `RightArm`
 
 #### Servo calibration / trim mode
 
@@ -332,17 +333,17 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `readConfig(): void`
 
-- **Block**: `read config`
+- **Block**: `load configuration`
 - **What it does**: Loads saved robot configuration, including servo trim values and radio channel.
 
 #### `writeConfig(): void`
 
-- **Block**: `write config`
+- **Block**: `save configuration`
 - **What it does**: Saves current robot configuration, including servo trim values and radio channel.
 
 #### `setWalkSpeedRange(min: number, max: number): void`
 
-- **Block**: `set walk speed range min %min max %max`
+- **Block**: `set walk speed range from %min to %max`
 - **What it does**: Sets the robot's internal maximum speed scalars used by autonomous behaviors and remote control.
 - **Parameters**:
   - `min`: backward max speed (typically negative)
@@ -444,7 +445,7 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `moveServos(targets: number[], speeds: number[], syncList: number[], syncSpeedGain: number, asyncList: number[], asyncSpeedGain: number): boolean`
 
-- **Block**: `move servos targets %targets speeds %speeds synchronous indexes %syncList synchronous gain %syncSpeedGain asynchronous indexes %asyncList asynchronous gain %asyncSpeedGain`
+- **Block**: `move servos to %targets with speeds %speeds sync indexes %syncList gain %syncSpeedGain async indexes %asyncList gain %asyncSpeedGain`
 - **What it does**: Moves multiple servos toward target angles simultaneously, with separate synchronous and asynchronous servo groups.
 - **Parameters**:
   - `targets`: array of 10 target angles (0 to 180)
@@ -457,24 +458,24 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `setControlOffsets(indexes: number[], values: number[]): void`
 
-- **Block**: `set control offsets indexes %indexes values %values`
+- **Block**: `set control offsets for indexes %indexes to values %values`
 - **What it does**: Sets servo control offsets for feedback or feedforward control. Each value is an angle offset added to the servo motion target.
 
 #### `incrementControlOffsets(indexes: number[], values: number[], gain: number): void`
 
-- **Block**: `increment control offsets indexes %indexes values %values gain %gain`
+- **Block**: `increment control offsets for indexes %indexes by values %values with gain %gain`
 - **What it does**: Increments servo control offsets smoothly. Each value is multiplied by gain and added to the current offset.
 
 #### `leftEyeBright(brightness: number): void`
 
-- **Block**: `set left eye brightness %brightness`
+- **Block**: `set left eye brightness to %brightness`
 - **Parameters**:
   - `brightness`: `0 .. 1`
 - **What it does**: Sets left eye LED brightness.
 
 #### `rightEyeBright(brightness: number): void`
 
-- **Block**: `set right eye brightness %brightness`
+- **Block**: `set right eye brightness to %brightness`
 - **Parameters**:
   - `brightness`: `0 .. 1`
 - **What it does**: Sets right eye LED brightness.
@@ -483,7 +484,7 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `setMode(mode: Mode): void`
 
-- **Block**: `set mode %mode`
+- **Block**: `set mode to %mode`
 - **What it does**: Sets Robot PU's behavior mode directly.
 
 #### `greet(): void`
@@ -499,12 +500,12 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `playToneSequenceMs(frequencies: number[], durations: number[]): void`
 
-- **Block**: `play tones frequencies %frequencies durations (ms) %durations`
+- **Block**: `play tones with frequencies %frequencies and durations (ms) %durations`
 - **What it does**: Plays a sequence of tones using arrays of frequencies in Hz and durations in milliseconds. Use frequency `0` for a rest.
 
-#### `walk(speed: number, turn: number): number`
+#### `walk(speed: number, turn: number): void`
 
-- **Block**: `walk speed %speed turn %turn`
+- **Block**: `walk at speed %speed, turning %turn`
 - **Parameters**:
   - `speed`: `-5 .. 5`
     - Positive = forward
@@ -514,21 +515,18 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
     - `0` = straight
     - `1` = hard right
 - **What it does**: Executes a self-balancing walking gait using the micro:bit accelerometer.
-- **Return**: `number` motion status
-  - `1` means the gait step is still in progress
-  - `0` means the current step completed (the internal gait state advanced)
 - **Notes**:
   - This is designed to be called repeatedly (e.g. inside `basic.forever`).
   - You may use speed higher than 5 to make the robot move faster but the robot will be less stable because it cannot balance well due to the limited sampling rate of IMU and servo action speed.
 
-#### `walkDo(speed: number, turn: number): void`
+#### `isWalkStepDone(): boolean`
 
-- **Block**: `walk speed %speed turn %turn` (statement form)
-- **What it does**: Same as `walk(...)` but discards the return value.
+- **Block**: `is walk step done?`
+- **What it does**: Returns `true` when the last walk step completed.
 
 #### `walkByCompass(headingDeg: number): number`
 
-- **Block**: `walk by compass %headingDeg`
+- **Block**: `walk by compass heading %headingDeg`
 - **What it does**: Walks toward a target compass heading while avoiding obstacles.
 - **Parameters**:
   - `headingDeg`: target heading in degrees (0 = north, 90 = east)
@@ -536,7 +534,7 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `walkByCompassPID(headingDeg: number, kp: number, ki: number, kd: number): number`
 
-- **Block**: `walk by compass PID %headingDeg proportional gain %kp integral gain %ki derivative gain %kd`
+- **Block**: `walk by compass PID heading %headingDeg with proportional gain %kp integral gain %ki derivative gain %kd`
 - **What it does**: Walks toward a target compass heading using PID control while avoiding obstacles.
 - **Parameters**:
   - `headingDeg`: target heading in degrees
@@ -545,95 +543,86 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
   - `kd`: derivative gain
 - **Return**: `number` motion status
 
-#### `explore(): number`
+#### `explore(): void`
 
 - **Block**: `explore`
 - **What it does**: Autonomous obstacle avoidance using the onboard ultrasonic sensor (HCSR04).
   - Samples distance ahead while sweeping and steers toward the most open direction.
   - Internally calls `walk(...)` with computed speed/turn.
-- **Return**: `number` motion status (same convention as `walk`)
 - **Notes**:
   - The explore speed range is influenced by `setWalkSpeedRange(min, max)`.
 
-#### `exploreDo(): void`
+#### `isExploreDone(): boolean`
 
-- **Block**: `explore` (statement form)
-- **What it does**: Same as `explore()` but discards the return value.
+- **Block**: `is explore done?`
+- **What it does**: Returns `true` when the last explore step completed.
 
-#### `stand(): number`
-
-- **Block**: `stand`
-- **What it does**: Moves the robot into a standing pose (balanced / ready).
-- **Return**: `number` motion status (same convention as `walk`)
-
-#### `standDo(): void`
-
-- **Block**: `stand` (statement form)
-- **What it does**: Same as `stand()` but discards the return value.
-
-#### `sideStep(direction: number): number`
+#### `sideStep(direction: number): void`
 
 - **Block**: `side step %direction`
 - **Parameters**:
   - `direction`: `-1 .. 1` (negative = left, positive = right)
 - **What it does**: Performs a sideways step.
-- **Return**: `number` motion status
 
-#### `sideStepDo(direction: number): void`
+#### `isSideStepDone(): boolean`
 
-- **Block**: `side step %direction` (statement form)
-- **What it does**: Same as `sideStep()` but discards the return value.
+- **Block**: `is side step done?`
+- **What it does**: Returns `true` when the last side step completed.
 
-#### `dance(): number`
+#### `dance(): void`
 
 - **Block**: `dance`
 - **What it does**: Beat-reactive dancing.
   - Uses `input.soundLevel()` to detect beats and vary movement.
   - Animates the NeoPixel LEDs during high beats.
-- **Return**: `number` motion status (same convention as `walk`)
 
-#### `danceDo(): void`
+#### `isDanceDone(): boolean`
 
-- **Block**: `dance` (statement form)
-- **What it does**: Same as `dance()` but discards the return value.
+- **Block**: `is dance done?`
+- **What it does**: Returns `true` when the last dance move completed.
 
-#### `kick(): number`
+#### `kick(): void`
 
 - **Block**: `kick`
 - **What it does**: A quick kick-like burst using an accelerated forward gait.
-- **Return**: `number` motion status
-  - Returns `0` when the kick completes and the robot transitions back to manual/neutral behavior internally.
 
-#### `kickDo(): void`
+#### `isKickDone(): boolean`
 
-- **Block**: `kick` (statement form)
-- **What it does**: Same as `kick()` but discards the return value.
+- **Block**: `is kick done?`
+- **What it does**: Returns `true` when the last kick completed.
 
-#### `jump(): number`
+#### `jump(): void`
 
 - **Block**: `jump`
 - **What it does**: Executes a jump sequence.
   - Uses an auxiliary servo during the sequence.
-- **Return**: `number` motion status
-  - Returns `0` when the jump completes and the auxiliary servo retracts.
 
-#### `jumpDo(): void`
+#### `isJumpDone(): boolean`
 
-- **Block**: `jump` (statement form)
-- **What it does**: Same as `jump()` but discards the return value.
+- **Block**: `is jump done?`
+- **What it does**: Returns `true` when the last jump completed.
 
-#### `rest(): number`
+#### `rest(): void`
 
 - **Block**: `rest`
 - **What it does**: Balanced idle / rest pose.
   - Keeps balance using the accelerometer.
   - Reacts to sound level with subtle motion.
-- **Return**: `number` motion status (same convention as `walk`)
 
-#### `restDo(): void`
+#### `isRestDone(): boolean`
 
-- **Block**: `rest` (statement form)
-- **What it does**: Same as `rest()` but discards the return value.
+- **Block**: `is rest done?`
+- **What it does**: Returns `true` when the last rest cycle completed.
+
+#### `stand(): void`
+
+- **Block**: `stand`
+- **What it does**: Moves the robot into a standing pose (balanced / ready).
+
+#### `isStandDone(): boolean`
+
+- **Block**: `is stand done?`
+- **What it does**: Returns `true` when the robot reached the standing position.
 
 #### `calibrate(): void`
 
@@ -645,20 +634,20 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 #### `talk(text: string): void`
 
 - **Block**: `talk %text`
-- **What it does**: Text-to-speech using the Billy voice package.
+- **What it does**: Speaks text aloud as a melodic robotic voice. If the text contains only morse characters it is played as morse code instead.
 - **Parameters**:
   - `text`: Text to speak.
 
-#### `sing(s: string): void`
+#### `sing(song: string): void`
 
-- **Block**: `sing %s`
+- **Block**: `sing %song`
 - **What it does**: Sings a musical note sequence using the built-in music engine.
 - **Parameters**:
-  - `s`: Note sequence string. Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use `-` for a rest.
+  - `song`: Note sequence string. Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use `-` for a rest.
 
 #### `morse(code: string, unitMs: number): void`
 
-- **Block**: `morse %code|| speed %unitMs ms`
+- **Block**: `play morse code %code|| at speed %unitMs ms`
 - **What it does**: Plays a morse code string using ITU-standard timing.
 
 #### `toMorse(text: string): string`
@@ -669,7 +658,7 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `morseText(text: string, unitMs: number): void`
 
-- **Block**: `say %text in morse|| speed %unitMs ms`
+- **Block**: `play %text in morse|| at speed %unitMs ms`
 - **What it does**: Translates plain text to morse code and plays it immediately.
 
 ### Remote Control
@@ -685,32 +674,32 @@ Robot PU can be controlled over the micro:bit radio protocol by sending either:
 - **Value messages** (recommended for joysticks / continuous control)
   - Send using `radio.sendValue(name, value)`
   - Receive using `radio.onReceivedValue((name, value) => ...)`
-  - Forward to robotPu using `robotPu.runKeyValueCommand(name, value)`
+  - Forward to robotPuPro using `robotPuPro.runKeyValueCommand(name, value)`
 - **String messages** (recommended for text, singing, and simple triggers)
   - Send using `radio.sendString(text)`
   - Receive using `radio.onReceivedString((text) => ...)`
-  - Forward to robotPu using `robotPu.runStringCommand(text)`
+  - Forward to robotPuPro using `robotPuPro.runStringCommand(text)`
 
 **Important note about `radio.sendValue`**:
 
 - micro:bit radio "value" packets are transmitted as integers.
 - For **movement control** (`#puspeed`, `#puturn`), Robot PU expects a value roughly in `-1 .. 1`.
-  - If your controller sends a different scale (for example `-100 .. 100`), scale it on the receiver before calling `robotPu.runKeyValueCommand`.
+  - If your controller sends a different scale (for example `-100 .. 100`), scale it on the receiver before calling `robotPuPro.runKeyValueCommand`.
 - For **gesture head control** (`#puroll`, `#pupitch`), values are treated as angles (degrees) to yaw/pitch PU's head.
 
 **Channel / pairing**:
 
 - Robot PU uses the micro:bit radio **group** as its channel.
-- Use `robotPu.channel()` / `robotPu.setChannel(...)` (or `radio.setGroup(...)` on the sender) so both devices are on the same group (0..255).
+- Use `robotPuPro.channel()` / `robotPuPro.setChannel(...)` (or `radio.setGroup(...)` on the sender) so both devices are on the same group (0..255).
 
 **Receiver (Robot PU micro:bit) example**:
 
 ```ts
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 radio.onReceivedString(function (text) {
-    robotPu.runStringCommand(text)
+    robotPuPro.runStringCommand(text)
 })
 ```
 
@@ -747,9 +736,9 @@ If your controller sends larger integers for movement (for example `-100 .. 100`
 ```ts
 radio.onReceivedValue(function (name, value) {
     if (name == "#puspeed" || name == "#puturn") {
-        robotPu.runKeyValueCommand(name, value / 100)
+        robotPuPro.runKeyValueCommand(name, value / 100)
     } else {
-        robotPu.runKeyValueCommand(name, value)
+        robotPuPro.runKeyValueCommand(name, value)
     }
 })
 ```
@@ -758,11 +747,11 @@ If your controller is a phone/app over BLE, the typical architecture is:
 
 - Phone/app (BLE)
 - Controller micro:bit receives BLE events and converts them to `radio.sendValue(...)` / `radio.sendString(...)`
-- Robot PU micro:bit receives radio and calls `robotPu.runKeyValueCommand(...)` / `robotPu.runStringCommand(...)`
+- Robot PU micro:bit receives radio and calls `robotPuPro.runKeyValueCommand(...)` / `robotPuPro.runStringCommand(...)`
 
 #### `runStringCommand(s: string): void`
 
-- **Block**: `execute command %s`
+- **Block**: `run string command %command`
 - **What it does**: Parses and executes a string command.
 - **Supported command formats**:
   - `#put<text>`: speak `<text>` (text-to-speech)
@@ -772,7 +761,7 @@ If your controller is a phone/app over BLE, the typical architecture is:
 
 #### `runKeyValueCommand(key: string, v: number): void`
 
-- **Block**: `execute command key %key value %v`
+- **Block**: `execute command with key %key and value %value`
 - **What it does**: Executes a key/value command (mostly used for joystick-style control).
 - **Supported keys**:
   - `#puspeed`: forward/back command.
@@ -798,57 +787,57 @@ If your controller is a phone/app over BLE, the typical architecture is:
 
 ```ts
 // Initialize robot by ask it to greet
-robotPu.greet()
+robotPuPro.greet()
 
 // press button A to walk forward in circles
 input.onButtonPressed(Button.A, function () {
     for (let index = 0; index < 400; index++) {
-        robotPu.walk(3, -0.5)
+        robotPuPro.walk(3, -0.5)
     }
 })
 // logo up to sing
 input.onGesture(Gesture.LogoUp, function () {
-    robotPu.sing("E D G F B A C5 B ")
+    robotPuPro.sing("E D G F B A C5 B ")
 })
 // tilt left to kick
 input.onGesture(Gesture.TiltLeft, function () {
-    robotPu.kick()
+    robotPuPro.kick()
 })
 // face down to talk
 input.onGesture(Gesture.ScreenDown, function () {
-    robotPu.talk("Put me down")
+    robotPuPro.talk("Put me down")
 })
 // press button A+B to do autopilot
 input.onButtonPressed(Button.AB, function () {
     for (let index = 0; index < 4000; index++) {
-        robotPu.explore()
+        robotPuPro.explore()
     }
 })
 // Register the event listener for incoming string messages
 radio.onReceivedString(function (receivedString) {
-    robotPu.runStringCommand(receivedString)
+    robotPuPro.runStringCommand(receivedString)
 })
 // press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
     for (let index = 0; index < 400; index++) {
-        robotPu.walk(-1, -0.5)
+        robotPuPro.walk(-1, -0.5)
     }
 })
 // tilt right to jump
 input.onGesture(Gesture.TiltRight, function () {
-    robotPu.jump()
+    robotPuPro.jump()
 })
 // listen to radio messages for commands of key value pairs
 radio.onReceivedValue(function (name, value) {
-    robotPu.runKeyValueCommand(name, value)
+    robotPuPro.runKeyValueCommand(name, value)
 })
 // logo down to rest
 input.onGesture(Gesture.LogoDown, function () {
-    robotPu.rest()
+    robotPuPro.rest()
 })
 // press logo button to dance using set mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    robotPu.setMode(robotPu.Mode.Dance)
+    robotPuPro.setMode(robotPuPro.Mode.Dance)
 })
 ```
 
