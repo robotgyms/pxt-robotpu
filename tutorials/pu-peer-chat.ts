@@ -48,7 +48,7 @@ radio.onReceivedString(function (receivedString: string) {
 
     // 2) Peer chat protocol: PU|<name>|<mode>|<distCm>|<loud>|<ts>
     if (receivedString.length == 0) return
-    if (receivedString.substr(0, 3) != "PU|") return
+    if (receivedString.substring(0, 3) != "PU|") return
 
     const parts = receivedString.split("|")
     if (parts.length < 6) return

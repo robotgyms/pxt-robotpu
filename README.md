@@ -200,11 +200,12 @@ make clean
 This removes the local `built/` directory.
 
 ### Release example
+Before release, must review everything with BBC MakeCode extension approval requirements.
 
-To release version `1.0.42`:
+To release version `1.0.42`, have to a `v`:
 
 ```bash
-make release VERSION=1.0.42
+make release VERSION=v1.0.42
 ```
 
 The release target:
