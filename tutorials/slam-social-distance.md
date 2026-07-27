@@ -123,7 +123,7 @@ function readFacePacket() {
         faceYaw = i8(packet[16])
         lastFaceSeenMs = input.runningTime()
 
-        robotPuPro.setModeVar(robotPuPro.Mode.API)
+        robotPuPro.setMode(robotPuPro.Mode.API)
         robotPuPro.servoStep(
             robotPuPro.ServoJoint.HeadYaw,
             robotPuPro.servoTargets()[4] + faceYaw * 0.08,
@@ -139,7 +139,7 @@ function updateMotion() {
 
     if (!faceIsRecent) {
         behavior = "searching"
-        robotPuPro.setModeVar(robotPuPro.Mode.API)
+        robotPuPro.setMode(robotPuPro.Mode.API)
         robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, 75, 2)
         robotPuPro.leftEyeBright(0.002)
         robotPuPro.rightEyeBright(0.002)
