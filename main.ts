@@ -436,6 +436,19 @@ namespace robotPuPro {
         return lastJumpDone;
     }
 
+    /**
+     * Update the eye blink animation with the given alert level. Higher alert levels blink faster and brighter.
+     * @param alertLevel alertness from 0 (sleepy) to 10 (fully alert), eg: 5
+     */
+    //% blockId=robotpu_blink block="blink with alert level %alertLevel"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% alertLevel.min=0 alertLevel.max=10 alertLevel.defl=5
+    //% weight=79 blockGap=8
+    export function blink(alertLevel: number): void {
+        ensureRobot().pcb.blink(alertLevel);
+    }
+
     /** Rest in a balanced idle pose. Reacts subtly to sound. */
     //% blockId=robotpu_rest block="rest"
     //% subcategory="Actions"
