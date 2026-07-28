@@ -19,6 +19,7 @@
   "robotPuPro.ServoJoint.RightShoulder|block": "右肩",
   "robotPuPro.bodyPitch|block": "身体俯仰",
   "robotPuPro.bodyRoll|block": "身体侧倾",
+  "robotPuPro.blink|block": "按警觉等级 %alertLevel 眨眼",
   "robotPuPro.calibrate|block": "校准",
   "robotPuPro.changeChannel|block": "频道改变 %delta",
   "robotPuPro.channel|block": "频道",

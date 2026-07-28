@@ -19,6 +19,7 @@
   "robotPuPro.ServoJoint.RightShoulder|block": "right shoulder",
   "robotPuPro.bodyPitch|block": "body pitch",
   "robotPuPro.bodyRoll|block": "body roll",
+  "robotPuPro.blink|block": "blink with alert level %alertLevel",
   "robotPuPro.calibrate|block": "calibrate",
   "robotPuPro.changeChannel|block": "change channel by %delta",
   "robotPuPro.channel|block": "channel",

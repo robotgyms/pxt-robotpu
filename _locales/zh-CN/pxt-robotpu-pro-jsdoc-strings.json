@@ -64,6 +64,8 @@
   "robotPuPro.ServoJoint": "机器人PU伺服关节。每个关节对应机器人本体上的一台伺服电机。",
   "robotPuPro.bodyPitch": "返回当前主体俯仰角（以度为单位）。积极意味着向前倾斜。",
   "robotPuPro.bodyRoll": "返回当前身体滚动角度（以度为单位）。正数表示向右倾斜。",
+  "robotPuPro.blink": "根据给定的警觉等级更新眼睛眨眼动画。更高的警觉等级眨眼更快更亮。",
+  "robotPuPro.blink|param|alertLevel": "警觉度，从 0（困倦）到 10（完全警觉），例如：5",
   "robotPuPro.calibrate": "移动到校准姿势并闪烁眼睛。更改伺服微调值后很有用。",
   "robotPuPro.changeChannel": "将无线电频道更改给定量。在 0 到 255 之间环绕。",
   "robotPuPro.changeChannel|param|delta": "改变频道的金额, eg: 1",
