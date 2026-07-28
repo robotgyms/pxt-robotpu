@@ -51,7 +51,7 @@
   "robotPuPro.runStringCommand|param|command|defl": "#putHello!",
   "robotPuPro.saveServoTrimCalibration|block": "保存舵机微调",
   "robotPuPro.servoControls|block": "舵机控制",
-  "robotPuPro.servoStepStatus|block": "舵机步进 %joint 到 %target 步长 %stepSize",
+  "robotPuPro.servoStepStatus|block": "%joint 移动到 %target 使用步长 %stepSize 的状态",
   "robotPuPro.servoStep|block": "移动 %joint 舵机到 %target 步长 %stepSize",
   "robotPuPro.servoTargets|block": "舵机目标",
   "robotPuPro.servoTrims|block": "舵机微调",

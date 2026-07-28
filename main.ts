@@ -608,7 +608,7 @@ namespace robotPuPro {
      * @param target target angle from 0 to 180 degrees, eg: 90
      * @param stepSize maximum degrees to move per call, eg: 2
      */
-    //% blockId=robotpu_servo_step_status block="servo step %joint to %target step size %stepSize"
+    //% blockId=robotpu_servo_step_status block="status of %joint moving to %target using step %stepSize"
     //% subcategory="Actuators"
     //% group="Actuators"
     //% target.min=0 target.max=180 target.defl=90
