@@ -103,7 +103,7 @@ function testVoice() {
 }
 
 /**
- * TEST: Actions - call walk, sideStep, explore, stand, rest, dance, kick, jump commands
+ * TEST: Actions - call walk, sideStep, explore, stand, rest, dance, kick, jump, blink commands
  * [HARDWARE]
  * Expected: each command runs without error. LED shows 1 after each call.
  * Pass: no crash, LED shows 1 for each.
@@ -118,6 +118,7 @@ function testReturnValues() {
     robotPuPro.dance();           basic.showNumber(1); basic.pause(200)
     robotPuPro.kick();            basic.showNumber(1); basic.pause(200)
     robotPuPro.jump();            basic.showNumber(1); basic.pause(200)
+    robotPuPro.blink(5);          basic.showNumber(1); basic.pause(200)
 }
 
 /**
