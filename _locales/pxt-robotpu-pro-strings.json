@@ -47,7 +47,7 @@
   "robotPuPro.runStringCommand|block": "run string command %command",
   "robotPuPro.saveServoTrimCalibration|block": "save servo trims",
   "robotPuPro.servoControls|block": "servo controls",
-  "robotPuPro.servoStepStatus|block": "servo step %joint to %target step size %stepSize",
+  "robotPuPro.servoStepStatus|block": "status of %joint moving to %target using step %stepSize",
   "robotPuPro.servoStep|block": "move %joint servo to %target with step size %stepSize",
   "robotPuPro.servoTargets|block": "servo targets",
   "robotPuPro.servoTrims|block": "servo trims",
