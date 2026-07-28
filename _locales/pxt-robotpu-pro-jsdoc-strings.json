@@ -64,6 +64,8 @@
   "robotPuPro.ServoJoint": "Robot PU servo joints. Each joint corresponds to one servo motor on the robot body.",
   "robotPuPro.bodyPitch": "Return the current body pitch angle in degrees. Positive means leaning forward.",
   "robotPuPro.bodyRoll": "Return the current body roll angle in degrees. Positive means tilting to the right.",
+  "robotPuPro.blink": "Update the eye blink animation with the given alert level. Higher alert levels blink faster and brighter.",
+  "robotPuPro.blink|param|alertLevel": "alertness from 0 (sleepy) to 10 (fully alert), eg: 5",
   "robotPuPro.calibrate": "Move to the calibration pose and flash the eyes. Useful after changing servo trim values.",
   "robotPuPro.changeChannel": "Change the radio channel by a given amount. Wraps around between 0 and 255.",
   "robotPuPro.changeChannel|param|delta": "amount to change the channel by, eg: 1",

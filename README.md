@@ -603,6 +603,15 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Block**: `is jump done?`
 - **What it does**: Returns `true` when the last jump completed.
 
+#### `blink(alertLevel: number): void`
+
+- **Block**: `blink with alert level %alertLevel`
+- **Parameters**:
+  - `alertLevel`: `0 .. 10` (higher values make the eyes blink faster and brighter)
+- **What it does**: Updates the eye blink animation.
+- **Notes**:
+  - Call repeatedly in a loop for continuous blinking.
+
 #### `rest(): void`
 
 - **Block**: `rest`
