@@ -43,6 +43,7 @@
   "robotPuPro.playToneSequenceMs|block": "播放音调 频率为 %frequencies 时长（毫秒）为 %durations",
   "robotPuPro.readConfig|block": "加载配置",
   "robotPuPro.resetOdom|block": "重置机器人位置",
+  "robotPuPro.stepCount|block": "步数",
   "robotPuPro.rest|block": "休息",
   "robotPuPro.rightEyeBright|block": "设置右眼亮度为 %brightness",
   "robotPuPro.runKeyValueCommand|block": "执行命令，键为 %key 值为 %value",

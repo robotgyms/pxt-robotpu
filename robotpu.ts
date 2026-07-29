@@ -663,6 +663,7 @@ function rot2(thetaRad: number): number[][] {
 export class Odometry {
     public axisHalfDistanceMm: number;
     public currentTransformation: number[][];
+    public pedometer: number = 0;
 
     static rot2(thetaRad: number): number[][] {
         let c = Math.cos(thetaRad);
@@ -744,6 +745,7 @@ export class Odometry {
     constructor(axisHalfDistanceMm: number = 25.0) {
         this.axisHalfDistanceMm = axisHalfDistanceMm;
         this.currentTransformation = Odometry.identity3();
+        this.pedometer = 0;
     }
 
     update(transformationMatrix: number[][]): void {
@@ -753,11 +755,13 @@ export class Odometry {
 
     leftStep(yawAngleDeg: number): void {
         // Apply one walking step where the left leg is the support pivot.
+        this.pedometer++;
         this.update(Odometry.rotateAboutPivot(Odometry.deg2rad(yawAngleDeg), [-this.axisHalfDistanceMm, 0.0]));
     }
 
     rightStep(yawAngleDeg: number): void {
         // Apply one walking step where the right leg is the support pivot.
+        this.pedometer++;
         this.update(Odometry.rotateAboutPivot(Odometry.deg2rad(yawAngleDeg), [this.axisHalfDistanceMm, 0.0]));
     }
 
@@ -771,6 +775,7 @@ export class Odometry {
 
     reset(): void {
         this.currentTransformation = Odometry.identity3();
+        this.pedometer = 0;
     }
 }
 
@@ -1478,6 +1483,7 @@ export class RobotPu {
                 this.lastLeftLegAngle = this.pcb.servoTarget[1];
                 this.lastRightLegAngle = this.pcb.servoTarget[3];
             }
+            this.odom.pedometer += 1;
         }
         return ret;
     }

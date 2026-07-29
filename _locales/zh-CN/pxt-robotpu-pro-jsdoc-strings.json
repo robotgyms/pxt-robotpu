@@ -104,6 +104,7 @@
   "robotPuPro.playToneSequenceMs|param|frequencies": "音调频率数组（以 Hz 为单位），使用 0 表示休息, eg: [440, 550, 660]",
   "robotPuPro.readConfig": "从闪存加载保存的机器人配置，包括伺服调整值和无线电通道。",
   "robotPuPro.resetOdom": "重置里程计，使机器人 PU 的位置为 (0, 0)，航向为 0 度（北）。",
+  "robotPuPro.stepCount": "返回里程计计步器统计的行走步数。",
   "robotPuPro.rest": "以平衡的闲置姿势休息。对声音反应灵敏。",
   "robotPuPro.rightEyeBright": "设置右眼 LED 亮度。",
   "robotPuPro.rightEyeBright|param|brightness": "亮度从 0（关闭）到 1（全亮度）, eg: 0.5",

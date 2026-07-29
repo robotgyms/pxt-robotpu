@@ -785,6 +785,15 @@ namespace robotPuPro {
         ensureRobot().resetOdom();
     }
 
+    /** Return the number of walking steps counted by the odometry pedometer. */
+    //% blockId=robotpu_pedometer block="step count"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=31 blockGap=8
+    export function stepCount(): number {
+        return ensureRobot().odom.pedometer;
+    }
+
     /** Return Robot PU's estimated location as [x, y, heading]. x and y are in millimeters, heading is in degrees. */
     //% blockId=robotpu_location_array block="robot position"
     //% subcategory="Sensors"
