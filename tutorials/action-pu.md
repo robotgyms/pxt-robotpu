@@ -106,40 +106,40 @@ To run actions one after another, wait for `isDone(...)` before starting the nex
 
 ```typescript
 // Walk forward
-robotPuPro.start(robotPuPro.Action.Walk, 5)
+robotPuPro.start(robotPuPro.Action.Walk, 10)
 while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
-    basic.pause(20)
+    basic.pause(500)
 }
 
 // Turn left
-robotPuPro.start(robotPuPro.Action.TurnLeft, 4)
+robotPuPro.start(robotPuPro.Action.TurnLeft, 8)
 while (!robotPuPro.isDone(robotPuPro.Action.TurnLeft)) {
-    basic.pause(20)
+    basic.pause(500)
 }
 
 // Jump once
 robotPuPro.start(robotPuPro.Action.Jump, 1)
 while (!robotPuPro.isDone(robotPuPro.Action.Jump)) {
-    basic.pause(20)
+    basic.pause(500)
 }
 
 // Stand up straight
 robotPuPro.start(robotPuPro.Action.Stand, 1)
 while (!robotPuPro.isDone(robotPuPro.Action.Stand)) {
-    basic.pause(20)
+    basic.pause(500)
 }
 ```
 ## Change Walking speed and direction
 
 ```typescript
-robotPuPro.start(robotPuPro.Action.Walk, 5)
+robotPuPro.start(robotPuPro.Action.Walk, 10)
 
 while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
     // gradually slow down
-    robotPuPro.setWalkSpeed(robotPuPro.walkSpeed()*0.9)
-    // gradually turn right 
-    robotPuPro.setWalkDirection(robotPuPro.walkDirection()+0.01)
-    basic.pause(200)
+    robotPuPro.setWalkSpeed(robotPuPro.walkSpeed() * 0.9)
+    // gradually turn left
+    robotPuPro.setWalkDirection(robotPuPro.walkDirection() + 0.1)
+    basic.pause(500)
 }
 ```
 You can use this method to do customized object avoidance or other behaviors, such as following a person or object, running through a maze, etc.
