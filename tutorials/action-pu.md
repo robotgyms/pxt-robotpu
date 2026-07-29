@@ -36,15 +36,6 @@ Look for these blocks at the top of the Robot PU toolbox:
 | `greet` | Speaks the robot's name and serial number (one-shot). |
 | `stand` | Moves to a neutral standing pose. |
 
-> **Tip:** `walk` means walk **forward**.
-
-> **Careful with `steps` on sound/animation tokens:** `laugh`, `cry`, `scream`, `funny`, `greet`, `blink`, and `stop` don't have a "gait cycle" — internally they always report "done" on every call. That means `steps` controls **how many times in a row** they repeat, not a gait boundary count. Use `steps = 1` to trigger them once:
-> ```typescript
-> robotPuPro.start(robotPuPro.Action.Laugh, 1)   // laughs once
-> robotPuPro.start(robotPuPro.Action.Laugh, 3)   // laughs 3 times in a row
-> ```
-> For simple one-shot sounds it's usually easier to call the direct block instead, eg. `robotPuPro.laugh()` — see [Play sound effects](#play-sound-effects) below.
-
 ## Start an action for a number of steps
 
 ```typescript
@@ -55,12 +46,20 @@ This starts walking forward and stops after **10 completions**. A completion is 
 
 `steps` tells `start` how many `0` returns (completion events) to wait for. `0` or a negative number means **run forever** until `stop()` is called.
 
+> **Tip:** `walk` means walk **forward**.
+
+> **Careful with `steps` on sound/animation tokens:** `laugh`, `cry`, `scream`, `funny`, `greet`, `blink`, and `stop` don't have a "gait cycle" — internally they always report "done" on every call. That means `steps` controls **how many times in a row** they repeat, not a gait boundary count. Use `steps = 1` to trigger them once:
+> ```typescript
+> robotPuPro.start(robotPuPro.Action.Laugh, 1)   // laughs once
+> robotPuPro.start(robotPuPro.Action.Laugh, 3)   // laughs 3 times in a row
+> ```
+> For simple one-shot sounds it's usually easier to call the direct block instead, eg. `robotPuPro.laugh()` — see [Play sound effects](#play-sound-effects) below.
+
+This example starts the explore action and stops after **8 completions**.
 
 ```typescript
 robotPuPro.start(robotPuPro.Action.Explore, 8)
 ```
-This starts the explore action and stops after **8 completions**. 
-
 ## Another action will stop the previous action
 
 ```typescript
