@@ -51,14 +51,23 @@ Look for these blocks at the top of the Robot PU toolbox:
 robotPuPro.start(robotPuPro.Action.Walk, 10)
 ```
 
+This starts walking forward and stops after **10 completions**. A completion is a gait-state boundary, not always one physical step. If your gait has 2 states per step, 10 completions is about 5 steps. Adjust the number to match your robot.
+
+`steps` tells `start` how many `0` returns (completion events) to wait for. `0` or a negative number means **run forever** until `stop()` is called.
+
+
 ```typescript
 robotPuPro.start(robotPuPro.Action.Explore, 8)
 ```
+This starts the explore action and stops after **8 completions**. 
 
+## Another action will stop the previous action
 
-This starts walking forward and stops after **5 completions**. A completion is a gait-state boundary, not always one physical step. If your gait has 2 states per step, 5 completions is about 2.5 steps. Adjust the number to match your robot.
-
-`steps` tells `start` how many `0` completion events to wait for. `0` or a negative number means **run forever** until `stop()` is called.
+```typescript
+robotPuPro.start(robotPuPro.Action.Walk, 10)
+robotPuPro.start(robotPuPro.Action.Explore, 8)
+```
+The explore action will stop the walk action and start the explore action.
 
 ## Wait until an action is done
 
