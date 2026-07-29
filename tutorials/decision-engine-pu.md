@@ -189,7 +189,7 @@ targetSpeed = parseInt(parts[1])
 // -----------------------------
 const EMERGENCY_STOP_CM = 10     // hard stop
 const AVOID_CM = 20              // avoidance threshold
-const AVOID_TURN = 0.9           // strong turn
+const AVOID_TURN = -0.9          // strong turn (negative = right)
 const FOLLOW_GAIN = 1 / 90       // heading error → turn
 
 // -----------------------------

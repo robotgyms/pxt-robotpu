@@ -57,7 +57,19 @@ This starts walking forward and stops after **5 completions**. A completion is a
 
 ## Wait until an action is done
 
-Because `start` is non-blocking, you can poll `isDone(...)` in a loop. Inside the loop you can:
+Because `start` is non-blocking, you can poll `isDone(...)` in a loop. 
+
+```typescript
+robotPuPro.start(robotPuPro.Action.Walk, 20)
+
+while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
+    basic.pause(100)
+}
+
+basic.showIcon(IconNames.Yes)
+```
+
+Inside the loop you also can:
 - Call other **sound/sensor-only** functions for multitasking (eg. `laugh()`, `talk()`, reading sensors) — safe, as long as they don't touch the servos.
 - Call `stop()` to cancel the action you are waiting for, eg. on a button press.
 
@@ -84,7 +96,7 @@ The robot walks for 20 completions (or until button A is pressed). When it is do
 
 ## Stop the current action
 
-Use `stop()` to cancel any action at any time. For those steps with `0` or negative values, action will runs forever. A `stop()` will stop the action immediately.
+Use `stop()` to cancel any action at any time. For `steps` of `0` or a negative value, the action will run forever until stopped. Calling `stop()` will stop the action immediately.
 
 ```typescript
 robotPuPro.start(robotPuPro.Action.Walk, 0) // 0 steps means run forever
@@ -137,7 +149,7 @@ robotPuPro.start(robotPuPro.Action.Walk, 10)
 while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
     // gradually slow down
     robotPuPro.setWalkSpeed(robotPuPro.walkSpeed() * 0.9)
-    // gradually turn left
+    // gradually turn left (positive direction = left, negative = right)
     robotPuPro.setWalkDirection(robotPuPro.walkDirection() + 0.1)
     basic.pause(500)
 }

@@ -1446,7 +1446,7 @@ namespace robotPuPro {
 
         /**
          * Executes a side-stepping (lateral) movement using specific state indices.
-         * @param di Directional bias: positive for right, negative for left.
+         * @param di Directional bias: positive for left, negative for right.
          */
         public sideStep(di: number): number {
             // 1. Select the gait state sequence based on direction
@@ -1978,7 +1978,7 @@ namespace robotPuPro {
          * Map sonar distance readings to a steering direction for auto-pilot.
          * @param distances List of sonar distance readings from left to right
          * @param turnGain Scaling factor for turn intensity (default: 1.5)
-         * @returns Steering direction between -1.0 (left) and 1.0 (right)
+         * @returns Steering direction between -1.0 (right) and 1.0 (left)
          */
         public getTurnFromSonar(distances: number[], turnGain: number = 1.5): number {
             // 1. Guard against empty arrays

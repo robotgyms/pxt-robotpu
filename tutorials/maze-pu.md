@@ -187,13 +187,13 @@ basic.forever(function () {
     const safeSpeed = Math.map(Math.max(dRight, dLeft), 7, 25, 0, 3)
 
     if (dFront > 0 && dFront < TOO_CLOSE_CM) {
-        robotPuPro.walk(1.6, -0.9)
+        robotPuPro.walk(1.6, 0.9)   // emergency escape: turn left (positive = left)
     } else if (rightOpen) {
-        robotPuPro.walk(safeSpeed, 0.35)
+        robotPuPro.walk(safeSpeed, -0.35)   // turn right (negative = right)
     } else if (frontOpen) {
         robotPuPro.walk(safeSpeed, 0)
     } else {
-        robotPuPro.walk(1.6, -0.9)
+        robotPuPro.walk(1.6, 0.9)   // dead end: turn around, turn left (positive = left)
     }
 
     radio.sendValue("fd0", d[0])

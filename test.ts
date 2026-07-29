@@ -139,7 +139,7 @@ function testStandRestCalibrate() {
 /**
  * TEST: Actions - walk (forward, backward, turn)
  * [HARDWARE]
- * Expected: robot walks forward 2 seconds, backward 2 seconds, turns right 2 seconds.
+ * Expected: robot walks forward 2 seconds, backward 2 seconds, turns left 2 seconds.
  * Pass: visible walking motion in correct directions, no crash.
  */
 function testWalk() {
@@ -153,7 +153,7 @@ function testWalk() {
 /**
  * TEST: Actions - sideStep (left and right)
  * [HARDWARE]
- * Expected: robot steps left then right.
+ * Expected: robot steps right then left.
  * Pass: visible sideways motion, no crash.
  */
 function testSideStep() {
@@ -446,7 +446,7 @@ function testRunStringCommand() {
 /**
  * TEST: Remote Control - runKeyValueCommand (speed, turn, head)
  * [HARDWARE]
- * Expected: robot walks forward, turns right, tilts head.
+ * Expected: robot walks forward, turns left, tilts head.
  * Pass: visible motion, no crash.
  */
 function testRunKeyValueCommand() {
@@ -484,7 +484,7 @@ input.onButtonPressed(Button.A, function () {
 })
 
 /**
- * Button B: side step left then right.
+ * Button B: side step right then left.
  * [HARDWARE] Expected: robot steps sideways.
  */
 input.onButtonPressed(Button.B, function () {

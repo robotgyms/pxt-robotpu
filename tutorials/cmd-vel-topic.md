@@ -60,11 +60,11 @@ input.onButtonPressed(Button.AB, function () {
 })
 
 input.onGesture(Gesture.TiltLeft, function () {
-    angular = -30
+    angular = 30
 })
 
 input.onGesture(Gesture.TiltRight, function () {
-    angular = 30
+    angular = -30
 })
 
 basic.forever(function () {
@@ -90,7 +90,7 @@ radio.onReceivedString(function (msg) {
 })
 
 basic.forever(function () {
-    robotPuPro.walkDo(linear / 100, angular / 100)
+    robotPuPro.walk(linear / 100, angular / 100)
     basic.pause(100)
 })
 ```
