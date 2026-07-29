@@ -104,6 +104,7 @@
   "robotPuPro.playToneSequenceMs|param|frequencies": "array of tone frequencies in Hz, use 0 for a rest, eg: [440, 550, 660]",
   "robotPuPro.readConfig": "Load saved robot configuration from flash storage, including servo trim values and radio channel.",
   "robotPuPro.resetOdom": "Reset the odometry so Robot PU's position is (0, 0) and heading is 0 degrees (north).",
+  "robotPuPro.stepCount": "Return the number of walking steps counted by the odometry pedometer.",
   "robotPuPro.rest": "Rest in a balanced idle pose. Reacts subtly to sound.",
   "robotPuPro.rightEyeBright": "Set the right eye LED brightness.",
   "robotPuPro.rightEyeBright|param|brightness": "brightness from 0 (off) to 1 (full brightness), eg: 0.5",

@@ -41,6 +41,7 @@
   "robotPuPro.playToneSequenceMs|block": "play tones with frequencies %frequencies and durations (ms) %durations",
   "robotPuPro.readConfig|block": "load configuration",
   "robotPuPro.resetOdom|block": "reset robot position",
+  "robotPuPro.stepCount|block": "step count",
   "robotPuPro.rest|block": "rest",
   "robotPuPro.rightEyeBright|block": "set right eye brightness to %brightness",
   "robotPuPro.runKeyValueCommand|block": "execute command with key %key and value %value",
