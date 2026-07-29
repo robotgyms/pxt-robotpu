@@ -59,10 +59,10 @@ basic.forever(function () {
     if (sR > best) { best = sR; action = 2 }
     if (sB > best) { best = sB; action = 3 }
 
-    if (action == 0) robotPuPro.walkDo(2, 0)
-    else if (action == 1) robotPuPro.sideStepDo(-1)
-    else if (action == 2) robotPuPro.sideStepDo(1)
-    else robotPuPro.walkDo(-2, 0)
+    if (action == 0) robotPuPro.walk(2, 0)
+    else if (action == 1) robotPuPro.sideStep(1)    // turn left: positive = left
+    else if (action == 2) robotPuPro.sideStep(-1)   // turn right: negative = right
+    else robotPuPro.walk(-2, 0)
 
     basic.pause(80)
 })

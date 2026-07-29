@@ -270,11 +270,11 @@ function stepForward(): void {
 }
 
 function turnRight90ish(): void {
-    driveFor(380, TURN_SPEED, TURN_BIAS)
+    driveFor(380, TURN_SPEED, -TURN_BIAS)   // negative = right
 }
 
 function turnLeft90ish(): void {
-    driveFor(380, TURN_SPEED, -TURN_BIAS)
+    driveFor(380, TURN_SPEED, TURN_BIAS)   // positive = left
 }
 
 function turnAround(): void {
