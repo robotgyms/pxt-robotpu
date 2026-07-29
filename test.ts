@@ -60,30 +60,31 @@ function testTrimAndConfig() {
 }
 
 /**
- * TEST: Setup - eyeBrightness, setEyeBrightness
+ * TEST: Actuators - leftEyeBright, rightEyeBright
  * [HARDWARE] Eyes should dim then brighten.
  * Expected: eyes fade to 0.1 then back to 0.8.
  * Pass: visible eye brightness change, no crash.
  */
 function testEyeBrightness() {
-    robotPuPro.setEyeBrightness(0.1)
+    robotPuPro.leftEyeBright(0.1)
+    robotPuPro.rightEyeBright(0.1)
     basic.pause(500)
-    robotPuPro.setEyeBrightness(0.8)
+    robotPuPro.leftEyeBright(0.8)
+    robotPuPro.rightEyeBright(0.8)
     basic.pause(500)
-    robotPuPro.setEyeBrightness(0.5)
+    robotPuPro.leftEyeBright(0.5)
+    robotPuPro.rightEyeBright(0.5)
 }
 
 /**
- * TEST: Setup - setWalkSpeedRange, eyeBrightness getter
+ * TEST: Setup - setWalkSpeedRange
  * [SIMULATOR SAFE]
- * Expected: speed range set, eyeBrightness getter returns 0.5 after setEyeBrightness(0.5).
- * Pass: no crash, LED shows 1 for eyeBrightness > 0.
+ * Expected: speed range set, no crash.
+ * Pass: LED shows 1.
  */
 function testSetupExtended() {
     robotPuPro.setWalkSpeedRange(-3, 4)
-    robotPuPro.setEyeBrightness(0.5)
-    const b = robotPuPro.eyeBrightness()
-    basic.showNumber(b > 0 ? 1 : 0)   // expect 1
+    basic.showNumber(1)   // expect 1
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────

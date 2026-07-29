@@ -352,19 +352,6 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Notes**:
   - This affects `explore()` speed planning and remote-control mapping.
 
-#### `eyeBrightness(): number`
-
-- **Block**: `eye brightness`
-- **What it does**: Returns the maximum brightness of Robot PU's eye LEDs.
-- **Return**: `0 .. 1`
-
-#### `setEyeBrightness(brightness: number): void`
-
-- **Block**: `set eye brightness to %brightness`
-- **What it does**: Sets the maximum brightness of Robot PU's eye LEDs.
-- **Parameters**:
-  - `brightness`: `0 .. 1`
-
 ### Sensors
 
 #### `sonarDistanceCm(): number`
