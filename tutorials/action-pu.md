@@ -48,8 +48,13 @@ Look for these blocks at the top of the Robot PU toolbox:
 ## Start an action for a number of steps
 
 ```typescript
-robotPuPro.start(robotPuPro.Action.Walk, 5)
+robotPuPro.start(robotPuPro.Action.Walk, 10)
 ```
+
+```typescript
+robotPuPro.start(robotPuPro.Action.Explore, 8)
+```
+
 
 This starts walking forward and stops after **5 completions**. A completion is a gait-state boundary, not always one physical step. If your gait has 2 states per step, 5 completions is about 2.5 steps. Adjust the number to match your robot.
 
@@ -63,6 +68,16 @@ Because `start` is non-blocking, you can poll `isDone(...)` in a loop.
 robotPuPro.start(robotPuPro.Action.Walk, 20)
 
 while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
+    basic.pause(100)
+}
+
+basic.showIcon(IconNames.Yes)
+```
+
+```typescript
+robotPuPro.start(robotPuPro.Action.Explore, 20)
+
+while (!robotPuPro.isDone(robotPuPro.Action.Explore)) {
     basic.pause(100)
 }
 
