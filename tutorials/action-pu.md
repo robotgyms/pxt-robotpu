@@ -1,208 +1,316 @@
- # 🤖 Lesson: Robot PU Actions (Asynchronous Motion)
- 
- Most Robot PU actions are designed to be **asynchronous** to prevent the micro:bit from locking up.
- 
- Many motion blocks return a **status code**:
- 
- - **`0`**: the action has reached a completion boundary (a “step” / state finished)
- - **`1`**: the action is still running (keep calling it)
- 
- This lets you build “synchronous” behavior yourself by repeatedly calling the action until you observe enough `0` return events.
- 
- ---
- 
- ## 1. Action APIs (What you can call)
- 
- ### Motion actions (return status `number`)
- 
- - `robotPuPro.walk(speed, turn)`
- - `robotPuPro.sideStep(direction)`
- - `robotPuPro.explore()`
- - `robotPuPro.dance()`
- - `robotPuPro.kick()`
- - `robotPuPro.jump()`
- - `robotPuPro.rest()`
- - `robotPuPro.stand()`
- 
- ### Motion actions (statement versions, return `void`)
- 
- These are the same actions but **do not return a code**, so they are harder to sequence precisely:
- 
- - `robotPuPro.walkDo(speed, turn)`
- - `robotPuPro.sideStepDo(direction)`
- - `robotPuPro.exploreDo()`
- - `robotPuPro.danceDo()`
- - `robotPuPro.kickDo()`
- - `robotPuPro.jumpDo()`
- - `robotPuPro.restDo()`
- - `robotPuPro.standDo()`
- 
- ### Non-motion actions (usually synchronous)
- 
- - `robotPuPro.greet()`
- - `robotPuPro.talk(text)` — plays text as a **melodic robotic tune** (RoboVoice); auto-detects morse strings
- - `robotPuPro.sing(text)` — plays a note-letter sequence
- - `robotPuPro.morse(code, unitMs?)` — plays ITU morse code beeps
- - `robotPuPro.morseText(text, unitMs?)` — translates text to morse and plays it
- - `robotPuPro.setMode(mode)` (switch the internal behavior state machine)
+# 🤖 Lesson: Robot PU Actions with Action Tokens
 
-> **Real human speech:** `talk()` is a musical voice, not text-to-speech. For spoken words, add **[pxt-billy](https://github.com/adamish/pxt-billy)** and use `billy.say(text)`.
- 
- ---
- 
- ## 2. Why actions are asynchronous
- 
- A motion like walking or sidestepping is not “one motor command”. It is a sequence of body poses that must be updated repeatedly over time.
- 
- If a block tried to do the whole motion in one call (blocking), it could:
- 
- - freeze button/radio events
- - starve background tasks
- - make the whole system feel “locked up”
- 
- So Robot PU action APIs are designed to be called repeatedly in a loop.
- 
- ---
- 
- ## 3. Comparing “synchronous” vs “asynchronous” patterns
- 
- ### A. Synchronous (blocking) idea (what we avoid)
- 
- This is the style that can cause lock-ups:
- 
- ```typescript
- // (Concept only) A blocking API would look like this.
- // robotPuPro.walkBlocking(3)
- // robotPuPro.sideStepBlocking(-1)
- ```
- 
- ### B. Asynchronous (recommended)
- 
- You call the action many times. Each call advances the motion.
- 
- ```typescript
- let rc = robotPuPro.walk(2, 0)
- if (rc == 0) {
-     // A completion boundary happened (a gait state finished)
- }
- ```
- 
- ---
+Robot PU has a simple **start → check → stop** API. Pick an action, tell the robot how many "steps" (completions) to do, then check `is done?` or `stop` it.
 
- ## 3.5 Example: call `walk()` 100 times (no return checking)
+## New action blocks
 
- Sometimes you just want to “drive” the motion for a fixed amount of time and you do not care about counting steps.
+Look for these blocks at the top of the Robot PU toolbox:
 
- This pattern ignores the return value and simply calls `walk(...)` repeatedly:
+- `start %action for %steps steps`
+- `is %action done?`
+- `stop robot`
 
- ```typescript
- for (let i = 0; i < 100; i++) {
-     robotPuPro.walk(2, 0) // ignore rc
- }
- ```
+`start` runs in the background, so your program can keep doing other things.
 
- ## 3.6 JavaScript “function pointers” (callbacks)
- 
- In JavaScript / TypeScript, you can store a function in a variable and pass it to another function. This is often called a **callback** (similar idea to a “function pointer” in C).
- 
- In this lesson we pass a function like `() => number` into helpers such as `doCompletions(...)`.
- 
- Example:
- 
- ```typescript
- function myAction(): number {
-     return robotPuPro.walk(2, 0)
- }
- 
- function do400Times(run: () => number): void {
-     let done = 0
-     while (done < 400) {
-         const rc = run()
-         done += 1
-     }
- }
- 
- // Pass a function *reference* (do not call it here)
- do400Times(myAction)
- 
- // Or pass an inline anonymous function (arrow function)
- do400Times(() => robotPuPro.walk(2, 0))
- ```
- 
- Key idea:
- 
- - `robotPuPro.walk(2, 0)` calls the function immediately and produces a `number`.
- - `() => robotPuPro.walk(2, 0)` produces a function that we can call later, many times.
- 
- ---
- 
- ## 4. How to “wait for completion” (build synchronous behavior safely)
- 
- The safest pattern is:
- 
- - Call the action
- - If it returns `1`, it is still running (keep calling)
- - When it returns `0`, treat that as a completion boundary for counting
- 
- ### A. Wait until one completion event
- 
- ```typescript
- function waitOneCompletion(run: () => number): void {
-     while (true) {
-         const rc = run()
-         if (rc == 0) return
-     }
- }
- ```
- 
- ### B. Count completions inside loops
- 
- ```typescript
- function doCompletions(run: () => number, completions: number): void {
-     let done = 0
-     while (done < completions) {
-         const rc = run()
-         if (rc == 0) done += 1
-     }
- }
- ```
- 
- Notes:
- 
- - The meaning of a “completion” depends on the action (it is typically a gait/state boundary).
- - For some gaits, one physical “step” is made of multiple internal states. If your gait uses **2 states per step**, then you will see `rc == 0` **twice per step**.
- 
- ---
- 
- ## 5. Final program: walk forward, sidestep left, jump, stand
- 
- Requirements:
- 
- - walk forward for **3 steps** (if it is **2 states per step**, count `return == 0` for **6 times**)
- - side step left for **3 steps**
- - jump **1** time
- - stand
- 
- ```typescript
-function doCompletions(run: () => number, completions: number): void {
- let done = 0
- while (done < completions) {
-  const rc = run()
-  if (rc == 0) done += 1
- }
+### Action token dropdown
+
+`start` accepts an **Action** token. The current tokens are:
+
+| Token | What it does |
+| --- | --- |
+| `stop` | Cancels the current action and returns to the rest pose. |
+| `walk` | Walks **forward**. |
+| `walk backward` | Walks backward. |
+| `turn left` | Walks forward while turning left. |
+| `turn right` | Walks forward while turning right. |
+| `explore` | Autonomously avoids obstacles using the sonar sensor. |
+| `dance` | Dances to the beat detected by the microphone. |
+| `rest` | Holds a balanced idle pose. |
+| `kick` | Performs a kicking motion. |
+| `jump` | Performs a jump sequence. |
+| `laugh` | Plays a laughing sound effect (one-shot). |
+| `cry` | Plays a crying sound effect (one-shot). |
+| `scream` | Plays a screaming sound effect (one-shot). |
+| `funny` | Plays a funny/silly sound effect (one-shot). |
+| `blink` | Runs the eye blink animation using the robot's internal alert level. |
+| `greet` | Speaks the robot's name and serial number (one-shot). |
+| `stand` | Moves to a neutral standing pose. |
+
+> **Tip:** `walk` means walk **forward**.
+
+> **Careful with `steps` on sound/animation tokens:** `laugh`, `cry`, `scream`, `funny`, `greet`, `blink`, and `stop` don't have a "gait cycle" — internally they always report "done" on every call. That means `steps` controls **how many times in a row** they repeat, not a gait boundary count. Use `steps = 1` to trigger them once:
+> ```typescript
+> robotPuPro.start(robotPuPro.Action.Laugh, 1)   // laughs once
+> robotPuPro.start(robotPuPro.Action.Laugh, 3)   // laughs 3 times in a row
+> ```
+> For simple one-shot sounds it's usually easier to call the direct block instead, eg. `robotPuPro.laugh()` — see [Play sound effects](#play-sound-effects) below.
+
+## Start an action for a number of steps
+
+```typescript
+robotPuPro.start(robotPuPro.Action.Walk, 5)
+```
+
+This starts walking forward and stops after **5 completions**. A completion is a gait-state boundary, not always one physical step. If your gait has 2 states per step, 5 completions is about 2.5 steps. Adjust the number to match your robot.
+
+`steps` tells `start` how many `0` completion events to wait for. `0` or a negative number means **run forever** until `stop()` is called.
+
+## Wait until an action is done
+
+Because `start` is non-blocking, you can poll `isDone(...)` in a loop. Inside the loop you can:
+- Call other **sound/sensor-only** functions for multitasking (eg. `laugh()`, `talk()`, reading sensors) — safe, as long as they don't touch the servos.
+- Call `stop()` to cancel the action you are waiting for, eg. on a button press.
+
+Avoid calling another **servo-driving** function (like `dance()`, `kick()`, or another `start(...)`) while waiting — it will fight the current action for control of the same servos.
+
+```typescript
+robotPuPro.start(robotPuPro.Action.Walk, 20)
+
+while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
+    // Do other things here
+    robotPuPro.laugh() // Good: laugh() only plays sound, it never touches the servos.
+    basic.pause(1000)
+    robotPuPro.dance() // Bad: dance() drives the same servos as walk(), so they fight over servo controls.
+    if (input.buttonIsPressed(Button.A)) { // Press button A to stop the walk action.
+        robotPuPro.stop()
+        break
+    }
 }
 
-// 1) Walk forward: 3 steps
-// If your gait uses 2 states per step, count 0 six times
-doCompletions(() => robotPuPro.walk(2, 0), 6)
+basic.showIcon(IconNames.Yes)
+```
 
-// 2) Side step left: 3 steps
-// direction: negative = left, positive = right
-doCompletions(() => robotPuPro.sideStep(-0.2), 6)
+The robot walks for 20 completions (or until button A is pressed). When it is done, the program shows a checkmark.
 
-// 3) Jump one time
-doCompletions(() => robotPuPro.jump(), 4)
+## Stop the current action
 
-// 4) Stand (return to neutral)
-doCompletions(() => robotPuPro.stand(), 1)
- ```
+Use `stop()` to cancel any action at any time. For those steps with `0` or negative values, action will runs forever. A `stop()` will stop the action immediately.
+
+```typescript
+robotPuPro.start(robotPuPro.Action.Walk, 0) // 0 steps means run forever
+basic.pause(1000)  // walk for about 1 second
+robotPuPro.stop()
+```
+
+Or use `stop()` in a button event:
+
+```typescript
+input.onButtonPressed(Button.A, function () {
+    robotPuPro.stop()
+})
+```
+
+## Chain actions
+
+To run actions one after another, wait for `isDone(...)` before starting the next.
+
+```typescript
+// Walk forward
+robotPuPro.start(robotPuPro.Action.Walk, 5)
+while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
+    basic.pause(20)
+}
+
+// Turn left
+robotPuPro.start(robotPuPro.Action.TurnLeft, 4)
+while (!robotPuPro.isDone(robotPuPro.Action.TurnLeft)) {
+    basic.pause(20)
+}
+
+// Jump once
+robotPuPro.start(robotPuPro.Action.Jump, 1)
+while (!robotPuPro.isDone(robotPuPro.Action.Jump)) {
+    basic.pause(20)
+}
+
+// Stand up straight
+robotPuPro.start(robotPuPro.Action.Stand, 1)
+while (!robotPuPro.isDone(robotPuPro.Action.Stand)) {
+    basic.pause(20)
+}
+```
+## Change Walking speed and direction
+
+```typescript
+robotPuPro.start(robotPuPro.Action.Walk, 5)
+
+while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
+    // gradually slow down
+    robotPuPro.setWalkSpeed(robotPuPro.walkSpeed()*0.9)
+    // gradually turn right 
+    robotPuPro.setWalkDirection(robotPuPro.walkDirection()+0.01)
+    basic.pause(200)
+}
+```
+You can use this method to do customized object avoidance or other behaviors, such as following a person or object, running through a maze, etc.
+
+## Play sound effects
+Use sound effects to show emotions or react to objects detected by sensors.
+
+For example, when the microphone hears a loud noise, play a scream sound:
+```typescript
+if (input.soundLevel() > 200) {
+    robotPuPro.scream()
+}
+```
+
+When tilted left, play a funny sound:
+```typescript
+if (robotPuPro.bodyRoll() < -20) {
+    robotPuPro.funny()
+}
+```
+
+When tilted right, play a happy sound:
+```typescript
+if (robotPuPro.bodyRoll() > 20) {
+    robotPuPro.laugh()
+}
+```
+
+When upside down, play a sad sound:
+```typescript
+if (input.isGesture(Gesture.ScreenUp)) {
+    robotPuPro.cry()
+}
+```
+
+You can also trigger these as action tokens instead of calling the function directly, eg: `robotPuPro.start(robotPuPro.Action.Scream, 1)`.
+
+## Switch actions on the fly
+
+`start` automatically stops the previous action, so you can switch without calling `stop()` first.
+
+```typescript
+input.onButtonPressed(Button.A, function () {
+    robotPuPro.start(robotPuPro.Action.Dance, 0)
+})
+
+input.onButtonPressed(Button.B, function () {
+    robotPuPro.start(robotPuPro.Action.Rest, 1)
+})
+```
+
+## Why action tokens are great for AI: reinforcement learning with Q-tables
+
+### The problem with continuous control
+
+Many robot behaviors (like `walk(speed, turn)`) take continuous numbers. Reinforcement learning algorithms like **Q-learning** need a small, *discrete* set of actions to choose from — otherwise the table of possibilities is infinite. Robot PU's **Action tokens** (`Walk`, `TurnLeft`, `TurnRight`, `Rest`, ...) are already a finite, named list, so they map directly onto the "actions" a Q-learning agent picks from. You don't need to invent your own action set or discretize speed/turn values yourself.
+
+### What a Q-table actually is
+
+A **Q-table** is a 2D grid: one row per **state**, one column per **action**. Each cell holds a number (the *Q-value*) estimating "how good is it to take this action from this state?" The agent's job is to:
+
+1. Look at the current state.
+2. Pick the action with the highest Q-value in that state's row (**exploit**) — or occasionally pick a random action to keep learning (**explore**).
+3. Run the action, observe a **reward** (and the new state).
+4. Update the Q-value for `(state, action)` using the reward.
+5. Repeat.
+
+### Turning sensor readings into a small state space
+
+micro:bit has very limited RAM, so keep the state space small — a handful of *bins*, not raw sensor floats. For example, bucket the front sonar distance into 3 states using the existing sensor block:
+
+```typescript
+function getState(): number {
+    const d = robotPuPro.sonarDistanceCm()
+    if (d < 15) return 0        // "close" — obstacle nearby
+    if (d < 40) return 1        // "medium"
+    return 2                    // "far" — clear path
+}
+```
+
+### Building the table and choosing actions
+
+Keep the action list small too — 3-4 tokens is plenty for micro:bit:
+
+```typescript
+let actions = [
+    robotPuPro.Action.Walk,
+    robotPuPro.Action.TurnLeft,
+    robotPuPro.Action.TurnRight
+]
+
+const numStates = 3
+const numActions = actions.length
+
+// Q[state][action]
+let Q: number[][] = []
+for (let s = 0; s < numStates; s++) {
+    Q.push([0, 0, 0])
+}
+
+const learningRate = 0.3
+const discount = 0.8
+let epsilon = 0.3   // chance of picking a random (exploring) action
+
+function chooseAction(state: number): number {
+    if (Math.random() < epsilon) {
+        return Math.floor(Math.random() * numActions)   // explore
+    }
+    // exploit: pick the column with the highest Q-value in this state's row
+    let best = 0
+    for (let a = 1; a < numActions; a++) {
+        if (Q[state][a] > Q[state][best]) best = a
+    }
+    return best
+}
+```
+
+### Reward shaping and the update rule
+
+A simple reward: positive for staying far from obstacles, negative for getting close.
+
+```typescript
+function getReward(state: number): number {
+    if (state == 0) return -1   // close to an obstacle: bad
+    if (state == 2) return 1    // far / clear path: good
+    return 0                    // medium: neutral
+}
+```
+
+The Q-learning update rule blends the old estimate with the new observed reward plus the best possible future value:
+
+```
+Q[s][a] = Q[s][a] + learningRate * (reward + discount * max(Q[nextState]) - Q[s][a])
+```
+
+### Putting it all together
+
+```typescript
+basic.forever(function () {
+    let state = getState()
+    let actionIndex = chooseAction(state)
+
+    robotPuPro.start(actions[actionIndex], 1)
+    while (!robotPuPro.isDone(actions[actionIndex])) {
+        basic.pause(20)
+    }
+
+    let nextState = getState()
+    let reward = getReward(nextState)
+
+    // Find the best Q-value achievable from the next state
+    let maxNext = Q[nextState][0]
+    for (let a = 1; a < numActions; a++) {
+        if (Q[nextState][a] > maxNext) maxNext = Q[nextState][a]
+    }
+
+    // Q-learning update
+    Q[state][actionIndex] = Q[state][actionIndex] +
+        learningRate * (reward + discount * maxNext - Q[state][actionIndex])
+
+    // Slowly reduce exploration over time so the robot exploits what it learned
+    epsilon = Math.max(0.05, epsilon * 0.995)
+})
+```
+
+Because each `start(action, 1)` / `isDone(...)` pair behaves like a single, complete "step" in an RL episode — it starts, runs to a known completion boundary, and reports back cleanly — you get a natural training loop without needing to manage low-level timing yourself. This is the core reason discrete action tokens are convenient for reinforcement learning on a small embedded robot: the environment step function is just `start()` + `isDone()`, and the state comes straight from Robot PU's sensor blocks (`sonarDistanceCm()`, `bodyRoll()`, `bodyPitch()`, etc.).
+
+## Things to remember
+
+- `start(...)` is **non-blocking**. The robot runs the action in the background.
+- `0` (or less) steps means **run forever** until `stop()` or another `start(...)`.
+- `isDone(action)` is `true` when that action has finished **or was stopped**.
+- The `steps` count counts **completion events** (`0` returns from the gait engine), which may be more or fewer than physical steps.
+- `stop()` resets the robot to the `rest` pose.

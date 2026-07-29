@@ -80,8 +80,8 @@ namespace robotPuPro {
                     robot.stateMachine();   // Executes current behavior logic
                     // Use a slightly larger pause to prevent CPU starvation
                     // 20ms is standard for robotics to maintain 50Hz responsiveness
-                    // but robot PU need 200Hz to maintain 200Hz responsiveness
-                    basic.pause(5);
+                    // but robot PU need 10ms to maintain 100Hz smoothness of actions
+                    basic.pause(10);
                 }
             });
         }
@@ -94,6 +94,28 @@ namespace robotPuPro {
         const r = ensureRobot();
         r.gst = Mode.API;
         return r;
+    }
+
+    /** Start a robot action and run it for the given number of steps (0 or less = forever). */
+    //% blockId=robotpu_start_action block="start %action for %steps steps"
+    //% steps.min=0 steps.defl=1
+    //% weight=100 blockGap=8
+    export function start(action: Action, steps: number): void {
+        ensureRobot().startAction(action, steps);
+    }
+
+    /** Check if the chosen action has finished. */
+    //% blockId=robotpu_action_done block="is %action done?"
+    //% weight=99 blockGap=8
+    export function isDone(action: Action): boolean {
+        return ensureRobot().isActionDone(action);
+    }
+
+    /** Stop the current action and reset to rest. */
+    //% blockId=robotpu_stop_action block="stop robot"
+    //% weight=98 blockGap=8
+    export function stop(): void {
+        ensureRobot().stopAction();
     }
 
     /** Current radio channel (0..255). Both Robot PU and the gamepad must use the same channel to communicate. */
@@ -208,28 +230,52 @@ namespace robotPuPro {
         ensureRobot().setFwdMaxSpeed(max);
     }
 
-    /** The maximum brightness of Robot PU's eye LEDs (0 to 1). */
-    //% blockId=robotpu_eye_brightness_var block="eye brightness"
+    /**
+     * Set the forward/backward walking speed.
+     * @param speed walking speed from -5 (full backward) to 5 (full forward), eg: 0
+     */
+    //% blockId=robotpu_set_walk_speed block="set walk speed to %speed"
     //% subcategory="Setup"
     //% group="Setup"
-    //% weight=94
-    export function eyeBrightness(): number {
-        return ensureRobot().pcb.eyeBrightness;
+    //% speed.min=-5 speed.max=5 speed.defl=0
+    //% weight=94 blockGap=8
+    export function setWalkSpeed(speed: number): void {
+        ensureRobot().walkSpeed = speed;
     }
 
     /**
-     * Set the maximum brightness of Robot PU's eye LEDs.
-     * @param brightness brightness from 0 (off) to 1 (full brightness), eg: 0.5
+     * Set the left/right turning bias.
+     * @param direction turn bias from -1 (full left) to 1 (full right), 0 is straight, eg: 0
      */
-    //% blockId=robotpu_set_eye_brightness_var block="set eye brightness to %brightness"
+    //% blockId=robotpu_set_walk_direction block="set walk direction to %direction"
     //% subcategory="Setup"
     //% group="Setup"
-    //% brightness.min=0 brightness.max=1 brightness.defl=0.5
-    //% brightness.fieldOptions.precision=0.01
-    //% weight=94
-    export function setEyeBrightness(brightness: number): void {
-        brightness = Math.min(1, Math.max(0, brightness));
-        ensureRobot().pcb.eyeBrightness = brightness;
+    //% direction.min=-1 direction.max=1 direction.defl=0
+    //% weight=94 blockGap=8
+    export function setWalkDirection(direction: number): void {
+        ensureRobot().walkDirection = direction;
+    }
+
+    /**
+     * Get the current walking speed.
+     */
+    //% blockId=robotpu_walk_speed_var block="walk speed"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=93
+    export function walkSpeed(): number {
+        return ensureRobot().walkSpeed;
+    }
+
+    /**
+     * Get the current walking direction.
+     */
+    //% blockId=robotpu_walk_direction_var block="walk direction"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=93
+    export function walkDirection(): number {
+        return ensureRobot().walkDirection;
     }
 
     /** Robot PU introduces itself by speaking its name and serial number. */
@@ -434,6 +480,42 @@ namespace robotPuPro {
     //% weight=80 blockGap=8
     export function isJumpDone(): boolean {
         return lastJumpDone;
+    }
+
+    /** Play a laughing sound effect. Call it when Robot PU feels happy. */
+    //% blockId=robotpu_laugh block="laugh"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=79 blockGap=8
+    export function laugh(): void {
+        ensureRobot().laugh();
+    }
+
+    /** Play a crying sound effect. Call it when Robot PU feels sad. */
+    //% blockId=robotpu_cry block="cry"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=79 blockGap=8
+    export function cry(): void {
+        ensureRobot().cry();
+    }
+
+    /** Play a screaming sound effect. Call it when Robot PU gets surprised. */
+    //% blockId=robotpu_scream block="scream"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=79 blockGap=8
+    export function scream(): void {
+        ensureRobot().scream();
+    }
+
+    /** Play a funny sound effect. Call it when Robot PU feels funny. */
+    //% blockId=robotpu_funny block="funny"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=79 blockGap=8
+    export function funny(): void {
+        ensureRobot().funny();
     }
 
     /**
@@ -820,7 +902,7 @@ namespace robotPuPro {
 
     /**
      * Execute a key/value command received over radio. Use this inside a radio.onReceivedValue handler.
-     * Supported keys: #puspeed (forward/back), #puturn (left/right), #puroll (head yaw), #pupitch (head pitch), #puB (behavior).
+     * Supported keys: #puspeed (forward/back), #puturn (left/right), #puroll (head yaw), #pupitch (head pitch), #puB (behavior), #pulogo (status announcement), #purs (rest pose index).
      * @param key the command key received from radio, eg: "#puspeed"
      * @param value the command value received from radio, eg: 1
      */
