@@ -1,5 +1,7 @@
 # pxt-robotpu-pro — Robot PU MakeCode Extension
 
+> This is the `robotpu-pro` (advanced) package for Robot PU. It is backward compatible with the beginner version [pxt-PU-Robot](https://github.com/elecfreaks/pxt-PU-Robot.git) maintained by ElecFreaks, an authorized vendor. The advanced package exposes more actions, more sensor data, and feedback control APIs, so users can develop more complex robot systems and start SLAM support with CogniCap, the AI camera for Robot PU ([pxt-robotpu-cap](https://github.com/robotgyms/pxt-robotpu-cap)).
+
 ## Overview
 
 This repository is a MakeCode extension for BBC micro:bit (V2 only) to program Robot PU. Using this extension requires the micro:bit V2 hardware. micro:bit V1 will display the 927 error code.

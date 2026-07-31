@@ -1,6 +1,6 @@
 MIT License
  
- Copyright (c) 2025 Robot Gyms Inc.
+ Copyright (c) 2025 RobotGyms Inc.
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,3 +28,9 @@ does NOT grant permission to use these trademarks for commercial
 redistribution, hardware cloning, or submitting duplicate extensions
 under the RobotGyms brand family to third-party ecosystems (such as
 the Micro:bit Foundation) without explicit written authorization.
+
+-------------------------------------------------------------------
+ATTRIBUTION & MAINTENANCE:
+ElecFreaks (https://shop.elecfreaks.com/) forked this repository and is authorized to maintain the
+pxt-robotpu package (https://github.com/elecfreaks/pxt-PU-Robot.git) for beginners.
+RobotGyms Inc. maintains this pxt-robotpu-pro package for advanced users.
