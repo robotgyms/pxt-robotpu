@@ -33,6 +33,7 @@
 \usepackage{booktabs}
 \usepackage{parskip}
 \usepackage{url}
+\usepackage{qrcode}                    % 二维码
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage{wrapfig}
@@ -56,6 +57,7 @@
 % ── 自定义命令：彩色信息框 ──────────────────────────────────────────────────────
 \newcommand{\featurebox}[3]{%
   \begin{tcolorbox}[
+      enhanced,
       colback=#1!8,
       colframe=#1,
       arc=3pt,
@@ -99,7 +101,7 @@
   \vspace{0pt}
   \begin{center}
     \includegraphics[width=\linewidth,height=5.8cm,keepaspectratio]%
-      {../product/robotpu.png}
+      {../product/robotpu-tools.png}
   \end{center}
   \vspace{2pt}
   \begin{center}
@@ -121,8 +123,10 @@
   基于 \textbf{BBC micro:bit V2} 的完整课堂机器人套件。
   从小学课堂到大学机器人实验室，Robot PU 将抽象的 STEM 概念
   转化为生动有趣的实践项目。
-  可选配 \textbf{ESP32-S3 智能帽}，解锁 AI 摄像头感知、
-  足球对战与 SLAM 导航功能。}
+  两套即用软件方案可选：入门轨道适合低龄学生，
+  高级轨道包含更多传感器、动作与 AI 摄像头项目。
+  选配 \textbf{智能帽}，可解锁人脸识别、目标追踪、
+  机器人足球与建图功能。}
 
   \vspace{5pt}
 
@@ -151,8 +155,8 @@
   \vspace{4pt}
 
   % 可选配件
-  \featurebox{puOrange}{\faMicrochip\; 可选升级：ESP32-S3 智能帽}{%
-    新增 AI 摄像头、语音指令、SLAM 导航、人脸识别、
+  \featurebox{puOrange}{\faMicrochip\; 可选升级：智能帽}{%
+    新增 AI 摄像头、语音、建图、人脸识别、
     目标追踪与足球自主对战功能。\textit{单独销售。}
   }
 \end{minipage}
@@ -171,8 +175,8 @@
   {\small\bfseries\color{puDark}行走与表达}\\
   {\footnotesize
     行走、转弯、横步、踢腿、跳跃、休息。
-    随音乐节拍舞动。语音说话与唱歌，
-    LED 眼睛显示情绪。}
+    随音乐节拍舞动。用亲切的机器人语音说话与唱歌，
+    LED 眼睛闪烁显示心情。}
 
   \columnbreak
 
@@ -180,37 +184,36 @@
   \begin{center}
     \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_walk.png}
   \end{center}
-  {\small\bfseries\color{puDark}自动驾驶与导航}\\
+  {\small\bfseries\color{puDark}探索与导航}\\
   {\footnotesize
-    超声波避障、迷宫求解、
-    路径跟随、局部规划器、
-    跟随领队、任务决策引擎。}
+    漫游避障、求解简单迷宫、
+    跟随线条或路径，还能跟随领队。
+    培养问题解决与空间推理能力。}
 
   \columnbreak
 
   % 第3列
   \begin{center}
-    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_ideas.png}
+    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_happy.png}
   \end{center}
-  {\small\bfseries\color{puDark}感知与控制}\\
+  {\small\bfseries\color{puDark}感知与平衡}\\
   {\footnotesize
-    超声波、IMU 姿态、
-    罗盘航向、麦克风输入。
-    信号滤波、航向融合、
-    PID 平衡与舵机标定。}
+    使用距离与倾斜传感器保持直立，
+    避免碰撞，并对声音作出反应。
+    自平衡运动让它在桌面或地面稳稳站立。}
 
   \columnbreak
 
   % 第4列
   \begin{center}
-    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_star.png}
+    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_sing.png}
   \end{center}
-  {\small\bfseries\color{puDark}多机器人与 AI}\\
+  {\small\bfseries\color{puDark}团队与 AI}\\
   {\footnotesize
-    无线手柄、点对点聊天、
-    同步合唱、队形控制、
-    任务分配、ROS 风格架构，
-    AI 摄像头足球与 SLAM。}
+    机器人可通过无线电聊天、
+    同步合唱、进行团队游戏。
+    加装智能帽摄像头，
+    体验人脸识别、目标追踪与机器人足球。}
 
 \end{multicols}
 
@@ -236,7 +239,7 @@
 \hfill
 \begin{minipage}[c]{0.25\linewidth}
   \begin{center}
-    \includegraphics[height=2.2cm,keepaspectratio]{../cartoons/pu_happy.png}\\
+    \includegraphics[height=2.2cm,keepaspectratio]{../cartoons/pu_jump.png}\\
     {\footnotesize\color{puGray}\textit{来认识 PU！}}
   \end{center}
 \end{minipage}
@@ -306,12 +309,13 @@
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
     {\color{puYellow}$\bigstar$} & 安装手臂 \\
     {\color{puYellow}$\bigstar$} & 舵机零点标定 \\
+    {\color{puYellow}$\bigstar$} & 材料规格 \\
   \end{tabular}}
 }
 
 \vspace{3pt}
 
-\featurebox{puBlue}{\faRunning\; 硬件与核心 API}{%
+\featurebox{puBlue}{\faRunning\; 硬件与行为}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
     {\color{puYellow}$\bigstar$}             & PU 的运动原理 \\
@@ -366,7 +370,8 @@
     {\color{puYellow}$\bigstar\bigstar$} & 事件循环 \\
     {\color{puYellow}$\bigstar\bigstar$} & 自定义事件与处理器 \\
     {\color{puYellow}$\bigstar\bigstar$} & 状态机 \\
-    {\color{puYellow}$\bigstar\bigstar$} & 面向对象架构（OOP）\\
+    {\color{puYellow}$\bigstar\bigstar$} & 状态切换（setMode）\\
+    {\color{puYellow}$\bigstar\bigstar$} & 面向对象架构 \\
   \end{tabular}}
 }
 
@@ -392,57 +397,57 @@
 \vspace{3pt}
 
 \begin{center}
-  \includegraphics[height=1.8cm,keepaspectratio]{../cartoons/pu_questions.png}
-  \includegraphics[height=1.8cm,keepaspectratio]{../cartoons/pu_jump.png}
+  \includegraphics[height=1.8cm,keepaspectratio]{../cartoons/pu_stand.png}
 \end{center}
 
 \columnbreak
 
 % ---- 第三栏 ------------------------------------------------------------------
-\featurebox{puGray}{\faSitemap\; ROS 概念}{%
+\featurebox{puGray}{\faSitemap\; 高级系统}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
-    {\color{puYellow}$\bigstar\bigstar$}         & ROS 节点角色 \\
-    {\color{puYellow}$\bigstar\bigstar$}         & micro:bit 上的 ROS 话题 \\
-    {\color{puYellow}$\bigstar\bigstar$}         & /cmd\_vel 话题 \\
-    {\color{puYellow}$\bigstar\bigstar$}         & /scan 话题 \\
-    {\color{puYellow}$\bigstar\bigstar$}         & /diagnostics 话题 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 遥测日志记录 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 基站仪表盘 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 安全守护 + 紧急停止 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 故障恢复行为 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 行为树 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 任务配方 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 任务分配 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 队形控制 \\
+    {\color{puYellow}$\bigstar\bigstar$}         & 机器人担任不同角色 \\
+    {\color{puYellow}$\bigstar\bigstar$}         & 机器人之间共享消息 \\
+    {\color{puYellow}$\bigstar\bigstar$}         & 移动指令 \\
+    {\color{puYellow}$\bigstar\bigstar$}         & 感知周围环境 \\
+    {\color{puYellow}$\bigstar\bigstar$}         & 健康检查 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 活动日志记录 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 教师仪表盘 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 安全停止 + 紧急停止 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 从故障中恢复 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 行为计划 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 任务计划 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 共享任务 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 团队队形 \\
   \end{tabular}}
 }
 
 \vspace{3pt}
 
-\featurebox{puGray}{\faCalculator\; 控制理论与数学}{%
+\featurebox{puGray}{\faCalculator\; 数学与稳定性}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 变换矩阵 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 反馈控制回路 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 信号滤波器 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 航向融合 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & PID 平衡控制 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 高级平衡控制 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 机器人移动的数学原理 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 自我修正运动 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 平滑传感器读数 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 可靠的方向感知 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 双腿平衡 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 不平整地面平衡 \\
   \end{tabular}}
 }
 
 \vspace{3pt}
 
-\featurebox{puOrange}{\faCamera\; 视觉、AI 与足球 SLAM}{%
+\featurebox{puOrange}{\faCamera\; AI 摄像头与机器人足球}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & K230 AI 摄像头 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 智能帽 AI 摄像头 \\
     {\color{puYellow}$\bigstar\bigstar\bigstar$} & 人脸搜索与追踪 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM I2C 摄像头消息 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM 里程计 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM 足球追踪 \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM 足球局部地图 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 读取智能摄像头消息 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 追踪机器人位置 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 跟随足球 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 构建局部地图 \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & 保持一米社交距离 \\
   \end{tabular}}
 }
 
@@ -472,10 +477,17 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.28\linewidth}
-  \begin{center}
-    \includegraphics[height=1.6cm,keepaspectratio]{../cartoons/pu_sing.png}
-    \includegraphics[height=1.6cm,keepaspectratio]{../cartoons/pu_supprise.png}
-  \end{center}
+  \centering
+  \begin{tabular}{@{}c@{\hspace{5pt}}c@{\hspace{5pt}}c@{\hspace{5pt}}c@{}}
+    \qrcode[height=1.0cm,level=M]{https://www.amazon.com/dp/B0DR8RGVXN} &
+    \qrcode[height=1.0cm,level=M]{https://www.youtube.com/@TheStoryofPu-yw8tr/videos} &
+    \qrcode[height=1.0cm,level=M]{https://github.com/robotgyms/pxt-robotpu} &
+    \qrcode[height=1.0cm,level=M]{https://github.com/NovaSeq/RobotPu} \\[2pt]
+    {\tiny Amazon} &
+    {\tiny YouTube} &
+    {\tiny\parbox[t]{0.85cm}{\centering GitHub\\(block)}} &
+    {\tiny\parbox[t]{0.85cm}{\centering GitHub\\(python)}}
+  \end{tabular}
 \end{minipage}
 
 \end{document}
