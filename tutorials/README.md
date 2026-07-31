@@ -51,6 +51,7 @@ mindmap
     Build & Calibration
       Add arms
       Servo trim calibration
+      Material specifications
     Robot Hardware & Core APIs
       How PU moves
       Action APIs
@@ -63,6 +64,7 @@ mindmap
       SLAM odometry
       Soccer ball follow
       Soccer local occupancy map
+      CogniCap social distance
     Music and Expression
       Beat reactive behaviors
       Music helpers
@@ -79,6 +81,7 @@ mindmap
       Event loop
       Custom events
       State machines
+      State switch
       OOP architecture
       Synchronization
     Navigation & Mapping
@@ -261,6 +264,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 
 - **Add arms** ⭐: [AddArms.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/AddArms.md)
 - **Servo trim calibration** ⭐: [servo-trim-calibration.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/servo-trim-calibration.md)
+- **Material specifications** ⭐: [specifications.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/specifications.md)
 
 ### Robot hardware & core APIs
 
@@ -277,6 +281,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **SLAM odometry** ⭐⭐⭐: [slam-odometry-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-odometry-pu.md)
 - **SLAM soccer ball follow** ⭐⭐⭐: [slam-soccer-ball-follow.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-ball-follow.md)
 - **SLAM soccer local occupancy map** ⭐⭐⭐: [slam-soccer-local-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-local-map.md)
+- **Keep a 1 meter social distance** ⭐⭐⭐: [slam-social-distance.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-social-distance.md)
 
 ### Music, speech, and expression
 
@@ -304,6 +309,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **Event loop** ⭐⭐: [event-loop-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-loop-pu.md)
 - **Custom events and handlers** ⭐⭐: [event-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-pu.md)
 - **State machines** ⭐⭐: [state-machine-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-machine-pu.md)
+- **State switch with setMode** ⭐⭐: [state-switch-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-switch-pu.md)
 - **Object-oriented programming architecture** ⭐⭐: [OOP-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/OOP-pu.md)
 - **Synchronized singing** ⭐⭐: [synchronized-sing-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/synchronized-sing-pu.md)
 
@@ -408,8 +414,11 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **slam-odometry-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-odometry-pu.md
 - **slam-soccer-ball-follow.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-ball-follow.md
 - **slam-soccer-local-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-local-map.md
+- **slam-social-distance.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-social-distance.md
 - **sonar-operator.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sonar-operator.md
+- **specifications.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/specifications.md
 - **state-machine-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-machine-pu.md
+- **state-switch-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-switch-pu.md
 - **submarine.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/submarine.md
 - **synchronized-sing-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/synchronized-sing-pu.md
 - **talk-content.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-content.md
@@ -423,5 +432,5 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 
 ## Folder contents quick reference
 
-- **Markdown tutorials**: `63` `.md` files, including this `README.md`.
+- **Markdown tutorials**: `66` `.md` files, including this `README.md`.
 - **Compiled examples**: `.hex` files are included for selected complete projects.
