@@ -50,6 +50,7 @@
 % ── Helpers ────────────────────────────────────────────────────────────────────
 \newcommand{\featurebox}[3]{%
   \begin{tcolorbox}[
+      enhanced,
       colback=#1!8,
       colframe=#1,
       arc=3pt,
@@ -97,7 +98,7 @@
   \vspace{0pt}
   \begin{center}
     \includegraphics[width=\linewidth,height=5.8cm,keepaspectratio]%
-      {../product/robotpu.png}
+      {../product/robotpu-tools.png}
   \end{center}
   \vspace{2pt}
   \begin{center}
@@ -117,10 +118,12 @@
   \vspace{4pt}
   {\footnotesize\color{puGray}
   A complete, classroom-ready robot built on the \textbf{BBC micro:bit V2}.
-  From elementary classrooms to college robotics labs, Robot PU turns
+  From elementary classrooms to high-school robotics clubs, Robot PU turns
   abstract STEM concepts into hands-on, creative projects.
-  Add the optional \textbf{ESP32-S3 Smart Hat} to unlock AI-camera
-  perception, soccer, and SLAM navigation.}
+  Two ready-to-use software options are available: a beginner track
+  for younger students and an advanced track with more sensors,
+  actions, and AI-camera projects. Add the optional \textbf{Smart Hat}
+  to unlock face tracking, robot soccer, and mapping.}
 
   \vspace{6pt}
 
@@ -149,9 +152,9 @@
   \vspace{4pt}
 
   % Optional add-on
-  \featurebox{puOrange}{\faMicrochip\; Optional: ESP32-S3 Smart Hat}{%
-    Adds AI camera, voice commands, SLAM navigation, face detection,
-    object tracking, and robot soccer autonomy. \textit{Sold separately.}
+  \featurebox{puOrange}{\faMicrochip\; Optional: Smart Hat for AI \& Soccer}{%
+    Adds AI camera, voice commands, mapping, face detection,
+    object tracking, and robot soccer. \textit{Sold separately.}
   }
 \end{minipage}
 
@@ -166,11 +169,11 @@
   \begin{center}
     \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_dance.png}
   \end{center}
-  {\small\bfseries\color{puDark}Walk \& Express}\\
+  {\small\bfseries\color{puDark}Move \& Express}\\
   {\footnotesize
-    Walk, turn, side-step, kick, jump, rest.
-    Dance routines that react to music beats.
-    Talk \& sing with RoboVoice. Blinking LED eyes show mood.}
+    Walk, turn, step sideways, kick, jump, and rest.
+    Dance to music. Talk and sing with a friendly robot voice.
+    Blinking LED eyes show mood and personality.}
 
   \columnbreak
 
@@ -178,35 +181,35 @@
   \begin{center}
     \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_walk.png}
   \end{center}
-  {\small\bfseries\color{puDark}Autopilot \& Navigation}\\
+  {\small\bfseries\color{puDark}Explore \& Navigate}\\
   {\footnotesize
-    Sonar obstacle avoidance. Maze solving.
-    Path following. Local planner. Leader following.
-    Decision engine for guided missions.}
+    Roams around obstacles, solves simple mazes,
+    follows a line or path, and can trail a leader.
+    Great for teaching problem solving and spatial reasoning.}
 
   \columnbreak
 
   % col 3
   \begin{center}
-    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_ideas.png}
+    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_happy.png}
   \end{center}
-  {\small\bfseries\color{puDark}Sensing \& Control}\\
+  {\small\bfseries\color{puDark}Sense \& Balance}\\
   {\footnotesize
-    Sonar, IMU tilt/roll/pitch, compass heading, microphone input.
-    Signal filtering, heading fusion, and PID balance control.
-    Servo trim calibration \& kinematics.}
+    Uses distance and tilt sensors to stay upright,
+    avoid bumps, and react to sounds.
+    Self-balancing motion keeps it steady on the desk or floor.}
 
   \columnbreak
 
   % col 4
   \begin{center}
-    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_star.png}
+    \includegraphics[height=1.2cm,keepaspectratio]{../cartoons/pu_sing.png}
   \end{center}
-  {\small\bfseries\color{puDark}Multi-Robot \& AI}\\
+  {\small\bfseries\color{puDark}Teamwork \& AI}\\
   {\footnotesize
-    Radio gamepad, peer-to-peer chat, synchronized singing.
-    Formation control, task allocation, ROS-inspired architecture.
-    AI camera soccer \& SLAM (Smart Hat).}
+    Robots can chat by radio, sing together, and play team games.
+    Add the Smart Hat camera to try face recognition,
+    object tracking, and robot soccer.}
 
 \end{multicols}
 
@@ -232,7 +235,7 @@
 \hfill
 \begin{minipage}[c]{0.25\linewidth}
   \begin{center}
-    \includegraphics[height=2.2cm,keepaspectratio]{../cartoons/pu_happy.png}\\
+    \includegraphics[height=2.2cm,keepaspectratio]{../cartoons/pu_jump.png}\\
     {\footnotesize\color{puGray}\textit{Meet PU!}}
   \end{center}
 \end{minipage}
@@ -302,12 +305,13 @@
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
     {\color{puYellow}$\bigstar$}   & Add arms \\
     {\color{puYellow}$\bigstar$}   & Servo trim calibration \\
+    {\color{puYellow}$\bigstar$}   & Material specifications \\
   \end{tabular}}
 }
 
 \vspace{3pt}
 
-\featurebox{puBlue}{\faRunning\; Robot Hardware \& APIs}{%
+\featurebox{puBlue}{\faRunning\; Robot Hardware \& Behaviors}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
     {\color{puYellow}$\bigstar$}   & How Robot PU moves \\
@@ -362,7 +366,8 @@
     {\color{puYellow}$\bigstar\bigstar$} & Event loop \\
     {\color{puYellow}$\bigstar\bigstar$} & Custom events \& handlers \\
     {\color{puYellow}$\bigstar\bigstar$} & State machines \\
-    {\color{puYellow}$\bigstar\bigstar$} & OOP architecture \\
+    {\color{puYellow}$\bigstar\bigstar$} & State switch (setMode) \\
+    {\color{puYellow}$\bigstar\bigstar$} & Object-oriented design \\
   \end{tabular}}
 }
 
@@ -388,57 +393,57 @@
 \vspace{3pt}
 
 \begin{center}
-  \includegraphics[height=1.8cm,keepaspectratio]{../cartoons/pu_questions.png}
-  \includegraphics[height=1.8cm,keepaspectratio]{../cartoons/pu_jump.png}
+  \includegraphics[height=1.8cm,keepaspectratio]{../cartoons/pu_stand.png}
 \end{center}
 
 \columnbreak
 
 % ---- Column 3 ----------------------------------------------------------------
-\featurebox{puGray}{\faSitemap\; ROS Concepts}{%
+\featurebox{puGray}{\faSitemap\; Advanced Systems}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
-    {\color{puYellow}$\bigstar\bigstar$} & ROS nodes as roles \\
-    {\color{puYellow}$\bigstar\bigstar$} & ROS topics on micro:bit \\
-    {\color{puYellow}$\bigstar\bigstar$} & /cmd\_vel topic \\
-    {\color{puYellow}$\bigstar\bigstar$} & /scan topic \\
-    {\color{puYellow}$\bigstar\bigstar$} & /diagnostics topic \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Telemetry logging \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Base station dashboard \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Safety watchdog + E-stop \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Fault recovery behaviors \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Behavior trees \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Mission recipes \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Task allocation \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Formation control \\
+    {\color{puYellow}$\bigstar\bigstar$} & Robots as different roles \\
+    {\color{puYellow}$\bigstar\bigstar$} & Sharing messages between robots \\
+    {\color{puYellow}$\bigstar\bigstar$} & Move commands \\
+    {\color{puYellow}$\bigstar\bigstar$} & Sense the surroundings \\
+    {\color{puYellow}$\bigstar\bigstar$} & Health checks \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Activity logging \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Teacher dashboard \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Safety stop + E-stop \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Recovering from faults \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Behavior plans \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Mission plans \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Sharing tasks \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Team formations \\
   \end{tabular}}
 }
 
 \vspace{3pt}
 
-\featurebox{puGray}{\faCalculator\; Control \& Math}{%
+\featurebox{puGray}{\faCalculator\; Math \& Stability}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Transformation matrix \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Feedback loops \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Signal filters \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Heading fusion \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & PID balancing \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Improved balancing \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & How math makes the robot move \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Self-correcting motion \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Smoothing sensor readings \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Reliable direction sensing \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Balance on two legs \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Balance on uneven ground \\
   \end{tabular}}
 }
 
 \vspace{3pt}
 
-\featurebox{puOrange}{\faCamera\; Vision, AI \& Soccer SLAM}{%
+\featurebox{puOrange}{\faCamera\; AI Camera \& Robot Soccer}{%
   {\footnotesize
   \begin{tabular}{@{}p{0.06\linewidth}p{0.78\linewidth}@{}}
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & K230 AI camera \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Search \& track face \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM I2C camera message \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM odometry \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM soccer ball follow \\
-    {\color{puYellow}$\bigstar\bigstar\bigstar$} & SLAM soccer local map \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Smart Hat AI camera \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Find and follow a face \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Read smart-camera messages \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Track where the robot goes \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Follow a soccer ball \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Build a local map \\
+    {\color{puYellow}$\bigstar\bigstar\bigstar$} & Keep a 1~m social distance \\
   \end{tabular}}
 }
 
@@ -468,10 +473,17 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.28\linewidth}
-  \begin{center}
-    \includegraphics[height=1.6cm,keepaspectratio]{../cartoons/pu_sing.png}
-    \includegraphics[height=1.6cm,keepaspectratio]{../cartoons/pu_supprise.png}
-  \end{center}
+  \centering
+  \begin{tabular}{@{}c@{\hspace{5pt}}c@{\hspace{5pt}}c@{\hspace{5pt}}c@{}}
+    \qrcode[height=1.0cm,level=M]{https://www.amazon.com/dp/B0DR8RGVXN} &
+    \qrcode[height=1.0cm,level=M]{https://www.youtube.com/@TheStoryofPu-yw8tr/videos} &
+    \qrcode[height=1.0cm,level=M]{https://github.com/robotgyms/pxt-robotpu} &
+    \qrcode[height=1.0cm,level=M]{https://github.com/NovaSeq/RobotPu} \\[2pt]
+    {\tiny Amazon} &
+    {\tiny YouTube} &
+    {\tiny\parbox[t]{0.85cm}{\centering GitHub\\(block)}} &
+    {\tiny\parbox[t]{0.85cm}{\centering GitHub\\(python)}}
+  \end{tabular}
 \end{minipage}
 
 \end{document}
