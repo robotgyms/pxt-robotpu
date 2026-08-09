@@ -1193,10 +1193,8 @@ namespace robotPuPro {
      * Kid-friendly action tokens. Used with start(action, steps).
      */
     export enum Action {
-        //% block="stop"
-        Stop = 0,
         //% block="walk"
-        Walk,
+        Walk = 0,
         //% block="walk backward"
         WalkBackward,
         //% block="turn left"
@@ -1209,6 +1207,8 @@ namespace robotPuPro {
         Dance,
         //% block="rest"
         Rest,
+        //% block="stand"
+        Stand,
         //% block="kick"
         Kick,
         //% block="jump"
@@ -1225,8 +1225,8 @@ namespace robotPuPro {
         Blink,
         //% block="greet"
         Greet,
-        //% block="stand"
-        Stand
+        //% block="stop"
+        Stop
     }
 
     /**
