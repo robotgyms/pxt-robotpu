@@ -1,7 +1,7 @@
 {
     "name": "pxt-robotpu-pro",
     "version": "1.0.84",
-    "description": "Robot PU MakeCode extension (micro:bit (V2) only) exposing walk, autopilot, dance, kick, jump, rest, talk, sing.",
+    "description": "Robot PU Pro MakeCode extension (micro:bit (V2) only) exposing walk, autopilot, dance, kick, jump, rest, talk, sing.",
     "license": "MIT",
     "dependencies": {
         "core": "*",
@@ -14,6 +14,8 @@
         "robotpu.ts",
         "main.ts",
         "README.md",
+        "_locales/pxt-robotpu-pro-jsdoc-strings.json",
+        "_locales/pxt-robotpu-pro-strings.json",
         "_locales/zh-CN/pxt-robotpu-pro-strings.json",
         "_locales/zh-CN/pxt-robotpu-pro-jsdoc-strings.json"
     ],

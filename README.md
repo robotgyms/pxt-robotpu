@@ -236,6 +236,20 @@ make push-tag VERSION=1.0.42
 
 Before running a release, make sure your GitHub authentication is configured for pushing to the repository.
 
+## Search Engine Optimization
+
+A separate `index.html` file is not required for a MakeCode / PXT extension. MakeCode and GitHub discover and index the package from `README.md`, `pxt.json`, and the GitHub repository's About section. The README's H1 and overview already contain the main keywords (`MakeCode`, `micro:bit`, `Robot PU`, `10-DOF`, `SLAM`, `CogniCap`), and `pxt.json` provides the description shown inside MakeCode.
+
+This extension uses:
+
+- **Descriptive metadata** in `pxt.json` (name, version, description)
+- **Keyword-rich content** in `README.md` (H1, overview, features, API reference)
+- **GitHub repository About field** for the public description, topics, and website link
+
+The GitHub repository **About** field is the description that MakeCode shows in its extension search results, so it must be concise, accurate, and consistent with the Robot PU product branding. Do not treat it as a free-text keyword dump; changes there directly affect how the package appears when users search for extensions in MakeCode.
+
+If you later publish a dedicated website via GitHub Pages, an `index.html` with Open Graph / JSON-LD tags would help that site, but it is not needed for MakeCode package discovery or GitHub repository search.
+
 ## Blocks / API
 This extension auto-initializes the robot on the first call to any `robotPuPro.*` API:
 
