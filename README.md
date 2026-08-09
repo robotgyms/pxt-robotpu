@@ -1,16 +1,20 @@
-# pxt-robotpu-pro — Robot PU MakeCode Extension
+# pxt-robotpu-pro — 10-DOF Robot PU MakeCode Extension
 
-> This is the `robotpu-pro` (advanced) package for Robot PU. It is backward compatible with the beginner version [pxt-PU-Robot](https://github.com/elecfreaks/pxt-PU-Robot.git) maintained by ElecFreaks, an authorized vendor. The advanced package exposes more actions, more sensor data, and feedback control APIs, so users can develop more complex robot systems and start SLAM support with CogniCap, the AI camera for Robot PU ([pxt-robotpu-cap](https://github.com/robotgyms/pxt-robotpu-cap)).
+> This is the `robotpu-pro` (advanced) package for **Robot PU with 10-DOF support**. It is backward compatible with the beginner version [pxt-PU-Robot](https://github.com/elecfreaks/pxt-PU-Robot.git) with 6 DOF maintained by ElecFreaks, an authorized vendor. The advanced package exposes more actions (10 DOF), more sensor data, and feedback control APIs, so users can develop more complex robot systems and start SLAM support with CogniCap, the AI camera for Robot PU ([pxt-robotpu-cap](https://github.com/robotgyms/pxt-robotpu-cap)).
 
 ## Overview
 
 This repository is a MakeCode extension for BBC micro:bit (V2 only) to program Robot PU. Using this extension requires the micro:bit V2 hardware. micro:bit V1 will display the 927 error code.
 
-Robot PU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode. This software package was ported from [Python Version](https://github.com/NovaSeq/RobotPu.git).
+Robot PU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode. This software package was ported from [Python Version](https://github.com/NovaSeq/RobotPu.git). It extends the beginner version (6 DOF) with more actions (10 DOF), more sensor data, and feedback control APIs.
 
 PU can walk, autopilot, dance, kick, jump, rest, talk, and sing. It reacts to music, balances using its IMU, and navigates with an ultrasonic sensor.
 The retail kit includes a gamepad built from the second micro:bit for radio-based remote control, including gesture head control (tilt to yaw/pitch PU’s head).
 ![Robot PU](https://raw.githubusercontent.com/robotgyms/pxt-robotpu/main/assets/robotpu.png)
+
+## 10-DOF Support
+
+The **pro** version of this MakeCode extension unlocks the full **10 degrees of freedom (10-DOF)** of Robot PU. Compared with the [beginner 6-DOF package](https://github.com/elecfreaks/pxt-PU-Robot.git), the advanced package exposes more actions, more sensor data, and feedback control APIs for complex behaviors such as SLAM navigation, multi-robot coordination, and AI-camera projects with [CogniCap](https://github.com/robotgyms/pxt-robotpu-cap).
 
 Learn more about The Story of PU, which shows robot PU's activities, hardware, software, tutorials, and upgrade projects at:
 
@@ -25,6 +29,7 @@ Purchase links:
 
 ## Features
 
+- **10-DOF advanced motion**: full 10 degrees of freedom for richer poses, steps, jumps, kicks, and dance routines beyond the 6-DOF beginner version
 - **Expressive personality**: dance routines, reactions, auto-pilot, soccer
 - **Classroom-ready** with block coding, javascript and [Python](https://github.com/NovaSeq/RobotPu.git) paths
 - **Maker-friendly** with free tutorials and projects of hardware and software to upgrade robot PU
@@ -287,6 +292,11 @@ The MakeCode blocks are defined in `main.ts` under the `robotPuPro` namespace an
   - Trims are applied immediately and remain active until changed.
   - Use with the `ServoJoint` enum: `LeftFoot`, `LeftLeg`, `RightFoot`, `RightLeg`, `HeadYaw`, `HeadPitch`, `LeftShoulder`, `LeftArm`, `RightShoulder`, `RightArm`
 
+#### `toggleServoTrim(): void`
+
+- **Block**: `toggle servo trim mode`
+- **What it does**: Toggles servo trim calibration mode on or off. Use the gamepad to select and adjust each servo while in calibration mode.
+
 #### Servo calibration / trim mode
 
 Use servo calibration / trim mode to align the robot's feet, legs, neck yaw, and head pitch into a neutral standing position.
@@ -307,7 +317,7 @@ Use servo calibration / trim mode to align the robot's feet, legs, neck yaw, and
   - The current radio channel number is saved.
   - When the robot boots again, it remembers the saved servo trim and radio channel.
 
-The servo index order is:
+The servo index order for 10-DOF is:
 
 | Servo index | Joint | Driver / Pin | Notes |
 |-------------|-------|--------------|-------|
@@ -324,14 +334,9 @@ The servo index order is:
 
 Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C servo controller. The optional arm servos 8 and 9 are driven directly from micro:bit PWM pins P14 (left arm) and P15 (right arm).
 
-#### `toggleServoTrim(): void`
-
-- **Block**: `toggle servo trim calibration mode`
-- **What it does**: Toggles servo trim calibration mode on or off. Use the gamepad to select and adjust each servo while in calibration mode.
-
 #### `saveServoTrimCalibration(): void`
 
-- **Block**: `save servo trim calibration`
+- **Block**: `save servo trims`
 - **What it does**: Saves the current servo trim values and radio channel, exits trim calibration mode, and returns to normal operation.
 
 #### `readConfig(): void`
@@ -354,6 +359,30 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Notes**:
   - This affects `explore()` speed planning and remote-control mapping.
 
+#### `setWalkSpeed(speed: number): void`
+
+- **Block**: `set walk speed to %speed`
+- **What it does**: Sets the forward/backward walking speed.
+- **Parameters**:
+  - `speed`: walking speed from `-5` (full backward) to `5` (full forward)
+
+#### `setWalkDirection(direction: number): void`
+
+- **Block**: `set walk direction to %direction`
+- **What it does**: Sets the left/right turning bias.
+- **Parameters**:
+  - `direction`: turn bias from `-1` (full right) to `1` (full left), `0` is straight
+
+#### `walkSpeed(): number`
+
+- **Block**: `walk speed`
+- **What it does**: Returns the current walking speed.
+
+#### `walkDirection(): number`
+
+- **Block**: `walk direction`
+- **What it does**: Returns the current walking direction.
+
 ### Sensors
 
 #### `sonarDistanceCm(): number`
@@ -363,7 +392,7 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `frontDistanceArray(): number[]`
 
-- **Block**: `front distance array`
+- **Block**: `front distances`
 - **What it does**: Returns a 5-element array describing the forward "distance profile" used by explore:
   - `[left, leftFront, front, rightFront, right]`
 
@@ -399,13 +428,18 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `resetOdom(): void`
 
-- **Block**: `reset robot location`
+- **Block**: `reset robot position`
 - **What it does**: Resets the odometry so Robot PU's position is (0, 0) and heading is 0 degrees (north).
 
 #### `locationArray(): number[]`
 
-- **Block**: `robot location array`
+- **Block**: `robot position`
 - **What it does**: Returns Robot PU's estimated location as `[x, y, heading]`. x and y are in millimeters, heading is in degrees.
+
+#### `stepCount(): number`
+
+- **Block**: `step count`
+- **What it does**: Returns the number of walking steps counted by the odometry pedometer.
 
 ### Actuators
 
@@ -427,7 +461,7 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 #### `servoStepStatus(joint: ServoJoint, target: number, stepSize: number): number`
 
-- **Block**: `servo step %joint to %target step size %stepSize`
+- **Block**: `status of %joint moving to %target using step %stepSize`
 - **Parameters**:
   - `target`: `0 .. 180`
   - `stepSize`: `1 .. 20`
@@ -471,6 +505,27 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **What it does**: Sets right eye LED brightness.
 
 ### Actions
+
+#### `start(action: Action, steps: number): void`
+
+- **Block**: `start %action for %steps steps`
+- **What it does**: Starts a robot action and runs it for the given number of steps. Use `0` or less for continuous execution.
+- **Parameters**:
+  - `action`: one of the `Action` values, e.g. `Action.Walk`
+  - `steps`: number of steps to run (`0` or less for forever)
+
+#### `isDone(action: Action): boolean`
+
+- **Block**: `is %action done?`
+- **What it does**: Checks if the chosen action has finished.
+- **Parameters**:
+  - `action`: the action to check
+- **Return**: `true` when the action is done
+
+#### `stop(): void`
+
+- **Block**: `stop robot`
+- **What it does**: Stops the current action and resets to rest.
 
 #### `setMode(mode: Mode): void`
 
@@ -659,6 +714,26 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 - **Block**: `play %text in morse|| at speed %unitMs ms`
 - **What it does**: Translates plain text to morse code and plays it immediately.
+
+#### `laugh(): void`
+
+- **Block**: `laugh`
+- **What it does**: Plays a laughing sound effect. Call it when Robot PU feels happy.
+
+#### `cry(): void`
+
+- **Block**: `cry`
+- **What it does**: Plays a crying sound effect. Call it when Robot PU feels sad.
+
+#### `scream(): void`
+
+- **Block**: `scream`
+- **What it does**: Plays a screaming sound effect. Call it when Robot PU gets surprised.
+
+#### `funny(): void`
+
+- **Block**: `funny`
+- **What it does**: Plays a funny sound effect. Call it when Robot PU feels funny.
 
 ### Remote Control
 
