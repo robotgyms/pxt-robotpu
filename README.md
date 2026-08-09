@@ -14,16 +14,18 @@ The retail kit includes a gamepad built from the second micro:bit for radio-base
 
 ## 10-DOF Support
 
-The **pro** version of this MakeCode extension unlocks the full **10 degrees of freedom (10-DOF)** of Robot PU. Compared with the [beginner 6-DOF package](https://github.com/elecfreaks/pxt-PU-Robot.git), the advanced package exposes more actions, more sensor data, and feedback control APIs for complex behaviors such as SLAM navigation, multi-robot coordination, and AI-camera projects with [CogniCap](https://github.com/robotgyms/pxt-robotpu-cap).
+The **pro** version of this MakeCode extension exposes the **10 degrees of freedom (10-DOF)** API for advanced kinematics, custom motion sequencing, and additional protocols beyond the basic 6-DOF Robot PU package. Compared with the [beginner 6-DOF package](https://github.com/elecfreaks/pxt-PU-Robot.git), the advanced package exposes more actions, more sensor data, and feedback control APIs for complex behaviors such as SLAM navigation, multi-robot coordination, and AI-camera projects with [CogniCap](https://github.com/robotgyms/pxt-robotpu-cap).
+
+## Product Links
 
 Learn more about The Story of PU, which shows robot PU's activities, hardware, software, tutorials, and upgrade projects at:
 
 - **Product Website**: [robotgyms.com/pu](https://robotgyms.com/pu)
 - **YouTube**: [The Story of PU](https://www.youtube.com/@TheStoryofPu-yw8tr)
 - **TikTok**: [@thestoryofpu](https://www.tiktok.com/@thestoryofpu)
-- **Quick Start**： [How to use this library](https://youtu.be/aBw55nYjWDg)
+- **Quick Start**: [How to use this library](https://youtu.be/aBw55nYjWDg)
 
-Purchase links:
+## Purchase Links
 
 - **Amazon**: [Robot PU kit](https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN)
 
@@ -89,7 +91,7 @@ Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
   - Build obstacle avoidance, maze solving, autopilot exploration, odometry-lite pose estimation, heading fusion, 2D maps, occupancy grids, path planning, path following, and local planners.
   - Use Robot PU location data as an entry point to SLAM-style robot navigation.
 
-- ** Learn AI **
+- **Learn AI**
   - Use AI to generate songs and sing them.
   - Use Smart Hat Accessories to do face detection, object tracking, and voice commands.
   
@@ -154,7 +156,7 @@ Use these graphs to:
 ## Dependencies
 
 - core, radio, neopixel (from MakeCode)
-- Billy voice package: github:adamish/pxt-billy
+- Billy voice package: [pxt-billy](https://github.com/adamish/pxt-billy)
 
 ## Development with Makefile
 
@@ -511,7 +513,7 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Block**: `start %action for %steps steps`
 - **What it does**: Starts a robot action and runs it for the given number of steps. Use `0` or less for continuous execution.
 - **Parameters**:
-  - `action`: one of the `Action` values, e.g. `Action.Walk`
+  - `action`: one of the `robotPuPro.Action` values, e.g. `robotPuPro.Action.Walk`
   - `steps`: number of steps to run (`0` or less for forever)
 
 #### `isDone(action: Action): boolean`
@@ -531,6 +533,8 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 
 - **Block**: `set mode to %mode`
 - **What it does**: Sets Robot PU's behavior mode directly.
+- **Parameter**:
+  - `mode`: one of the `robotPuPro.Mode` values, e.g. `robotPuPro.Mode.Walk`
 
 #### `greet(): void`
 
