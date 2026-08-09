@@ -98,7 +98,7 @@ namespace robotPuPro {
 
     /** Start a robot action and run it for the given number of steps (0 or less = forever). */
     //% blockId=robotpu_start_action block="start %action for %steps steps"
-    //% action.defl=Action.Walk
+    //% action.defl=robotPuPro.Action.Walk
     //% steps.min=0 steps.defl=1
     //% weight=100 blockGap=8
     export function start(action: Action, steps: number): void {
@@ -107,7 +107,7 @@ namespace robotPuPro {
 
     /** Check if the chosen action has finished. */
     //% blockId=robotpu_action_done block="is %action done?"
-    //% action.defl=Action.Walk
+    //% action.defl=robotPuPro.Action.Walk
     //% weight=99 blockGap=8
     export function isDone(action: Action): boolean {
         return ensureRobot().isActionDone(action);
