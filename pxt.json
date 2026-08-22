@@ -17,7 +17,9 @@
         "_locales/pxt-robotpu-pro-jsdoc-strings.json",
         "_locales/pxt-robotpu-pro-strings.json",
         "_locales/zh-CN/pxt-robotpu-pro-strings.json",
-        "_locales/zh-CN/pxt-robotpu-pro-jsdoc-strings.json"
+        "_locales/zh-CN/pxt-robotpu-pro-jsdoc-strings.json",
+        "_locales/zh-TW/pxt-robotpu-pro-strings.json",
+        "_locales/zh-TW/pxt-robotpu-pro-jsdoc-strings.json"
     ],
     "testFiles": [
         "test.ts"
