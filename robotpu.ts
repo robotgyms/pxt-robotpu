@@ -650,17 +650,19 @@ namespace robotPuPro {
         }
 
         /**
-         * Turn the speaker on by setting the audio pin (P0) to output mode.
+         * Turn the speaker on 
          */
         public speakerOn(): void {
             music.setBuiltInSpeakerEnabled(true);
         }
 
         /**
-         * Turn the speaker off by setting the audio pin (P0) to input mode.
+         * Turn the speaker off
          */
         public speakerOff(): void {
             music.setBuiltInSpeakerEnabled(false);
+            // Force Pin 0 LOW to pull down the driver transistor to avoid speaker overheating and wasting power
+            pins.digitalWritePin(DigitalPin.P0, 0);
         }
 
         /**
