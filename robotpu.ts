@@ -452,16 +452,19 @@ namespace robotPuPro {
 
         /**
          * Control a DC motor. sp: -100 to 100.
+         * @param m motor index (1 or 2)
+         * @param sp speed from -100 (full reverse) to 100 (full forward)
          */
-        public motor(m: number, sp: number): void {
-            if (sp >= -100 && sp <= 100 && m >= 1 && m <= 2) {
-                let buf = pins.createBuffer(4);
-                buf.setNumber(NumberFormat.UInt8LE, 0, m);
-                buf.setNumber(NumberFormat.UInt8LE, 1, 0x01);
-                buf.setNumber(NumberFormat.Int8LE, 2, sp); // Signed speed
-                buf.setNumber(NumberFormat.UInt8LE, 3, 0);
-                pins.i2cWriteBuffer(this.i2cAddress, buf);
-            }
+        public dcMotor(m: number, sp: number): void {
+            m = Math.floor(m);
+            if (m < 1 || m > 2) return;
+            sp = Math.floor(Math.max(-100, Math.min(100, sp)));
+            let buf = pins.createBuffer(4);
+            buf.setNumber(NumberFormat.UInt8LE, 0, m);
+            buf.setNumber(NumberFormat.UInt8LE, 1, sp >= 0 ? 0x01 : 0x02);
+            buf.setNumber(NumberFormat.Int8LE, 2, Math.abs(sp));
+            buf.setNumber(NumberFormat.UInt8LE, 3, 0);
+            pins.i2cWriteBuffer(this.i2cAddress, buf);
         }
 
         /**
@@ -502,6 +505,24 @@ namespace robotPuPro {
             }
             this.servo(idx, this.servoTarget[idx]);
             return err
+        }
+
+        /**
+         * Move a servo smoothly to an angle (0-180) using the PCB's smooth motion command.
+         * @param sr servo index 0-7
+         * @param a target angle
+         */
+        public servoSmooth(sr: number, a: number): void {
+            if (sr >= 0 && sr <= 7) {
+                a = Math.min(180, Math.max(0, Math.floor(a)));
+                let reg = (sr == 7) ? 0x20 : sr + 0x13;
+                let buf = pins.createBuffer(4);
+                buf.setNumber(NumberFormat.UInt8LE, 0, reg);
+                buf.setNumber(NumberFormat.UInt8LE, 1, a);
+                buf.setNumber(NumberFormat.UInt8LE, 2, 0);
+                buf.setNumber(NumberFormat.UInt8LE, 3, 0);
+                pins.i2cWriteBuffer(this.i2cAddress, buf);
+            }
         }
 
         /**
@@ -578,6 +599,31 @@ namespace robotPuPro {
         }
 
         /**
+         * Turn the servo power on or off.
+         * @param on true to power on, false to power off
+         */
+        public setServoPower(on: boolean): void {
+            let buf = pins.createBuffer(4);
+            buf.setNumber(NumberFormat.UInt8LE, 0, on ? 0x31 : 0x32);
+            buf.setNumber(NumberFormat.UInt8LE, 1, 0);
+            buf.setNumber(NumberFormat.UInt8LE, 2, 0);
+            buf.setNumber(NumberFormat.UInt8LE, 3, 0);
+            pins.i2cWriteBuffer(this.i2cAddress, buf);
+        }
+
+        /**
+         * Read the battery level from the PCB.
+         * @returns battery percentage from 0 to 100
+         */
+        public getBatteryLevel(): number {
+            let cmd = pins.createBuffer(4);
+            cmd.setNumber(NumberFormat.UInt8LE, 0, 0x33);
+            pins.i2cWriteBuffer(this.i2cAddress, cmd, true);
+            let ret = pins.i2cReadBuffer(this.i2cAddress, 1);
+            return ret.getNumber(NumberFormat.UInt8LE, 0);
+        }
+
+        /**
          * Eyes ON/OFF control.
          */
         public eyesCtl(c: number): void {
@@ -601,6 +647,20 @@ namespace robotPuPro {
         public rightEyeBright(b: number): void {
             pins.analogWritePin(AnalogPin.P13, b);
             this.rightEyeBrightness = b;
+        }
+
+        /**
+         * Turn the speaker on by setting the audio pin (P0) to output mode.
+         */
+        public speakerOn(): void {
+            pins.digitalWritePin(DigitalPin.P0, 0);
+        }
+
+        /**
+         * Turn the speaker off by setting the audio pin (P0) to input mode.
+         */
+        public speakerOff(): void {
+            pins.digitalReadPin(DigitalPin.P0);
         }
 
         /**
@@ -1260,6 +1320,7 @@ namespace robotPuPro {
         private alertLevel: number = 10;
         private alertScale: number = 0.9;
         private restState: number = 26;
+        private sleepPoweredDown: boolean = false;
 
         // IMU & Balance
         private bodyPitch: number = 0;
@@ -1392,6 +1453,17 @@ namespace robotPuPro {
         public start() {
             this.stand();
             this.resetOdom();
+            this.pcb.speakerOff();
+        }
+
+        /**
+         * Turn the speaker on, run a sound function, then turn it off to save power.
+         * @param fn the sound-playing function to run
+         */
+        private withSpeaker(fn: () => void): void {
+            this.pcb.speakerOn();
+            fn();
+            this.pcb.speakerOff();
         }
 
         public resetOdom() {
@@ -1503,8 +1575,10 @@ namespace robotPuPro {
         }
 
         public talk(text: string): void {
-            this.voice.reset();
-            this.voice.speak(text);
+            this.withSpeaker(() => {
+                this.voice.reset();
+                this.voice.speak(text);
+            });
         }
 
 
@@ -1512,6 +1586,7 @@ namespace robotPuPro {
          * Play a laughing sound effect. Call it when Robot PU feels happy
          */
         public laugh(): void {
+            this.pcb.speakerOn();
             let count = 2 + Math.random() * 3;
             for (let index = 0; index < count; index++) {
                 music.setVolume(255 - index * 30)
@@ -1524,12 +1599,14 @@ namespace robotPuPro {
                     120 + Math.random() * 50, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
                 basic.pause(60 + Math.random() * 10)
             }
+            this.pcb.speakerOff();
         }
 
         /**
          * Play a crying sound effect. Call it when Robot PU feels sad
          */
         public cry(): void {
+            this.pcb.speakerOn();
             let count = 3 + Math.random() * 3;
             for (let i = 0; i < count; i++) {
                 music.setVolume(Math.min(255, 125 + i * 40))
@@ -1548,12 +1625,14 @@ namespace robotPuPro {
                 )
                 basic.pause(120 + Math.random() * 10)
             }
+            this.pcb.speakerOff();
         }
 
         /**
          * Play a funny sound effect. Call it when Robot PU feels funny
          */
         public funny(): void {
+            this.pcb.speakerOn();
             music.setVolume(255)
             music.play(music.createSoundExpression(
                 WaveShape.Sawtooth,
@@ -1565,12 +1644,14 @@ namespace robotPuPro {
                 SoundExpressionEffect.Tremolo,
                 InterpolationCurve.Curve
             ), music.PlaybackMode.UntilDone)
+            this.pcb.speakerOff();
         }
 
         /**
          * Play a screaming sound effect. Call it when Robot PU gets suprised
          */
         public scream(): void {
+            this.pcb.speakerOn();
             music.setVolume(255)
             // weeweee
             music.play(
@@ -1600,6 +1681,7 @@ namespace robotPuPro {
                 ),
                 music.PlaybackMode.UntilDone
             );
+            this.pcb.speakerOff();
         }
 
         /*
@@ -2195,22 +2277,37 @@ namespace robotPuPro {
          * Ported from sleep() in Python.
          */
         public sleepMode(): void {
-            // 1. Refresh IMU data and return to a neutral standing pose
-            this.balanceParam();
-            this.stand();
-
-            // 2. Turn off the 5x5 LED matrix eyes
-            this.pcb.eyesCtl(0);
-
-            // 3. Clear the NeoPixel strip to save battery
-            this.np.clear();
-            this.np.show();
-
-            // 4. Monitor for wake-up triggers (e.g., sound or touch)
+            // 1. Check for wake-up triggers first
             if (this.checkWakeup() == 1) {
                 // Return to Idle/Standby state
                 this.gst = 0;
+                if (this.sleepPoweredDown) {
+                    this.pcb.speakerOn();
+                    this.pcb.setServoPower(true);
+                    this.sleepPoweredDown = false;
+                }
                 this.talk("I am awake"); // Optional feedback
+                return;
+            }
+
+            // 2. Enter low-power sleep if not already powered down
+            if (!this.sleepPoweredDown) {
+                // Refresh IMU data and return to a neutral standing pose
+                this.balanceParam();
+                this.stand();
+
+                // Turn off the 5x5 LED matrix eyes
+                this.pcb.eyesCtl(0);
+
+                // Clear the NeoPixel strip to save battery
+                this.np.clear();
+                this.np.show();
+
+                // Turn speaker and servo power off to save power
+                this.pcb.speakerOff();
+                this.pcb.setServoPower(false);
+
+                this.sleepPoweredDown = true;
             }
         }
 
@@ -2240,8 +2337,51 @@ namespace robotPuPro {
          * @param s The note sequence string, e.g. "C5 D E F G".
          */
         public sing(s: string): void {
-            music.play(music.stringPlayable(s, 120), music.PlaybackMode.InBackground)
+            this.withSpeaker(() => {
+                music.play(music.stringPlayable(s, 120), music.PlaybackMode.UntilDone);
+            });
         }
+
+        /**
+         * Play a morse code string using ITU-standard timing.
+         * @param code morse code string to play, e.g. "... --- ...".
+         * @param unitMs duration of one dit in milliseconds.
+         */
+        public morse(code: string, unitMs: number = 80): void {
+            this.withSpeaker(() => {
+                this.voice.morse(code, unitMs);
+            });
+        }
+
+        /**
+         * Translate plain text to morse code and play it immediately.
+         * @param text plain text to translate and play as morse.
+         * @param unitMs duration of one dit in milliseconds.
+         */
+        public morseText(text: string, unitMs: number = 80): void {
+            this.withSpeaker(() => {
+                this.voice.morse(RoboVoice.toMorse(text), unitMs);
+            });
+        }
+
+        /**
+         * Play a sequence of tones using arrays of frequencies in Hz and durations in milliseconds.
+         * Use frequency 0 for a rest.
+         * @param frequencies tone frequencies in Hz.
+         * @param durations tone durations in milliseconds.
+         */
+        public playToneSequenceMs(frequencies: number[], durations: number[]): void {
+            this.withSpeaker(() => {
+                const n = Math.min(frequencies ? frequencies.length : 0, durations ? durations.length : 0);
+                for (let i = 0; i < n; i++) {
+                    const dur = Math.max(0, Math.round(durations[i]));
+                    const f = Math.round(frequencies[i]);
+                    if (f <= 0) music.rest(dur);
+                    else music.playTone(f, dur);
+                }
+            });
+        }
+
         /**
          * Makes the robot greet using text-to-speech.
          * The robot will speak its serial number and name.
