@@ -653,14 +653,14 @@ namespace robotPuPro {
          * Turn the speaker on by setting the audio pin (P0) to output mode.
          */
         public speakerOn(): void {
-            pins.digitalWritePin(DigitalPin.P0, 0);
+            //pins.digitalWritePin(DigitalPin.P0, 0);
         }
 
         /**
          * Turn the speaker off by setting the audio pin (P0) to input mode.
          */
         public speakerOff(): void {
-            pins.digitalReadPin(DigitalPin.P0);
+            //pins.digitalReadPin(DigitalPin.P0);
         }
 
         /**
