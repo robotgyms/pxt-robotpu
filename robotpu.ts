@@ -653,14 +653,14 @@ namespace robotPuPro {
          * Turn the speaker on by setting the audio pin (P0) to output mode.
          */
         public speakerOn(): void {
-            //pins.digitalWritePin(DigitalPin.P0, 0);
+            music.setBuiltInSpeakerEnabled(true);
         }
 
         /**
          * Turn the speaker off by setting the audio pin (P0) to input mode.
          */
         public speakerOff(): void {
-            //pins.digitalReadPin(DigitalPin.P0);
+            music.setBuiltInSpeakerEnabled(false);
         }
 
         /**
@@ -2282,7 +2282,6 @@ namespace robotPuPro {
                 // Return to Idle/Standby state
                 this.gst = 0;
                 if (this.sleepPoweredDown) {
-                    this.pcb.speakerOn();
                     this.pcb.setServoPower(true);
                     this.sleepPoweredDown = false;
                 }
@@ -2303,8 +2302,7 @@ namespace robotPuPro {
                 this.np.clear();
                 this.np.show();
 
-                // Turn speaker and servo power off to save power
-                this.pcb.speakerOff();
+                // Turn servo power off to save power
                 this.pcb.setServoPower(false);
 
                 this.sleepPoweredDown = true;
