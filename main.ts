@@ -216,6 +216,24 @@ namespace robotPuPro {
         ensureRobot().writeConfig();
     }
 
+    /** Turn the speaker on. */
+    //% blockId=robotpu_speaker_on block="speaker on"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=95 blockGap=8
+    export function speakerOn(): void {
+        ensureRobot().pcb.speakerOn();
+    }
+
+    /** Turn the speaker off to save power. */
+    //% blockId=robotpu_speaker_off block="speaker off"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=94 blockGap=8
+    export function speakerOff(): void {
+        ensureRobot().pcb.speakerOff();
+    }
+
     /**
      * Set the walk speed range. The minimum maps to full backward speed, the maximum maps to full forward speed.
      * @param min maximum backward speed (negative value), eg: -3
@@ -308,13 +326,7 @@ namespace robotPuPro {
     //% subcategory="Actions"
     //% group="Actions"
     export function playToneSequenceMs(frequencies: number[], durations: number[]): void {
-        const n = Math.min(frequencies ? frequencies.length : 0, durations ? durations.length : 0);
-        for (let i = 0; i < n; i++) {
-            const dur = Math.max(0, Math.round(durations[i]));
-            const f = Math.round(frequencies[i]);
-            if (f <= 0) music.rest(dur);
-            else music.playTone(f, dur);
-        }
+        ensureRobot().playToneSequenceMs(frequencies, durations);
     }
 
     /**
@@ -619,7 +631,7 @@ namespace robotPuPro {
     //% weight=74 blockGap=8
     //% helpUrl="https://robotgyms.com/pu"
     export function morse(code: string, unitMs: number = 80): void {
-        ensureRobot().voice.morse(code, unitMs);
+        ensureRobot().morse(code, unitMs);
     }
 
     /**
@@ -651,7 +663,7 @@ namespace robotPuPro {
     //% weight=72 blockGap=8
     //% helpUrl="https://robotgyms.com/pu"
     export function morseText(text: string, unitMs: number = 80): void {
-        ensureRobot().voice.morse(RoboVoice.toMorse(text), unitMs);
+        ensureRobot().morseText(text, unitMs);
     }
 
     /**
@@ -701,6 +713,48 @@ namespace robotPuPro {
     export function servoStepStatus(joint: ServoJoint, target: number, stepSize: number): number {
         const r = getRobotAPI();
         return r.pcb.servoStep(target, stepSize, joint as number);
+    }
+
+    /**
+     * Move a servo joint smoothly to an angle (0-180) using the PCB's smooth motion command.
+     * @param joint the servo joint to move, eg: robotPuPro.ServoJoint.HeadYaw
+     * @param angle target angle from 0 to 180 degrees, eg: 90
+     */
+    //% blockId=robotpu_servo_smooth block="smooth move %joint servo to %angle"
+    //% subcategory="Actuators"
+    //% group="Actuators"
+    //% angle.min=0 angle.max=180 angle.defl=90
+    //% weight=47 blockGap=8
+    export function servoSmooth(joint: ServoJoint, angle: number): void {
+        const r = getRobotAPI();
+        r.pcb.servoSmooth(joint as number, angle);
+    }
+
+    /**
+     * Turn the servo power on or off.
+     * @param on true to turn servo power on, false to turn it off
+     */
+    //% blockId=robotpu_set_servo_power block="set servo power to %on"
+    //% subcategory="Actuators"
+    //% group="Actuators"
+    //% weight=46 blockGap=8
+    export function setServoPower(on: boolean): void {
+        getRobotAPI().pcb.setServoPower(on);
+    }
+
+    /**
+     * Run a DC motor.
+     * @param motor motor number (1 or 2), eg: 1
+     * @param speed motor speed from -100 to 100, eg: 50
+     */
+    //% blockId=robotpu_dc_motor block="run DC motor %motor at speed %speed"
+    //% subcategory="Actuators"
+    //% group="Actuators"
+    //% motor.min=1 motor.max=2 motor.defl=1
+    //% speed.min=-100 speed.max=100 speed.defl=0
+    //% weight=45 blockGap=8
+    export function dcMotor(motor: number, speed: number): void {
+        getRobotAPI().pcb.dcMotor(motor, speed);
     }
 
     /**
@@ -794,6 +848,15 @@ namespace robotPuPro {
     //% weight=39 blockGap=8
     export function sonarDistanceCm(): number {
         return ensureRobot().sonar.distanceCm();
+    }
+
+    /** Return the battery level from the PCB. */
+    //% blockId=robotpu_battery_level block="battery level (%)"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=39 blockGap=8
+    export function batteryLevel(): number {
+        return ensureRobot().pcb.getBatteryLevel();
     }
 
     /** Return the current body roll angle in degrees. Positive means tilting to the right. */

@@ -77,30 +77,46 @@ function testEyeBrightness() {
 }
 
 /**
- * TEST: Setup - setWalkSpeedRange
+ * TEST: Setup - setWalkSpeedRange, setWalkSpeed, setWalkDirection, walkSpeed, walkDirection
  * [SIMULATOR SAFE]
- * Expected: speed range set, no crash.
- * Pass: LED shows 1.
+ * Expected: speed range set, setters update internal values, getters return the same.
+ * Pass: LED shows the set values, no crash.
  */
 function testSetupExtended() {
     robotPuPro.setWalkSpeedRange(-3, 4)
-    basic.showNumber(1)   // expect 1
+    robotPuPro.setWalkSpeed(2)
+    basic.showNumber(robotPuPro.walkSpeed())   // expect 2
+    basic.pause(300)
+    robotPuPro.setWalkDirection(0.5)
+    basic.showNumber(robotPuPro.walkDirection())   // expect 0.5
+    basic.pause(300)
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
 
 /**
- * TEST: Actions - greet, talk, sing
- * [HARDWARE] RoboVoice melodic synthesizer.
- * Expected: robot speaks its name, says "Hello", sings a scale.
- * Pass: audible speech and melody, no crash.
+ * TEST: Actions - speakerOn, greet, talk, sing, laugh, cry, scream, funny, speakerOff
+ * [HARDWARE] RoboVoice melodic synthesizer and sound effects.
+ * Expected: speaker is turned on, robot speaks/sings/plays effects, then speaker is turned off to save power.
+ * Pass: audible sounds, no crash.
  */
 function testVoice() {
+    robotPuPro.speakerOn()
     robotPuPro.greet()
     basic.pause(1000)
     robotPuPro.talk("Hello!")
     basic.pause(1000)
     robotPuPro.sing("C D E F G ")
+    basic.pause(500)
+    robotPuPro.laugh()
+    basic.pause(500)
+    robotPuPro.cry()
+    basic.pause(500)
+    robotPuPro.scream()
+    basic.pause(500)
+    robotPuPro.funny()
+    basic.pause(500)
+    robotPuPro.speakerOff()
 }
 
 /**
@@ -266,18 +282,59 @@ function testTalkMelody() {
     robotPuPro.talk("I am Robot PU.")
 }
 
+/**
+ * TEST: Actions - start, isDone, isXDone, stop
+ * [HARDWARE]
+ * Expected: start triggers a short stand action, all done-check functions return without error, stop resets.
+ * Pass: LED shows 1 for each call, no crash.
+ */
+function testActionDone() {
+    robotPuPro.start(robotPuPro.Action.Stand, 1)
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isDone(robotPuPro.Action.Stand)
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isWalkStepDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isExploreDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isSideStepDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isDanceDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isKickDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isJumpDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isRestDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.isStandDone()
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.stop()
+    basic.showNumber(1); basic.pause(200)
+}
+
 // ── Actuators ──────────────────────────────────────────────────────────────
 
 /**
- * TEST: Actuators - servo (direct angle control)
+ * TEST: Actuators - servo, servoSmooth, setServoPower
  * [HARDWARE]
- * Expected: head yaw servo moves to 60 degrees, pauses, then returns to 90 degrees.
- * Pass: visible head turn, no crash.
+ * Expected: head yaw servo moves to 60 and 90 degrees, head pitch servo smoothly moves,
+ *           servo power can be turned off and on again.
+ * Pass: visible head turn and smooth motion, no crash.
  */
 function testServo() {
     robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 60)
     basic.pause(500)
     robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 90)
+    basic.pause(500)
+    robotPuPro.servoSmooth(robotPuPro.ServoJoint.HeadPitch, 70)
+    basic.pause(500)
+    robotPuPro.servoSmooth(robotPuPro.ServoJoint.HeadPitch, 90)
+    basic.pause(500)
+    robotPuPro.setServoPower(false)
+    basic.pause(200)
+    robotPuPro.setServoPower(true)
+    basic.pause(200)
 }
 
 /**
@@ -357,6 +414,8 @@ function testSonar() {
     robotPuPro.sonarScan()
     const dist = robotPuPro.sonarDistanceCm()
     basic.showNumber(Math.min(dist, 99))
+    basic.pause(500)
+    basic.showNumber(robotPuPro.batteryLevel())
 }
 
 /**
@@ -427,6 +486,8 @@ function testOdometry() {
     basic.showNumber(Math.round(loc[1]))   // expect 0
     basic.pause(300)
     basic.showNumber(Math.round(loc[2]))   // expect 0
+    basic.pause(300)
+    basic.showNumber(robotPuPro.stepCount())   // expect 0
 }
 
 // ── Remote Control ─────────────────────────────────────────────────────────
@@ -569,12 +630,13 @@ input.onGesture(Gesture.LogoUp, function () {
 })
 
 /**
- * Screen up: run return-value tests for all action functions.
+ * Screen up: run return-value tests for all action functions and done-check tests.
  * [HARDWARE] Expected: LED shows 1 for each call.
  */
 input.onGesture(Gesture.ScreenUp, function () {
     basic.showNumber(11)
     testReturnValues()
+    testActionDone()
 })
 
 /**
