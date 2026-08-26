@@ -653,16 +653,16 @@ namespace robotPuPro {
          * Turn the speaker on 
          */
         public speakerOn(): void {
-            music.setBuiltInSpeakerEnabled(true);
+            //music.setBuiltInSpeakerEnabled(true);
         }
 
         /**
          * Turn the speaker off
          */
         public speakerOff(): void {
-            music.setBuiltInSpeakerEnabled(false);
+            //music.setBuiltInSpeakerEnabled(false);
             // Force Pin 0 LOW to pull down the driver transistor to avoid speaker overheating and wasting power
-            pins.digitalWritePin(DigitalPin.P0, 0);
+            //pins.digitalWritePin(DigitalPin.P0, 0);
         }
 
         /**
