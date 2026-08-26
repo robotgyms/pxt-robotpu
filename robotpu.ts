@@ -1941,7 +1941,7 @@ namespace robotPuPro {
                 this.setControlOffsets([5], [-this.bodyPitch2]);
             }
             let sl = input.soundLevel();
-            this.pr.stateTargets[this.restState][5] = 90 - sl * 0.3;
+            this.pr.stateTargets[this.restState][5] = 90 - sl * 0.15;
             return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + sl * 0.001,
                 [6, 7, 8, 9], 0.5);
         }
