@@ -637,6 +637,17 @@ namespace robotPuPro {
     }
 
     /**
+     * Compose a new procedural song and sing it.
+     */
+    //% blockId=robotpu_compose_sing block="compose and sing"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=74
+    export function composeAndSing(): void {
+        ensureRobot().composeAndSing();
+    }
+
+    /**
      * Play a morse code string using ITU-standard timing.
      * Use '.' for dit, '-' for dah, ' ' to separate letters, '  ' (double space) to separate words, '/' as an alternative letter separator.
      * @param code morse code string to play, eg: "... --- ..."

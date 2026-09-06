@@ -108,6 +108,8 @@ function testVoice() {
     basic.pause(1000)
     robotPuPro.sing("C D E F G ")
     basic.pause(500)
+    robotPuPro.composeAndSing()
+    basic.pause(500)
     robotPuPro.laugh()
     basic.pause(500)
     robotPuPro.cry()
