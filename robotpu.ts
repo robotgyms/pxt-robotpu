@@ -2369,6 +2369,13 @@ namespace robotPuPro {
         }
 
         /**
+         * Compose a new procedural song and sing it.
+         */
+        public composeAndSing(): void {
+            this.sing(this.content.composeSong());
+        }
+
+        /**
          * Play a morse code string using ITU-standard timing.
          * @param code morse code string to play, e.g. "... --- ...".
          * @param unitMs duration of one dit in milliseconds.
