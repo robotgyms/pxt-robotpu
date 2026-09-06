@@ -17,6 +17,7 @@ namespace robotPuPro {
     let lastJumpDone = false;
     let lastRestDone = false;
     let lastStandDone = false;
+    let lastSitDone = false;
 
     /**
      * Robot PU behavior modes. Set the mode to switch between built-in behaviors.
@@ -588,6 +589,24 @@ namespace robotPuPro {
     //% weight=77 blockGap=8
     export function isStandDone(): boolean {
         return lastStandDone;
+    }
+
+    /** Move to the sitting pose. */
+    //% blockId=robotpu_sit block="sit"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=76 blockGap=8
+    export function sit(): void {
+        lastSitDone = (getRobotAPI().sit() === 0);
+    }
+
+    /** Return true when the robot reached the sitting position. */
+    //% blockId=robotpu_is_sit_done block="is sit done?"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% weight=76 blockGap=8
+    export function isSitDone(): boolean {
+        return lastSitDone;
     }
 
     /**

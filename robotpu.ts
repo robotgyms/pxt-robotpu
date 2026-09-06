@@ -64,7 +64,7 @@ namespace robotPuPro {
                 [90 - w_t, 90 - 25, 90 - j_t, 90 - 45, 90 + l_s, 90, 90, 180, 90, 90],     // 12: b5
                 [90 + j_t, 90 + 45, 90 + w_t, 90 + 25, 90 - l_s, 90, 90 - l_s, 90, 0, 45],     // 13: b6
                 [130, 90, 50, 90, 90, 90, 0, 0, 90, 45],                 // 14: jump
-                [0, 85, 180, 95, 90, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],                  // 15
+                [0, 85, 180, 95, 90, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],                  // 15: sit
                 [85, 90, 95, 90, 45, 65, 90, 90 + l_s, 90 + l_s, 90],                  // 16: dance
                 [85, 90, 95, 90, 135, 65, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],                 // 17
                 [75, 90, 30, 90, 135, 105, 90 + l_s, 90 + l_s, 90, 90],                // 18: side move
@@ -1269,6 +1269,8 @@ namespace robotPuPro {
         Dance,
         //% block="rest"
         Rest,
+        //% block="sit"
+        Sit,
         //% block="stand"
         Stand,
         //% block="kick"
@@ -1471,6 +1473,7 @@ namespace robotPuPro {
             this.registerAction(Action.Blink, () => { this.pcb.blink(this.alertLevel); return 0; });
             this.registerAction(Action.Greet, () => { this.greet(); return 0; });
             this.registerAction(Action.Stand, () => this.stand());
+            this.registerAction(Action.Sit, () => this.sit());
 
             this.pcb.eyesCtl(1);
             this.showChannel();
@@ -2243,6 +2246,29 @@ namespace robotPuPro {
                 0.5
             );
         }
+
+
+        /**
+         * Set the robot to a neutral standing position.
+         * Ported from stand() in Python.
+         */
+        public sit(): number {
+            // 1. Execute transition to neutral state (Index 0)
+            // states: [0]
+            // syncList: all servos [0, 1, 2, 3, 4, 5]
+            // syncSpeed: 2.0 (moderate speed)
+            // asyncList: [] (none)
+            // asyncSpeed: 0.5
+            return this.pcb.move(
+                this.pr,
+                [15],
+                [0, 1, 2, 3, 4, 5],
+                2.0,
+                [6, 7, 8, 9],
+                0.5
+            );
+        }
+
 
         /**
          * Monitors sensors to determine if the robot should exit sleep mode.
