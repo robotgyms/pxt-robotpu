@@ -1389,6 +1389,9 @@ namespace robotPuPro {
         public cmdFuncDict: { [key: string]: (v: number) => void };
         // Define the State Dictionary
         private stateFuncDict: { [key: number]: () => void };
+        // Action handlers for the unified action dispatcher (see startAction).
+        // New actions can be added at runtime with registerAction().
+        private actionFuncDict: { [key: number]: () => number };
 
         // beacon timeout
         public beaconTimeout: number = 2000;
@@ -1447,6 +1450,27 @@ namespace robotPuPro {
                 [4]: () => this.kick(),
                 [5]: () => this.joystick()
             };
+
+            // Unified action handlers. Extra channels (I2C, Bluetooth, radio)
+            // can register additional actions with registerAction().
+            this.actionFuncDict = {};
+            this.registerAction(Action.Stop, () => { this.rest(); return 0; });
+            this.registerAction(Action.Walk, () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); });
+            this.registerAction(Action.WalkBackward, () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); });
+            this.registerAction(Action.TurnLeft, () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); });
+            this.registerAction(Action.TurnRight, () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); });
+            this.registerAction(Action.Explore, () => this.explore());
+            this.registerAction(Action.Dance, () => this.dance());
+            this.registerAction(Action.Rest, () => this.rest());
+            this.registerAction(Action.Kick, () => this.kick());
+            this.registerAction(Action.Jump, () => this.jump());
+            this.registerAction(Action.Laugh, () => { this.laugh(); return 0; });
+            this.registerAction(Action.Cry, () => { this.cry(); return 0; });
+            this.registerAction(Action.Scream, () => { this.scream(); return 0; });
+            this.registerAction(Action.Funny, () => { this.funny(); return 0; });
+            this.registerAction(Action.Blink, () => { this.pcb.blink(this.alertLevel); return 0; });
+            this.registerAction(Action.Greet, () => { this.greet(); return 0; });
+            this.registerAction(Action.Stand, () => this.stand());
 
             this.pcb.eyesCtl(1);
             this.showChannel();
@@ -1712,47 +1736,23 @@ namespace robotPuPro {
         }
 
         /**
-         * Map an Action token to a zero-returning one-shot function.
+         * Register a custom action handler. The handler must return 0 when one
+         * execution completes (or a non-zero status while still working on it).
+         * Extra channels (I2C, Bluetooth, radio) and MakeCode extensions can add
+         * new actions at runtime without touching the built-in set.
+         * @param action the Action token (or any unique index) to register
+         * @param run the handler function
+         */
+        public registerAction(action: Action, run: () => number): void {
+            this.actionFuncDict[action] = run;
+        }
+
+        /**
+         * Look up the handler for an Action token. Unknown actions run a no-op.
          */
         private actionRunner(action: Action): () => number {
-            switch (action) {
-                case Action.Stop:
-                    return () => { this.rest(); return 0; };
-                case Action.Walk:
-                    return () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); };
-                case Action.WalkBackward:
-                    return () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); };
-                case Action.TurnLeft:
-                    return () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); };
-                case Action.TurnRight:
-                    return () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); };
-                case Action.Explore:
-                    return () => this.explore();
-                case Action.Dance:
-                    return () => this.dance();
-                case Action.Rest:
-                    return () => this.rest();
-                case Action.Kick:
-                    return () => this.kick();
-                case Action.Jump:
-                    return () => this.jump();
-                case Action.Laugh:
-                    return () => { this.laugh(); return 0; };
-                case Action.Cry:
-                    return () => { this.cry(); return 0; };
-                case Action.Scream:
-                    return () => { this.scream(); return 0; };
-                case Action.Funny:
-                    return () => { this.funny(); return 0; };
-                case Action.Blink:
-                    return () => { this.pcb.blink(this.alertLevel); return 0; };
-                case Action.Greet:
-                    return () => { this.greet(); return 0; };
-                case Action.Stand:
-                    return () => this.stand();
-                default:
-                    return () => 0;
-            }
+            const run: (() => number) | undefined = this.actionFuncDict[action];
+            return run === undefined ? () => 0 : run;
         }
 
         /**
