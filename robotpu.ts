@@ -1295,6 +1295,8 @@ namespace robotPuPro {
         Stop,
         //% block="drive"
         Drive,
+        //% block="calibrate"
+        Calibrate = -4,
         //% block="duck"
         Duck = -5
     }
@@ -1531,6 +1533,8 @@ namespace robotPuPro {
                     return 20;
                 case Action.Greet:
                     return 21;
+                case Action.Calibrate:
+                    return -4;
                 case Action.Duck:
                     return -5;
                 default:
