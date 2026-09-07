@@ -1427,7 +1427,7 @@ namespace robotPuPro {
 
             this.sn = sn;
             this.name = name;
-            this.gst = 0;
+            this.gst = Mode.Rest;
             this.lastCmdTS = control.millis();
             this.readConfig();
 
@@ -1454,21 +1454,21 @@ namespace robotPuPro {
                 "#purs": (v) => this.pose(v),
                 "#puact": (v) => this.switchAction(v as Action)
             };
-            // Single state machine table.  The keys are exactly the Action enum
-            // values, so the mapping is 1:1.  Special non-action states (fall,
-            // fetal, sleep, API) keep their numeric keys.
+            // Single state machine table.  The keys are exactly the Action and Mode
+            // enum values, so the mapping is 1:1.  Negative gst values are only
+            // used for calibration / error / sleep conditions.
             this.stateFuncDict = {
-                [Action.Calibrate]: () => { this.trim(); return 0; },
-                [-3]: () => { this.fall(); return 0; },
-                [-2]: () => { this.fetal(); return 0; },
-                [-1]: () => 0,
-                [Action.Rest]: () => { this.idle(); return 0; },
+                [Mode.CalibrateServo]: () => { this.trim(); return 0; },
+                [Mode.Fall]: () => { this.fall(); return 0; },
+                [Mode.Fetal]: () => { this.fetal(); return 0; },
+                [Mode.Sleep]: () => 0,
+                [Mode.Rest]: () => { this.idle(); return 0; },
                 [Action.Explore]: () => this.explore(),
                 [Action.Jump]: () => this.jump(),
                 [Action.Dance]: () => this.dance(),
                 [Action.Kick]: () => this.kick(),
                 [Action.Drive]: () => this.joystick(),
-                [6]: () => 0, // API / manual mode: background loop does nothing
+                [Mode.API]: () => 0, // API / manual mode: background loop does nothing
                 [Action.Walk]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); },
                 [Action.WalkBackward]: () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); },
                 [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
@@ -1744,7 +1744,7 @@ namespace robotPuPro {
          * Stop the current action and reset to rest/idle.
          */
         public stopAction(): void {
-            this.gst = Action.Rest; // Rest/Idle
+            this.gst = Mode.Rest; // Rest/Idle
             this.walkSpeed = 0;
             this.walkDirection = 0;
             this.actionDone = true;
@@ -1761,7 +1761,7 @@ namespace robotPuPro {
          * Returns to idle but preserves lastAction so isActionDone still works.
          */
         private completeAction(): void {
-            this.gst = Action.Rest; // Rest/Idle
+            this.gst = Mode.Rest; // Rest/Idle
             this.walkSpeed = 0;
             this.walkDirection = 0;
             this.actionDone = true;
@@ -1927,7 +1927,7 @@ namespace robotPuPro {
         public updateStates(): void {
             // 1. Fall detection using Accelerometer
             if (input.isGesture(Gesture.FreeFall)) {
-                this.gst = -2; // Enter fall state
+                this.gst = Mode.Fetal; // Enter fall state
             }
 
             // 2. Handle automatic state transitions (Inactivity Timeout)
@@ -1943,7 +1943,7 @@ namespace robotPuPro {
             }
 
             // 3. Balance monitoring and recovery logic
-            if (this.gst != -2) { // If not in protective fetal position
+            if (this.gst != Mode.Fetal) { // If not in protective fetal position
                 // Check tilt thresholds (equivalent to bodyRoll2/bodyPitch2 in Python)
                 if (Math.abs(this.bodyRoll2) > 75 || Math.abs(this.bodyPitch2) > 75) {
                     this.balanceParam(); // Recalculate IMU data
@@ -1951,12 +1951,12 @@ namespace robotPuPro {
                     this.pcb.numSteps = 0; // Reset step count on fall
 
                     if (this.fellCount > 16) {
-                        this.gst = -3; // Enter "Help me" recovery state
+                        this.gst = Mode.Fall; // Enter "Help me" recovery state
                     }
                 } else {
                     this.fellCount = 0;
                     // Return to previous state after standing up
-                    if (this.gst == -3) {
+                    if (this.gst == Mode.Fall) {
                         this.gst = this.lastState;
                         this.talk("Thanks");
                     }
@@ -2333,7 +2333,7 @@ namespace robotPuPro {
 
             // 3. If alert level reaches 0, enter deeper sleep (state -1)
             if (this.alertLevel < 1) {
-                this.gst = -1;
+                this.gst = Mode.Sleep;
             }
 
             return 0; // Remain asleep
@@ -2347,7 +2347,7 @@ namespace robotPuPro {
             // 1. Check for wake-up triggers first
             if (this.checkWakeup() == 1) {
                 // Return to Idle/Standby state
-                this.gst = 0;
+                this.gst = Mode.Rest;
                 if (this.sleepPoweredDown) {
                     this.pcb.setServoPower(true);
                     this.sleepPoweredDown = false;
@@ -2646,7 +2646,7 @@ namespace robotPuPro {
                 this.headYawBias = 0;
                 this.talk("Rest!");
             } else if (v == 1) {
-                if (this.gst == -4) {
+                if (this.gst == Mode.CalibrateServo) {
                     this.adjustTrim(-1);
                 } else {
                     this.talk("Exploring");
@@ -2655,13 +2655,13 @@ namespace robotPuPro {
                     this.switchAction(Action.Explore);
                 }
             } else if (v == 2) {
-                if (this.gst == -4) {
+                if (this.gst == Mode.CalibrateServo) {
                     this.setTrimIndex(this.trimIndex + 1);
                 } else {
                     this.switchAction(Action.Jump);
                 }
             } else if (v == 3) {
-                if (this.gst == -4) {
+                if (this.gst == Mode.CalibrateServo) {
                     this.setTrimIndex(this.trimIndex - 1);
                 } else {
                     this.talk("Dance!");
@@ -2669,7 +2669,7 @@ namespace robotPuPro {
                     this.switchAction(Action.Dance);
                 }
             } else if (v == 4) {
-                if (this.gst == -4) {
+                if (this.gst == Mode.CalibrateServo) {
                     this.adjustTrim(1);
                 } else {
                     this.switchAction(Action.Kick);
@@ -2701,12 +2701,12 @@ namespace robotPuPro {
         }
 
         public beginTrimCalibration(): void {
-            this.gst = -4;
+            this.gst = Mode.CalibrateServo;
             this.showTrimIndex();
         }
 
         public toggleServoTrim(): void {
-            if (this.gst == -4) {
+            if (this.gst == Mode.CalibrateServo) {
                 this.saveTrimCalibration();
             } else {
                 this.beginTrimCalibration();
@@ -2718,7 +2718,7 @@ namespace robotPuPro {
             this.writeConfig();
             this.stand();
             this.talk("Saved!");
-            this.gst = 0;
+            this.gst = Mode.Rest;
             this.showChannel();
         }
 
