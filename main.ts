@@ -20,35 +20,6 @@ namespace robotPuPro {
     let lastSitDone = false;
 
     /**
-     * Robot PU behavior modes. Set the mode to switch between built-in behaviors.
-     */
-    export enum Mode {
-        //% block="trim calibration"
-        CalibrateServo = -4,
-        //% block="fall (help)"
-        Fall = -3,
-        //% block="fetal (fall protection)"
-        Fetal = -2,
-        //% block="sleep"
-        Sleep = -1,
-        //% block="rest"
-        Rest = 0,
-        //% block="explore"
-        Explore = 1,
-        //% block="jump"
-        Jump = 2,
-        //% block="dance"
-        Dance = 3,
-        //% block="kick"
-        Kick = 4,
-        //% block="walk (remote control)"
-        Walk = 5,
-        //% block="API (advanced programming)"
-        API = 6,
-
-    }
-
-    /**
      * Robot PU servo joints. Each joint corresponds to one servo motor on the robot body.
      */
     export enum ServoJoint {
@@ -189,15 +160,6 @@ namespace robotPuPro {
     //% weight=99
     export function changeChannel(delta: number): void {
         ensureRobot().incrGroupId(delta);
-    }
-
-    /** The current behavior mode Robot PU is running. */
-    //% blockId=robotpu_mode_var block="mode"
-    //% subcategory="Setup"
-    //% group="Setup"
-    //% weight=98
-    export function mode(): Mode {
-        return ensureRobot().gst as Mode;
     }
 
     /**
@@ -365,19 +327,6 @@ namespace robotPuPro {
 
     /**
      * Set Robot PU's behavior mode directly.
-     * @param mode the behavior mode to switch to, eg: robotPuPro.Mode.Walk
-     */
-    //% blockId=robotpu_setMode block="set mode to %mode"
-    //% weight=86 blockGap=8
-    //% subcategory="Actions"
-    //% group="Actions"
-    export function setMode(mode: Mode): void {
-        const r = ensureRobot();
-        r.gst = mode as number;
-        r.actionWatchdog = true;
-        r.lastCmdTS = control.millis();
-    }
-
     /**
      * Walk with a given speed and turn bias. Call repeatedly in a loop to keep walking.
      * @param speed walking speed from -5 (full backward) to 5 (full forward), eg: 2
