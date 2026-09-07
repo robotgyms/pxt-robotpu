@@ -1294,7 +1294,9 @@ namespace robotPuPro {
         //% block="stop"
         Stop,
         //% block="drive"
-        Drive
+        Drive,
+        //% block="duck"
+        Duck = -5
     }
 
     /**
@@ -1478,7 +1480,8 @@ namespace robotPuPro {
                 [18]: () => { this.scream(); return 0; },
                 [19]: () => { this.funny(); return 0; },
                 [20]: () => { this.pcb.blink(this.alertLevel); return 0; },
-                [21]: () => { this.greet(); return 0; }
+                [21]: () => { this.greet(); return 0; },
+                [-5]: () => { this.duck(); return 0; }
             };
             this.pcb.eyesCtl(1);
             this.showChannel();
@@ -1528,6 +1531,8 @@ namespace robotPuPro {
                     return 20;
                 case Action.Greet:
                     return 21;
+                case Action.Duck:
+                    return -5;
                 default:
                     // Custom / registered actions use their raw index.
                     return action;
@@ -2434,8 +2439,9 @@ namespace robotPuPro {
                 const status = behavior();
 
                 // Counted actions: when the handler reports one completed step,
-                // stop after the requested number of steps.
-                if (this.actionRunning && this.gst > 0 && this.targetSteps > 0) {
+                // stop after the requested number of steps.  Works for any gst,
+                // including negative special states such as Duck (-5).
+                if (this.actionRunning && this.targetSteps > 0) {
                     if (status == 0) {
                         this.stepsDone += 1;
                         if (this.stepsDone >= this.targetSteps) {
@@ -2518,6 +2524,15 @@ namespace robotPuPro {
         public greet(): void {
             // 1. Combine the identification strings
             this.talk("My name is " + this.sn + " " + this.name);
+        }
+
+        /**
+         * Low protective crouch (duck).
+         * Default uses the compact fetal pose (state index 1) as a low crouch.
+         * Replace with a dedicated duck target when one is defined in Parameters.
+         */
+        public duck(): void {
+            this.pcb.servoMove(this.pr.stateTargets[1]);
         }
 
         public stateTalk(): void {
