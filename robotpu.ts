@@ -1258,43 +1258,41 @@ namespace robotPuPro {
      */
     export enum Action {
         //% block="walk"
-        Walk = 0,
+        Walk = 10,
         //% block="walk backward"
-        WalkBackward,
+        WalkBackward = 11,
         //% block="turn left"
-        TurnLeft,
+        TurnLeft = 12,
         //% block="turn right"
-        TurnRight,
+        TurnRight = 13,
         //% block="explore"
-        Explore,
+        Explore = 1,
         //% block="dance"
-        Dance,
+        Dance = 3,
         //% block="rest"
-        Rest,
+        Rest = 0,
         //% block="sit"
-        Sit,
+        Sit = 14,
         //% block="stand"
-        Stand,
+        Stand = 15,
         //% block="kick"
-        Kick,
+        Kick = 4,
         //% block="jump"
-        Jump,
+        Jump = 2,
         //% block="laugh"
-        Laugh,
+        Laugh = 16,
         //% block="cry"
-        Cry,
+        Cry = 17,
         //% block="scream"
-        Scream,
+        Scream = 18,
         //% block="funny"
-        Funny,
+        Funny = 19,
         //% block="blink"
-        Blink,
+        Blink = 20,
         //% block="greet"
-        Greet,
-        //% block="stop"
-        Stop,
+        Greet = 21,
         //% block="drive"
-        Drive,
+        Drive = 5,
         //% block="calibrate"
         Calibrate = -4,
         //% block="duck"
@@ -1408,8 +1406,8 @@ namespace robotPuPro {
         private lastRightLegAngle: number = 0;
 
         // Action-token state for start/stop/isDone
-        public currentAction: Action = Action.Stop;
-        public lastAction: Action = Action.Stop;
+        public currentAction: Action = Action.Rest;
+        public lastAction: Action = Action.Rest;
         public actionDone: boolean = true;
         public actionRunning: boolean = false;
 
@@ -1456,102 +1454,49 @@ namespace robotPuPro {
                 "#purs": (v) => this.pose(v),
                 "#puact": (v) => this.switchAction(v as Action)
             };
-            // Single state machine table.  The same dictionary is used by the
-            // background loop for both autonomous/continuous states and
-            // counted MakeCode / I2C / Bluetooth / RL actions.
+            // Single state machine table.  The keys are exactly the Action enum
+            // values, so the mapping is 1:1.  Special non-action states (fall,
+            // fetal, sleep, API) keep their numeric keys.
             this.stateFuncDict = {
-                [-4]: () => { this.trim(); return 0; },
+                [Action.Calibrate]: () => { this.trim(); return 0; },
                 [-3]: () => { this.fall(); return 0; },
                 [-2]: () => { this.fetal(); return 0; },
                 [-1]: () => 0,
-                [0]: () => { this.idle(); return 0; },
-                [1]: () => this.explore(),
-                [2]: () => this.jump(),
-                [3]: () => this.dance(),
-                [4]: () => this.kick(),
-                [5]: () => this.joystick(),
+                [Action.Rest]: () => { this.idle(); return 0; },
+                [Action.Explore]: () => this.explore(),
+                [Action.Jump]: () => this.jump(),
+                [Action.Dance]: () => this.dance(),
+                [Action.Kick]: () => this.kick(),
+                [Action.Drive]: () => this.joystick(),
                 [6]: () => 0, // API / manual mode: background loop does nothing
-                [10]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); },
-                [11]: () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); },
-                [12]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
-                [13]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
-                [14]: () => this.sit(),
-                [15]: () => this.stand(),
-                [16]: () => { this.laugh(); return 0; },
-                [17]: () => { this.cry(); return 0; },
-                [18]: () => { this.scream(); return 0; },
-                [19]: () => { this.funny(); return 0; },
-                [20]: () => { this.pcb.blink(this.alertLevel); return 0; },
-                [21]: () => { this.greet(); return 0; },
-                [-5]: () => { this.duck(); return 0; }
+                [Action.Walk]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); },
+                [Action.WalkBackward]: () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); },
+                [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
+                [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
+                [Action.Sit]: () => this.sit(),
+                [Action.Stand]: () => this.stand(),
+                [Action.Laugh]: () => { this.laugh(); return 0; },
+                [Action.Cry]: () => { this.cry(); return 0; },
+                [Action.Scream]: () => { this.scream(); return 0; },
+                [Action.Funny]: () => { this.funny(); return 0; },
+                [Action.Blink]: () => { this.pcb.blink(this.alertLevel); return 0; },
+                [Action.Greet]: () => { this.greet(); return 0; },
+                [Action.Duck]: () => { this.duck(); return 0; }
             };
             this.pcb.eyesCtl(1);
             this.showChannel();
         }
 
         /**
-         * Convert a public Action token to an internal gst state id.
-         * Negative and special states (trim, fall, fetal, idle) are not Actions.
-         * Custom action indices (>= 100, not in the Action enum) are used as-is.
-         */
-        public actionToState(action: number): number {
-            switch (action) {
-                case Action.Rest:
-                case Action.Stop:
-                    return 0;
-                case Action.Explore:
-                    return 1;
-                case Action.Jump:
-                    return 2;
-                case Action.Dance:
-                    return 3;
-                case Action.Kick:
-                    return 4;
-                case Action.Drive:
-                    return 5;
-                case Action.Walk:
-                    return 10;
-                case Action.WalkBackward:
-                    return 11;
-                case Action.TurnLeft:
-                    return 12;
-                case Action.TurnRight:
-                    return 13;
-                case Action.Sit:
-                    return 14;
-                case Action.Stand:
-                    return 15;
-                case Action.Laugh:
-                    return 16;
-                case Action.Cry:
-                    return 17;
-                case Action.Scream:
-                    return 18;
-                case Action.Funny:
-                    return 19;
-                case Action.Blink:
-                    return 20;
-                case Action.Greet:
-                    return 21;
-                case Action.Calibrate:
-                    return -4;
-                case Action.Duck:
-                    return -5;
-                default:
-                    // Custom / registered actions use their raw index.
-                    return action;
-            }
-        }
-
-        /**
-         * Register a custom action handler. The handler must return 0 when one
-         * execution completes. Extra channels (I2C, Bluetooth, radio) and RL
-         * can add new actions at runtime without touching the built-in set.
+         * Register a custom action handler at the action index it uses.
+         * The handler must return 0 when one execution completes.
+         * Extra channels (I2C, Bluetooth, radio) and RL can add new actions
+         * at runtime without touching the built-in set.
          * @param action the Action token or any unique index to register
          * @param run the handler function
          */
         public registerAction(action: number, run: () => number): void {
-            this.stateFuncDict[this.actionToState(action)] = run;
+            this.stateFuncDict[action] = run;
         }
 
         public start() {
@@ -1799,13 +1744,13 @@ namespace robotPuPro {
          * Stop the current action and reset to rest/idle.
          */
         public stopAction(): void {
-            this.gst = 0; // Rest/Idle
+            this.gst = Action.Rest; // Rest/Idle
             this.walkSpeed = 0;
             this.walkDirection = 0;
             this.actionDone = true;
             this.actionRunning = false;
-            this.lastAction = Action.Stop;
-            this.currentAction = Action.Stop;
+            this.lastAction = Action.Rest;
+            this.currentAction = Action.Rest;
             this.actionWatchdog = false;
             this.targetSteps = 0;
             this.stepsDone = 0;
@@ -1816,12 +1761,12 @@ namespace robotPuPro {
          * Returns to idle but preserves lastAction so isActionDone still works.
          */
         private completeAction(): void {
-            this.gst = 0; // Rest/Idle
+            this.gst = Action.Rest; // Rest/Idle
             this.walkSpeed = 0;
             this.walkDirection = 0;
             this.actionDone = true;
             this.actionRunning = false;
-            this.currentAction = Action.Stop;
+            this.currentAction = Action.Rest;
             // this.lastAction stays as the completed action
         }
 
@@ -1834,7 +1779,7 @@ namespace robotPuPro {
          */
         public startAction(action: Action, steps: number, waitForCompletion: boolean = false, external: boolean = false): void {
             this.stopAction();
-            this.gst = this.actionToState(action);
+            this.gst = action; // Action enum values are the gst ids now
             this.currentAction = action;
             this.lastAction = action;
             this.targetSteps = steps;
