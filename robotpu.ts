@@ -1300,6 +1300,26 @@ namespace robotPuPro {
     }
 
     /**
+     * Internal robot states.  These are the same values as the Action enum where
+     * they overlap, and include the non-action (error / sleep / API) states.
+     * This enum is not a public MakeCode block; it is only for readable gst
+     * assignments inside the library.
+     */
+    export enum Mode {
+        Calibrate = -4,
+        Fall = -3,
+        Fetal = -2,
+        Sleep = -1,
+        Rest = 0,
+        Explore = 1,
+        Jump = 2,
+        Dance = 3,
+        Kick = 4,
+        Drive = 5,
+        API = 6
+    }
+
+    /**
      * RobotPu Class for MakeCode
      * Optimized with internal PCB and Parameters instances.
      */
@@ -1458,7 +1478,7 @@ namespace robotPuPro {
             // enum values, so the mapping is 1:1.  Negative gst values are only
             // used for calibration / error / sleep conditions.
             this.stateFuncDict = {
-                [Mode.CalibrateServo]: () => { this.trim(); return 0; },
+                [Mode.Calibrate]: () => { this.trim(); return 0; },
                 [Mode.Fall]: () => { this.fall(); return 0; },
                 [Mode.Fetal]: () => { this.fetal(); return 0; },
                 [Mode.Sleep]: () => 0,
@@ -2646,7 +2666,7 @@ namespace robotPuPro {
                 this.headYawBias = 0;
                 this.talk("Rest!");
             } else if (v == 1) {
-                if (this.gst == Mode.CalibrateServo) {
+                if (this.gst == Mode.Calibrate) {
                     this.adjustTrim(-1);
                 } else {
                     this.talk("Exploring");
@@ -2655,13 +2675,13 @@ namespace robotPuPro {
                     this.switchAction(Action.Explore);
                 }
             } else if (v == 2) {
-                if (this.gst == Mode.CalibrateServo) {
+                if (this.gst == Mode.Calibrate) {
                     this.setTrimIndex(this.trimIndex + 1);
                 } else {
                     this.switchAction(Action.Jump);
                 }
             } else if (v == 3) {
-                if (this.gst == Mode.CalibrateServo) {
+                if (this.gst == Mode.Calibrate) {
                     this.setTrimIndex(this.trimIndex - 1);
                 } else {
                     this.talk("Dance!");
@@ -2669,7 +2689,7 @@ namespace robotPuPro {
                     this.switchAction(Action.Dance);
                 }
             } else if (v == 4) {
-                if (this.gst == Mode.CalibrateServo) {
+                if (this.gst == Mode.Calibrate) {
                     this.adjustTrim(1);
                 } else {
                     this.switchAction(Action.Kick);
@@ -2701,12 +2721,12 @@ namespace robotPuPro {
         }
 
         public beginTrimCalibration(): void {
-            this.gst = Mode.CalibrateServo;
+            this.gst = Mode.Calibrate;
             this.showTrimIndex();
         }
 
         public toggleServoTrim(): void {
-            if (this.gst == Mode.CalibrateServo) {
+            if (this.gst == Mode.Calibrate) {
                 this.saveTrimCalibration();
             } else {
                 this.beginTrimCalibration();

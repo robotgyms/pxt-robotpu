@@ -16,10 +16,10 @@
 // ── Setup ──────────────────────────────────────────────────────────────────
 
 /**
- * TEST: Setup - channel, setChannel, changeChannel, mode, setMode
+ * TEST: Setup - channel, setChannel, changeChannel, start, stop
  * [SIMULATOR SAFE]
  * Expected: channel shows 166, then increments to 167, then decrements to 166.
- *           mode returns API after setMode(API).
+ *           start/stop toggle rest state.
  * Pass: LED shows 166, then 167, then 166, no crash.
  */
 function testSetup() {
@@ -32,11 +32,11 @@ function testSetup() {
     robotPuPro.changeChannel(-1)
     basic.showNumber(robotPuPro.channel())    // expect 166
     basic.pause(500)
-    robotPuPro.setMode(robotPuPro.Mode.API)
-    basic.showNumber(robotPuPro.mode())       // expect 6 (API)
+    robotPuPro.start(robotPuPro.Action.Rest, 0)
+    basic.showNumber(0)                       // rest
     basic.pause(500)
-    robotPuPro.setMode(robotPuPro.Mode.Rest)
-    basic.showNumber(robotPuPro.mode())       // expect 0 (Rest)
+    robotPuPro.stop()
+    basic.showNumber(0)                       // rest
     basic.pause(500)
 }
 
@@ -128,7 +128,7 @@ function testVoice() {
  * Pass: no crash, LED shows 1 for each.
  */
 function testReturnValues() {
-    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.stop()
     robotPuPro.walk(2, 0);        basic.showNumber(1); basic.pause(200)
     robotPuPro.sideStep(-1);      basic.showNumber(1); basic.pause(200)
     robotPuPro.explore();         basic.showNumber(1); basic.pause(200)
@@ -202,12 +202,12 @@ function testJumpKickDance() {
  * Pass: robot moves and avoids obstacles, no crash.
  */
 function testExplore() {
-    robotPuPro.setMode(robotPuPro.Mode.Explore)
+    robotPuPro.start(robotPuPro.Action.Explore, 0)
     basic.pause(2000)
-    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.stop()
     basic.pause(200)
     for (let i = 0; i < 50; i++) { robotPuPro.explore() }   // return-value variant
-    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.stop()
 }
 
 /**
@@ -357,7 +357,7 @@ function testServo() {
  * Pass: smooth head pitch motion, servoStepStatus returns 1 while moving and 0 when arrived, no crash.
  */
 function testServoStep() {
-    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.stop()
     for (let i = 0; i < 60; i++) {
         robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, 120, 2)
         basic.pause(20)
@@ -376,7 +376,7 @@ function testServoStep() {
  * Pass: smooth pose transition, no crash.
  */
 function testMoveServos() {
-    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.stop()
     const pose = [90, 90, 90, 90, 120, 105, 90, 90, 0, 180]
     const speed = [2, 2, 2, 2, 5, 5, 6, 6, 6, 6]
     for (let i = 0; i < 100; i++) {
@@ -524,7 +524,7 @@ function testRunStringCommand() {
  * Pass: visible motion, no crash.
  */
 function testRunKeyValueCommand() {
-    robotPuPro.setMode(robotPuPro.Mode.Walk)
+    robotPuPro.start(robotPuPro.Action.Drive, 0)
     robotPuPro.runKeyValueCommand("#puspeed", 1)
     basic.pause(500)
     robotPuPro.runKeyValueCommand("#puturn", 1)
@@ -534,7 +534,7 @@ function testRunKeyValueCommand() {
     robotPuPro.runKeyValueCommand("#pupitch", 20)
     basic.pause(500)
     robotPuPro.runKeyValueCommand("#puspeed", 0)
-    robotPuPro.setMode(robotPuPro.Mode.API)
+    robotPuPro.stop()
 }
 
 // ── Radio listeners (always active) ────────────────────────────────────────
