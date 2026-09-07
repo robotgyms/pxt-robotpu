@@ -9,15 +9,6 @@
 //% helpUrl="https://robotgyms.com/pu"
 namespace robotPuPro {
     let robot: RobotPu;
-    let lastWalkDone = false;
-    let lastExploreDone = false;
-    let lastSideStepDone = false;
-    let lastDanceDone = false;
-    let lastKickDone = false;
-    let lastJumpDone = false;
-    let lastRestDone = false;
-    let lastStandDone = false;
-    let lastSitDone = false;
 
     /**
      * Robot PU servo joints. Each joint corresponds to one servo motor on the robot body.
@@ -342,16 +333,7 @@ namespace robotPuPro {
         const r = getRobotAPI();
         r.walkSpeed = speed;
         r.walkDirection = turn;
-        lastWalkDone = (r.walk(speed, turn) === 0);
-    }
-
-    /** Return true when the last walk step completed. */
-    //% blockId=robotpu_is_walk_done block="is walk step done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=85 blockGap=8
-    export function isWalkStepDone(): boolean {
-        return lastWalkDone;
+        r.walk(speed, turn);
     }
 
     /**
@@ -393,16 +375,7 @@ namespace robotPuPro {
     //% group="Actions"
     //% weight=84 blockGap=8
     export function explore(): void {
-        lastExploreDone = (getRobotAPI().explore() === 0);
-    }
-
-    /** Return true when the last explore step completed. */
-    //% blockId=robotpu_is_explore_done block="is explore done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=84 blockGap=8
-    export function isExploreDone(): boolean {
-        return lastExploreDone;
+        getRobotAPI().explore();
     }
 
     /**
@@ -415,16 +388,7 @@ namespace robotPuPro {
     //% direction.min=-1 direction.max=1 direction.defl=-1
     //% weight=83 blockGap=8
     export function sideStep(direction: number): void {
-        lastSideStepDone = (getRobotAPI().sideStep(direction) === 0);
-    }
-
-    /** Return true when the last side step completed. */
-    //% blockId=robotpu_is_side_step_done block="is side step done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=83 blockGap=8
-    export function isSideStepDone(): boolean {
-        return lastSideStepDone;
+        getRobotAPI().sideStep(direction);
     }
 
     /** Dance to music using the microphone to detect the beat. Call repeatedly in a loop. */
@@ -433,16 +397,7 @@ namespace robotPuPro {
     //% group="Actions"
     //% weight=82 blockGap=8
     export function dance(): void {
-        lastDanceDone = (getRobotAPI().dance() === 0);
-    }
-
-    /** Return true when the last dance move completed. */
-    //% blockId=robotpu_is_dance_done block="is dance done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=82 blockGap=8
-    export function isDanceDone(): boolean {
-        return lastDanceDone;
+        getRobotAPI().dance();
     }
 
     /** Perform a kick motion. Call repeatedly in a loop to complete the kick. */
@@ -451,16 +406,7 @@ namespace robotPuPro {
     //% group="Actions"
     //% weight=81 blockGap=8
     export function kick(): void {
-        lastKickDone = (getRobotAPI().kick() === 0);
-    }
-
-    /** Return true when the last kick completed. */
-    //% blockId=robotpu_is_kick_done block="is kick done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=81 blockGap=8
-    export function isKickDone(): boolean {
-        return lastKickDone;
+        getRobotAPI().kick();
     }
 
     /** Perform a jump sequence. Call repeatedly in a loop to complete the jump. */
@@ -469,16 +415,7 @@ namespace robotPuPro {
     //% group="Actions"
     //% weight=80 blockGap=8
     export function jump(): void {
-        lastJumpDone = (getRobotAPI().jump() === 0);
-    }
-
-    /** Return true when the last jump completed. */
-    //% blockId=robotpu_is_jump_done block="is jump done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=80 blockGap=8
-    export function isJumpDone(): boolean {
-        return lastJumpDone;
+        getRobotAPI().jump();
     }
 
     /** Play a laughing sound effect. Call it when Robot PU feels happy. */
@@ -536,16 +473,7 @@ namespace robotPuPro {
     //% group="Actions"
     //% weight=78 blockGap=8
     export function rest(): void {
-        lastRestDone = (getRobotAPI().rest() === 0);
-    }
-
-    /** Return true when the last rest cycle completed. */
-    //% blockId=robotpu_is_rest_done block="is rest done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=78 blockGap=8
-    export function isRestDone(): boolean {
-        return lastRestDone;
+        getRobotAPI().rest();
     }
 
     /** Move to the calibration pose and flash the eyes. Useful after changing servo trim values. */
@@ -563,16 +491,7 @@ namespace robotPuPro {
     //% group="Actions"
     //% weight=77 blockGap=8
     export function stand(): void {
-        lastStandDone = (getRobotAPI().stand() === 0);
-    }
-
-    /** Return true when the robot reached the standing position. */
-    //% blockId=robotpu_is_stand_done block="is stand done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=77 blockGap=8
-    export function isStandDone(): boolean {
-        return lastStandDone;
+        getRobotAPI().stand();
     }
 
     /** Move to the sitting pose. */
@@ -581,16 +500,7 @@ namespace robotPuPro {
     //% group="Actions"
     //% weight=76 blockGap=8
     export function sit(): void {
-        lastSitDone = (getRobotAPI().sit() === 0);
-    }
-
-    /** Return true when the robot reached the sitting position. */
-    //% blockId=robotpu_is_sit_done block="is sit done?"
-    //% subcategory="Actions"
-    //% group="Actions"
-    //% weight=76 blockGap=8
-    export function isSitDone(): boolean {
-        return lastSitDone;
+        getRobotAPI().sit();
     }
 
     /**
