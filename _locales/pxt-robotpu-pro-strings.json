@@ -23,6 +23,7 @@
   "robotPuPro.calibrate|block": "calibrate",
   "robotPuPro.changeChannel|block": "change channel by %delta",
   "robotPuPro.channel|block": "channel",
+  "robotPuPro.composeAndSing|block": "compose and sing",
   "robotPuPro.dance|block": "dance",
   "robotPuPro.explore|block": "explore",
   "robotPuPro.eyeBrightness|block": "eye brightness",
@@ -67,6 +68,7 @@
   "robotPuPro.sing|param|song|defl": "C5 B",
   "robotPuPro.sonarDistanceCm|block": "sonar distance (cm)",
   "robotPuPro.sonarScan|block": "sonar scan",
+  "robotPuPro.sit|block": "sit",
   "robotPuPro.stand|block": "stand",
   "robotPuPro.talk|block": "talk %text",
   "robotPuPro.talk|param|text|defl": "Hi",
@@ -96,5 +98,9 @@
   "robotPuPro.isKickDone|block": "is kick done?",
   "robotPuPro.isJumpDone|block": "is jump done?",
   "robotPuPro.isRestDone|block": "is rest done?",
-  "robotPuPro.isStandDone|block": "is stand done?"
+  "robotPuPro.isSitDone|block": "is sit done?",
+  "robotPuPro.isStandDone|block": "is stand done?",
+  "robotPuPro.startAndWait|block": "start %action for %steps steps and wait",
+  "robotPuPro.stepsDone|block": "steps done for %action",
+  "robotPuPro.stepsRemaining|block": "steps remaining for %action"
 }

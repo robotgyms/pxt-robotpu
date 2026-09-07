@@ -70,6 +70,7 @@
   "robotPuPro.changeChannel": "将无线电频道更改给定量。在 0 到 255 之间环绕。",
   "robotPuPro.changeChannel|param|delta": "改变频道的金额, eg: 1",
   "robotPuPro.channel": "当前无线电频道 (0..255)。机器人PU和游戏手柄必须使用相同的通道进行通信。",
+  "robotPuPro.composeAndSing": "编写一首新的程序歌曲并演唱。",
   "robotPuPro.dance": "使用麦克风检测节拍，随着音乐起舞。循环中反复调用。",
   "robotPuPro.explore": "使用声纳传感器自主探索以避免障碍物。循环中反复调用。",
   "robotPuPro.eyeBrightness": "机器人 PU 眼睛 LED 的最大亮度（0 到 1）。",
@@ -152,6 +153,7 @@
   "robotPuPro.sing|param|song": "要唱的音符序列字符串, eg: \"C5 B G - E F E G \"",
   "robotPuPro.sonarDistanceCm": "返回当前声纳距离读数（以厘米为单位）。如果未检测到任何内容，则返回一个较大的值。",
   "robotPuPro.sonarScan": "获取一个声纳读数并更新内部前距阵列。在读取前面的距离数组之前调用它。",
+  "robotPuPro.sit": "移动到坐姿。",
   "robotPuPro.stand": "移动到站立姿势。",
   "robotPuPro.talk": "以有旋律的机器人声音大声朗读文本。如果文本仅包含莫尔斯字符（. - / 空格），则会按莫尔斯电码播放。",
   "robotPuPro.talk|param|text": "要朗读的文本或莫尔斯电码字符串, eg: \"Hello!\"",
@@ -176,5 +178,13 @@
   "robotPuPro.isKickDone": "上一次踢腿完成时返回 true。",
   "robotPuPro.isJumpDone": "上一次跳跃完成时返回 true。",
   "robotPuPro.isRestDone": "上一次休息周期完成时返回 true。",
-  "robotPuPro.isStandDone": "机器人到达站立位置时返回 true。"
+  "robotPuPro.isSitDone": "机器人到达坐姿位置时返回 true。",
+  "robotPuPro.isStandDone": "机器人到达站立位置时返回 true。",
+  "robotPuPro.startAndWait": "启动一个机器人动作，并等待指定的步数完成。",
+  "robotPuPro.startAndWait|param|action": "要启动的动作，例如 robotPuPro.Action.Walk",
+  "robotPuPro.startAndWait|param|steps": "要运行的步数，例如 1",
+  "robotPuPro.stepsDone": "返回所选动作已完成的步数。",
+  "robotPuPro.stepsDone|param|action": "要检查的动作，例如 robotPuPro.Action.Walk",
+  "robotPuPro.stepsRemaining": "返回所选动作剩余的步数。",
+  "robotPuPro.stepsRemaining|param|action": "要检查的动作，例如 robotPuPro.Action.Walk"
 }

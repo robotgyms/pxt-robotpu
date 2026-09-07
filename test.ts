@@ -294,6 +294,10 @@ function testTalkMelody() {
 function testActionDone() {
     robotPuPro.start(robotPuPro.Action.Stand, 1)
     basic.showNumber(1); basic.pause(200)
+    robotPuPro.stepsDone(robotPuPro.Action.Stand)
+    basic.showNumber(1); basic.pause(200)
+    robotPuPro.stepsRemaining(robotPuPro.Action.Stand)
+    basic.showNumber(1); basic.pause(200)
     robotPuPro.isDone(robotPuPro.Action.Stand)
     basic.showNumber(1); basic.pause(200)
     robotPuPro.isWalkStepDone()
