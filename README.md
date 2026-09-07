@@ -696,6 +696,16 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Block**: `is stand done?`
 - **What it does**: Returns `true` when the robot reached the standing position.
 
+#### `sit(): void`
+
+- **Block**: `sit`
+- **What it does**: Moves the robot into a sitting pose.
+
+#### `isSitDone(): boolean`
+
+- **Block**: `is sit done?`
+- **What it does**: Returns `true` when the robot reached the sitting position.
+
 #### `calibrate(): void`
 
 - **Block**: `calibrate`
@@ -716,6 +726,11 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **What it does**: Sings a musical note sequence using the built-in music engine.
 - **Parameters**:
   - `song`: Note sequence string. Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use `-` for a rest.
+
+#### `composeAndSing(): void`
+
+- **Block**: `compose and sing`
+- **What it does**: Composes a new procedural song with `composeSong()` and sings it.
 
 #### `morse(code: string, unitMs: number): void`
 

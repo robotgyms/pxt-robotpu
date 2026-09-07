@@ -70,6 +70,7 @@
   "robotPuPro.changeChannel": "Change the radio channel by a given amount. Wraps around between 0 and 255.",
   "robotPuPro.changeChannel|param|delta": "amount to change the channel by, eg: 1",
   "robotPuPro.channel": "Current radio channel (0..255). Both Robot PU and the gamepad must use the same channel to communicate.",
+  "robotPuPro.composeAndSing": "Compose a new procedural song and sing it.",
   "robotPuPro.dance": "Dance to music using the microphone to detect the beat. Call repeatedly in a loop.",
   "robotPuPro.explore": "Explore autonomously using the sonar sensor to avoid obstacles. Call repeatedly in a loop.",
   "robotPuPro.eyeBrightness": "The maximum brightness of Robot PU's eye LEDs (0 to 1).",
@@ -152,6 +153,7 @@
   "robotPuPro.sing|param|song": "the note sequence string to sing, eg: \"C5 B G - E F E G \"",
   "robotPuPro.sonarDistanceCm": "Return the current sonar distance reading in centimeters. Returns a large value if nothing is detected.",
   "robotPuPro.sonarScan": "Take one sonar reading and update the internal front distance array. Call this before reading the front distance array.",
+  "robotPuPro.sit": "Move to the sitting pose.",
   "robotPuPro.stand": "Move to the standing pose.",
   "robotPuPro.talk": "Speak text aloud as a melodic robotic voice. If the text contains only morse characters (. - / space) it is played as morse code instead.",
   "robotPuPro.talk|param|text": "the text to speak or morse code string, eg: \"Hello!\"",
@@ -176,5 +178,13 @@
   "robotPuPro.isKickDone": "Return true when the last kick completed.",
   "robotPuPro.isJumpDone": "Return true when the last jump completed.",
   "robotPuPro.isRestDone": "Return true when the last rest cycle completed.",
-  "robotPuPro.isStandDone": "Return true when the robot reached the standing position."
+  "robotPuPro.isSitDone": "Return true when the robot reached the sitting position.",
+  "robotPuPro.isStandDone": "Return true when the robot reached the standing position.",
+  "robotPuPro.startAndWait": "Start a robot action and block until the requested number of steps finish.",
+  "robotPuPro.startAndWait|param|action": "the action to start, eg: robotPuPro.Action.Walk",
+  "robotPuPro.startAndWait|param|steps": "number of steps to run, eg: 1",
+  "robotPuPro.stepsDone": "Return the number of steps completed for the chosen action.",
+  "robotPuPro.stepsDone|param|action": "the action to check, eg: robotPuPro.Action.Walk",
+  "robotPuPro.stepsRemaining": "Return the number of steps remaining for the chosen action.",
+  "robotPuPro.stepsRemaining|param|action": "the action to check, eg: robotPuPro.Action.Walk"
 }

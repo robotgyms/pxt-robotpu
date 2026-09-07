@@ -70,6 +70,7 @@
   "robotPuPro.changeChannel": "將無線電頻道更改給定量。在 0 到 255 之間環繞。",
   "robotPuPro.changeChannel|param|delta": "改變頻道的金額, eg: 1",
   "robotPuPro.channel": "當前無線電頻道 (0..255)。機器人PU和遊戲手柄必須使用相同的通道進行通信。",
+  "robotPuPro.composeAndSing": "編寫一首新的程序歌曲並演唱。",
   "robotPuPro.dance": "使用麥克風檢測節拍，隨著音樂起舞。循環中反覆調用。",
   "robotPuPro.explore": "使用聲納傳感器自主探索以避免障礙物。循環中反覆調用。",
   "robotPuPro.eyeBrightness": "機器人 PU 眼睛 LED 的最大亮度（0 到 1）。",
@@ -152,6 +153,7 @@
   "robotPuPro.sing|param|song": "要唱的音符序列字符串, eg: \"C5 B G - E F E G \"",
   "robotPuPro.sonarDistanceCm": "返回當前聲納距離讀數（以釐米為單位）。如果未檢測到任何內容，則返回一個較大的值。",
   "robotPuPro.sonarScan": "獲取一個聲納讀數並更新內部前距陣列。在讀取前面的距離數組之前調用它。",
+  "robotPuPro.sit": "移動到坐姿。",
   "robotPuPro.stand": "移動到站立姿勢。",
   "robotPuPro.talk": "以有旋律的機器人聲音大聲朗讀文本。如果文本僅包含莫爾斯字符（. - / 空格），則會按莫爾斯電碼播放。",
   "robotPuPro.talk|param|text": "要朗讀的文本或莫爾斯電碼字符串, eg: \"Hello!\"",
@@ -176,5 +178,13 @@
   "robotPuPro.isKickDone": "上一次踢腿完成時返回 true。",
   "robotPuPro.isJumpDone": "上一次跳躍完成時返回 true。",
   "robotPuPro.isRestDone": "上一次休息週期完成時返回 true。",
-  "robotPuPro.isStandDone": "機器人到達站立位置時返回 true。"
+  "robotPuPro.isSitDone": "機器人到達坐姿位置時返回 true。",
+  "robotPuPro.isStandDone": "機器人到達站立位置時返回 true。",
+  "robotPuPro.startAndWait": "啟動一個機器人動作，並等待指定的步數完成。",
+  "robotPuPro.startAndWait|param|action": "要啟動的動作，例如 robotPuPro.Action.Walk",
+  "robotPuPro.startAndWait|param|steps": "要運行的步數，例如 1",
+  "robotPuPro.stepsDone": "返回所選動作已完成的步數。",
+  "robotPuPro.stepsDone|param|action": "要檢查的動作，例如 robotPuPro.Action.Walk",
+  "robotPuPro.stepsRemaining": "返回所選動作剩餘的步數。",
+  "robotPuPro.stepsRemaining|param|action": "要檢查的動作，例如 robotPuPro.Action.Walk"
 }

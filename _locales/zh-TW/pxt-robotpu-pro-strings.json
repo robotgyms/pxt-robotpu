@@ -23,6 +23,7 @@
   "robotPuPro.calibrate|block": "校準",
   "robotPuPro.changeChannel|block": "頻道改變 %delta",
   "robotPuPro.channel|block": "頻道",
+  "robotPuPro.composeAndSing|block": "作曲並演唱",
   "robotPuPro.dance|block": "跳舞",
   "robotPuPro.explore|block": "探索",
   "robotPuPro.eyeBrightness|block": "眼睛亮度",
@@ -71,6 +72,7 @@
   "robotPuPro.sing|param|song|defl": "C5 B G - E F E G ",
   "robotPuPro.sonarDistanceCm|block": "超聲波距離（釐米）",
   "robotPuPro.sonarScan|block": "超聲波掃描",
+  "robotPuPro.sit|block": "坐下",
   "robotPuPro.stand|block": "站立",
   "robotPuPro.talk|block": "說話 %text",
   "robotPuPro.talk|param|text|defl": "Hello!",
@@ -101,5 +103,9 @@
   "robotPuPro.isKickDone|block": "踢腿完成了嗎？",
   "robotPuPro.isJumpDone|block": "跳躍完成了嗎？",
   "robotPuPro.isRestDone|block": "休息完成了嗎？",
-  "robotPuPro.isStandDone|block": "站立完成了嗎？"
+  "robotPuPro.isSitDone|block": "坐下完成了嗎？",
+  "robotPuPro.isStandDone|block": "站立完成了嗎？",
+  "robotPuPro.startAndWait|block": "啟動 %action 走 %steps 步並等待",
+  "robotPuPro.stepsDone|block": "%action 已完成步數",
+  "robotPuPro.stepsRemaining|block": "%action 剩餘步數"
 }

@@ -94,6 +94,8 @@ namespace robotPuPro {
     function getRobotAPI(): RobotPu {
         const r = ensureRobot();
         r.gst = Mode.API;
+        r.actionWatchdog = true;
+        r.lastCmdTS = control.millis();
         return r;
     }
 
@@ -114,11 +116,36 @@ namespace robotPuPro {
         return ensureRobot().isActionDone(action);
     }
 
+    /** Start an action and wait until it finishes the requested number of steps. */
+    //% blockId=robotpu_start_and_wait block="start %action for %steps steps and wait"
+    //% action.defl=robotPuPro.Action.Walk
+    //% steps.min=1 steps.defl=1
+    //% weight=98 blockGap=8
+    export function startAndWait(action: Action, steps: number): void {
+        ensureRobot().startAction(action, steps, true);
+    }
+
     /** Stop the current action and reset to rest. */
     //% blockId=robotpu_stop_action block="stop robot"
-    //% weight=98 blockGap=8
+    //% weight=97 blockGap=8
     export function stop(): void {
         ensureRobot().stopAction();
+    }
+
+    /** Return how many steps of the chosen action have completed. */
+    //% blockId=robotpu_steps_done block="steps done for %action"
+    //% action.defl=robotPuPro.Action.Walk
+    //% weight=96 blockGap=8
+    export function stepsDone(action: Action): number {
+        return ensureRobot().getStepsDone(action);
+    }
+
+    /** Return how many steps of the chosen action are still remaining. */
+    //% blockId=robotpu_steps_remaining block="steps remaining for %action"
+    //% action.defl=robotPuPro.Action.Walk
+    //% weight=95
+    export function stepsRemaining(action: Action): number {
+        return ensureRobot().getStepsRemaining(action);
     }
 
     /** Current radio channel (0..255). Both Robot PU and the gamepad must use the same channel to communicate. */
@@ -341,6 +368,8 @@ namespace robotPuPro {
     export function setMode(mode: Mode): void {
         const r = ensureRobot();
         r.gst = mode as number;
+        r.actionWatchdog = true;
+        r.lastCmdTS = control.millis();
     }
 
     /**

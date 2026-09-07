@@ -261,8 +261,12 @@ namespace robotPuPro {
         sentences: string[];
 
         constructor() {
-            this.notes = ["#70REYY", "#62MIYY", "#58FAOR", "#52SOHW", "#46LAOR", "#42TIYY", "#39DOWW",
-                "#35REYY", "#31MIYY", "#29FAOR", "#26SOHW", "#23LAOR", "#21TIYY", "#20DOWW"];
+            // D Dorian scale across two octaves. Index 0 = RE (D4), 7 = D5, 13 = C6.
+            // Chord offsets are scale degrees, e.g. [0,2,4,6] = Dm7, [0,3,5] = G major.
+            this.notes = [
+                "D4", "E4", "F4", "G4", "A4", "B4", "C5",
+                "D5", "E5", "F5", "G5", "A5", "B5", "C6"
+            ];
             this.chord = [[0, 3, 5], [0, 2, 4, 6], [0, 2, 4, 7], [0, 1, 2, 3]];
             this.pattern = [[0, 0, 0, 0], [0, 0, 1], [0, 1, 0], [1, 0, 0], [1, 1], [3]];
             this.loc = ["here", "there", "up", "down", "left", "right", "front", "back", ""];
@@ -285,9 +289,13 @@ namespace robotPuPro {
         }
 
         /**
-         * Composes a procedural song string
+         * Composes a procedural song string compatible with music.stringPlayable().
+         * Generates a space-separated sequence of D-Dorian notes with durations.
          */
         composeSong(): string {
+            // Map pattern element m to a MakeCode stringPlayable duration suffix.
+            // 0 = default quarter note, 1 = eighth, 3 = half. Index 2 is unused.
+            const duration = ["", ":8", ":4", ":2"];
             let song: string[] = [];
             let b = this.notes.length;
             let d = this.choice(this.chord);
@@ -300,31 +308,25 @@ namespace robotPuPro {
                     let n = (l + this.choice(d) + this.choice([-1, 0, 0, 0, 0, 1])) % b;
                     if (n < 0) n += b; // Handle negative modulo
 
-                    let o = this.notes[n];
+                    let note = this.notes[n] + duration[m];
 
                     if (m >= 1 && this.randint(0, 8) == 0) {
-                        song.push(o);
+                        // Arpeggiate: play the chord tone plus m neighbour/chord notes.
+                        song.push(note);
                         for (let count = 0; count < m; count++) {
                             let innerIdx = (n + this.choice([-1, 0, 1])) % b;
                             if (innerIdx < 0) innerIdx += b;
-                            song.push(this.notes[innerIdx]);
+                            song.push(this.notes[innerIdx] + duration[m]);
                         }
                     } else {
-                        // Python: n + n[-1] * 4 * j
-                        // Appends the last character of the note string repeated (4 * j) times
-                        let repeatedChar = o.charAt(o.length - 1);
-                        let suffix = "";
-                        for (let count2 = 0; count2 < (4 * m); count2++) {
-                            suffix += repeatedChar;
-                        }
-                        song.push(o + suffix);
+                        song.push(note);
                     }
                     k += m + 1;
                 }
                 d = this.choice(this.chord);
                 w = this.choice(this.pattern);
             }
-            return song.join("");
+            return song.join(" ");
         }
 
         /**
@@ -1290,7 +1292,9 @@ namespace robotPuPro {
         //% block="greet"
         Greet,
         //% block="stop"
-        Stop
+        Stop,
+        //% block="drive"
+        Drive
     }
 
     /**
@@ -1389,11 +1393,9 @@ namespace robotPuPro {
 
         // Command Dictionary
         public cmdFuncDict: { [key: string]: (v: number) => void };
-        // Define the State Dictionary
-        private stateFuncDict: { [key: number]: () => void };
-        // Action handlers for the unified action dispatcher (see startAction).
-        // New actions can be added at runtime with registerAction().
-        private actionFuncDict: { [key: number]: () => number };
+        // Single state machine dictionary. Every state, including Action states,
+        // lives here.  Handlers return 0 when one step/cycle completes.
+        private stateFuncDict: { [key: number]: () => number };
 
         // beacon timeout
         public beaconTimeout: number = 2000;
@@ -1406,6 +1408,15 @@ namespace robotPuPro {
         public lastAction: Action = Action.Stop;
         public actionDone: boolean = true;
         public actionRunning: boolean = false;
+
+        // Counted-action bookkeeping
+        public targetSteps: number = 0;
+        public stepsDone: number = 0;
+
+        // Dead-man (watchdog) flag: true only when an external channel
+        // (radio / I2C / Bluetooth / gamepad) is actively controlling the robot.
+        // Programmatic start() actions keep this false so they run to completion.
+        public actionWatchdog: boolean = false;
 
         constructor(sn: string, name: string = "peu") {
             // Initialize Core Components inside constructor
@@ -1438,45 +1449,100 @@ namespace robotPuPro {
                 "#pupitch": (v) => this.pitch(v),
                 "#puB": (v) => this.button(v),
                 "#pulogo": (v) => this.logo(v),
-                "#purs": (v) => this.pose(v)
+                "#purs": (v) => this.pose(v),
+                "#puact": (v) => this.switchAction(v as Action)
             };
-            // We use arrow functions () => to ensure 'this' refers to the RobotPu instance
+            // Single state machine table.  The same dictionary is used by the
+            // background loop for both autonomous/continuous states and
+            // counted MakeCode / I2C / Bluetooth / RL actions.
             this.stateFuncDict = {
-                [-4]: () => this.trim(),
-                [-3]: () => this.fall(),
-                [-2]: () => this.fetal(),
-                [0]: () => this.idle(),
+                [-4]: () => { this.trim(); return 0; },
+                [-3]: () => { this.fall(); return 0; },
+                [-2]: () => { this.fetal(); return 0; },
+                [-1]: () => 0,
+                [0]: () => { this.idle(); return 0; },
                 [1]: () => this.explore(),
                 [2]: () => this.jump(),
                 [3]: () => this.dance(),
                 [4]: () => this.kick(),
-                [5]: () => this.joystick()
+                [5]: () => this.joystick(),
+                [6]: () => 0, // API / manual mode: background loop does nothing
+                [10]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); },
+                [11]: () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); },
+                [12]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
+                [13]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
+                [14]: () => this.sit(),
+                [15]: () => this.stand(),
+                [16]: () => { this.laugh(); return 0; },
+                [17]: () => { this.cry(); return 0; },
+                [18]: () => { this.scream(); return 0; },
+                [19]: () => { this.funny(); return 0; },
+                [20]: () => { this.pcb.blink(this.alertLevel); return 0; },
+                [21]: () => { this.greet(); return 0; }
             };
-
-            // Unified action handlers. Extra channels (I2C, Bluetooth, radio)
-            // can register additional actions with registerAction().
-            this.actionFuncDict = {};
-            this.registerAction(Action.Stop, () => { this.rest(); return 0; });
-            this.registerAction(Action.Walk, () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); });
-            this.registerAction(Action.WalkBackward, () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); });
-            this.registerAction(Action.TurnLeft, () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); });
-            this.registerAction(Action.TurnRight, () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); });
-            this.registerAction(Action.Explore, () => this.explore());
-            this.registerAction(Action.Dance, () => this.dance());
-            this.registerAction(Action.Rest, () => this.rest());
-            this.registerAction(Action.Kick, () => this.kick());
-            this.registerAction(Action.Jump, () => this.jump());
-            this.registerAction(Action.Laugh, () => { this.laugh(); return 0; });
-            this.registerAction(Action.Cry, () => { this.cry(); return 0; });
-            this.registerAction(Action.Scream, () => { this.scream(); return 0; });
-            this.registerAction(Action.Funny, () => { this.funny(); return 0; });
-            this.registerAction(Action.Blink, () => { this.pcb.blink(this.alertLevel); return 0; });
-            this.registerAction(Action.Greet, () => { this.greet(); return 0; });
-            this.registerAction(Action.Stand, () => this.stand());
-            this.registerAction(Action.Sit, () => this.sit());
-
             this.pcb.eyesCtl(1);
             this.showChannel();
+        }
+
+        /**
+         * Convert a public Action token to an internal gst state id.
+         * Negative and special states (trim, fall, fetal, idle) are not Actions.
+         * Custom action indices (>= 100, not in the Action enum) are used as-is.
+         */
+        public actionToState(action: number): number {
+            switch (action) {
+                case Action.Rest:
+                case Action.Stop:
+                    return 0;
+                case Action.Explore:
+                    return 1;
+                case Action.Jump:
+                    return 2;
+                case Action.Dance:
+                    return 3;
+                case Action.Kick:
+                    return 4;
+                case Action.Drive:
+                    return 5;
+                case Action.Walk:
+                    return 10;
+                case Action.WalkBackward:
+                    return 11;
+                case Action.TurnLeft:
+                    return 12;
+                case Action.TurnRight:
+                    return 13;
+                case Action.Sit:
+                    return 14;
+                case Action.Stand:
+                    return 15;
+                case Action.Laugh:
+                    return 16;
+                case Action.Cry:
+                    return 17;
+                case Action.Scream:
+                    return 18;
+                case Action.Funny:
+                    return 19;
+                case Action.Blink:
+                    return 20;
+                case Action.Greet:
+                    return 21;
+                default:
+                    // Custom / registered actions use their raw index.
+                    return action;
+            }
+        }
+
+        /**
+         * Register a custom action handler. The handler must return 0 when one
+         * execution completes. Extra channels (I2C, Bluetooth, radio) and RL
+         * can add new actions at runtime without touching the built-in set.
+         * @param action the Action token or any unique index to register
+         * @param run the handler function
+         */
+        public registerAction(action: number, run: () => number): void {
+            this.stateFuncDict[this.actionToState(action)] = run;
         }
 
         public start() {
@@ -1721,62 +1787,6 @@ namespace robotPuPro {
         }
 
         /**
-         * Generic action-step loop. Runs `run` until it returns 0 the requested
-         * number of times. If completions is 0, it runs until the mode is no
-         * longer API (i.e. stop() was called).
-         */
-        public doCompletions(run: () => number, completions: number): void {
-            let done = 0;
-            while ((completions <= 0 || done < completions) && this.gst == 6) {
-                const rc = run();
-                if (rc == 0) done += 1;
-                this.lastCmdTS = control.millis();
-                basic.pause(20);
-            }
-            this.actionDone = true;
-            this.actionRunning = false;
-            this.currentAction = Action.Stop;
-        }
-
-        /**
-         * Register a custom action handler. The handler must return 0 when one
-         * execution completes (or a non-zero status while still working on it).
-         * Extra channels (I2C, Bluetooth, radio) and MakeCode extensions can add
-         * new actions at runtime without touching the built-in set.
-         * @param action the Action token (or any unique index) to register
-         * @param run the handler function
-         */
-        public registerAction(action: Action, run: () => number): void {
-            this.actionFuncDict[action] = run;
-        }
-
-        /**
-         * Look up the handler for an Action token. Unknown actions run a no-op.
-         */
-        private actionRunner(action: Action): () => number {
-            const run: (() => number) | undefined = this.actionFuncDict[action];
-            return run === undefined ? () => 0 : run;
-        }
-
-        /**
-         * Start an action token for a number of completions/steps.
-         * Use 0 steps to keep it running until stop() is called.
-         */
-        public startAction(action: Action, steps: number): void {
-            this.stopAction();
-            this.gst = 6; // Mode.API
-            this.currentAction = action;
-            this.actionDone = false;
-            this.actionRunning = true;
-            this.lastCmdTS = control.millis();
-            const run = this.actionRunner(action);
-            control.runInParallel(() => {
-                this.doCompletions(run, steps);
-            });
-            this.lastAction = action;
-        }
-
-        /**
          * Stop the current action and reset to rest/idle.
          */
         public stopAction(): void {
@@ -1787,14 +1797,86 @@ namespace robotPuPro {
             this.actionRunning = false;
             this.lastAction = Action.Stop;
             this.currentAction = Action.Stop;
-
+            this.actionWatchdog = false;
+            this.targetSteps = 0;
+            this.stepsDone = 0;
         }
 
         /**
-         * Check if an action has finished (or was stopped).
+         * Called internally when a counted action reaches its target.
+         * Returns to idle but preserves lastAction so isActionDone still works.
+         */
+        private completeAction(): void {
+            this.gst = 0; // Rest/Idle
+            this.walkSpeed = 0;
+            this.walkDirection = 0;
+            this.actionDone = true;
+            this.actionRunning = false;
+            this.currentAction = Action.Stop;
+            // this.lastAction stays as the completed action
+        }
+
+        /**
+         * Start an action token for a number of steps.
+         * Use 0 steps to keep it running until stop() is called.
+         * Set waitForCompletion to block this fiber until the action finishes.
+         * Set external to true for radio / I2C / Bluetooth / gamepad channels
+         * so the dead-man watchdog is active.
+         */
+        public startAction(action: Action, steps: number, waitForCompletion: boolean = false, external: boolean = false): void {
+            this.stopAction();
+            this.gst = this.actionToState(action);
+            this.currentAction = action;
+            this.lastAction = action;
+            this.targetSteps = steps;
+            this.stepsDone = 0;
+            this.actionDone = false;
+            this.actionRunning = true;
+            this.actionWatchdog = external;
+            this.lastCmdTS = control.millis();
+
+            if (waitForCompletion && steps > 0) {
+                // Block this fiber until the counted action completes or is pre-empted.
+                // The background stateMachine still runs the action.
+                while (this.currentAction == action && !this.isActionDone(action)) {
+                    basic.pause(20);
+                }
+            }
+        }
+
+        /**
+         * Switch to an action from an external control channel.
+         * Enables the dead-man watchdog.  The action runs until another
+         * command arrives or the watchdog times out.
+         */
+        public switchAction(action: Action): void {
+            if (this.actionRunning && this.currentAction == action) return;
+            this.startAction(action, 0, false, true);
+        }
+
+        /**
+         * Check if an action has finished (or was stopped/pre-empted).
          */
         public isActionDone(action: Action): boolean {
             return this.actionDone && this.lastAction == action;
+        }
+
+        /**
+         * Return the number of steps completed for a running or just-finished action.
+         */
+        public getStepsDone(action: Action): number {
+            if (this.actionRunning && this.currentAction == action) return this.stepsDone;
+            if (this.actionDone && this.lastAction == action) return this.targetSteps;
+            return 0;
+        }
+
+        /**
+         * Return the number of steps remaining for a running action.
+         */
+        public getStepsRemaining(action: Action): number {
+            if (this.actionRunning && this.currentAction == action) return Math.max(0, this.targetSteps - this.stepsDone);
+            if (this.actionDone && this.lastAction == action) return 0;
+            return 0;
         }
 
         /**
@@ -1895,11 +1977,14 @@ namespace robotPuPro {
             }
 
             // 2. Handle automatic state transitions (Inactivity Timeout)
-            if (this.gst > 0) { // If in an active state
+            // The dead-man watchdog is only active when an external control
+            // channel (radio / I2C / Bluetooth / gamepad) is driving the robot.
+            // Programmatic start() actions keep actionWatchdog == false.
+            if (this.gst > 0 && this.actionWatchdog) { // If in an active state
                 this.alertLevel = 10; // Reset alert level
                 // 2-second timeout to return to idle
                 if (control.millis() - this.lastCmdTS > this.beaconTimeout) {
-                    this.gst = 0;
+                    this.stopAction();
                 }
             }
 
@@ -2346,11 +2431,22 @@ namespace robotPuPro {
             // Python: self.stateFuncDict.get(self.gst, self.sleep)()
             let behavior = this.stateFuncDict[this.gst];
             if (behavior) {
-                behavior();
+                const status = behavior();
+
+                // Counted actions: when the handler reports one completed step,
+                // stop after the requested number of steps.
+                if (this.actionRunning && this.gst > 0 && this.targetSteps > 0) {
+                    if (status == 0) {
+                        this.stepsDone += 1;
+                        if (this.stepsDone >= this.targetSteps) {
+                            this.completeAction();
+                        }
+                    }
+                }
             }
 
-            // 2. Handle blinking and state tracking
-            if (this.gst >= 0 && this.gst <= 5) {
+            // 2. Handle blinking and state tracking for all normal (non-special) states
+            if (this.gst >= 0) {
                 // Update eye blink animation based on alert level (alertLevel)
                 this.pcb.blink(this.alertLevel);
 
@@ -2567,11 +2663,11 @@ namespace robotPuPro {
         // Command Handlers
         public speed(v: number) {
             if (v > 0.2) {
+                this.switchAction(Action.Drive);
                 this.walkSpeed = v * this.fwdSpeed;
-                this.gst = 5;
             } else if (v < -0.2) {
+                this.switchAction(Action.Drive);
                 this.walkSpeed = -v * this.bwdSpeed;
-                this.gst = 5;
             } else {
                 this.walkSpeed = 0;
             }
@@ -2581,7 +2677,7 @@ namespace robotPuPro {
         public pitch(v: number) { this.headPitchBias = (v * -1 + this.headPitchBias) * 0.5; }
         public button(v: number) {
             if (v == 0) {
-                this.gst = 0;
+                this.stopAction();
                 this.headPitchBias = 0;
                 this.headYawBias = 0;
                 this.talk("Rest!");
@@ -2592,13 +2688,13 @@ namespace robotPuPro {
                     this.talk("Exploring");
                     this.exploreSpeed = 3.0;
                     this.exploreDirection = 0.0;
-                    this.gst = 1;
+                    this.switchAction(Action.Explore);
                 }
             } else if (v == 2) {
                 if (this.gst == -4) {
                     this.setTrimIndex(this.trimIndex + 1);
                 } else {
-                    this.gst = 2;
+                    this.switchAction(Action.Jump);
                 }
             } else if (v == 3) {
                 if (this.gst == -4) {
@@ -2606,13 +2702,13 @@ namespace robotPuPro {
                 } else {
                     this.talk("Dance!");
                     this.danceSpeed = 1.5;
-                    this.gst = 3;
+                    this.switchAction(Action.Dance);
                 }
             } else if (v == 4) {
                 if (this.gst == -4) {
                     this.adjustTrim(1);
                 } else {
-                    this.gst = 4;
+                    this.switchAction(Action.Kick);
                 }
             }
         }
@@ -2621,7 +2717,7 @@ namespace robotPuPro {
             this.stateTalk();
         }
 
-        public pose(v: number) { this.restState = v; this.gst = 0; }
+        public pose(v: number) { this.restState = v; this.stopAction(); }
 
         public setTrim(index: number, value: number) {
             this.pcb.servoTrim[index] = value
@@ -2726,7 +2822,15 @@ namespace robotPuPro {
                 this.sendStatusCode("ACK")
             }
 
-            // 5. Process #pun: Name/Serial Update
+            // 5. Process #pua: Switch to an action by index (e.g. #pua5)
+            else if (s.substr(0, 4) == "#pua") {
+                let a = parseInt(s.substr(4));
+                if (!isNaN(a)) {
+                    this.switchAction(a as Action);
+                }
+            }
+
+            // 6. Process #pun: Name/Serial Update
             else if (s.substr(0, 4) == "#pun") {
                 this.sn = s.substr(4);
                 this.greet();
