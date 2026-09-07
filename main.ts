@@ -25,6 +25,12 @@ namespace robotPuPro {
     export enum Mode {
         //% block="trim calibration"
         CalibrateServo = -4,
+        //% block="fall (help)"
+        Fall = -3,
+        //% block="fetal (fall protection)"
+        Fetal = -2,
+        //% block="sleep"
+        Sleep = -1,
         //% block="rest"
         Rest = 0,
         //% block="explore"
