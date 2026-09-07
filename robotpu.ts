@@ -1549,10 +1549,6 @@ namespace robotPuPro {
             return this.bodyPitch;
         }
 
-        public getMusicPeriod(): number {
-            return this.music.period;
-        }
-
         public getMusicTempo(): number {
             const p = this.music.period;
             if (p <= 0) return 0;
@@ -2062,10 +2058,6 @@ namespace robotPuPro {
             radio.sendString(message);
         }
 
-        public s_code(code: string): void {
-            this.sendStatusCode(code);
-        }
-
         /**
          * Calculates exploration speed and direction based on sonar point-cloud.
          * Ported from set_explore_param() in Python.
@@ -2551,22 +2543,8 @@ namespace robotPuPro {
         /**
          * Returns the forward max speed scalar.
          */
-        public getFwdMaxSpeed(): number {
-            return this.fwdSpeed;
-        }
-
-        /**
-         * Sets the forward max speed scalar.
-         */
         public setFwdMaxSpeed(v: number): void {
             this.fwdSpeed = v;
-        }
-
-        /**
-         * Returns the backward max speed scalar.
-         */
-        public getBwdMaxSpeed(): number {
-            return this.bwdSpeed;
         }
 
         /**
@@ -2766,26 +2744,16 @@ namespace robotPuPro {
         }
 
         public runKeyValueCommand(key: string, v: number) {
-            this.runKeyValueCMD(key, v);
-        }
-
-        public runKeyValueCMD(key: string, v: number) {
             this.lastCmdTS = control.millis();
 
-            // 3. Look up the function in the dictionary
+            // Look up the function in the dictionary and execute it if it exists.
             let action = this.cmdFuncDict[key];
-
-            // 4. If the function exists, execute it (the "noop" equivalent)
             if (action) {
-                action(v)
+                action(v);
             }
         }
 
         public runStringCommand(s: string) {
-            this.runStrCMD(s);
-        }
-
-        public runStrCMD(s: string) {
             // 1. Update the timestamp of the last received command
             this.lastCmdTS = control.millis()
 
