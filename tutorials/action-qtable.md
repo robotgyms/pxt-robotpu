@@ -6,7 +6,7 @@ This tutorial shows how to use an action Q-table to make Robot PU learn from exp
 
 Can the robot do something to make its owner turn on music? Different users are persuaded by different actions, so the robot needs to learn the best action (and sequence of actions) for each user.
 
-In this tutorial the robot uses a small Q-table that records how good each action is after every previous action. It also listens through the microphone and uses the music library to detect music. Valid music has a BPM between 60 and 200 and a BPM variance of less than 10.
+In this tutorial the robot uses a small Q-table that records how good each action is after every previous action. It also listens through the microphone. Use `robotPuPro.musicTempo()` and `robotPuPro.musicBeat()` to keep the music detector updated, and `robotPuPro.isMusic()` to decide whether music is playing.
 
 The robot can choose from these 8 actions:
 
@@ -24,7 +24,8 @@ The robot can choose from these 8 actions:
 - The **state** is the last action the robot performed.
 - The **Q-table** stores a value for every `(lastAction, nextAction)` pair. A higher value means that pair is more likely to lead to music.
 - A rolling buffer keeps the last 360 `(state, action)` pairs. When music is detected, every recent pair gets discounted credit.
-- Every 5 seconds the robot picks the next action, runs it, checks for music, and learns.
+- Every 5 seconds the robot picks the next action, runs it, checks `isMusic()`, and learns.
+- A separate `basic.forever` loop calls `musicTempo()` every 20 ms so the beat detector stays up to date.
 
 ## Program
 
@@ -34,23 +35,9 @@ Copy this program into the MakeCode **JavaScript** editor.
 const ACTIONS = 8
 const ACTION_MS = 5000
 const HISTORY_SIZE = 360
-const BPM_LO = 60
-const BPM_HI = 200
-const BPM_VARIANCE_MAX = 100
 const ALPHA = 0.2
 const GAMMA = 0.9
 const EPSILON = 15
-
-const ACTION_NAMES = [
-    "sing",
-    "jump",
-    "dance",
-    "explore",
-    "walk",
-    "side step",
-    "rest",
-    "say please"
-]
 
 // Q-table: Q[lastAction][nextAction]
 let Q: number[][] = []
@@ -70,10 +57,6 @@ for (let i = 0; i < HISTORY_SIZE; i++) {
     histS.push(0)
     histA.push(0)
 }
-
-// Recent valid BPM values for variance check
-let bpmBuf: number[] = []
-const BPM_BUF_SIZE = 12
 
 function pushHistory(s: number, a: number) {
     histS[histPtr] = s
@@ -129,26 +112,6 @@ function runAction(a: number) {
     }
 }
 
-function isMusicOn(): boolean {
-    let bpm = robotPuPro.musicTempo()
-    if (bpm < BPM_LO || bpm > BPM_HI) return false
-
-    bpmBuf.push(bpm)
-    if (bpmBuf.length > BPM_BUF_SIZE) bpmBuf.shift()
-
-    if (bpmBuf.length < BPM_BUF_SIZE) return false
-
-    let mean = 0
-    for (let v of bpmBuf) mean += v
-    mean /= bpmBuf.length
-
-    let varSum = 0
-    for (let v of bpmBuf) varSum += (v - mean) * (v - mean)
-    let variance = varSum / bpmBuf.length
-
-    return variance < BPM_VARIANCE_MAX
-}
-
 function showBestAction(state: number) {
     let bestA = 0
     let bestV = Q[state][0]
@@ -165,22 +128,25 @@ robotPuPro.greet()
 basic.pause(500)
 
 let state = 0
+
+basic.forever(function () {
+    robotPuPro.musicTempo()
+    basic.pause(20)
+})
+
 basic.forever(function () {
     let action = chooseAction(state)
     pushHistory(state, action)
 
     runAction(action)
 
-    if (isMusicOn()) {
+    if (robotPuPro.isMusic()) {
         updateQDelayed(1)
         basic.showIcon(IconNames.Heart)
         showBestAction(state)
-        // Reset for the next learning episode
-        bpmBuf = []
         histLen = 0
         state = 0
     } else {
-        // One-step Q update with the best future action
         let nextBest = Q[action][0]
         for (let a = 1; a < ACTIONS; a++) {
             if (Q[action][a] > nextBest) nextBest = Q[action][a]
@@ -196,10 +162,11 @@ basic.forever(function () {
 ## What happens
 
 1. `greet()` calibrates and stands the robot up.
-2. The first `basic.forever` loop picks an action using the Q-table, runs it, and listens for music.
-3. If valid music is detected, every recent `(lastAction, action)` pair gets credit, the heart icon appears, and the learned best action is shown.
-4. If no music is detected, the robot does a small one-step Q update and tries the next action.
-5. Over many attempts the Q-table converges to the action sequence that is most likely to make the owner play music.
+2. A background `basic.forever` loop calls `musicTempo()` every 20 ms to keep the microphone beat detector updated.
+3. The main `basic.forever` loop picks an action using the Q-table, runs it, and checks `isMusic()`.
+4. If music is detected, every recent `(lastAction, action)` pair gets credit, the heart icon appears, and the learned best action is shown.
+5. If no music is detected, the robot does a small one-step Q update and tries the next action.
+6. Over many attempts the Q-table converges to the action sequence that is most likely to make the owner play music.
 
 ## Tuning the performance
 
@@ -208,7 +175,7 @@ basic.forever(function () {
 | Learning speed | Change `ALPHA` (higher = faster but less stable) |
 | Delayed reward reach | Change `GAMMA` (higher = credit reaches further back) |
 | Exploration | Change `EPSILON` (percent chance of random action) |
-| Music detection | Change `BPM_LO`, `BPM_HI`, `BPM_VARIANCE_MAX` |
+| Music sensitivity | Use `musicTempo()` more/less often, or use `musicBeat()` to react on every beat |
 | Action duration | Change `ACTION_MS` (default 5000 ms) |
 | History size | Change `HISTORY_SIZE` (default 360 entries) |
 

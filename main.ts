@@ -828,13 +828,31 @@ namespace robotPuPro {
         return ensureRobot().getBodyPitch();
     }
 
-    /** Return the live music tempo detected from the microphone in beats per minute. */
+    /** Return the current music tempo estimate in beats per minute. Call repeatedly to update the estimate. */
     //% blockId=robotpu_music_tempo block="music tempo"
     //% subcategory="Sensors"
     //% group="Sensors"
-    //% weight=37 blockGap=8
+    //% weight=39 blockGap=8
     export function musicTempo(): number {
         return ensureRobot().getMusicTempo();
+    }
+
+    /** Return true if a musical beat was just detected by the microphone. */
+    //% blockId=robotpu_music_beat block="music beat"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=38 blockGap=8
+    export function musicBeat(): boolean {
+        return ensureRobot().getMusicBeat();
+    }
+
+    /** Return true when music is being played (recent beat with a valid BPM). */
+    //% blockId=robotpu_is_music block="is music playing"
+    //% subcategory="Sensors"
+    //% group="Sensors"
+    //% weight=37 blockGap=8
+    export function isMusic(): boolean {
+        return ensureRobot().getIsMusic();
     }
 
     /** Return the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm. */

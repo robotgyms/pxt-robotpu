@@ -164,6 +164,9 @@ namespace robotPuPro {
         bufferSize: number;
         buf: number[];
         lastIndex: number;
+        beat: boolean;
+        beatIdx: number;
+        lastBeatTime: number;
         period: number;
         hits: number;
 
@@ -176,6 +179,9 @@ namespace robotPuPro {
                 this.buf.push(0);
             }
             this.lastIndex = 0;
+            this.beat = false;
+            this.beatIdx = 0;
+            this.lastBeatTime = 0;
             this.period = 500; // most possible period in ms
             this.hits = 0;
         }
@@ -245,6 +251,12 @@ namespace robotPuPro {
                     let smoothFactor = (periodRatio > 0.8 && periodRatio < 1.2) ? 0.1 : 0.05;
 
                     this.period = (this.period * (1.0 - smoothFactor)) + (newPeriod * smoothFactor);
+                }
+
+                this.beat = isABeatResult;
+                this.beatIdx = idx;
+                if (isABeatResult) {
+                    this.lastBeatTime = timestamp;
                 }
             }
             return isABeatResult;
@@ -1582,12 +1594,28 @@ namespace robotPuPro {
         public getMusicTempo(): number {
             const ts = control.millis();
             const loud = input.soundLevel();
-            if (this.music.isABeat(ts, loud, 1.005)) {
-                const p = this.music.period;
-                if (p <= 0) return 0;
-                return Math.round(60000 / p);
-            }
-            return 0;
+            this.music.isABeat(ts, loud, 1.005);
+            const p = this.music.period;
+            if (p <= 0) return 0;
+            return Math.round(60000 / p);
+        }
+
+        public getMusicBeat(): boolean {
+            const ts = control.millis();
+            const loud = input.soundLevel();
+            this.music.isABeat(ts, loud, 1.005);
+            return this.music.beat;
+        }
+
+        public getIsMusic(): boolean {
+            const ts = control.millis();
+            const loud = input.soundLevel();
+            this.music.isABeat(ts, loud, 1.005);
+            const p = this.music.period;
+            if (p <= 0) return false;
+            const bpm = 60000 / p;
+            if (bpm < 60 || bpm > 200) return false;
+            return (ts - this.music.lastBeatTime) < (p * 2);
         }
 
         /**
