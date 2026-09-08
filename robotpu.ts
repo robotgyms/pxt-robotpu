@@ -1619,6 +1619,22 @@ namespace robotPuPro {
         }
 
         /**
+         * Return a 0..1 brightness value that pulses on each detected music beat.
+         * Call repeatedly in a loop and pass the result to leftEyeBright/rightEyeBright.
+         */
+        public ledBeat(): number {
+            const ts = control.millis();
+            const loud = input.soundLevel();
+            this.music.isABeat(ts, loud, 1.005);
+            const p = this.music.period;
+            if (p <= 0 || this.music.lastBeatTime <= 0) return 0;
+            let phase = (ts - this.music.lastBeatTime) / p;
+            if (phase < 0) phase = 0;
+            if (phase > 1) phase = 1;
+            return Math.max(0, 1 - phase);
+        }
+
+        /**
          * Handles manual movement and stance control from a remote.
          * Ported from joystick() in Python.
          */
