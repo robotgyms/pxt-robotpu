@@ -2635,7 +2635,8 @@ namespace robotPuPro {
             let ms = input.soundLevel();
 
             // 1. Check for a musical beat using the MusicLib helper
-            let il = this.music.isABeat(ts, ms, 1.005);
+            this.music.isABeat(ts, ms, 1.005);
+            let il = this.music.beat;
 
             // 2. High-beat logic: Pulse LEDs and flip wiggle direction
             if (ts - this.lastHighBeat > this.music.period * 0.5) {
