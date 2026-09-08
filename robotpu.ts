@@ -38,7 +38,7 @@ namespace robotPuPro {
             this.walkBwdStates = [6, 5, 7, 3];
             this.skateFwdStates = [8, 9, 10, 11];
             this.skateBwdStates = [12, 1, 13, 9];
-            this.boxingStates = [8, 9, 10, 11, 12, 13];
+            this.boxingStates = [2, 3, 4, 5] //[8, 9, 10, 11, 12, 13];
             this.danceOkStates = [0, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 16, 17];
 
             let w_t = this.walkTilt;
@@ -250,6 +250,16 @@ namespace robotPuPro {
             return isABeatResult;
         }
     }
+    /**
+     * Style for procedurally composed songs.
+     */
+    export enum SongStyle {
+        //% block="cute"
+        Cute = 0,
+        //% block="disco"
+        Disco = 1
+    }
+
     export class Content {
         notes: string[];
         chord: number[][];
@@ -290,41 +300,73 @@ namespace robotPuPro {
 
         /**
          * Composes a procedural song string compatible with music.stringPlayable().
-         * Generates a space-separated sequence of D-Dorian notes with durations.
+         * @param style "cute" keeps the original D-Dorian melody; "disco" returns a
+         *              four-on-the-floor dance loop in D-Dorian.
          */
-        composeSong(): string {
-            // Map pattern element m to a MakeCode stringPlayable duration suffix.
-            // 0 = default quarter note, 1 = eighth, 3 = half. Index 2 is unused.
-            const duration = ["", ":8", ":4", ":2"];
+        public composeSong(style: SongStyle = SongStyle.Cute): string {
             let song: string[] = [];
-            let b = this.notes.length;
-            let d = this.choice(this.chord);
-            let w = this.choice(this.pattern);
-            let k = 0;
+            switch (style) {
+                case SongStyle.Disco: {
+                    // Disco: 8 bars of 4/4 quarter notes at ~120 BPM.
+                    // Progression: | Dm7 | G | Dm7 | G | ... in D-Dorian.
+                    let b = this.notes.length;
+                    let dm7 = this.chord[1];   // [0, 2, 4, 6] = Dm7
+                    let g = this.chord[0];     // [0, 3, 5]    = G major
+                    let barChords = [dm7, g, dm7, g];
+                    let bars = 8;
 
-            while (k < 16) {
-                let l = this.randint(0, b - 1);
-                for (let m of w) {
-                    let n = (l + this.choice(d) + this.choice([-1, 0, 0, 0, 0, 1])) % b;
-                    if (n < 0) n += b; // Handle negative modulo
-
-                    let note = this.notes[n] + duration[m];
-
-                    if (m >= 1 && this.randint(0, 8) == 0) {
-                        // Arpeggiate: play the chord tone plus m neighbour/chord notes.
-                        song.push(note);
-                        for (let count = 0; count < m; count++) {
-                            let innerIdx = (n + this.choice([-1, 0, 1])) % b;
-                            if (innerIdx < 0) innerIdx += b;
-                            song.push(this.notes[innerIdx] + duration[m]);
+                    for (let bar = 0; bar < bars; bar++) {
+                        let d = barChords[bar % 4];
+                        for (let beat = 0; beat < 4; beat++) {
+                            let n: number;
+                            if (beat % 2 == 0) {
+                                // Downbeats: strong root (D4 or D5) for the four-on-the-floor feel
+                                n = (beat == 0) ? this.choice([0, 7]) : this.choice([0, 7]);
+                            } else {
+                                // Offbeats: higher chord tone
+                                n = (7 + this.choice(d)) % b;
+                            }
+                            song.push(this.notes[n] + ":4");
                         }
-                    } else {
-                        song.push(note);
                     }
-                    k += m + 1;
                 }
-                d = this.choice(this.chord);
-                w = this.choice(this.pattern);
+
+                case SongStyle.Cute:
+                default: {
+                    // Original "cute" D-Dorian procedural melody
+                    // Map pattern element m to a MakeCode stringPlayable duration suffix.
+                    // 0 = default quarter note, 1 = eighth, 2 = quarter, 3 = half.
+                    const duration = ["", ":8", ":4", ":2"];
+                    let b = this.notes.length;
+                    let d = this.choice(this.chord);
+                    let w = this.choice(this.pattern);
+                    let k = 0;
+
+                    while (k < 16) {
+                        let l = this.randint(0, b - 1);
+                        for (let m of w) {
+                            let n = (l + this.choice(d) + this.choice([-1, 0, 0, 0, 0, 1])) % b;
+                            if (n < 0) n += b; // Handle negative modulo
+
+                            let note = this.notes[n] + duration[m];
+
+                            if (m >= 1 && this.randint(0, 8) == 0) {
+                                // Arpeggiate: play the chord tone plus m neighbour/chord notes.
+                                song.push(note);
+                                for (let count = 0; count < m; count++) {
+                                    let innerIdx = (n + this.choice([-1, 0, 1])) % b;
+                                    if (innerIdx < 0) innerIdx += b;
+                                    song.push(this.notes[innerIdx] + duration[m]);
+                                }
+                            } else {
+                                song.push(note);
+                            }
+                            k += m + 1;
+                        }
+                        d = this.choice(this.chord);
+                        w = this.choice(this.pattern);
+                    }
+                }
             }
             return song.join(" ");
         }
@@ -553,7 +595,7 @@ namespace robotPuPro {
             syncList: number[], sp: number,
             asyncList: number[], asyncSp: number): number {
             if (sp == 0) return 0;
-            this.pos = Math.min(this.pos, states.length - 1);
+            this.pos = this.pos % states.length;
             this.currentState = states[this.pos];
             let targets = p.stateTargets[this.currentState];
             let spIdx = p.stateSpeedIndices[this.currentState] || 0;
@@ -683,12 +725,12 @@ namespace robotPuPro {
                     this.rightEyeBright(brightness);
                 }
             } else {
-                if (tsDiff > Math.randomRange(100, 250)) {
+                if (tsDiff > randint(100, 250)) {
                     this.eyesCtl(1);
-                    if (Math.randomRange(0, 4) == 0) {
-                        this.blinkInterval = Math.randomRange(100, 250);
+                    if (randint(0, 4) == 0) {
+                        this.blinkInterval = randint(100, 250);
                     } else {
-                        this.blinkInterval = Math.randomRange(this.blinkG, this.blinkG * 2);
+                        this.blinkInterval = randint(this.blinkG, this.blinkG * 2);
                     }
                 }
             }
@@ -1328,8 +1370,8 @@ namespace robotPuPro {
 
         // Movement & State
         public lastCmdTS: number;
-        private fwdSpeed: number = 3;
-        private bwdSpeed: number = -2;
+        private fwdSpeed: number = 6;
+        private bwdSpeed: number = -4;
         public walkSpeed: number = 0;
         public walkDirection: number = 0;
         private headPitchBias: number = 0;
@@ -1366,7 +1408,8 @@ namespace robotPuPro {
             16: [17, 16, 17, 16, 17]      // Rocking motion
         };
 
-        private danceSpeed: number = 1.0;           // Dance speed multiplier
+        private danceSpeed: number = 3.0;           // Dance speed multiplier
+        private danceSpeedTarget: number = 6;     // User-set dance speed limit
         private lastLowBeat: number = 0;       // Timestamp of last low beat
         private lastHighBeat: number = 0;      // Timestamp of last high beat
         private danceYawWiggle: number = 12;     // Left/right wiggle angle (degrees)
@@ -1582,7 +1625,7 @@ namespace robotPuPro {
             this.setControlOffsets([0, 1, 2, 3, 4, 5], [0, 0, 0, 0, 0, 0]);
 
             // 3. Calculate movement speed based on forward speed multiplier
-            let movementSpeed = di * this.fwdSpeed * 0.68;
+            let movementSpeed = di * this.fwdSpeed;
 
             // 4. Execute the movement via the PCB engine
             // Parameters: states, syncList (0-3), syncSpeed, asyncList (4-5), asyncSpeed
@@ -1982,7 +2025,7 @@ namespace robotPuPro {
 
         // Behavior States
         private idle() {
-            if (Math.randomRange(0, 100) == 0) this.alertLevel *= this.alertScale;
+            if (randint(0, 100) == 0) this.alertLevel *= this.alertScale;
             this.rest();
         }
 
@@ -2017,7 +2060,7 @@ namespace robotPuPro {
             this.pcb.flash();
 
             // 2. Randomly trigger a voice request for help (approx 1 in 500 cycles)
-            if (Math.randomRange(0, 500) == 0) {
+            if (randint(0, 500) == 0) {
                 // Use pxt-billy to speak the distress message
                 this.talk("Help me stand up!");
 
@@ -2035,7 +2078,7 @@ namespace robotPuPro {
             this.pcb.flash();
 
             // 2. 0.5% chance to shout for help (random.randint(0, 200) == 0)
-            if (Math.randomRange(0, 200) == 0) {
+            if (randint(0, 200) == 0) {
                 this.talk("Help me!");
             }
 
@@ -2090,10 +2133,10 @@ namespace robotPuPro {
                 nd = nd > 0 ? 1 : -1;
                 this.exploreDirection = (this.exploreDirection * 9 + nd) * 0.1; // Slow smoothing for escape
 
-                dis -= 10 + Math.randomRange(-5, 0);
+                dis -= 10 + randint(-5, 0);
 
                 // Low probability to shout for help via radio
-                if (Math.randomRange(0, 400) == 0) {
+                if (randint(0, 400) == 0) {
                     this.talk(this.content.sentences[5]);
                     this.sendStatusCode("W1"); // Send Warning Code 1
                 }
@@ -2240,15 +2283,7 @@ namespace robotPuPro {
             // states: [24, 14, 0, 0]
             // sync_servos (legs): [0, 1, 2, 3] at speed 3
             // async_servos (waist/head): [4, 5] at speed 2
-            let md = this.pcb.move(this.pr, [24, 14, 0, 0], [0, 1, 2, 3, 6, 7, 8, 9], 3, [4, 5], 2);
-
-            // 2. Check if move completed (md == 0) and gait is at the end (pos == 3)
-            if (md == 0 && this.pcb.pos == 3) {
-                // Transition to Joystick/Manual state
-                this.gst = 5;
-            }
-
-            return md;
+            return this.pcb.move(this.pr, [24, 14, 0, 0 ], [0, 1, 2, 3], 3, [4, 5, 6, 7, 8, 9], 2);
         }
 
         /**
@@ -2258,20 +2293,16 @@ namespace robotPuPro {
         public kick(): number {
             // 1. Execute the forward walk states at high speed
             // legs: [0, 1, 2, 3] at speed 3, body/head: [4, 5] at speed 2
-            let md = this.pcb.move(
-                this.pr,
-                this.pr.boxingStates,
-                [0, 1, 2, 3],
-                3,
-                [4, 5, 6, 7, 8, 9],
-                2
-            );
+            let md = this.pcb.move(this.pr, this.pr.boxingStates, [0, 1, 2, 3], 6, [4, 5, 6, 7, 8, 9], 4);
+            serial.writeLine("md:"+md)
+            serial.writeLine("pos:" + this.pcb.pos)
 
             // 2. Check if the movement step is finished (md == 0)
             // and ensure the gait has reached index 0 or 2 (strike positions)
-            if (md == 0 && (this.pcb.pos == 0 || this.pcb.pos == 2 || this.pcb.pos >= this.pr.boxingStates.length)) {
+            if (md == 0 && (this.pcb.pos == this.pr.boxingStates.length / 2 || this.pcb.pos == 0)) {
                 // Switch back to Joystick/Manual control state
-                this.gst = 5;
+                serial.writeLine("Done")
+                this.switchAction(Action.Drive)
             }
 
             return md;
@@ -2425,17 +2456,10 @@ namespace robotPuPro {
          * Sing a note sequence string using the built-in music engine.
          * @param s The note sequence string, e.g. "C5 D E F G".
          */
-        public sing(s: string): void {
+        public sing(s: string, bpm: number = 120): void {
             this.withSpeaker(() => {
-                music.play(music.stringPlayable(s, 120), music.PlaybackMode.UntilDone);
+                music.play(music.stringPlayable(s, bpm * 4), music.PlaybackMode.UntilDone);
             });
-        }
-
-        /**
-         * Compose a new procedural song and sing it.
-         */
-        public composeAndSing(): void {
-            this.sing(this.content.composeSong());
         }
 
         /**
@@ -2502,7 +2526,7 @@ namespace robotPuPro {
                 this.content.cuteWords(),
                 "Temperature is " + input.temperature() + " degree."
             ];
-            this.talk(words[Math.randomRange(0, words.length - 1)]);
+            this.talk(words[randint(0, words.length - 1)]);
         }
 
         /**
@@ -2561,9 +2585,9 @@ namespace robotPuPro {
             // 1. Loop through the 4 pixels on the robot's strip
             for (let p = 0; p < 4; p++) {
                 // 2. Generate random RGB values (0-128 for moderate brightness)
-                let red = Math.randomRange(0, 128);
-                let green = Math.randomRange(0, 128);
-                let blue = Math.randomRange(0, 128);
+                let red = randint(0, 128);
+                let green = randint(0, 128);
+                let blue = randint(0, 128);
 
                 // 3. Set the color for the specific pixel
                 // Use neopixel.rgb to combine the values into a single color object
@@ -2592,9 +2616,9 @@ namespace robotPuPro {
             }
 
             // 3. Low-beat logic: Change the dance move routine
-            if (il && (ts - this.lastLowBeat > this.music.period * Math.randomRange(8, 16))) {
+            if (il && (ts - this.lastLowBeat > this.music.period * randint(8, 16))) {
                 // Pick a new move from the approved dance state list
-                this.danceState = [this.pr.danceOkStates[Math.randomRange(0, this.pr.danceOkStates.length - 1)]];
+                this.danceState = [this.pr.danceOkStates[randint(0, this.pr.danceOkStates.length - 1)]];
                 this.lastLowBeat = ts;
             }
 
@@ -2611,8 +2635,8 @@ namespace robotPuPro {
             this.setControlOffsets([0, 1, 2, 3, 4, 5],
                 [ft, lt, ft, lt, this.rl, this.dancePitchWiggle - ms * 0.001]);
 
-            // 6. Dynamic speed adjustment
-            this.danceSpeed = Math.min(1.5, this.danceSpeed * 1.015);
+            // 6. Dynamic speed adjustment (capped at user target)
+            this.danceSpeed = Math.min(this.danceSpeedTarget, this.danceSpeed * 1.015);
             if (this.maxG > 1800) { // If shaking too hard, slow down
                 this.danceSpeed *= 0.9;
             }
@@ -2620,6 +2644,16 @@ namespace robotPuPro {
             // 7. Execute the movement via the PCB instance
             return this.pcb.move(this.pr, this.danceState, [0, 1, 2, 3],
                 this.danceSpeed, [4, 5, 6, 7, 8, 9], this.danceSpeed);
+        }
+
+        /**
+         * Set the dance speed multiplier. Higher is faster/more energetic.
+         * @param v speed multiplier, typically 0.1 to 6.0.
+         */
+        public setDanceSpeed(v: number): void {
+            const s = Math.max(0.1, Math.min(10.0, v));
+            this.danceSpeed = s;
+            this.danceSpeedTarget = s;
         }
 
         // Command Handlers
@@ -2663,7 +2697,7 @@ namespace robotPuPro {
                     this.setTrimIndex(this.trimIndex - 1);
                 } else {
                     this.talk("Dance!");
-                    this.danceSpeed = 1.5;
+                    this.setDanceSpeed(1.5);
                     this.switchAction(Action.Dance);
                 }
             } else if (v == 4) {
