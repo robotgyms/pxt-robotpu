@@ -14,7 +14,7 @@ Robot PU has four building blocks that fit together for this project:
 
 - `robotPuPro.greet()` — wakes up and calibrates the robot.
 - `robotPuPro.setDanceSpeed(6)` — sets a fast, energetic dance speed (default is 2.0; higher is faster).
-- `robotPuPro.composeSong(SongStyle.Disco)` and `robotPuPro.composeSong(SongStyle.Cute)` — compose new song strings in each style.
+- `robotPuPro.composeSong(robotPuPro.SongStyle.Disco)` and `robotPuPro.composeSong(robotPuPro.SongStyle.Cute)` — compose new song strings in each style.
 - `robotPuPro.sing(song, 120)` — plays the song at 120 BPM; it is **blocking**, so the robot finishes the song before moving on.
 - `robotPuPro.dance()` — performs one step of the beat-reactive dance. Call it in a loop so the robot keeps dancing.
 
@@ -61,7 +61,7 @@ basic.forever(function () {
 
 | To change | Adjust |
 |---|---|
-| Song style | Use `SongStyle.Disco`, `SongStyle.Cute`, or alternate them as in the example |
+| Song style | Use `robotPuPro.SongStyle.Disco`, `robotPuPro.SongStyle.Cute`, or alternate them as in the example |
 | Singing speed | Pass a BPM to `robotPuPro.sing(song, 120)` or change the number |
 | Dance speed | Use `robotPuPro.setDanceSpeed(...)` — higher is faster; try 1.5–6.0 |
 | Dance smoothness | Increase `basic.pause(...)` in the dance loop if the robot wobbles |
@@ -75,6 +75,6 @@ basic.forever(function () {
 
 ## Next steps
 
-- Combine `robotPuPro.composeSong(SongStyle.Disco)` with your own LED patterns.
+- Combine `robotPuPro.composeSong(robotPuPro.SongStyle.Disco)` with your own LED patterns.
 - Use `robotPuPro.talk("Disco time!")` before the song starts.
 - Read the `dance-pu.md` tutorial to build custom dance choreography.

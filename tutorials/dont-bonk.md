@@ -79,7 +79,7 @@ let distance = 0
 robotPuPro.setChannel(166)
 basic.forever(function () {
     distance = robotPuPro.sonarDistanceCm()
-    robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    robotPuPro.walk(Math.map(distance, 7, 20, -1, 6), 0)
     basic.pause(10)
 })
 
@@ -306,7 +306,7 @@ basic.forever(function () {
     }
 })
 basic.forever(function () {
-    robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    robotPuPro.walk(Math.map(distance, 7, 20, -1, 6), 0)
     basic.pause(10)
 })
 
@@ -326,13 +326,13 @@ What each part is doing:
      - `pitch`: closer = higher frequency.
      - `pulseDelay`: closer = shorter delay (faster beeps).
    - Outside that range, it waits longer to avoid annoying noise when the reading is out-of-range.
-5. `robotPuPro.walkDo(Math.map(distance, 8, 20, 0, 4), 0)`
+5. `robotPuPro.walk(Math.map(distance, 8, 20, 0, 4), 0)`
    - Converts distance into forward walking speed: when the wall is close, speed approaches `0`; when farther, speed approaches `4`.
 
 To allow PU to **back up** when it gets too close, tweak the mapping so very small distances produce a **negative speed**:
 
 ```typescript
-robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 4), 0)
+robotPuPro.walk(Math.map(distance, 7, 20, -1, 4), 0)
 ```
 
 ---

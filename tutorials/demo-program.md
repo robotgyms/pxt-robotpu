@@ -111,7 +111,7 @@ function scare () {
     robotPuPro.talk("What is it?")
     music.play(music.createSoundExpression(WaveShape.Sine, 5000, 0, 255, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
     for (let index = 0; index < 50; index++) {
-        robotPuPro.jumpDo()
+        robotPuPro.jump()
     }
     basic.pause(5000)
 }
@@ -172,7 +172,7 @@ input.setSoundThreshold(SoundThreshold.Loud, 184)
 init_sound()
 // Initialize robot by ask it to greet
 robotPuPro.greet()
-robotPuPro.standDo()
+robotPuPro.stand()
 robotPuPro.setChannel(166)
 robotPuPro.sing("C5 B G - E F E G ")
 ```
@@ -189,7 +189,7 @@ Here are safe extensions that do not break compatibility with the retail gamepad
 
 - **Add a safety timeout**
   - record `lastControlMs` inside the two radio handlers
-  - if no messages arrive for ~500ms, call `robotPuPro.walkDo(0, 0)`
+  - if no messages arrive for ~500ms, call `robotPuPro.walk(0, 0)`
 
 - **Add custom radio commands (optional)**
   - intercept a new key in `radio.onReceivedValue`, handle it, then `return`

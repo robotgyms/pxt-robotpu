@@ -232,16 +232,16 @@ const FAST_CM_PER_S = 5
 
 basic.forever(function () {
     if (mode == 1) {
-        robotPuPro.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0.6)
+        robotPuPro.walk(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0.6)
     } else if (mode == 2) {
-        robotPuPro.restDo()
+        robotPuPro.rest()
     } else if (mode == 3) {
         // use loop to make robot PU jump for a while to escape from the torpedo
         for (let index = 0; index < 100; index++) {
-            robotPuPro.jumpDo()
+            robotPuPro.jump()
         }
     } else {
-        robotPuPro.walkDo(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0)
+        robotPuPro.walk(Math.constrain(Math.map(distance, STOP_CM, 20, -1, 4), -5, 5), 0)
     }
     basic.pause(20)
 })
