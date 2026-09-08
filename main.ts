@@ -855,13 +855,13 @@ namespace robotPuPro {
         return ensureRobot().getIsMusic();
     }
 
-    /** Return a 0-1 LED brightness that pulses in time with the music. Use with `leftEyeBright` or `rightEyeBright`. */
-    //% blockId=robotpu_led_beat block="led beat"
+    /** Return a 0-1 level that follows sound like an old radio sound-bar (VU meter). Use with `leftEyeBright` or `rightEyeBright`. */
+    //% blockId=robotpu_led_level block="led level"
     //% subcategory="Sensors"
     //% group="Sensors"
     //% weight=36 blockGap=8
-    export function ledBeat(): number {
-        return ensureRobot().ledBeat();
+    export function ledLevel(): number {
+        return ensureRobot().ledLevel();
     }
 
     /** Return the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm. */
