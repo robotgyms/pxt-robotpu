@@ -268,7 +268,7 @@ Here is an example to make the robot go to positions one by one.
 
 Key ideas:
 
-- `robotPuPro.setMode(robotPuPro.Mode.API)` tells the robot you are directly commanding joints (instead of running walk/dance state machines).
+- Low-level servo commands automatically put the robot into the right internal state for direct joint control; you do not need to call `start()` or `stop()` before using them.
 - The `radio.onReceived...` handlers are optional. They are only needed if you want to also control the robot from a gamepad/remote using `robotPuPro.runStringCommand(...)` and `robotPuPro.runKeyValueCommand(...)`.
 - `robotPuPro.setChannel(166)` must match your controller/gamepad radio channel.
 - use `robotPuPro.servo()` to move each servo
@@ -276,7 +276,6 @@ Key ideas:
 
 ```typescript
 function pos1 () {
-    robotPuPro.setMode(robotPuPro.Mode.API)
     robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 90)
     robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 90)
     robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 90)
@@ -291,7 +290,6 @@ radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
 function pos2 () {
-    robotPuPro.setMode(robotPuPro.Mode.API)
     robotPuPro.servo(robotPuPro.ServoJoint.LeftFoot, 70)
     robotPuPro.servo(robotPuPro.ServoJoint.LeftLeg, 71)
     robotPuPro.servo(robotPuPro.ServoJoint.RightFoot, 70)

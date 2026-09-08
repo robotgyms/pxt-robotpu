@@ -213,9 +213,11 @@ function skate(speedGain: number): void {
 //
 // The internal fiber calls robot.updateStates() which has its own fall
 // detection (bodyRoll2 > 75 deg, sets gst = -3). To prevent it from
-// hijacking control during a skate trial we keep gst = Mode.API (6) at all
-// times. getRobotAPI() sets this automatically each time moveServos() is
-// called, but we also pin it explicitly inside waitForRecovery().
+// hijacking control during a skate trial, low-level commands like
+// moveServos() automatically put the robot into the API state for direct
+// control. getRobotAPI() sets this automatically each time moveServos() is
+// called; waitForRecovery() keeps the learning loop paused so the internal
+// state machine does not take over.
 //
 // Why not one blocking for-loop?
 //   A blocking loop inside basic.forever stalls the MakeCode scheduler.
@@ -300,18 +302,15 @@ function logUpdate(reward: number, efficiency: number, stability: number): void 
 // During this wait, Loop 1 is paused so no gait commands are sent.
 // The human places the robot back on its feet; once stable, training resumes.
 //
-// We also keep robotPu in API mode (gst = 6) throughout recovery so the
-// internal state machine fiber (updateStates/stateMachine in main.ts) cannot
-// transition gst to -3 ("Help me") and interrupt the learning session.
+// While paused, no gait commands are sent, so the robot stays still while the
+// human places it back on its feet. Low-level blocks like servo() automatically
+// put the robot into the right internal state for direct control when needed.
 function waitForRecovery(): void {
     paused = true
     robotPuPro.talk("I fell")   // melodic voice; use billy.say() for real speech
-    // pin API mode to block the internal state machine from taking over
-    robotPuPro.setMode(robotPuPro.Mode.API)
     // wait until both tilt angles are safely upright
     while (Math.abs(robotPuPro.bodyPitch()) > 20 || Math.abs(robotPuPro.bodyRoll()) > 20) {
         basic.pause(200)
-        robotPuPro.setMode(robotPuPro.Mode.API)  // re-pin each poll in case it got reset
     }
     // small extra pause to let the robot settle after being placed
     basic.pause(1000)

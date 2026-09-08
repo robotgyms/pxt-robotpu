@@ -1299,25 +1299,12 @@ namespace robotPuPro {
         Duck = -5
     }
 
-    /**
-     * Internal robot states.  These are the same values as the Action enum where
-     * they overlap, and include the non-action (error / sleep / API) states.
-     * This enum is not a public MakeCode block; it is only for readable gst
-     * assignments inside the library.
-     */
-    export enum Mode {
-        Calibrate = -4,
-        Fall = -3,
-        Fetal = -2,
-        Sleep = -1,
-        Rest = 0,
-        Explore = 1,
-        Jump = 2,
-        Dance = 3,
-        Kick = 4,
-        Drive = 5,
-        API = 6
-    }
+    // Internal state ids that do not have a user-facing Action token.
+    // Action enum values are used directly wherever a public action exists.
+    export const API_GST = 6;
+    const FALL_GST = -3;
+    const FETAL_GST = -2;
+    const SLEEP_GST = -1;
 
     /**
      * RobotPu Class for MakeCode
@@ -1447,7 +1434,7 @@ namespace robotPuPro {
 
             this.sn = sn;
             this.name = name;
-            this.gst = Mode.Rest;
+            this.gst = Action.Rest;
             this.lastCmdTS = control.millis();
             this.readConfig();
 
@@ -1474,21 +1461,21 @@ namespace robotPuPro {
                 "#purs": (v) => this.pose(v),
                 "#puact": (v) => this.switchAction(v as Action)
             };
-            // Single state machine table.  The keys are exactly the Action and Mode
-            // enum values, so the mapping is 1:1.  Negative gst values are only
-            // used for calibration / error / sleep conditions.
+            // Single state machine table.  Keys use Action enum values directly;
+            // internal non-action states use the FALL_GST / FETAL_GST / SLEEP_GST
+            // / API_GST constants.  The mapping is 1:1.
             this.stateFuncDict = {
-                [Mode.Calibrate]: () => { this.trim(); return 0; },
-                [Mode.Fall]: () => { this.fall(); return 0; },
-                [Mode.Fetal]: () => { this.fetal(); return 0; },
-                [Mode.Sleep]: () => 0,
-                [Mode.Rest]: () => { this.idle(); return 0; },
+                [Action.Calibrate]: () => { this.trim(); return 0; },
+                [FALL_GST]: () => { this.fall(); return 0; },
+                [FETAL_GST]: () => { this.fetal(); return 0; },
+                [SLEEP_GST]: () => 0,
+                [Action.Rest]: () => { this.idle(); return 0; },
                 [Action.Explore]: () => this.explore(),
                 [Action.Jump]: () => this.jump(),
                 [Action.Dance]: () => this.dance(),
                 [Action.Kick]: () => this.kick(),
                 [Action.Drive]: () => this.joystick(),
-                [Mode.API]: () => 0, // API / manual mode: background loop does nothing
+                [API_GST]: () => 0, // API / manual state: background loop does nothing
                 [Action.Walk]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); },
                 [Action.WalkBackward]: () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); },
                 [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
@@ -1760,7 +1747,7 @@ namespace robotPuPro {
          * Stop the current action and reset to rest/idle.
          */
         public stopAction(): void {
-            this.gst = Mode.Rest; // Rest/Idle
+            this.gst = Action.Rest; // Rest/Idle
             this.walkSpeed = 0;
             this.walkDirection = 0;
             this.actionDone = true;
@@ -1777,7 +1764,7 @@ namespace robotPuPro {
          * Returns to idle but preserves lastAction so isActionDone still works.
          */
         private completeAction(): void {
-            this.gst = Mode.Rest; // Rest/Idle
+            this.gst = Action.Rest; // Rest/Idle
             this.walkSpeed = 0;
             this.walkDirection = 0;
             this.actionDone = true;
@@ -1787,13 +1774,28 @@ namespace robotPuPro {
         }
 
         /**
+         * Turn the dead-man watchdog on and refresh the command timestamp.
+         * Call this from any external control channel (radio / I2C / Bluetooth / gamepad).
+         */
+        public watchDogOn(): void {
+            this.actionWatchdog = true;
+            this.lastCmdTS = control.millis();
+        }
+
+        /**
+         * Turn the dead-man watchdog off.
+         */
+        public watchDogOff(): void {
+            this.actionWatchdog = false;
+        }
+
+        /**
          * Start an action token for a number of steps.
          * Use 0 steps to keep it running until stop() is called.
          * Set waitForCompletion to block this fiber until the action finishes.
-         * Set external to true for radio / I2C / Bluetooth / gamepad channels
-         * so the dead-man watchdog is active.
+         * This does NOT set the dead-man watchdog; use watchDogOn() for external streams.
          */
-        public startAction(action: Action, steps: number, waitForCompletion: boolean = false, external: boolean = false): void {
+        public startAction(action: Action, steps: number, waitForCompletion: boolean = false): void {
             this.stopAction();
             this.gst = action; // Action enum values are the gst ids now
             this.currentAction = action;
@@ -1802,8 +1804,6 @@ namespace robotPuPro {
             this.stepsDone = 0;
             this.actionDone = false;
             this.actionRunning = true;
-            this.actionWatchdog = external;
-            this.lastCmdTS = control.millis();
 
             if (waitForCompletion && steps > 0) {
                 // Block this fiber until the counted action completes or is pre-empted.
@@ -1816,12 +1816,12 @@ namespace robotPuPro {
 
         /**
          * Switch to an action from an external control channel.
-         * Enables the dead-man watchdog.  The action runs until another
-         * command arrives or the watchdog times out.
+         * Does not touch the dead-man watchdog; the bridge (runKeyValueCommand /
+         * runStringCommand / watchDogOn) must enable it.
          */
         public switchAction(action: Action): void {
             if (this.actionRunning && this.currentAction == action) return;
-            this.startAction(action, 0, false, true);
+            this.startAction(action, 0, false);
         }
 
         /**
@@ -1943,7 +1943,7 @@ namespace robotPuPro {
         public updateStates(): void {
             // 1. Fall detection using Accelerometer
             if (input.isGesture(Gesture.FreeFall)) {
-                this.gst = Mode.Fetal; // Enter fall state
+                this.gst = FETAL_GST; // Enter fall state
             }
 
             // 2. Handle automatic state transitions (Inactivity Timeout)
@@ -1959,7 +1959,7 @@ namespace robotPuPro {
             }
 
             // 3. Balance monitoring and recovery logic
-            if (this.gst != Mode.Fetal) { // If not in protective fetal position
+            if (this.gst != FETAL_GST) { // If not in protective fetal position
                 // Check tilt thresholds (equivalent to bodyRoll2/bodyPitch2 in Python)
                 if (Math.abs(this.bodyRoll2) > 75 || Math.abs(this.bodyPitch2) > 75) {
                     this.balanceParam(); // Recalculate IMU data
@@ -1967,12 +1967,12 @@ namespace robotPuPro {
                     this.pcb.numSteps = 0; // Reset step count on fall
 
                     if (this.fellCount > 16) {
-                        this.gst = Mode.Fall; // Enter "Help me" recovery state
+                        this.gst = FALL_GST; // Enter "Help me" recovery state
                     }
                 } else {
                     this.fellCount = 0;
                     // Return to previous state after standing up
-                    if (this.gst == Mode.Fall) {
+                    if (this.gst == FALL_GST) {
                         this.gst = this.lastState;
                         this.talk("Thanks");
                     }
@@ -2345,7 +2345,7 @@ namespace robotPuPro {
 
             // 3. If alert level reaches 0, enter deeper sleep (state -1)
             if (this.alertLevel < 1) {
-                this.gst = Mode.Sleep;
+                this.gst = SLEEP_GST;
             }
 
             return 0; // Remain asleep
@@ -2359,7 +2359,7 @@ namespace robotPuPro {
             // 1. Check for wake-up triggers first
             if (this.checkWakeup() == 1) {
                 // Return to Idle/Standby state
-                this.gst = Mode.Rest;
+                this.gst = Action.Rest;
                 if (this.sleepPoweredDown) {
                     this.pcb.setServoPower(true);
                     this.sleepPoweredDown = false;
@@ -2644,7 +2644,7 @@ namespace robotPuPro {
                 this.headYawBias = 0;
                 this.talk("Rest!");
             } else if (v == 1) {
-                if (this.gst == Mode.Calibrate) {
+                if (this.gst == Action.Calibrate) {
                     this.adjustTrim(-1);
                 } else {
                     this.talk("Exploring");
@@ -2653,13 +2653,13 @@ namespace robotPuPro {
                     this.switchAction(Action.Explore);
                 }
             } else if (v == 2) {
-                if (this.gst == Mode.Calibrate) {
+                if (this.gst == Action.Calibrate) {
                     this.setTrimIndex(this.trimIndex + 1);
                 } else {
                     this.switchAction(Action.Jump);
                 }
             } else if (v == 3) {
-                if (this.gst == Mode.Calibrate) {
+                if (this.gst == Action.Calibrate) {
                     this.setTrimIndex(this.trimIndex - 1);
                 } else {
                     this.talk("Dance!");
@@ -2667,7 +2667,7 @@ namespace robotPuPro {
                     this.switchAction(Action.Dance);
                 }
             } else if (v == 4) {
-                if (this.gst == Mode.Calibrate) {
+                if (this.gst == Action.Calibrate) {
                     this.adjustTrim(1);
                 } else {
                     this.switchAction(Action.Kick);
@@ -2699,12 +2699,12 @@ namespace robotPuPro {
         }
 
         public beginTrimCalibration(): void {
-            this.gst = Mode.Calibrate;
+            this.gst = Action.Calibrate;
             this.showTrimIndex();
         }
 
         public toggleServoTrim(): void {
-            if (this.gst == Mode.Calibrate) {
+            if (this.gst == Action.Calibrate) {
                 this.saveTrimCalibration();
             } else {
                 this.beginTrimCalibration();
@@ -2716,7 +2716,7 @@ namespace robotPuPro {
             this.writeConfig();
             this.stand();
             this.talk("Saved!");
-            this.gst = Mode.Rest;
+            this.gst = Action.Rest;
             this.showChannel();
         }
 
@@ -2744,7 +2744,8 @@ namespace robotPuPro {
         }
 
         public runKeyValueCommand(key: string, v: number) {
-            this.lastCmdTS = control.millis();
+            // Any external command turns the dead-man watchdog on.
+            this.watchDogOn();
 
             // Look up the function in the dictionary and execute it if it exists.
             let action = this.cmdFuncDict[key];
@@ -2754,8 +2755,8 @@ namespace robotPuPro {
         }
 
         public runStringCommand(s: string) {
-            // 1. Update the timestamp of the last received command
-            this.lastCmdTS = control.millis()
+            // Any external command turns the dead-man watchdog on.
+            this.watchDogOn();
 
             // 2. Process #put: Text-to-Speech
             if (s.substr(0, 4) == "#put") {

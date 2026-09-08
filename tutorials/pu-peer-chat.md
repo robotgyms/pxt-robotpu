@@ -77,7 +77,7 @@ robotPuPro.talk(
 We will broadcast a status string that looks like:
 
 ```
-PU|<name>|<mode>|<distCm>|<loud>|<ts>
+PU|<name>|<action>|<distCm>|<loud>|<ts>
 ```
 
 Example:
@@ -133,21 +133,22 @@ const cuteTalks = [
 let lastReplyMs = 0
 const replyCooldownMs = 1500
 
-function modeToText(m: robotPuPro.Mode): string {
-    // Use compare() here (Text API)
-    const s = "" + m
-    if (s.compare("3") == 0) return "Dance"
-    if (s.compare("1") == 0) return "Explore"
-    if (s.compare("0") == 0) return "Rest"
-    return "Mode" + s
+// Track the action we started last. Update this when you call start() or stop().
+let currentAction: robotPuPro.Action = robotPuPro.Action.Rest
+
+function actionToText(a: robotPuPro.Action): string {
+    if (a == robotPuPro.Action.Dance) return "Dance"
+    if (a == robotPuPro.Action.Explore) return "Explore"
+    if (a == robotPuPro.Action.Rest) return "Rest"
+    return "Action" + a
 }
 
 function makeStatusString(): string {
-    const mode = modeToText(robotPuPro.mode())
+    const action = actionToText(currentAction)
     const dist = robotPuPro.sonarDistanceCm()
     const loud = input.soundLevel()
     const ts = control.millis()
-    return "PU|" + myName + "|" + mode + "|" + dist + "|" + loud + "|" + ts
+    return "PU|" + myName + "|" + action + "|" + dist + "|" + loud + "|" + ts
 }
 
 function sendStatus(): void {
@@ -188,7 +189,7 @@ radio.onReceivedString(function (receivedString: string) {
     if (parts.length < 6) return
 
     const otherName = parts[1]
-    const otherMode = parts[2]
+    const otherAction = parts[2]
 
     // Text API: parseFloat
     const otherDist = parseFloat(parts[3])
@@ -202,13 +203,13 @@ radio.onReceivedString(function (receivedString: string) {
     const first = otherName.charAt(0)
     const firstCode = otherName.charCodeAt(0)
 
-    robotPuPro.talk(otherName + " is " + otherMode + ". " + pick(cuteTalks))
+    robotPuPro.talk(otherName + " is " + otherAction + ". " + pick(cuteTalks))
     robotPuPro.talk("I heard " + first + " code " + firstCode)
 
     const now = control.millis()
     if (now - lastReplyMs > replyCooldownMs) {
         lastReplyMs = now
-        robotPuPro.talk("I am " + myName + ", " + modeToText(robotPuPro.mode()))
+        robotPuPro.talk("I am " + myName + ", " + actionToText(currentAction))
         sendStatus()
     }
 })

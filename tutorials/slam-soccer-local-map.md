@@ -329,7 +329,6 @@ function searchBall(searchPattern: { y: number, p: number }[]) {
             serial.writeLine("" + (`yawSearch: ${targetOffset.y * search_gain}`))
             serial.writeLine("" + (`pitchSearch: ${targetOffset.p * search_gain}`))
         }
-        robotPuPro.setMode(robotPuPro.Mode.API)
         robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
         robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
         robotPuPro.leftEyeBright(0.002)
@@ -558,7 +557,6 @@ function trackBall(p: Buffer) {
                 serial.writeLine(`ball y: ${y_mm}`)
             }
             // move head to look at the ball
-            robotPuPro.setMode(robotPuPro.Mode.API)
             robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.08, 8)
             robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.08, 8)
             robotPuPro.leftEyeBright(0.01)
