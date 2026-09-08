@@ -531,25 +531,41 @@ namespace robotPuPro {
      * Sing a musical note sequence using the built-in music engine.
      * Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use '-' for a rest.
      * @param song the note sequence string to sing, eg: "C5 B G - E F E G "
+     * @param bpm the tempo in beats per minute, eg: 120
      */
-    //% blockId=robotpu_sing block="sing %song"
+    //% blockId=robotpu_sing block="sing %song at %bpm bpm"
     //% song.shadow=text
+    //% bpm.min=40 bpm.max=240 bpm.defl=120
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=75
-    export function sing(song: string): void {
-        ensureRobot().sing(song);
+    export function sing(song: string, bpm: number = 120): void {
+        ensureRobot().sing(song, bpm);
     }
 
     /**
-     * Compose a new procedural song and sing it.
+     * Compose a song string in the chosen style.
+     * @param style the song style, eg: SongStyle.Disco
      */
-    //% blockId=robotpu_compose_sing block="compose and sing"
+    //% blockId=robotpu_compose block="compose song $style"
     //% subcategory="Actions"
     //% group="Actions"
     //% weight=74
-    export function composeAndSing(): void {
-        ensureRobot().composeAndSing();
+    export function composeSong(style: SongStyle = SongStyle.Disco): string {
+        return ensureRobot().content.composeSong(style);
+    }
+
+    /**
+     * Set the dance speed. 1.0 is the default speed, higher is faster/more energetic.
+     * @param speed speed multiplier, eg: 1.5
+     */
+    //% blockId=robotpu_set_dance_speed block="set dance speed to %speed"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% speed.min=0.5 speed.max=6.0 speed.defl=2.0
+    //% weight=73
+    export function setDanceSpeed(speed: number): void {
+        ensureRobot().setDanceSpeed(speed);
     }
 
     /**
