@@ -23,10 +23,11 @@ const cuteTalks = [
 
 let lastReplyMs = 0
 const replyCooldownMs = 1500
+let currentAction: robotPuPro.Action = robotPuPro.Action.Rest
 
 function makeStatusString(): string {
-    const mode = "" + robotPu.mode()
-    const dist = robotPu.sonarDistanceCm()
+    const mode = "" + currentAction
+    const dist = robotPuPro.sonarDistanceCm()
     const loud = input.soundLevel()
     const ts = control.millis()
     return "PU|" + myName + "|" + mode + "|" + dist + "|" + loud + "|" + ts
@@ -42,7 +43,7 @@ control.inBackground(function () {
 radio.onReceivedString(function (receivedString: string) {
     // 1) Preserve remote command feature: allow sending commands like "#putHello" over radio
     if (receivedString.charAt(0) == "#") {
-        robotPu.runStringCommand(receivedString)
+        robotPuPro.runStringCommand(receivedString)
         return
     }
 
@@ -61,16 +62,16 @@ radio.onReceivedString(function (receivedString: string) {
     // Avoid talking to ourselves
     if (otherName == myName) return
 
-    robotPu.talk(otherName + " is " + otherMode + ". " + pick(cuteTalks))
+    robotPuPro.talk(otherName + " is " + otherMode + ". " + pick(cuteTalks))
 
     const now = control.millis()
     if (now - lastReplyMs > replyCooldownMs) {
         lastReplyMs = now
-        robotPu.talk("I am " + myName + ". " + pick(cuteTalks))
+        robotPuPro.talk("I am " + myName + ". " + pick(cuteTalks))
         radio.sendString(makeStatusString())
     }
 })
 
 // Default setup
-robotPu.setChannel(166)
-robotPu.talk("Peer chat ready")
+robotPuPro.setChannel(166)
+robotPuPro.talk("Peer chat ready")

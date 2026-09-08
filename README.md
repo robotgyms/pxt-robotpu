@@ -942,11 +942,36 @@ radio.onReceivedValue(function (name, value) {
 input.onGesture(Gesture.LogoDown, function () {
     robotPuPro.rest()
 })
-// press logo button to dance using set mode
+// press logo button to dance using start action
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-    robotPuPro.setMode(robotPuPro.Mode.Dance)
+    robotPuPro.start(robotPuPro.Action.Dance, 0)
 })
 ```
+
+## Memory Profile
+
+Robot PU targets micro:bit V2 (V1 is disabled in `pxt.json`).
+
+| Build output | File | Approximate size |
+|--------------|------|------------------|
+| V2 flash image | `built/mbcodal-binary.hex` | ~650 KB actual (ASCII `.hex` ~1.3 MB). Most of this is the CODAL runtime; the compiled extension code is a small fraction. |
+| V1 flash image | `built/mbdal-binary.hex` | ~400 KB actual, but V1 is not supported by this extension. |
+
+### Runtime RAM estimate (micro:bit V2, 128 KB RAM)
+
+| Structure | Approximate size | Notes |
+|-----------|------------------|-------|
+| `Parameters.stateTargets` (27 × 10 boxed numbers) | ~4–5 KB | Largest single structure; every pose target for the 10 servos. |
+| `Parameters.speedCandidates` (11 × 10 boxed numbers) | ~1.5–2 KB | Per-state speed multipliers. |
+| Other `Parameters` arrays | ~0.5–1 KB | `stateSpeedIndices`, walk/dance state lists, etc. |
+| `PCB` servo arrays | ~0.5–1 KB | `servoCtrl`, `servoTarget`, `servoTrim`, `servoErr`. |
+| `Odometry`, `MusicLib`, `Content`, `RoboVoice` | ~1–2 KB | 3×3 transformation, 43-sample beat buffer, sentence/phrase lists, pitch maps. |
+| `RobotPu` fields and objects | ~1–2 KB | State machine variables, dictionaries, name/serial, etc. |
+| **Total extension data** | **~10–15 KB** | User-allocated heap for the Robot PU objects. |
+| pxt/CODAL runtime, heap, stack | ~30–50 KB | Base runtime overhead. |
+| **Total at runtime** | **~45–70 KB** | Leaves a safe margin inside the 128 KB V2 RAM. |
+
+The biggest opportunity to reduce RAM is `Parameters.stateTargets`. Reducing the number of stored poses, or storing them as `uint8`/`int8` instead of full boxed `number` values, would be the first place to optimize.
 
 ## Tips
 

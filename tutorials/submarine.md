@@ -15,7 +15,7 @@ Welcome to the official project repository for **Robot PU (Pair Up)**. Robot PU 
 
 ---
 
-## 🌊 2. Project: Submarine Sonar Mode
+## 🌊 2. Project: Submarine Sonar mode
 
 ### Problem Definition
 

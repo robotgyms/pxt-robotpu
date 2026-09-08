@@ -309,7 +309,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **Event loop** ⭐⭐: [event-loop-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-loop-pu.md)
 - **Custom events and handlers** ⭐⭐: [event-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-pu.md)
 - **State machines** ⭐⭐: [state-machine-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-machine-pu.md)
-- **State switch with setMode** ⭐⭐: [state-switch-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-switch-pu.md)
+- **State switch with start/stop** ⭐⭐: [state-switch-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-switch-pu.md)
 - **Object-oriented programming architecture** ⭐⭐: [OOP-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/OOP-pu.md)
 - **Synchronized singing** ⭐⭐: [synchronized-sing-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/synchronized-sing-pu.md)
 

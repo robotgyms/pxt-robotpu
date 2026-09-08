@@ -54,16 +54,13 @@ namespace robotPuPro {
                 }
             });
         }
-        // set last command timestamp to prevent timeout reset
-        robot.lastCmdTS = control.millis();
         return robot;
     }
 
     function getRobotAPI(): RobotPu {
         const r = ensureRobot();
-        r.gst = Mode.API;
-        r.actionWatchdog = true;
-        r.lastCmdTS = control.millis();
+        r.gst = API_GST;
+        r.watchDogOff();
         return r;
     }
 
@@ -98,6 +95,20 @@ namespace robotPuPro {
     //% weight=97 blockGap=8
     export function stop(): void {
         ensureRobot().stopAction();
+    }
+
+    /** Turn the dead-man watchdog on. External control streams should call this. */
+    //% blockId=robotpu_watchdog_on block="watchdog on"
+    //% weight=96 blockGap=8
+    export function watchDogOn(): void {
+        ensureRobot().watchDogOn();
+    }
+
+    /** Turn the dead-man watchdog off. */
+    //% blockId=robotpu_watchdog_off block="watchdog off"
+    //% weight=95 blockGap=8
+    export function watchDogOff(): void {
+        ensureRobot().watchDogOff();
     }
 
     /** Return how many steps of the chosen action have completed. */

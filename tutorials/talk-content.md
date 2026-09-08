@@ -8,7 +8,7 @@ Welcome to the official project repository for **Robot PU (Pair Up)**. Robot PU 
 In this tutorial you will learn how to:
 
 1. Build a **talk content generator** (random + templated phrases)
-2. Associate talk content with **Robot PU mode** and **robot status**
+2. Associate talk content with **Robot PU action** and **robot status**
 3. Express it using:
    1. `robotPuPro.talk(text)` — plays text as a melodic robotic tune (RoboVoice)
    2. `robotPuPro.sing(text)` — plays a note-letter sequence (e.g. `"C D E F G "`)
@@ -25,7 +25,7 @@ From the `pxt-robotpu` extension:
 * `robotPuPro.sing(text)` — note-letter sequence player (e.g. `"C D E F G "`)
 * `robotPuPro.morse(code, unitMs?)` — play ITU morse code beeps directly
 * `robotPuPro.morseText(text, unitMs?)` — translate plain text to morse and play it
-* `robotPuPro.mode()` → returns the current behavior mode
+* `robotPuPro.isDone(action)` → returns whether a counted action has finished
 * `robotPuPro.sonarDistanceCm()` → distance to obstacles
 * `robotPuPro.walk(...)`, `robotPuPro.explore()`, `robotPuPro.dance()`, etc.
 
@@ -103,6 +103,10 @@ const LOUD_LEVEL = 160
 let lastTalkMs = 0
 let talkCooldownMs = 2200
 
+// --- current action tracker ---
+// Update this variable whenever you call start() or stop() in your main program.
+let currentAction: robotPuPro.Action = robotPuPro.Action.Explore
+
 function canTalk(now: number): boolean {
     return (now - lastTalkMs) > talkCooldownMs
 }
@@ -122,12 +126,12 @@ enum TalkIntent {
     Idle
 }
 
-function intentFromState(mode: robotPuPro.Mode, distCm: number, loud: number): TalkIntent {
+function intentFromState(action: robotPuPro.Action, distCm: number, loud: number): TalkIntent {
     // Priority first
     if (distCm > 0 && distCm < VERY_NEAR_CM) return TalkIntent.Obstacle
-    if (mode == robotPuPro.Mode.Dance || loud > LOUD_LEVEL) return TalkIntent.Dancing
-    if (mode == robotPuPro.Mode.Explore) return TalkIntent.Exploring
-    if (mode == robotPuPro.Mode.Rest) return TalkIntent.Resting
+    if (action == robotPuPro.Action.Dance || loud > LOUD_LEVEL) return TalkIntent.Dancing
+    if (action == robotPuPro.Action.Explore) return TalkIntent.Exploring
+    if (action == robotPuPro.Action.Rest) return TalkIntent.Resting
     return TalkIntent.Idle
 }
 
@@ -175,11 +179,11 @@ function maybeMorse(now: number, loud: number): void {
 basic.forever(function () {
     const now = control.millis()
 
-    const mode = robotPuPro.mode()
+    const action = currentAction
     const distCm = robotPuPro.sonarDistanceCm()
     const loud = input.soundLevel()
 
-    const intent = intentFromState(mode, distCm, loud)
+    const intent = intentFromState(action, distCm, loud)
 
     // Speak more aggressively when obstacle is close
     talkCooldownMs = (intent == TalkIntent.Obstacle) ? 900 : 2200
@@ -199,8 +203,8 @@ basic.forever(function () {
 
 ## 🧪 5. Testing & Tuning
 
-1. **Mode association**:
-   1. Set PU to explore / dance / rest and confirm the speech changes.
+1. **Action association**:
+   1. Set `currentAction` to `robotPuPro.Action.Explore`, `robotPuPro.Action.Dance`, or call `robotPuPro.stop()` and confirm the speech changes.
 2. **Obstacle callouts**:
    1. Put a wall close to trigger the obstacle intent.
    2. Tune `VERY_NEAR_CM` and `NEAR_CM`.

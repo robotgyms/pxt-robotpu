@@ -163,10 +163,10 @@ input.onGesture(Gesture.Shake, function () {
 radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
-// press logo button to dance using set mode
+// press logo button to dance
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.talk("Dance!")
-    robotPuPro.setMode(robotPuPro.Mode.Dance)
+    robotPuPro.start(robotPuPro.Action.Dance, 0)
 })
 input.setSoundThreshold(SoundThreshold.Loud, 184)
 init_sound()

@@ -185,7 +185,6 @@ function searchFace() {
             serial.writeLine("" + (`yawSearch: ${targetOffset.y * search_gain}`))
             serial.writeLine("" + (`pitchSearch: ${targetOffset.p * search_gain}`))
         }
-        robotPuPro.setMode(robotPuPro.Mode.API)
         robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, currentYaw + targetOffset.y * search_gain, 1)
         robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, currentPitch + targetOffset.p * search_gain, 1)
         robotPuPro.leftEyeBright(0.002)
@@ -245,7 +244,6 @@ function trackFace(p: Buffer) {
                 // serial.writeLine(`head pitch: ${robotPuPro.servoTargets()[5]}`)
                 serial.writeLine(`pitchLock: ${pitch}`)
             }
-            robotPuPro.setMode(robotPuPro.Mode.API)
             robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, robotPuPro.servoTargets()[4] + yaw * 0.08, 8)
             robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, robotPuPro.servoTargets()[5] + pitch * 0.08, 8)
             robotPuPro.leftEyeBright(0.01)

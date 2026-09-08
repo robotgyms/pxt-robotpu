@@ -260,11 +260,11 @@ basic.forever(function () {
 ```
 
 ## How This Works
-Normal Mode
+Normal mode
 Robot aligns its compass to the leader’s heading
 Robot matches the leader’s joystick speed
 Smooth, coordinated swarm movement
-Override Mode
+Override mode
 Triggered when sonar detects an obstacle:
 
 Emergency stop if dangerously close
