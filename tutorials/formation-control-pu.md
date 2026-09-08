@@ -26,7 +26,7 @@ radio.setGroup(42)
 basic.forever(function () {
     // Toy command: walk forward
     radio.sendString("cmd,walk")
-    robotPuPro.walkDo(2, 0)
+    robotPuPro.walk(2, 0)
     basic.pause(150)
 })
 ```
@@ -52,14 +52,14 @@ basic.forever(function () {
 
     // Local safety override
     if (d > 0 && d < 12) {
-        robotPuPro.walkDo(-2, 0)
+        robotPuPro.walk(-2, 0)
         basic.pause(120)
         return
     }
 
-    if (cmd == "walk") robotPuPro.walkDo(2, 0)
-    else if (cmd == "left") robotPuPro.sideStepDo(-1)
-    else if (cmd == "right") robotPuPro.sideStepDo(1)
+    if (cmd == "walk") robotPuPro.walk(2, 0)
+    else if (cmd == "left") robotPuPro.sideStep(-1)
+    else if (cmd == "right") robotPuPro.sideStep(1)
     else robotPuPro.rest()
 
     basic.pause(40)

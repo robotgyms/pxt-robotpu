@@ -260,7 +260,7 @@ basic.forever(function () {
 })
 basic.forever(function () {
     distance = robotPuPro.sonarDistanceCm()
-    robotPuPro.walkDo(Math.map(distance, 7, 20, -1, 6), 0)
+    robotPuPro.walk(Math.map(distance, 7, 20, -1, 6), 0)
     basic.pause(10)
 })
 

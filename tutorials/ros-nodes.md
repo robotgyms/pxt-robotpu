@@ -75,11 +75,11 @@ basic.forever(function () {
 // --- Controller node ---
 basic.forever(function () {
     if (isStopped) {
-        robotPuPro.restDo()
+        robotPuPro.rest()
     } else if (goalDistance > 0) {
-        robotPuPro.walkDo(2, 0)
+        robotPuPro.walk(2, 0)
     } else {
-        robotPuPro.restDo()
+        robotPuPro.rest()
     }
     radio.sendString("cmd,straight")
     basic.pause(100)
@@ -89,7 +89,7 @@ basic.forever(function () {
 basic.forever(function () {
     if (obstacleDistance < 10) {
         isStopped = true
-        robotPuPro.restDo()
+        robotPuPro.rest()
         radio.sendString("estop,1")
     } else {
         isStopped = false

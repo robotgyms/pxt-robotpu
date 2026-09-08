@@ -71,7 +71,7 @@ basic.forever(function () {
     }
 
     // Normal behavior goes here
-    robotPuPro.walkDo(2, 0)
+    robotPuPro.walk(2, 0)
     basic.pause(20)
 })
 ```

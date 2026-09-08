@@ -134,7 +134,7 @@ radio.onReceivedValue(function (name, value) {
 basic.forever(function () {
     if (control.millis() - lastSteerMs > 500) {
         // No steering updates for 0.5s → stop
-        robotPuPro.walkDo(0, 0)
+        robotPuPro.walk(0, 0)
     }
     basic.pause(20)
 })
