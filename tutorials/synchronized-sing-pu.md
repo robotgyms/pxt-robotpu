@@ -490,7 +490,7 @@ input.onButtonPressed(Button.B, function () {
 radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
-// press logo button to dance using set mode
+// press logo button to start a dance track
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     track = robotPuPro.channel() % 4
     if (track == 0) {
