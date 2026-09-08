@@ -1682,13 +1682,13 @@ namespace robotPuPro {
                 this.sn = storedSn;
             }
             let storedGroup = settings.readNumber("robotpu.group");
-            if (!isNaN(storedGroup)) {
+            if (storedGroup !== undefined && !isNaN(storedGroup)) {
                 this.radioGroupID = Math.round(storedGroup) % 256;
                 if (this.radioGroupID < 0) this.radioGroupID += 256;
             }
             for (let i = 0; i < this.pr.dof; i++) {
                 let v = settings.readNumber("robotpu.trim." + i);
-                if (!isNaN(v)) {
+                if (v !== undefined && !isNaN(v)) {
                     this.pcb.servoTrim[i] = v;
                 }
             }
