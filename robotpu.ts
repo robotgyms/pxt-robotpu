@@ -1422,6 +1422,7 @@ namespace robotPuPro {
 
         private danceSpeed: number = 3.0;           // Dance speed multiplier
         private danceSpeedTarget: number = 6;     // User-set dance speed limit
+        private ledLevelValue: number = 0;       // VU-meter style smoothed level for eye LEDs
         private lastLowBeat: number = 0;       // Timestamp of last low beat
         private lastHighBeat: number = 0;      // Timestamp of last high beat
         private danceYawWiggle: number = 12;     // Left/right wiggle angle (degrees)
@@ -1619,19 +1620,19 @@ namespace robotPuPro {
         }
 
         /**
-         * Return a 0..1 brightness value that pulses on each detected music beat.
+         * Return a VU-meter style 0..1 level for the eye LEDs.
+         * It rises quickly on loud sound and fades smoothly, like an old radio sound-bar.
          * Call repeatedly in a loop and pass the result to leftEyeBright/rightEyeBright.
          */
-        public ledBeat(): number {
-            const ts = control.millis();
-            const loud = input.soundLevel();
-            this.music.isABeat(ts, loud, 1.005);
-            const p = this.music.period;
-            if (p <= 0 || this.music.lastBeatTime <= 0) return 0;
-            let phase = (ts - this.music.lastBeatTime) / p;
-            if (phase < 0) phase = 0;
-            if (phase > 1) phase = 1;
-            return Math.max(0, 1 - phase);
+        public ledLevel(): number {
+            const s = Math.min(1, Math.max(0, input.soundLevel() / 255));
+            // fast attack, slow decay
+            if (s > this.ledLevelValue) {
+                this.ledLevelValue = s;
+            } else {
+                this.ledLevelValue = this.ledLevelValue * 0.95;
+            }
+            return this.ledLevelValue;
         }
 
         /**
