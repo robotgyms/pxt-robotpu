@@ -1580,9 +1580,14 @@ namespace robotPuPro {
         }
 
         public getMusicTempo(): number {
-            const p = this.music.period;
-            if (p <= 0) return 0;
-            return 60000 / p;
+            const ts = control.millis();
+            const loud = input.soundLevel();
+            if (this.music.isABeat(ts, loud, 1.005)) {
+                const p = this.music.period;
+                if (p <= 0) return 0;
+                return Math.round(60000 / p);
+            }
+            return 0;
         }
 
         /**
@@ -2294,14 +2299,11 @@ namespace robotPuPro {
             // 1. Execute the forward walk states at high speed
             // legs: [0, 1, 2, 3] at speed 3, body/head: [4, 5] at speed 2
             let md = this.pcb.move(this.pr, this.pr.boxingStates, [0, 1, 2, 3], 6, [4, 5, 6, 7, 8, 9], 4);
-            serial.writeLine("md:"+md)
-            serial.writeLine("pos:" + this.pcb.pos)
 
             // 2. Check if the movement step is finished (md == 0)
             // and ensure the gait has reached index 0 or 2 (strike positions)
             if (md == 0 && (this.pcb.pos == this.pr.boxingStates.length / 2 || this.pcb.pos == 0)) {
                 // Switch back to Joystick/Manual control state
-                serial.writeLine("Done")
                 this.switchAction(Action.Drive)
             }
 

@@ -3,7 +3,7 @@
  * Robot PU can walk, dance, kick, jump, rest, explore, talk, and sing.
  * Control it with the gamepad or program custom behaviors.
  */
-//% weight=50 color=#e7660b icon="\uf2bd"
+//% weight=50 color=#c65a00 icon="\uf2bd"
 //% block="Robot PU"
 //% groups='["Setup", "Sensors", "Actuators", "Actions", "Remote Control", "Advanced"]'
 //% helpUrl="https://robotgyms.com/pu"

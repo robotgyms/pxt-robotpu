@@ -4,9 +4,9 @@
 
 ## Overview
 
-This repository is a MakeCode extension for BBC micro:bit (V2 only) to program Robot PU. Using this extension requires the micro:bit V2 hardware. micro:bit V1 will display the 927 error code.
+This repository is a MakeCode extension for micro:bit (V2 only) to program Robot PU. Using this extension requires the micro:bit V2 hardware. micro:bit V1 will display the 927 error code.
 
-Robot PU is a playful, programmable robot built on BBC micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode. This software package was ported from [Python Version](https://github.com/NovaSeq/RobotPu.git). It extends the beginner version (6 DOF) with more actions (10 DOF), more sensor data, and feedback control APIs.
+Robot PU is a playful, programmable robot built on micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode. This software package was ported from [Python Version](https://github.com/NovaSeq/RobotPu.git). It extends the beginner version (6 DOF) with more actions (10 DOF), more sensor data, and feedback control APIs.
 
 PU can walk, autopilot, dance, kick, jump, rest, talk, and sing. It reacts to music, balances using its IMU, and navigates with an ultrasonic sensor.
 The retail kit includes a gamepad built from the second micro:bit for radio-based remote control, including gesture head control (tilt to yaw/pitch PU’s head).
@@ -117,9 +117,9 @@ The JavaScript tutorial set includes **knowledge graphs** (mindmaps) that show h
   - a general tutorial mindmap (`mindmap.png` + Mermaid source)
   - an advanced, ROS-inspired mindmap (`advanced-ros-mindmap.png` + Mermaid source)
 
-![JavaScript Tutorials Knowledge Graph](tutorials/mindmap.png)
+![JavaScript Tutorials Knowledge Graph](https://raw.githubusercontent.com/robotgyms/pxt-robotpu/main/tutorials/mindmap.png)
 
-![Advanced ROS Topics Knowledge Graph](tutorials/advanced-ros-mindmap.png)
+![Advanced ROS Topics Knowledge Graph](https://raw.githubusercontent.com/robotgyms/pxt-robotpu/main/tutorials/advanced-ros-mindmap.png)
 
 Use these graphs to:
 
@@ -158,83 +158,9 @@ Use these graphs to:
 - core, radio, neopixel (from MakeCode)
 - Billy voice package: [pxt-billy](https://github.com/adamish/pxt-billy)
 
-## Development with Makefile
+## Development and release setup
 
-This repository includes a `Makefile` to wrap common PXT and release commands.
-
-### Build and compile check
-
-Run a full local MakeCode compile check before pushing:
-
-```bash
-make build
-```
-
-This runs:
-
-```bash
-pxt target microbit
-pxt install
-pxt build
-```
-
-You can also use:
-
-```bash
-make check
-```
-
-`make check` is an alias for `make build`.
-
-### Install or refresh the MakeCode target
-
-If this is a fresh clone, or if PXT says the target is missing, run:
-
-```bash
-make target
-```
-
-To install or refresh package dependencies from `pxt.json`, run:
-
-```bash
-make install
-```
-
-### Clean local build output
-
-```bash
-make clean
-```
-
-This removes the local `built/` directory.
-
-### Release example
-Before release, must review everything with BBC MakeCode extension approval requirements.
-
-All version numbers must start with a `v`, for example `v1.0.42`.
-
-```bash
-make release VERSION=v1.0.42
-```
-
-The release target:
-
-1. Runs the build.
-2. Updates the `version` key in `pxt.json`.
-3. Stages release files.
-4. Creates a git commit named `Release 1.0.42` if there are staged changes.
-5. Runs `git push`.
-6. Creates the local git tag if it does not already exist.
-7. Pushes the tag with `git push origin 1.0.42`.
-
-You can also manage tags separately:
-
-```bash
-make tag VERSION=1.0.42
-make push-tag VERSION=1.0.42
-```
-
-Before running a release, make sure your GitHub authentication is configured for pushing to the repository.
+For contributor instructions, local build commands, and release steps, see [CONTRIBUTING.md](https://github.com/robotgyms/pxt-robotpu/blob/main/CONTRIBUTING.md).
 
 ## Search Engine Optimization
 
@@ -982,6 +908,7 @@ The biggest opportunity to reduce RAM is `Parameters.stateTargets`. Reducing the
 ## License
 
 - MIT License. See `LICENSE`.
+- Robot PU name and logos are trademarks of Robot Gyms Inc. See `TRADEMARK.md`.
 - Copyright © 2025 Robot Gyms Inc.
 
 ## Acknowledgments

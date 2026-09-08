@@ -35,7 +35,7 @@ If you are unable to use GitHub Security Advisories, open a regular GitHub issue
 
 ## Scope
 
-This repository is a MakeCode extension targeting BBC micro:bit and Robot PU.
+This repository is a MakeCode extension targeting micro:bit and Robot PU.
 
 In scope:
 

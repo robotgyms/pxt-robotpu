@@ -186,7 +186,7 @@ Download (.hex): https://github.com/robotgyms/pxt-robotpu/raw/master/tutorials/m
 
 ### Tweaking the pxt-billy Voice (Pitch & Speed)
 
-To tweak the voice of the `pxt-billy` extension for the BBC micro:bit, you primarily adjust two parameters in the config API: **Pitch** (the frequency of the voice) and **Speed** (how fast the words are spoken).
+To tweak the voice of the `pxt-billy` extension for the micro:bit, you primarily adjust two parameters in the config API: **Pitch** (the frequency of the voice) and **Speed** (how fast the words are spoken).
 
 The "Billy" extension uses an 8-bit style synthesis. Generally, higher pitches sound younger/feminine, while lower pitches sound older/masculine.
 
