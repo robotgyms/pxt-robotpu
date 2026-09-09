@@ -2083,14 +2083,19 @@ namespace robotPuPro {
 
         // Behavior States
         private idle() {
-            // If music is detected, drive the eye LEDs with ledLevel() so they
-            // pulse in time. stateMachine() skips blink() when musicActive is true.
+            // Music mode: drive the eye LEDs from ledLevel() so they pulse with
+            // the sound. stateMachine() skips blink() while musicActive is true.
+            // Non-music mode: occasionally decay alertLevel so blink() gradually
+            // dims the eyes until the robot decides to sleep.
             this.musicActive = this.getIsMusic();
             if (this.musicActive) {
                 const b = Math.round(this.ledLevel() * 1023);
                 this.pcb.leftEyeBright(b);
                 this.pcb.rightEyeBright(b);
-            } else if (randint(0, 100) == 0) this.alertLevel *= this.alertScale;
+            } else if (randint(0, 100) == 0) {
+                this.alertLevel *= this.alertScale;
+            }
+            // Keep the body in a relaxed resting pose.
             this.rest();
         }
 
