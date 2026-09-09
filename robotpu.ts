@@ -977,6 +977,7 @@ namespace robotPuPro {
         // Intonation contour: rises on vowels, falls at boundaries
         private contourBias: number;
 
+        // sound
         constructor() {
             this.smoothIdx = 8;   // start at A4
             this.contourBias = 0;
@@ -1630,7 +1631,7 @@ namespace robotPuPro {
             if (s > this.ledLevelValue) {
                 this.ledLevelValue = s;
             } else {
-                this.ledLevelValue = this.ledLevelValue * 0.95;
+                this.ledLevelValue = this.ledLevelValue * 0.86;
             }
             return this.ledLevelValue;
         }
