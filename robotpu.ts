@@ -1621,14 +1621,15 @@ namespace robotPuPro {
         }
 
         /**
-         * Return a VU-meter style 0..1 level for the eye LEDs.
-         * It rises quickly on loud sound and fades smoothly, like an old radio sound-bar.
-         * Call repeatedly in a loop and pass the result to leftEyeBright/rightEyeBright.
+         * Return a 0..1 level for the eye LEDs that gives a strong pulse on new loud sounds.
+         * The LED only jumps when the incoming sound is much louder than the current level,
+         * then it fades smoothly. Call repeatedly in a loop and pass the result to
+         * leftEyeBright/rightEyeBright.
          */
-        public ledLevel(): number {
+        public ledLevel(pulseLevel : number = 4): number {
             const s = Math.min(1, Math.max(0, input.soundLevel() / 255));
-            // fast attack, slow decay
-            if (s > this.ledLevelValue) {
+            // strong pulse: only jump when the new sound is much louder, then decay
+            if (s > this.ledLevelValue * pulseLevel) {
                 this.ledLevelValue = s;
             } else {
                 this.ledLevelValue = this.ledLevelValue * 0.86;
