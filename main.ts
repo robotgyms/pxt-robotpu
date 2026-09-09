@@ -855,13 +855,15 @@ namespace robotPuPro {
         return ensureRobot().getIsMusic();
     }
 
-    /** Return a 0-1 level that follows sound like an old radio sound-bar (VU meter). Use with `leftEyeBright` or `rightEyeBright`. */
-    //% blockId=robotpu_led_level block="led level"
+    /** Return a 0-1 LED level that pulses on louder sounds. @param pulseLevel 1 = VU meter, 4 = strong pulse (default). @param decay 0 = instant off, 0.86 = quick fade (default), 0.95 = slow fade. Use with `leftEyeBright` or `rightEyeBright`. */
+    //% blockId=robotpu_led_level block="led level %pulseLevel %decay"
     //% subcategory="Sensors"
     //% group="Sensors"
     //% weight=36 blockGap=8
-    export function ledLevel(): number {
-        return ensureRobot().ledLevel();
+    //% pulseLevel.min=0 pulseLevel.max=10 pulseLevel.defl=4
+    //% decay.min=0 decay.max=1 decay.defl=0.86
+    export function ledLevel(pulseLevel: number = 4, decay: number = 0.86): number {
+        return ensureRobot().ledLevel(pulseLevel, decay);
     }
 
     /** Return the servo target angles array. Items: left foot, left leg, right foot, right leg, head yaw, head pitch, left shoulder, right shoulder, left arm, right arm. */

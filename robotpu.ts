@@ -1391,6 +1391,7 @@ namespace robotPuPro {
         private headYawBias: number = 0;
         private alertLevel: number = 10;
         private alertScale: number = 0.9;
+        private musicActive: boolean = false;
         private restState: number = 26;
         private sleepPoweredDown: boolean = false;
 
@@ -1621,18 +1622,23 @@ namespace robotPuPro {
         }
 
         /**
-         * Return a 0..1 level for the eye LEDs that gives a strong pulse on new loud sounds.
-         * The LED only jumps when the incoming sound is much louder than the current level,
-         * then it fades smoothly. Call repeatedly in a loop and pass the result to
-         * leftEyeBright/rightEyeBright.
+         * Return a 0..1 level for the eye LEDs.
+         *
+         * The returned value decays by `decay` each call, but jumps to the new
+         * sound level whenever it is louder than `ledLevelValue * pulseLevel`.
+         * @param pulseLevel how much louder a new sound must be to trigger a pulse (0 = raw level, 1 = VU meter, 4 = strong pulse).
+         * @param decay decay factor per call (0 = instant off, 0.86 = quick fade, 0.95 = slow fade).
          */
-        public ledLevel(pulseLevel : number = 4): number {
+        public ledLevel(pulseLevel: number = 4, decay: number = 0.86): number {
             const s = Math.min(1, Math.max(0, input.soundLevel() / 255));
-            // strong pulse: only jump when the new sound is much louder, then decay
+            pulseLevel = Math.max(0, pulseLevel);
+            decay = Math.min(1, Math.max(0, decay));
+            // Pulse: only rise when the new sound is much louder than the current
+            // level, otherwise fade smoothly.
             if (s > this.ledLevelValue * pulseLevel) {
                 this.ledLevelValue = s;
             } else {
-                this.ledLevelValue = this.ledLevelValue * 0.86;
+                this.ledLevelValue = this.ledLevelValue * decay;
             }
             return this.ledLevelValue;
         }
@@ -2077,7 +2083,14 @@ namespace robotPuPro {
 
         // Behavior States
         private idle() {
-            if (randint(0, 100) == 0) this.alertLevel *= this.alertScale;
+            // If music is detected, drive the eye LEDs with ledLevel() so they
+            // pulse in time. stateMachine() skips blink() when musicActive is true.
+            this.musicActive = this.getIsMusic();
+            if (this.musicActive) {
+                const b = Math.round(this.ledLevel() * 1023);
+                this.pcb.leftEyeBright(b);
+                this.pcb.rightEyeBright(b);
+            } else if (randint(0, 100) == 0) this.alertLevel *= this.alertScale;
             this.rest();
         }
 
@@ -2475,6 +2488,7 @@ namespace robotPuPro {
         public stateMachine(): void {
             // 1. Execute the current state's behavior
             // Python: self.stateFuncDict.get(self.gst, self.sleep)()
+            this.musicActive = false;
             let behavior = this.stateFuncDict[this.gst];
             if (behavior) {
                 const status = behavior();
@@ -2493,9 +2507,12 @@ namespace robotPuPro {
             }
 
             // 2. Handle blinking and state tracking for all normal (non-special) states
-            if (this.gst >= 0) {
-                // Update eye blink animation based on alert level (alertLevel)
-                this.pcb.blink(this.alertLevel);
+            if (this.gst > 0) {
+                // Update eye blink animation based on alert level (alertLevel),
+                // unless the idle state is driving the eyes from music.
+                if (!this.musicActive) {
+                    this.pcb.blink(this.alertLevel);
+                }
 
                 // Remember last normal state for recovery (e.g., after a fall)
                 this.lastState = this.gst;
