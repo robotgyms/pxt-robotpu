@@ -40,7 +40,6 @@ namespace robotPuPro {
         if (!robot) {
             const sn = "pu-" + control.deviceSerialNumber();
             robot = new RobotPu(sn, "peu");
-            robot.calibrate();
             robot.start();
             control.inBackground(function () {
                 // add background task to update states and execute behavior logic
