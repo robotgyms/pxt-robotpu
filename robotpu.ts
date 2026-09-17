@@ -1564,8 +1564,14 @@ namespace robotPuPro {
             this.stateFuncDict[action] = run;
         }
 
+        /**
+         * Boot initialization: load trims, then move through stand,
+         * calibration, and rest before background behavior begins.
+         */
         public start() {
             this.stand();
+            this.calibrate();
+            this.rest();
             this.resetOdom();
             this.pcb.speakerOff();
         }
@@ -1702,6 +1708,7 @@ namespace robotPuPro {
         }
 
         public readConfig(): void {
+            // Load saved robot settings from MakeCode flash storage (the "pu.txt" store).
             let storedSn = settings.readString("robotpu.sn");
             if (storedSn && storedSn.length > 0) {
                 this.sn = storedSn;
@@ -1711,7 +1718,8 @@ namespace robotPuPro {
                 this.radioGroupID = Math.round(storedGroup) % 256;
                 if (this.radioGroupID < 0) this.radioGroupID += 256;
             }
-            for (let i = 0; i < this.pr.dof; i++) {
+            // Load the servo trim offsets stored at "robotpu.trim.0" ... "robotpu.trim.9".
+            for (let i = 0; i < this.pcb.dof; i++) {
                 let v = settings.readNumber("robotpu.trim." + i);
                 if (v !== undefined && !isNaN(v)) {
                     this.pcb.servoTrim[i] = v;
@@ -2099,14 +2107,16 @@ namespace robotPuPro {
             this.rest();
         }
 
-        public rest(): number {
+        public rest(yaw:number = 0): number {
             this.balanceParam();
             for (let i = 0; i < this.pr.dof; i++) {
                 this.pcb.servoCtrl[i] *= 0.99;
             }
             let rl = Math.min(35.0, Math.max(-35.0, this.bodyRoll2));
             if (Math.abs(rl) > 5) {
-                this.setControlOffsets([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5]);
+                this.setControlOffsets([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5+yaw]);
+            } else{
+                this.setControlOffsets([0, 1, 2, 3, 4], [0, 0, 0, 0, yaw]);
             }
             if (Math.abs(this.bodyPitch2) > 10) {
                 this.setControlOffsets([5], [-this.bodyPitch2]);
@@ -2787,8 +2797,14 @@ namespace robotPuPro {
 
         public pose(v: number) { this.restState = v; this.stopAction(); }
 
+        /**
+         * Set a servo trim offset in memory.
+         * Call saveTrimCalibration() or writeConfig() to persist it to flash.
+         */
         public setTrim(index: number, value: number) {
-            this.pcb.servoTrim[index] = value
+            index = index % this.pcb.dof;
+            if (index < 0) index = this.pcb.dof - 1;
+            this.pcb.servoTrim[index] = value;
         }
 
         public setTrimIndex(index: number): void {
