@@ -118,4 +118,25 @@
  - Calibrate feet/legs first; head trims don’t affect walking stability much.
  - After saving, do a slow walk test (lower speed is easier to diagnose).
  - If the robot still yaws/drifts, re-check that both feet are flat and both legs are symmetric.
+
+---
+
+## Setting and saving trims by code
+
+Instead of using the gamepad trim mode, you can also set the trim offsets directly in your program. This is useful when you already know the values for your robot (for example, from the serial output of the calibration helper above).
+
+```typescript
+// Set the six main trim values for a typical robot.
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, 4)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, 4)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, 0)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
+robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
+
+// Save the in-memory trims to MakeCode flash storage.
+// Next time the robot boots, these values are loaded automatically.
+robotPuPro.saveServoTrimCalibration()
 ```
+
+`robotPuPro.setServoTrim(joint, value)` overwrites the trim for one joint in memory. `robotPuPro.saveServoTrimCalibration()` writes all current trims to flash so they are restored on the next boot.
