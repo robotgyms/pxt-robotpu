@@ -237,7 +237,7 @@ const BEAT_MS = 60000 / BPM  // 500 ms per beat
 //   beat 3: bounce again + head left/down
 //   beat 4: shift weight left + head slightly up
 const yawPattern = [20, 0, -20, 0]
-const pitchPattern = [15, -10, 15, -5]
+const pitchPattern = [5, -25, 5, -15]
 const legPattern = [8, 0, 8, 0]     // both legs bend together for the bounce
 const footPattern = [-8, 10, -8, -10] // feet compensate the bend / roll the body
 
