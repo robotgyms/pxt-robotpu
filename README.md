@@ -216,11 +216,6 @@ The MakeCode blocks are defined in `main.ts` under the `robotPuPro` namespace an
 - **Notes**:
   - Values wrap into `0..255`.
 
-#### `mode(): Mode`
-
-- **Block**: `mode`
-- **What it does**: Returns the current robot behavior mode.
-
 #### `setServoTrim(joint: ServoJoint, value: number): void`
 
 - **Block**: `set %joint servo trim to %value`
@@ -469,13 +464,6 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Block**: `stop robot`
 - **What it does**: Stops the current action and resets to rest.
 
-#### `setMode(mode: Mode): void`
-
-- **Block**: `set mode to %mode`
-- **What it does**: Sets Robot PU's behavior mode directly.
-- **Parameter**:
-  - `mode`: one of the `robotPuPro.Mode` values, e.g. `robotPuPro.Mode.Walk`
-
 #### `greet(): void`
 
 - **Block**: `greet`
@@ -508,11 +496,6 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
   - This is designed to be called repeatedly (e.g. inside `basic.forever`).
   - You may use speed higher than 5 to make the robot move faster but the robot will be less stable because it cannot balance well due to the limited sampling rate of IMU and servo action speed.
 
-#### `isWalkStepDone(): boolean`
-
-- **Block**: `is walk step done?`
-- **What it does**: Returns `true` when the last walk step completed.
-
 #### `walkByCompass(headingDeg: number): number`
 
 - **Block**: `walk by compass heading %headingDeg`
@@ -541,22 +524,12 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Notes**:
   - The explore speed range is influenced by `setWalkSpeedRange(min, max)`.
 
-#### `isExploreDone(): boolean`
-
-- **Block**: `is explore done?`
-- **What it does**: Returns `true` when the last explore step completed.
-
 #### `sideStep(direction: number): void`
 
 - **Block**: `side step %direction`
 - **Parameters**:
   - `direction`: `-1 .. 1` (negative = left, positive = right)
 - **What it does**: Performs a sideways step.
-
-#### `isSideStepDone(): boolean`
-
-- **Block**: `is side step done?`
-- **What it does**: Returns `true` when the last side step completed.
 
 #### `dance(): void`
 
@@ -565,31 +538,16 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
   - Uses `input.soundLevel()` to detect beats and vary movement.
   - Animates the NeoPixel LEDs during high beats.
 
-#### `isDanceDone(): boolean`
-
-- **Block**: `is dance done?`
-- **What it does**: Returns `true` when the last dance move completed.
-
 #### `kick(): void`
 
 - **Block**: `kick`
 - **What it does**: A quick kick-like burst using an accelerated forward gait.
-
-#### `isKickDone(): boolean`
-
-- **Block**: `is kick done?`
-- **What it does**: Returns `true` when the last kick completed.
 
 #### `jump(): void`
 
 - **Block**: `jump`
 - **What it does**: Executes a jump sequence.
   - Uses an auxiliary servo during the sequence.
-
-#### `isJumpDone(): boolean`
-
-- **Block**: `is jump done?`
-- **What it does**: Returns `true` when the last jump completed.
 
 #### `blink(alertLevel: number): void`
 
@@ -607,30 +565,15 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
   - Keeps balance using the accelerometer.
   - Reacts to sound level with subtle motion.
 
-#### `isRestDone(): boolean`
-
-- **Block**: `is rest done?`
-- **What it does**: Returns `true` when the last rest cycle completed.
-
 #### `stand(): void`
 
 - **Block**: `stand`
 - **What it does**: Moves the robot into a standing pose (balanced / ready).
 
-#### `isStandDone(): boolean`
-
-- **Block**: `is stand done?`
-- **What it does**: Returns `true` when the robot reached the standing position.
-
 #### `sit(): void`
 
 - **Block**: `sit`
 - **What it does**: Moves the robot into a sitting pose.
-
-#### `isSitDone(): boolean`
-
-- **Block**: `is sit done?`
-- **What it does**: Returns `true` when the robot reached the sitting position.
 
 #### `calibrate(): void`
 
@@ -646,17 +589,13 @@ Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C s
 - **Parameters**:
   - `text`: Text to speak.
 
-#### `sing(song: string): void`
+#### `sing(song: string, bpm: number = 120): void`
 
-- **Block**: `sing %song`
+- **Block**: `sing %song at %bpm bpm`
 - **What it does**: Sings a musical note sequence using the built-in music engine.
 - **Parameters**:
   - `song`: Note sequence string. Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use `-` for a rest.
-
-#### `composeAndSing(): void`
-
-- **Block**: `compose and sing`
-- **What it does**: Composes a new procedural song with `composeSong()` and sings it.
+  - `bpm`: Tempo in beats per minute (40–240).
 
 #### `morse(code: string, unitMs: number): void`
 
