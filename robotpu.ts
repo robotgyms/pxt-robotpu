@@ -1351,12 +1351,14 @@ namespace robotPuPro {
         //% block="calibrate"
         Calibrate = -4,
         //% block="duck"
-        Duck = -5
+        Duck = -5,
+        //% block="API mode"
+        API = 6
     }
 
     // Internal state ids that do not have a user-facing Action token.
     // Action enum values are used directly wherever a public action exists.
-    export const API_GST = 6;
+    export const API_GST = Action.API;
     const FALL_GST = -3;
     const FETAL_GST = -2;
     const SLEEP_GST = -1;
@@ -2511,7 +2513,7 @@ namespace robotPuPro {
                 // Counted actions: when the handler reports one completed step,
                 // stop after the requested number of steps.  Works for any gst,
                 // including negative special states such as Duck (-5).
-                if (this.actionRunning && this.targetSteps > 0) {
+                if (this.actionRunning && this.targetSteps > 0 && this.gst == this.currentAction) {
                     if (status == 0) {
                         this.stepsDone += 1;
                         if (this.stepsDone >= this.targetSteps) {

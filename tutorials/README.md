@@ -193,6 +193,7 @@ Teachers can cherry-pick from the pool using these age/grade bands. The level is
 - **TypeScript basics in MakeCode**: [javascript-quick-start.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/javascript-quick-start.md)
 - **Robot observation**: [observation-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/observation-pu.md)
 - **Don’t bonk**: [dont-bonk.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md)
+- **Direct servo control (API mode)**: [direct-servo-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md)
 - **Event loop**: [event-loop-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-loop-pu.md)
 - **Custom events and handlers**: [event-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-pu.md)
 - **State machines**: [state-machine-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-machine-pu.md)
@@ -269,6 +270,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 ### Robot hardware & core APIs
 
 - **How Robot PU moves** ⭐: [motorize-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/motorize-pu.md)
+- **Direct servo control (API mode)** ⭐⭐: [direct-servo-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md)
 - **Robot actions** ⭐: [action-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-pu.md)
 - **Robot observation** ⭐⭐: [observation-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/observation-pu.md)
 - **Don’t bonk** ⭐⭐: [dont-bonk.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md)
