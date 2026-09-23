@@ -1,56 +1,41 @@
-# pxt-robotpu-pro — 10-DOF Robot PU MakeCode Extension
+# Robot PU — the programmable 10-DOF robot for micro:bit
 
-> This is the `robotpu-pro` (advanced) package for **Robot PU with 10-DOF support**. It is backward compatible with the beginner version [pxt-PU-Robot](https://github.com/elecfreaks/pxt-PU-Robot.git) with 6 DOF maintained by ElecFreaks, an authorized vendor. The advanced package exposes more actions (10 DOF), more sensor data, and feedback control APIs, so users can develop more complex robot systems and start SLAM support with CogniCap, the AI camera for Robot PU ([pxt-robotpu-cap](https://github.com/robotgyms/pxt-robotpu-cap)).
+**Robot PU walks, dances, kicks, jumps, sings, talks, and balances itself — and kids program it in minutes with MakeCode blocks, JavaScript, or Python.**
 
-## Overview
-
-This repository is a MakeCode extension for micro:bit (V2 only) to program Robot PU. Using this extension requires the micro:bit V2 hardware. micro:bit V1 will display the 927 error code.
-
-Robot PU is a playful, programmable robot built on micro:bit. This extension exposes high‑level behaviors of the PU robot so learners can create interactive projects with block coding or JavaScript/TypeScript in MakeCode. This software package was ported from [Python Version](https://github.com/NovaSeq/RobotPu.git). It extends the beginner version (6 DOF) with more actions (10 DOF), more sensor data, and feedback control APIs.
-
-PU can walk, autopilot, dance, kick, jump, rest, talk, and sing. It reacts to music, balances using its IMU, and navigates with an ultrasonic sensor.
-The retail kit includes a gamepad built from the second micro:bit for radio-based remote control, including gesture head control (tilt to yaw/pitch PU’s head).
 ![Robot PU](https://raw.githubusercontent.com/robotgyms/pxt-robotpu/main/assets/robotpu.png)
 
-## 10-DOF Support
+## 🛒 Get Robot PU
 
-The **pro** version of this MakeCode extension exposes the **10 degrees of freedom (10-DOF)** API for advanced kinematics, custom motion sequencing, and additional protocols beyond the basic 6-DOF Robot PU package. Compared with the [beginner 6-DOF package](https://github.com/elecfreaks/pxt-PU-Robot.git), the advanced package exposes more actions, more sensor data, and feedback control APIs for complex behaviors such as SLAM navigation, multi-robot coordination, and AI-camera projects with [CogniCap](https://github.com/robotgyms/pxt-robotpu-cap).
+**[Buy the Robot PU kit on Amazon →](https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN)**
 
-## Product Links
+Everything you need is in the box:
 
-Learn more about The Story of PU, which shows robot PU's activities, hardware, software, tutorials, and upgrade projects at:
+- **Robot PU** — pre-built and upgradable
+- **2 × micro:bit compatible boards** — one drives the robot, one becomes the **radio gamepad**
+- **Gamepad remote control** — including gesture head control (tilt the gamepad to aim PU's head)
+- **Free learning content** — [Manual](https://robotgyms.com/courses/the-story-of-pu-book-1-pair-up/), [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/README.md), [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/), [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth), and [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
+- **[Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)** — design and 3D-print your own accessories
 
-- **Product Website**: [robotgyms.com/pu](https://robotgyms.com/pu)
-- **YouTube**: [The Story of PU](https://www.youtube.com/@TheStoryofPu-yw8tr)
-- **TikTok**: [@thestoryofpu](https://www.tiktok.com/@thestoryofpu)
-- **Quick Start**: [How to use this library](https://youtu.be/aBw55nYjWDg)
+**Ages 8+ • Classroom-ready • 60+ free learn-then-create projects**
 
-## Purchase Links
+More about PU: [robotgyms.com/pu](https://robotgyms.com/pu) · [YouTube](https://www.youtube.com/@TheStoryofPu-yw8tr) · [TikTok](https://www.tiktok.com/@thestoryofpu) · [Quick-start video](https://youtu.be/aBw55nYjWDg)
 
-- **Amazon**: [Robot PU kit](https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN)
-
-## Features
+## Why Robot PU
 
 - **10-DOF advanced motion**: full 10 degrees of freedom for richer poses, steps, jumps, kicks, and dance routines beyond the 6-DOF beginner version
-- **Expressive personality**: dance routines, reactions, auto-pilot, soccer
-- **Classroom-ready** with block coding, javascript and [Python](https://github.com/NovaSeq/RobotPu.git) paths
-- **Maker-friendly** with free tutorials and projects of hardware and software to upgrade robot PU
+- **Expressive personality**: dance routines, reactions, autopilot, soccer
+- **Classroom-ready**: block coding, JavaScript, and [Python](https://github.com/NovaSeq/RobotPu.git) paths
+- **Maker-friendly**: free tutorials plus hardware and software projects to upgrade Robot PU
+- **Grows with the learner**: from first blocks to SLAM navigation, PID control, AI-camera projects, and multi-robot coordination
 - **Open-source** with community resources
 
-## What’s in the Kit
+## Overview (for developers)
 
-- Robot PU (pre-built and upgradable)
-- 2 × micro:bit compatible board
-- Gamepad (remote control and distributed computation)
-- [Manual](https://robotgyms.com/courses/the-story-of-pu-book-1-pair-up/)
-- [Tutorials](https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials/README.md)
-- [Games](https://robotgyms.com/courses/the-story-of-pu-book-2-games/)
-- [Classes](https://robotgyms.com/courses/the-story-of-pu-book-3-growth)
-- [Upgrade Projects](https://robotgyms.com/courses/the-story-of-pu-book-4-journey/)
-- [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW) 
+This repository is a MakeCode extension for micro:bit (**V2 only** — micro:bit V1 displays error code 927) that exposes Robot PU's high-level behaviors so learners can build interactive projects in MakeCode. The software was ported from the [Python version](https://github.com/NovaSeq/RobotPu.git).
 
-The retail kit includes a **gamepad that uses the second micro:bit**. For the best experience (and to ensure the radio control protocol matches robotPuPro’s `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit:
-- https://makecode.microbit.org/_JbygU12aCAsU
+This is the `robotpu-pro` (advanced) package for **Robot PU with 10-DOF support**. It is backward compatible with the beginner [pxt-PU-Robot](https://github.com/elecfreaks/pxt-PU-Robot.git) package (6 DOF, maintained by ElecFreaks, an authorized vendor). The advanced package exposes more actions, more sensor data, and feedback-control APIs for complex behaviors such as SLAM navigation, multi-robot coordination, and AI-camera projects with [CogniCap](https://github.com/robotgyms/pxt-robotpu-cap), the AI camera for Robot PU.
+
+For the best experience with the retail gamepad (and to ensure the radio protocol matches robotPuPro's `runKeyValueCommand` / `runStringCommand`), flash the official Robot PU gamepad program to the gamepad micro:bit: https://makecode.microbit.org/_JbygU12aCAsU
 
 ## The Story Of Robot PU
 - [Return to Saduka](https://robotgyms.com/courses/the-saga-of-robot-pu)
@@ -106,7 +91,9 @@ Python package is at [RobotPu Python](https://github.com/NovaSeq/RobotPu.git).
 - **3D Design and 3D Printing**
   - Design and print 3D accessories to upgrade Robot PU.
     - TinkerCAD project: [Robot PU @ TinkerCAD](https://www.tinkercad.com/joinclass/GVDDWHKQW)
-      
+
+Ready to start? **[Get the Robot PU kit on Amazon →](https://www.amazon.com/Robot-Programmable-Interactive-Upgradable-Self-Balancing/dp/B0DR8RGVXN)**
+
 ## Tutorial knowledge graphs (JavaScript)
 
 The JavaScript tutorial set includes **knowledge graphs** (mindmaps) that show how topics connect and suggest a learning path.
