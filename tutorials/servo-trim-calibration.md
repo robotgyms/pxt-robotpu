@@ -42,6 +42,40 @@
  
  ---
  
+ ## Calibration helper program (tested)
+ 
+ This program:
+ 
+ - Forwards radio commands to Robot PU (`runStringCommand` / `runKeyValueCommand`).
+ - Pressing the micro:bit **logo button on Robot PU’s head** (not the gamepad) toggles trim mode (`robotPuPro.toggleServoTrim()`).
+ - Prints the trim array over serial so you can record your final numbers.
+ 
+ ```javascript
+ // Forward text commands received over radio to Robot PU (e.g. "#put..." talk).
+ radio.onReceivedString(function (receivedString) {
+     robotPuPro.runStringCommand(receivedString)
+ })
+ // Forward name/value commands (gamepad buttons, speed, turn, etc.).
+ radio.onReceivedValue(function (name, value) {
+     robotPuPro.runKeyValueCommand(name, value)
+ })
+ // Logo button on Robot PU's head: enter or exit trim mode.
+ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+     robotPuPro.toggleServoTrim()
+ })
+ // Robot and gamepad must use the same radio channel.
+ robotPuPro.setChannel(166)
+ // Print the trim values to serial every 500 ms so you can record them.
+ basic.forever(function () {
+     serial.writeLine("Servo Trim = " + robotPuPro.servoTrims().join(", "))
+     basic.pause(500)
+ })
+ ```
+ The program will print the servo trim values to the serial monitor. 
+ 
+ It can be downloaded from https://makecode.microbit.org/_fJpff9K92emh.
+ ---
+ 
  ## Servo calibration / trim mode (detailed steps)
  
  Robot PU includes a built-in servo calibration / trim mode. Use it to align the feet, legs, head yaw, and head pitch into a neutral standing position.
@@ -79,36 +113,6 @@
  - Legs look symmetric (no obvious twist).
  - In a stand pose, PU doesn’t look like he’s constantly correcting left/right.
  - When walking forward slowly, PU doesn’t consistently drift in one direction.
- 
- ---
- 
- ## Calibration helper program (tested)
- 
- This program:
- 
- - Forwards radio commands to Robot PU (`runStringCommand` / `runKeyValueCommand`).
- - Pressing the micro:bit **logo button on Robot PU’s head** (not the gamepad) toggles trim mode (`robotPuPro.toggleServoTrim()`).
- - Prints the trim array over serial so you can record your final numbers.
- 
- ```javascript
- radio.onReceivedString(function (receivedString) {
-     robotPuPro.runStringCommand(receivedString)
- })
- radio.onReceivedValue(function (name, value) {
-     robotPuPro.runKeyValueCommand(name, value)
- })
- input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-     robotPuPro.toggleServoTrim()
- })
- robotPuPro.setChannel(166)
- basic.forever(function () {
-     serial.writeLine("Servo Trim = " + robotPuPro.servoTrims().join(", "))
-     basic.pause(500)
- })
- ```
- The program will print the servo trim values to the serial monitor. 
- 
- It can be downloaded from https://makecode.microbit.org/_fJpff9K92emh.
 
  ---
  
