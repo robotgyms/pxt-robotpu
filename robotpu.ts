@@ -1401,8 +1401,8 @@ namespace robotPuPro {
 
         // Movement & State
         public lastCmdTS: number;
-        private fwdSpeed: number = 6;
-        private bwdSpeed: number = -4;
+        private fwdSpeed: number = 4;
+        private bwdSpeed: number = -3;
         public walkSpeed: number = 0;
         public walkDirection: number = 0;
         public walkMode: WalkMode = WalkMode.Walk;
