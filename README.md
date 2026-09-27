@@ -228,8 +228,8 @@ Use servo calibration / trim mode to align the robot's feet, legs, neck yaw, and
 - **Enter trim mode**: Press the micro:bit logo button.
 - **Robot pose**: The robot moves into calibration stand mode so the foot heels can be aligned.
 - **Select servo**:
-  - Press gamepad `B2` to decrease servo index.
-  - Press gamepad `B3` to increase servo index.
+  - Press gamepad `B2` to move to the next servo.
+  - Press gamepad `B3` to move to the previous servo.
   - The selected servo index is shown on the micro:bit display.
 - **Adjust trim**:
   - Press gamepad `B1` to move the selected servo one trim step in one direction.
@@ -257,6 +257,8 @@ The servo index order for 10-DOF is:
 | 9 | Right arm | micro:bit **P15** | Optional arms |
 
 Robot PU supports **10 servos** total. Servos 0–7 are driven through the I2C servo controller. The optional arm servos 8 and 9 are driven directly from micro:bit PWM pins P14 (left arm) and P15 (right arm).
+
+For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](tutorials/servo-trim-calibration.md).
 
 #### `saveServoTrimCalibration(): void`
 
@@ -794,8 +796,12 @@ radio.onReceivedValue(function (name, value) {
 input.onGesture(Gesture.LogoDown, function () {
     robotPuPro.rest()
 })
-// press logo button to dance using start action
+// press logo button to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    robotPuPro.toggleServoTrim()
+})
+// shake to dance using start action
+input.onGesture(Gesture.Shake, function () {
     robotPuPro.start(robotPuPro.Action.Dance, 0)
 })
 ```

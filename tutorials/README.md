@@ -187,6 +187,7 @@ Teachers can cherry-pick from the pool using these age/grade bands. The level is
 - **Music + beat-driven behaviors**: [music-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/music-pu.md)
 - **Remote control**: [remote-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/remote-control.md)
 - **Gamepad patterns**: [gamepad.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/gamepad.md)
+- **Skate mode**: [skate-mode.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md)
 
 ### Ages 11-13 (Grades 6-8)
 
@@ -272,6 +273,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **How Robot PU moves** ⭐: [motorize-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/motorize-pu.md)
 - **Direct servo control (API mode)** ⭐⭐: [direct-servo-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md)
 - **Robot actions** ⭐: [action-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-pu.md)
+- **Skate mode** ⭐: [skate-mode.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md)
 - **Robot observation** ⭐⭐: [observation-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/observation-pu.md)
 - **Don’t bonk** ⭐⭐: [dont-bonk.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md)
 

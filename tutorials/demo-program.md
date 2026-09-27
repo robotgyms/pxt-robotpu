@@ -163,8 +163,12 @@ input.onGesture(Gesture.Shake, function () {
 radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
-// press logo button to dance
+// press logo button to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    robotPuPro.toggleServoTrim()
+})
+// tilt the robot forward (logo down) to dance
+input.onGesture(Gesture.LogoDown, function () {
     robotPuPro.talk("Dance!")
     robotPuPro.start(robotPuPro.Action.Dance, 0)
 })
@@ -179,7 +183,7 @@ robotPuPro.sing("C5 B G - E F E G ")
 
 ### Initialization and Setup
 
-The code above initializes the robot by asking it to greet, stand, and set the channel to 166. It also plays a musical phrase using the `sing` function.
+The code above initializes the robot by asking it to greet, stand, and set the channel to 166. It also plays a musical phrase using the `sing` function. The logo button toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
 ---
 

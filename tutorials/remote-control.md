@@ -36,6 +36,11 @@ radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
 
+// press the logo button on Robot PU's head to enter/exit servo trim mode
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    robotPuPro.toggleServoTrim()
+})
+
 // Choose a channel 0..255. Both sides must match.
 robotPuPro.setChannel(166)
 ```
@@ -44,6 +49,7 @@ Notes:
 
 - `runKeyValueCommand(...)` is meant for “structured” messages like joystick axes and buttons.
 - `runStringCommand(...)` is meant for “free text” messages (often prefixed with `#pu...`).
+- `input.onLogoEvent(...)` toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
 ---
 

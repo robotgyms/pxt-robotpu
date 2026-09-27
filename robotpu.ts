@@ -1362,6 +1362,16 @@ namespace robotPuPro {
         API = 6
     }
 
+    /**
+     * Gait used by drive / joystick mode when speed is non-zero.
+     */
+    export enum WalkMode {
+        //% block="walk"
+        Walk = 0,
+        //% block="skate"
+        Skate = 1
+    }
+
     // Internal state ids that do not have a user-facing Action token.
     // Action enum values are used directly wherever a public action exists.
     export const API_GST = Action.API;
@@ -1395,6 +1405,7 @@ namespace robotPuPro {
         private bwdSpeed: number = -4;
         public walkSpeed: number = 0;
         public walkDirection: number = 0;
+        public walkMode: WalkMode = WalkMode.Walk;
         private headPitchBias: number = 0;
         private headYawBias: number = 0;
         private alertLevel: number = 10;
@@ -1471,6 +1482,9 @@ namespace robotPuPro {
         // Single state machine dictionary. Every state, including Action states,
         // lives here.  Handlers return 0 when one step/cycle completes.
         private stateFuncDict: { [key: number]: () => number };
+        // Gait dictionary for joystick / drive mode, keyed by WalkMode.
+        // Add new walking modes here; joystick() picks by this.walkMode.
+        private gaitFuncDict: { [key: number]: () => number };
 
         // beacon timeout
         public beaconTimeout: number = 2000;
@@ -1556,6 +1570,11 @@ namespace robotPuPro {
                 [Action.Blink]: () => { this.pcb.blink(this.alertLevel); return 0; },
                 [Action.Greet]: () => { this.greet(); return 0; },
                 [Action.Duck]: () => { this.duck(); return 0; }
+            };
+            // Gaits available in joystick / drive mode.
+            this.gaitFuncDict = {
+                [WalkMode.Walk]: () => this.walk(this.walkSpeed, this.walkDirection),
+                [WalkMode.Skate]: () => this.skate(this.walkSpeed, this.walkDirection)
             };
             this.pcb.eyesCtl(1);
             this.showChannel();
@@ -1680,8 +1699,9 @@ namespace robotPuPro {
                 return 0;
                 //return this.rest();
             } else {
-                // 3. If there is speed, perform the balanced walk
-                return this.walk(this.walkSpeed, this.walkDirection);
+                // 3. If there is speed, perform the balanced gait for the selected walk mode
+                let gait = this.gaitFuncDict[this.walkMode];
+                return gait ? gait() : this.walk(this.walkSpeed, this.walkDirection);
             }
         }
 
@@ -1867,6 +1887,13 @@ namespace robotPuPro {
          */
         public skateItr(): number {
             return this.skate(this.walkSpeed, this.walkDirection);
+        }
+
+        /**
+         * Select the gait used by joystick / drive mode when speed is non-zero.
+         */
+        public setWalkMode(mode: WalkMode): void {
+            this.walkMode = mode;
         }
 
         /**
