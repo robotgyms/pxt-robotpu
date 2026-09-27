@@ -36,8 +36,8 @@ namespace robotPuPro {
             // Movement sequences
             this.walkFwdStates = [2, 3, 4, 5];
             this.walkBwdStates = [6, 5, 7, 3];
-            this.skateFwdStates = [8, 9, 10, 11];
-            this.skateBwdStates = [12, 1, 13, 9];
+            this.skateFwdStates = [27, 28, 29, 30];
+            this.skateBwdStates = [6, 5, 7, 3];
             this.boxingStates = [2, 3, 4, 5] //[8, 9, 10, 11, 12, 13];
             this.danceOkStates = [0, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 16, 17];
 
@@ -75,11 +75,15 @@ namespace robotPuPro {
                 [105, 90, 105, 90, 90, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],                // 23
                 [130, 90, 50, 90, 90, 55, 0, 180, 135, 45],                 // 24: soccer
                 [90, 60, 90, 120, 90, 90, 90, 90, 90, 90],                 // 25: calibrate
-                [90, 90, 90, 90, 90, 90, 90, 90, 90, 90]                   // 26: rest
+                [90, 90, 90, 90, 90, 90, 90, 90, 90, 90],                   // 26: rest
+                [93 - w_t, 90 + 45, 90 - j_t, 90 + 35, 90 - l_s - 8, 90, 90 - l_s, 90 - l_s, 90, 90], // 27: skating
+                [93, 90 + 25, 93, 90 + l_s, 90 - l_s - 8, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],           // 28: s2
+                [90 + j_t, 90 - 35, 87 + w_t, 90 - 45, 90 + l_s + 8, 90, 90 + l_s, 90 + l_s, 90, 90], // 29: s3
+                [87, 90 - l_s, 87, 90 - 25, 90 + l_s + 8, 90, 90 + l_s, 90 + l_s, 90 - l_s, 90 + l_s],           // 30: s4
             ];
 
             // Mapping dictionary
-            this.stateSpeedIndices = [1, 0, 3, 4, 2, 4, 3, 2, 3, 4, 2, 4, 3, 2, 8, 10, 0, 0, 6, 6, 6, 6, 9, 7, 5, 7, 0];
+            this.stateSpeedIndices = [1, 0, 3, 4, 2, 4, 3, 2, 3, 4, 2, 4, 3, 2, 8, 10, 0, 0, 6, 6, 6, 6, 9, 7, 5, 7, 0, 3, 4, 2, 4];
 
             // Control speed vectors
             this.speedCandidates = [
@@ -1320,6 +1324,8 @@ namespace robotPuPro {
         TurnLeft = 12,
         //% block="turn right"
         TurnRight = 13,
+        //% block="skate"
+        Skate = 22,
         //% block="explore"
         Explore = 1,
         //% block="dance"
@@ -1540,6 +1546,7 @@ namespace robotPuPro {
                 [Action.WalkBackward]: () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); },
                 [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
                 [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
+                [Action.Skate]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.skateItr(); },
                 [Action.Sit]: () => this.sit(),
                 [Action.Stand]: () => this.stand(),
                 [Action.Laugh]: () => { this.laugh(); return 0; },
@@ -1571,6 +1578,7 @@ namespace robotPuPro {
          * calibration, and rest before background behavior begins.
          */
         public start() {
+            this.readConfig()
             this.stand();
             this.calibrate();
             this.rest();
@@ -1854,6 +1862,13 @@ namespace robotPuPro {
             return this.walk(this.walkSpeed, this.walkDirection);
         }
 
+        /*
+            Skate with speed and direction which set internally
+         */
+        public skateItr(): number {
+            return this.skate(this.walkSpeed, this.walkDirection);
+        }
+
         /**
          * Stop the current action and reset to rest/idle.
          */
@@ -1977,6 +1992,19 @@ namespace robotPuPro {
                     this.lastLeftLegAngle = this.pcb.servoTarget[1];
                     this.lastRightLegAngle = this.pcb.servoTarget[3];
                 }
+                this.odom.pedometer += 1;
+            }
+            return ret;
+        }
+
+         /**
+         * Triggers the balanced skating gait. 
+         * @param sp Speed (positive for forward, negative for backward)
+         * @param di Directional bias (-1.0 to 1.0)
+         */
+         public skate(sp: number, di: number): number {
+            let ret = this.moveBalance(sp, di, this.pr.skateFwdStates, this.pr.skateBwdStates);
+            if (ret == 0) {
                 this.odom.pedometer += 1;
             }
             return ret;

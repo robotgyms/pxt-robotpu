@@ -347,6 +347,24 @@ namespace robotPuPro {
     }
 
     /**
+     * Skate with a given speed and turn bias. Call repeatedly in a loop to keep skating.
+     * @param speed skating speed from -5 (full backward) to 5 (full forward), eg: 2
+     * @param turn turn bias from -1 (full right) to 1 (full left), 0 is straight, eg: 0
+     */
+    //% blockId=robotpu_skate block="skate at speed %speed, turning %turn"
+    //% subcategory="Actions"
+    //% group="Actions"
+    //% speed.min=-5 speed.max=5 speed.defl=2
+    //% turn.min=-1 turn.max=1 turn.defl=0
+    //% weight=85 blockGap=8
+    export function skate(speed: number, turn: number): void {
+        const r = getRobotAPI();
+        r.walkSpeed = speed;
+        r.walkDirection = turn;
+        r.skate(speed, turn);
+    }
+
+    /**
      * Walk toward a target compass heading while avoiding obstacles. Call repeatedly in a loop.
      * @param headingDeg target compass heading in degrees (0 = north, 90 = east), eg: 0
      */
