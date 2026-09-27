@@ -221,6 +221,10 @@ radio.onReceivedString(function (receivedString) {
 radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
+// press the logo button on Robot PU's head to enter/exit servo trim mode
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    robotPuPro.toggleServoTrim()
+})
 let pulseDelay = 0
 let pitch = 0
 let distance = 0
@@ -265,6 +269,8 @@ basic.forever(function () {
 })
 
 ```
+
+Pressing the logo button toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
 * **More Moods**: Add a third state for `BillyVoicePreset.Dalek` to make PU sound like a metallic villain.
 * **Touch Interaction**: Use the micro:bit V2 **Touch Logo** to trigger a "Giggle" sound or a special greeting.

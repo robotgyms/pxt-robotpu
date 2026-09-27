@@ -295,6 +295,19 @@ namespace robotPuPro {
         return ensureRobot().walkDirection;
     }
 
+    /**
+     * Select the gait the robot uses in drive (joystick) mode: walk or skate.
+     * @param mode the walking mode, eg: robotPuPro.WalkMode.Walk
+     */
+    //% blockId=robotpu_set_walk_mode block="set walking mode to %mode"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% mode.defl=robotPuPro.WalkMode.Walk
+    //% weight=93 blockGap=8
+    export function setWalkMode(mode: WalkMode): void {
+        ensureRobot().setWalkMode(mode);
+    }
+
     /** Robot PU introduces itself by speaking its name and serial number. */
     //% blockId=robotpu_greet block="greet"
     //% weight=89 blockGap=8

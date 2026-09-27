@@ -165,6 +165,11 @@ control.inBackground(function () {
 robotPuPro.setChannel(166)
 robotPuPro.talk("Peer chat on!")   // melodic voice; use billy.say() with pxt-billy for real speech
 
+// press the logo button on Robot PU's head to enter/exit servo trim mode
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    robotPuPro.toggleServoTrim()
+})
+
 radio.onReceivedString(function (receivedString: string) {
     // Text API: isEmpty
     if (receivedString.isEmpty()) return
@@ -215,6 +220,8 @@ radio.onReceivedString(function (receivedString: string) {
 })
 
 ```
+
+Pressing the logo button toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
 ---
 

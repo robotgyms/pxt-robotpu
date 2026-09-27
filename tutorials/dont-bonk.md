@@ -75,6 +75,10 @@ radio.onReceivedString(function (receivedString) {
 radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
+// press the logo button on Robot PU's head to enter/exit servo trim mode
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    robotPuPro.toggleServoTrim()
+})
 let distance = 0
 robotPuPro.setChannel(166)
 basic.forever(function () {
@@ -84,6 +88,9 @@ basic.forever(function () {
 })
 
 ```
+
+Pressing the logo button toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
+
 ---
 
 ## 💻 5. Implementation Script
@@ -286,6 +293,10 @@ radio.onReceivedString(function (receivedString) {
 radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
+// press the logo button on Robot PU's head to enter/exit servo trim mode
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    robotPuPro.toggleServoTrim()
+})
 let pulseDelay = 0
 let pitch = 0
 let distance = 0
@@ -311,6 +322,8 @@ basic.forever(function () {
 })
 
 ```
+
+Pressing the logo button toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
 What each part is doing:
 
