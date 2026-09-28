@@ -1650,7 +1650,7 @@ namespace robotPuPro {
             const loud = input.soundLevel();
             this.music.isABeat(ts, loud, 1.005);
             const p = this.music.period;
-            if (p <= 0) return false;
+            if (p <= 0 || loud< 80) return false;
             const bpm = 60000 / p;
             if (bpm < 60 || bpm > 200) return false;
             return (ts - this.music.lastBeatTime) < (p * 2);
@@ -1671,7 +1671,7 @@ namespace robotPuPro {
             // Pulse: only rise when the new sound is much louder than the current
             // level, otherwise fade smoothly.
             if (s > this.ledLevelValue * pulseLevel) {
-                this.ledLevelValue = s;
+                this.ledLevelValue = 1.5 * s;
             } else {
                 this.ledLevelValue = this.ledLevelValue * decay;
             }
@@ -2024,12 +2024,12 @@ namespace robotPuPro {
             return ret;
         }
 
-         /**
-         * Triggers the balanced skating gait. 
-         * @param sp Speed (positive for forward, negative for backward)
-         * @param di Directional bias (-1.0 to 1.0)
-         */
-         public skate(sp: number, di: number): number {
+        /**
+        * Triggers the balanced skating gait. 
+        * @param sp Speed (positive for forward, negative for backward)
+        * @param di Directional bias (-1.0 to 1.0)
+        */
+        public skate(sp: number, di: number): number {
             let ret = this.moveBalance(sp, di, this.pr.skateFwdStates, this.pr.skateBwdStates);
             if (ret == 0) {
                 this.odom.pedometer += 1;
@@ -2147,40 +2147,60 @@ namespace robotPuPro {
         }
 
         // Behavior States
-        private idle() {
+        // if music is on, swing left to riggt, if music is on long, then start to flash eyes, 
+        // if still on for 10 seconds, start to wiggle body
+        // if still on for 30 seconds, start to dance
+        private idle(): number {
             // Music mode: drive the eye LEDs from ledLevel() so they pulse with
             // the sound. stateMachine() skips blink() while musicActive is true.
             // Non-music mode: occasionally decay alertLevel so blink() gradually
             // dims the eyes until the robot decides to sleep.
             this.musicActive = this.getIsMusic();
+            let yaw = 0;
             if (this.musicActive) {
                 const b = Math.round(this.ledLevel() * 1023);
                 this.pcb.leftEyeBright(b);
                 this.pcb.rightEyeBright(b);
-            } else if (randint(0, 100) == 0) {
-                this.alertLevel *= this.alertScale;
+            } else {
+                this.pcb.blink(this.alertLevel)
             }
-            // Keep the body in a relaxed resting pose.
-            this.rest();
+
+            if (0) {
+                // Sway the head gently with the music: the servo crosses center
+                // on each beat and one full left-right cycle spans two beats of
+                // the detected music period (BPM = 60000 / period).
+                let period = Math.floor(this.music.period*8)
+                yaw = -20 * Math.sin(2*Math.PI * (control.millis()%period)/period);
+                let sl = input.soundLevel();
+                let pitch = (sl > 80) ? sl * -0.10 : 0;
+                // Keep the body in a relaxed resting pose.
+                return this.rest(yaw, pitch);
+            } else if (0){
+                return this.dance()
+            }
+            else {
+                return this.rest();
+            }
         }
 
-        public rest(yaw:number = 0): number {
+        public rest(yaw: number = 0, pitch:number = 0): number {
             this.balanceParam();
+            if (randint(0, 100) == 0) {
+                this.alertLevel *= this.alertScale;
+            }
             for (let i = 0; i < this.pr.dof; i++) {
                 this.pcb.servoCtrl[i] *= 0.99;
             }
             let rl = Math.min(35.0, Math.max(-35.0, this.bodyRoll2));
             if (Math.abs(rl) > 5) {
-                this.setControlOffsets([0, 1, 2, 3, 4], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5+yaw]);
-            } else{
-                this.setControlOffsets([0, 1, 2, 3, 4], [0, 0, 0, 0, yaw]);
+                this.setControlOffsets([0, 1, 2, 3, 4, 5], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5 + yaw, pitch]);
+            } else {
+                this.setControlOffsets([0, 1, 2, 3, 4, 5], [yaw, pitch, yaw, pitch, yaw, pitch]);
             }
             if (Math.abs(this.bodyPitch2) > 10) {
                 this.setControlOffsets([5], [-this.bodyPitch2]);
             }
-            let sl = input.soundLevel();
-            this.pr.stateTargets[this.restState][5] = 90 - sl * 0.15;
-            return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + sl * 0.001,
+            return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + pitch * 0.1,
                 [6, 7, 8, 9], 0.5);
         }
 
@@ -2420,7 +2440,7 @@ namespace robotPuPro {
             // states: [24, 14, 0, 0]
             // sync_servos (legs): [0, 1, 2, 3] at speed 3
             // async_servos (waist/head): [4, 5] at speed 2
-            return this.pcb.move(this.pr, [24, 14, 0, 0 ], [0, 1, 2, 3], 3, [4, 5, 6, 7, 8, 9], 2);
+            return this.pcb.move(this.pr, [24, 14, 0, 0], [0, 1, 2, 3], 3, [4, 5, 6, 7, 8, 9], 2);
         }
 
         /**
