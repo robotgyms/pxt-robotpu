@@ -2886,6 +2886,7 @@ namespace robotPuPro {
             if (this.gst == Action.Calibrate) {
                 this.saveTrimCalibration();
             } else {
+                this.stand();
                 this.beginTrimCalibration();
             }
             basic.pause(1000)
