@@ -42,12 +42,7 @@ After that, the editor will recognize calls like `robotPuPro.setChannel(...)` an
 ## Code (copy into MakeCode JavaScript)
 
 ```typescript
-robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftFoot, 4)
-robotPuPro.setServoTrim(robotPuPro.ServoJoint.LeftLeg, 0)
-robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, 4)
-robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, 0)
-robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
-robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
+robotPuPro.setChannel(166)
 radio.onReceivedValue(function(name: string, value: number) {
   robotPuPro.runKeyValueCommand(name,value)
 })

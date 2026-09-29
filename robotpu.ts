@@ -1651,7 +1651,7 @@ namespace robotPuPro {
             const loud = input.soundLevel();
             this.music.isABeat(ts, loud, 1.005);
             const p = this.music.period;
-            if (p <= 0 || loud < 80) return false;
+            if (p <= 0 || loud < 70) return false;
             const bpm = 60000 / p;
             if (bpm < 60 || bpm > 200) return false;
             return (ts - this.music.lastBeatTime) < (p * 2);
@@ -2167,31 +2167,33 @@ namespace robotPuPro {
             }
 
             // Track how long music has been playing continuously.
+            let ts = control.millis()
             if (this.musicActive) {
                 if (this.musicSince < 0) {
-                    this.musicSince = control.millis();
+                    this.musicSince = ts;
                 }
             } else {
                 this.musicSince = -1;
             }
-            let musicMs = this.musicSince < 0 ? 0 : control.millis() - this.musicSince;
+            let musicMs = this.musicSince < 0 ? 0 : ts - this.musicSince;
 
             if (this.musicActive) {
+                let sl = input.soundLevel();
                 if (musicMs < 5000) {
-                    // Sway the head gently with the music: one full left-right
-                    // cycle spans eight beats (quarter BPM) of the detected
-                    // music period (BPM = 60000 / period).
+                    // Sway the head gently with the music: the servo crosses center
+                    // on each beat and one full left-right cycle spans two beats of
+                    // the detected music period (BPM = 60000 / period).
                     let period = Math.floor(this.music.period * 8)
-                    yaw = -20 * Math.sin(2 * Math.PI * (control.millis() % period) / period);
-                    let sl = input.soundLevel();
-                    let pitch = (sl > 80) ? sl * -0.10 : 0;
+                    yaw = sl* -0.2 * Math.sin(2 * Math.PI * (ts % period) / period);
+                    let pitch = (sl > 70) ? sl * -0.10 : 0;
                     // Keep the body in a relaxed resting pose.
                     return this.rest(yaw, pitch);
                 } else {
-                    return this.danceMove(control.millis(), input.soundLevel());
+                    basic.pause(10)
+                    return this.danceMove(ts, sl);
                 }
             } else {
-                this.danceSpeed = 2;
+                this.danceSpeed = 1;
                 return this.rest();
             }
         }
@@ -2816,7 +2818,7 @@ namespace robotPuPro {
                 [ft, lt, ft, lt, this.rl, this.dancePitchWiggle - sl * 0.001]);
 
             // 6. Dynamic speed adjustment (capped at user target)
-            this.danceSpeed = Math.min(this.danceSpeedTarget, this.danceSpeed * 1.015);
+            this.danceSpeed = Math.min(this.danceSpeedTarget, this.danceSpeed * 1.01);
             if (this.maxG > 1800) { // If shaking too hard, slow down
                 this.danceSpeed *= 0.9;
             }
@@ -2927,6 +2929,12 @@ namespace robotPuPro {
             if (this.gst == Action.Calibrate) {
                 this.saveTrimCalibration();
             } else {
+                // Clear accumulated control offsets so the calibration pose
+                // starts with no offset (trims are preserved — they are what we adjust).
+                this.pcb.servoCtrl = [];
+                for (let i = 0; i < this.pcb.dof; i++) {
+                    this.pcb.servoCtrl.push(0);
+                }
                 this.stand();
                 this.beginTrimCalibration();
             }
