@@ -66,6 +66,8 @@
  - Prints the trim array over serial so you can record your final numbers.
  
  ```typescript
+  // Robot and gamepad must use the same radio channel.
+ robotPuPro.setChannel(166)
  // Forward name/value commands (gamepad buttons, speed, turn, etc.).
  radio.onReceivedValue(function (name, value) {
      robotPuPro.runKeyValueCommand(name, value)
@@ -74,8 +76,6 @@
  input.onLogoEvent(TouchButtonEvent.Pressed, function () {
      robotPuPro.toggleServoTrim()
  })
- // Robot and gamepad must use the same radio channel.
- robotPuPro.setChannel(166)
  // Print the trim values to serial every 500 ms so you can record them.
  basic.forever(function () {
      serial.writeLine("Servo Trim = " + robotPuPro.servoTrims().join(", "))
