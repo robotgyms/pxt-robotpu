@@ -1408,6 +1408,7 @@ namespace robotPuPro {
         public walkMode: WalkMode = WalkMode.Walk;
         private headPitchBias: number = 0;
         private headYawBias: number = 0;
+        private musicSince: number = -1;         // when continuous music started (-1 = none)
         private alertLevel: number = 10;
         private alertScale: number = 0.9;
         private musicActive: boolean = false;
@@ -1441,8 +1442,8 @@ namespace robotPuPro {
             16: [17, 16, 17, 16, 17]      // Rocking motion
         };
 
-        private danceSpeed: number = 3.0;           // Dance speed multiplier
-        private danceSpeedTarget: number = 6;     // User-set dance speed limit
+        private danceSpeed: number = 2.0;           // Dance speed multiplier
+        private danceSpeedTarget: number = 4;     // User-set dance speed limit
         private ledLevelValue: number = 0;       // VU-meter style smoothed level for eye LEDs
         private lastLowBeat: number = 0;       // Timestamp of last low beat
         private lastHighBeat: number = 0;      // Timestamp of last high beat
@@ -1549,7 +1550,7 @@ namespace robotPuPro {
                 [FALL_GST]: () => { this.fall(); return 0; },
                 [FETAL_GST]: () => { this.fetal(); return 0; },
                 [SLEEP_GST]: () => 0,
-                [Action.Rest]: () => { this.idle(); return 0; },
+                [Action.Rest]: () => this.idle(),
                 [Action.Explore]: () => this.explore(),
                 [Action.Jump]: () => this.jump(),
                 [Action.Dance]: () => this.dance(),
@@ -1650,7 +1651,7 @@ namespace robotPuPro {
             const loud = input.soundLevel();
             this.music.isABeat(ts, loud, 1.005);
             const p = this.music.period;
-            if (p <= 0 || loud< 80) return false;
+            if (p <= 0 || loud < 80) return false;
             const bpm = 60000 / p;
             if (bpm < 60 || bpm > 200) return false;
             return (ts - this.music.lastBeatTime) < (p * 2);
@@ -2165,25 +2166,37 @@ namespace robotPuPro {
                 this.pcb.blink(this.alertLevel)
             }
 
-            if (0) {
-                // Sway the head gently with the music: the servo crosses center
-                // on each beat and one full left-right cycle spans two beats of
-                // the detected music period (BPM = 60000 / period).
-                let period = Math.floor(this.music.period*8)
-                yaw = -20 * Math.sin(2*Math.PI * (control.millis()%period)/period);
-                let sl = input.soundLevel();
-                let pitch = (sl > 80) ? sl * -0.10 : 0;
-                // Keep the body in a relaxed resting pose.
-                return this.rest(yaw, pitch);
-            } else if (0){
-                return this.dance()
+            // Track how long music has been playing continuously.
+            if (this.musicActive) {
+                if (this.musicSince < 0) {
+                    this.musicSince = control.millis();
+                }
+            } else {
+                this.musicSince = -1;
             }
-            else {
+            let musicMs = this.musicSince < 0 ? 0 : control.millis() - this.musicSince;
+
+            if (this.musicActive) {
+                if (musicMs < 5000) {
+                    // Sway the head gently with the music: one full left-right
+                    // cycle spans eight beats (quarter BPM) of the detected
+                    // music period (BPM = 60000 / period).
+                    let period = Math.floor(this.music.period * 8)
+                    yaw = -20 * Math.sin(2 * Math.PI * (control.millis() % period) / period);
+                    let sl = input.soundLevel();
+                    let pitch = (sl > 80) ? sl * -0.10 : 0;
+                    // Keep the body in a relaxed resting pose.
+                    return this.rest(yaw, pitch);
+                } else {
+                    return this.danceMove(control.millis(), input.soundLevel());
+                }
+            } else {
+                this.danceSpeed = 2;
                 return this.rest();
             }
         }
 
-        public rest(yaw: number = 0, pitch:number = 0): number {
+        public rest(yaw: number = 0, pitch: number = 0): number {
             this.balanceParam();
             if (randint(0, 100) == 0) {
                 this.alertLevel *= this.alertScale;
@@ -2200,7 +2213,7 @@ namespace robotPuPro {
             if (Math.abs(this.bodyPitch2) > 10) {
                 this.setControlOffsets([5], [-this.bodyPitch2]);
             }
-            return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + pitch * 0.1,
+            return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + pitch * 0.25,
                 [6, 7, 8, 9], 0.5);
         }
 
@@ -2755,15 +2768,23 @@ namespace robotPuPro {
             // 4. Push the updated colors to the hardware
             this.np.show();
         }
+
+
         /**
          * Makes the robot dance with self-balance based on sound analysis.
          */
         public dance(): number {
             let ts = control.millis();
-            let ms = input.soundLevel();
-
+            let sl = input.soundLevel();
             // 1. Check for a musical beat using the MusicLib helper
-            this.music.isABeat(ts, ms, 1.005);
+            this.music.isABeat(ts, sl, 1.005);
+            return this.danceMove(ts, sl)
+        }
+
+        /**
+         * Makes the robot dance with self-balance based on sound analysis.
+         */
+        private danceMove(ts: number, sl: number): number {
             let il = this.music.beat;
 
             // 2. High-beat logic: Pulse LEDs and flip wiggle direction
@@ -2792,7 +2813,7 @@ namespace robotPuPro {
             // 5. Apply control vectors to servos
             // Servo 5 (head/body pitch) reacts to sound volume
             this.setControlOffsets([0, 1, 2, 3, 4, 5],
-                [ft, lt, ft, lt, this.rl, this.dancePitchWiggle - ms * 0.001]);
+                [ft, lt, ft, lt, this.rl, this.dancePitchWiggle - sl * 0.001]);
 
             // 6. Dynamic speed adjustment (capped at user target)
             this.danceSpeed = Math.min(this.danceSpeedTarget, this.danceSpeed * 1.015);
