@@ -36,7 +36,7 @@ namespace robotPuPro {
             // Movement sequences
             this.walkFwdStates = [2, 3, 4, 5];
             this.walkBwdStates = [6, 5, 7, 3];
-            this.skateFwdStates = [27, 28, 29, 30];
+            this.skateFwdStates = [27, 28, 29, 30, 31, 32];
             this.skateBwdStates = [6, 5, 7, 3];
             this.boxingStates = [2, 3, 4, 5] //[8, 9, 10, 11, 12, 13];
             this.danceOkStates = [0, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 16, 17];
@@ -76,14 +76,20 @@ namespace robotPuPro {
                 [130, 90, 50, 90, 90, 55, 0, 180, 135, 45],                 // 24: soccer
                 [90, 60, 90, 120, 90, 90, 90, 90, 90, 90],                 // 25: calibrate
                 [90, 90, 90, 90, 90, 90, 90, 90, 90, 90],                   // 26: rest
-                [93 - w_t, 90 + 45, 90 - j_t, 90 + 35, 90 - l_s - 8, 90, 90 - l_s, 90 - l_s, 90, 90], // 27: skating
-                [93, 90 + 25, 93, 90 + l_s, 90 - l_s - 8, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s],           // 28: s2
-                [90 + j_t, 90 - 35, 87 + w_t, 90 - 45, 90 + l_s + 8, 90, 90 + l_s, 90 + l_s, 90, 90], // 29: s3
-                [87, 90 - l_s, 87, 90 - 25, 90 + l_s + 8, 90, 90 + l_s, 90 + l_s, 90 - l_s, 90 + l_s],           // 30: s4
+
+                [90 - w_t, 90 - l_s - 10, 90 - j_t - 35, 90 - 15,    90 + l_s + 10, 90, 90 + l_s, 90 + l_s, 90 - l_s, 90 + l_s], // 27: Skate. 
+                [90 - w_t, 90-10,  90 - j_t, 90-30,                    90+l_s-10 , 90, 90 - l_s, 90 - l_s, 90, 90],              //28 s2
+                [90 - w_t, 90 + 30, 90 - w_t, 90 + l_s - 10,         90 - 20, 90, 90, 90 - l_s, 90 - l_s, 90 + l_s],           // 29: s3
+                [90 + j_t + 35, 90 + 15, 90 + w_t, 90 + l_s + 10,    90 -l_s -10, 90, 90 - l_s, 90 - l_s, 90 - l_s, 90 + l_s], // 30: s4
+                [90 + j_t, 90+30, 90 + w_t, 90 +10 ,                     90-l_s+10, 90, 90 + l_s, 90 + l_s, 90, 90],           // 31: s5
+                [90 + w_t, 90 - l_s + 10, 90 + w_t, 90 - 30,         90 + 20, 90, 90, 90 + l_s, 90 - l_s, 90 + l_s],           // 32: s6
+
             ];
 
             // Mapping dictionary
-            this.stateSpeedIndices = [1, 0, 3, 4, 2, 4, 3, 2, 3, 4, 2, 4, 3, 2, 8, 10, 0, 0, 6, 6, 6, 6, 9, 7, 5, 7, 0, 3, 4, 2, 4];
+            this.stateSpeedIndices = [1, 0, 3, 4, 2, 4, 3, 2, 3, 4,
+                2, 4, 3, 2, 8, 10, 0, 0, 6, 6,
+                6, 6, 9, 7, 5, 7, 0, 11, 13, 11, 12, 14, 12];
 
             // Control speed vectors
             this.speedCandidates = [
@@ -97,7 +103,11 @@ namespace robotPuPro {
                 [2, 1, 1, 1, 1, 1, 1, 1, 1, 1],             // 7
                 [5, 1, 5, 1, 1, 3, 1, 1, 1, 1],             // 8
                 [1, 1, 2, 1, 1, 1, 1, 1, 1, 1],             // 9
-                [6, 2, 6, 2, 1, 1, 1, 1, 1, 1]              // 10
+                [3, 2, 3, 2, 1, 1, 1, 1, 1, 1],              // 10
+                [3, 2, 8, 8, 3, 1, 2, 2, 2, 2],         // 11
+                [8, 8, 3, 2, 3, 1, 2, 2, 2, 2],         // 12
+                [2, 1.5, 4, 2, 3, 1, 2, 2, 1, 1],         // 13
+                [4, 2, 2, 1.5, 3, 1, 2, 2, 1, 1]         // 14
             ];
         }
     }
@@ -553,6 +563,13 @@ namespace robotPuPro {
          * Move servo toward target with controlled speed.
          */
         public servoStep(target: number, sp: number, idx: number): number {
+            // NaN defense: a transient NaN (e.g. from an IMU edge case) would
+            // otherwise poison servoTarget forever — err stays NaN, the servo
+            // never counts as idle, and every gait freezes permanently.
+            if (isNaN(target)) return 0;
+            if (isNaN(this.servoTarget[idx])) {
+                this.servoTarget[idx] = Math.max(0, Math.min(179, target));
+            }
             sp = Math.abs(sp);
             target = Math.max(0, Math.min(179, target));
             let err = target - this.servoTarget[idx];
@@ -2009,7 +2026,7 @@ namespace robotPuPro {
          * @param di Directional bias (-1.0 to 1.0)
          */
         public walk(sp: number, di: number): number {
-            let ret = this.moveBalance(sp, di, this.pr.walkFwdStates, this.pr.walkBwdStates);
+            let ret = this.moveBalance(sp, di, this.pr.walkFwdStates, this.pr.walkBwdStates, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9]);
             if (ret == 0) {
                 if (this.pcb.lastPos == 1) { // update left step odometry
                     this.odom.leftStep(this.pcb.servoTarget[1] - this.lastLeftLegAngle);
@@ -2031,7 +2048,7 @@ namespace robotPuPro {
         * @param di Directional bias (-1.0 to 1.0)
         */
         public skate(sp: number, di: number): number {
-            let ret = this.moveBalance(sp, di, this.pr.skateFwdStates, this.pr.skateBwdStates);
+            let ret = this.moveBalance(sp, di, this.pr.skateFwdStates, this.pr.skateBwdStates, [0, 1, 2, 3], [4,5,6, 7, 8, 9]);
             if (ret == 0) {
                 this.odom.pedometer += 1;
             }
@@ -2048,7 +2065,9 @@ namespace robotPuPro {
 
             this.maxG = Math.sqrt(ax * ax + ay * ay + az * az);
             this.pth = Math.atan2(ay, -az) * (180 / Math.PI);
-            this.rl = Math.asin(ax / (this.maxG || 1)) * (180 / Math.PI);
+            // asin domain is [-1, 1]: clamp to guard against float noise when
+            // ax/maxG lands slightly above 1 (would poison everything with NaN).
+            this.rl = Math.asin(Math.max(-1.0, Math.min(1.0, ax / (this.maxG || 1)))) * (180 / Math.PI);
 
             // Use this.pr and this.pcb for calculations
             let bd_p = this.pth + (this.pr.stateTargets[0][5] - this.pcb.servoTarget[5]);
@@ -2077,7 +2096,8 @@ namespace robotPuPro {
         }
 
         public moveBalance(sp: number, di: number,
-            forwardStates: number[], backwardStates: number[]) {
+            forwardStates: number[], backwardStates: number[],
+            sync_list: number[], async_list: number[]) {
             let sts = sp > 0 ? forwardStates : backwardStates;
             this.balanceParam();
 
@@ -2085,7 +2105,7 @@ namespace robotPuPro {
             let rightTiltOffset = 0;
             let lf = 0;
 
-            if (this.pcb.pos < 2 || this.pcb.pos == 6) { // Reference internal PCB
+            if (this.pcb.pos < sts.length / 2) { // Reference internal PCB
                 leftTiltOffset = Math.min(this.maxRollCtrl, Math.max(0.0, this.bodyRoll * 0.8 - this.pr.walkTilt));
                 lf = -12 * di;
             } else {
@@ -2100,7 +2120,7 @@ namespace robotPuPro {
                 [tiltOffset, lf - tiltOffset, tiltOffset, -lf - tiltOffset, -40 * di - tiltOffset, Math.min(25.0, -2.0 * this.bodyPitch2)]);
 
             // Call internal servo move
-            return this.pcb.move(this.pr, sts, [0, 1, 2, 3], sp, [4, 5, 6, 7, 8, 9], sp);
+            return this.pcb.move(this.pr, sts, sync_list, sp, async_list, sp);
         }
 
         /**
@@ -2184,7 +2204,7 @@ namespace robotPuPro {
                     // on each beat and one full left-right cycle spans two beats of
                     // the detected music period (BPM = 60000 / period).
                     let period = Math.floor(this.music.period * 8)
-                    yaw = sl* -0.2 * Math.sin(2 * Math.PI * (ts % period) / period);
+                    yaw = sl * -0.2 * Math.sin(2 * Math.PI * (ts % period) / period);
                     let pitch = (sl > 70) ? sl * -0.10 : 0;
                     // Keep the body in a relaxed resting pose.
                     return this.rest(yaw, pitch);

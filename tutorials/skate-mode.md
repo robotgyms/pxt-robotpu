@@ -121,7 +121,7 @@
  // doesn't also trigger the normal B1 action (explore).
  let lastPressMs = 0
  radio.onReceivedValue(function (name, value) {
-     if (name == "#puB" && value == 1) {
+     if (name == "#puB" && value == 2) {
          if (control.millis() - lastPressMs < 400) {
              // double press: skate mode
              robotPuPro.setWalkMode(robotPuPro.WalkMode.Skate)
