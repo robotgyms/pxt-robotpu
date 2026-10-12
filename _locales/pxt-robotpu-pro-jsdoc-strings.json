@@ -69,6 +69,7 @@
   "robotPuPro.changeChannel": "Change the radio channel by a given amount. Wraps around between 0 and 255.",
   "robotPuPro.changeChannel|param|delta": "amount to change the channel by, eg: 1",
   "robotPuPro.channel": "Current radio channel (0..255). Both Robot PU and the gamepad must use the same channel to communicate.",
+  "robotPuPro.connectToGamepad": "Connect Robot PU to the gamepad over radio. Call once at startup.\nRegisters radio handlers that forward incoming commands to the robot:\nname/value pairs go to runKeyValueCommand and strings go to runStringCommand.",
   "robotPuPro.dance": "Dance to music using the microphone to detect the beat. Call repeatedly in a loop.",
   "robotPuPro.explore": "Explore autonomously using the sonar sensor to avoid obstacles. Call repeatedly in a loop.",
   "robotPuPro.frontDistanceArray": "Return the front distance array in centimeters. Items: left, front-left, front, front-right, right. Call sonar scan first to update the values.",

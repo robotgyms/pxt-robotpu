@@ -962,6 +962,24 @@ namespace robotPuPro {
     }
 
     /**
+     * Connect Robot PU to the gamepad over radio. Call once at startup.
+     * Registers radio handlers that forward incoming commands to the robot:
+     * name/value pairs go to runKeyValueCommand and strings go to runStringCommand.
+     */
+    //% blockId=robotpu_connect_gamepad block="connect to gamepad"
+    //% weight=100 blockGap=8
+    //% helpUrl="https://robotgyms.com/pu"
+    export function connectToGamepad(): void {
+        const r = ensureRobot();
+        radio.onReceivedValue(function (name, value) {
+            r.runKeyValueCommand(name, value);
+        });
+        radio.onReceivedString(function (receivedString) {
+            r.runStringCommand(receivedString);
+        });
+    }
+
+    /**
      * Execute a string command received over radio. Use this inside a radio.onReceivedString handler.
      * Supported commands: #put<text> (speak), #pus<song> (sing), #puhi<name> (greet friend), #pun<name> (set robot name).
      * @param command the command string received from radio, eg: "#putHello!"

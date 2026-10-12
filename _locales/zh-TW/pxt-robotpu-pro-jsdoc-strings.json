@@ -69,6 +69,7 @@
   "robotPuPro.changeChannel": "將無線電頻道更改給定量。在 0 到 255 之間環繞。",
   "robotPuPro.changeChannel|param|delta": "改變頻道的金額, eg: 1",
   "robotPuPro.channel": "當前無線電頻道 (0..255)。機器人PU和遊戲手柄必須使用相同的通道進行通信。",
+  "robotPuPro.connectToGamepad": "通過無線電將機器人 PU 連接到遊戲手柄。啟動時調用一次。\n註冊無線電處理程序，將收到的命令轉發給機器人：\n鍵/值對發送到 runKeyValueCommand，字符串發送到 runStringCommand。",
   "robotPuPro.dance": "使用麥克風檢測節拍，隨著音樂起舞。循環中反覆調用。",
   "robotPuPro.explore": "使用聲納傳感器自主探索以避免障礙物。循環中反覆調用。",
   "robotPuPro.frontDistanceArray": "返回前方距離數組（以釐米為單位）。項目：左、左前、前、右前、右。首先調用聲納掃描來更新值。",
