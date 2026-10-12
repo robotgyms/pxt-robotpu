@@ -15,6 +15,7 @@
   "robotPuPro.calibrate|block": "校准",
   "robotPuPro.changeChannel|block": "频道改变 %delta",
   "robotPuPro.channel|block": "频道",
+  "robotPuPro.connectToGamepad|block": "连接游戏手柄",
   "robotPuPro.dance|block": "跳舞",
   "robotPuPro.explore|block": "探索",
   "robotPuPro.frontDistanceArray|block": "前方距离",

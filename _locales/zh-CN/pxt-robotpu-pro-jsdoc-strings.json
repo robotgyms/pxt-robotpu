@@ -69,6 +69,7 @@
   "robotPuPro.changeChannel": "将无线电频道更改给定量。在 0 到 255 之间环绕。",
   "robotPuPro.changeChannel|param|delta": "改变频道的金额, eg: 1",
   "robotPuPro.channel": "当前无线电频道 (0..255)。机器人PU和游戏手柄必须使用相同的通道进行通信。",
+  "robotPuPro.connectToGamepad": "通过无线电将机器人 PU 连接到游戏手柄。启动时调用一次。\n注册无线电处理程序，将收到的命令转发给机器人：\n键/值对发送到 runKeyValueCommand，字符串发送到 runStringCommand。",
   "robotPuPro.dance": "使用麦克风检测节拍，随着音乐起舞。循环中反复调用。",
   "robotPuPro.explore": "使用声纳传感器自主探索以避免障碍物。循环中反复调用。",
   "robotPuPro.frontDistanceArray": "返回前方距离数组（以厘米为单位）。项目：左、左前、前、右前、右。首先调用声纳扫描来更新值。",

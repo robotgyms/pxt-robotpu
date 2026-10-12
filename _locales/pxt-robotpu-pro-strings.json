@@ -15,6 +15,7 @@
   "robotPuPro.calibrate|block": "calibrate",
   "robotPuPro.changeChannel|block": "change channel by %delta",
   "robotPuPro.channel|block": "channel",
+  "robotPuPro.connectToGamepad|block": "connect to gamepad",
   "robotPuPro.dance|block": "dance",
   "robotPuPro.explore|block": "explore",
   "robotPuPro.frontDistanceArray|block": "front distances",
