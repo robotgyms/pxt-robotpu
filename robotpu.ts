@@ -469,6 +469,91 @@ namespace robotPuPro {
     }
     // Configuration Constants
 
+    // ------------------------------------------------------------------
+    // Shared I2C bus
+    //
+    // CODAL fibers yield inside pins.i2c* while waiting for the TWI
+    // peripheral, so two fibers doing I2C concurrently can interleave a
+    // transaction mid-transfer (corrupt data, or a wedged bus that freezes
+    // every fiber touching I2C). All bus traffic therefore goes through a
+    // single worker fiber that drains a FIFO queue: exactly one fiber ever
+    // calls pins.i2c*. Callers enqueue a job and pause until it completes,
+    // which preserves blocking semantics and FIFO ordering across fibers.
+    class I2CJob {
+        addr: number;
+        tx: Buffer;
+        rxLen: number;
+        repeated: boolean;
+        rx: Buffer;
+        done: boolean;
+    }
+    const I2C_QUEUE_MAX = 64;
+    let i2cQueue: I2CJob[] = [];
+    let i2cWorkerStarted = false;
+
+    function i2cWorker(): void {
+        while (true) {
+            let job = i2cQueue.shift();
+            if (!job) {
+                basic.pause(1);
+            } else {
+                if (job.tx) {
+                    pins.i2cWriteBuffer(job.addr, job.tx, job.repeated);
+                }
+                if (job.rxLen > 0) {
+                    job.rx = pins.i2cReadBuffer(job.addr, job.rxLen);
+                }
+                job.done = true;
+            }
+        }
+    }
+
+    /**
+     * Perform one I2C transaction on the shared robot bus. Optionally writes
+     * tx (pass null for a pure read), then reads rxLen bytes (0 for none).
+     * Serialized through the single I2C worker fiber; blocks the caller until
+     * complete. Returns the received buffer, or an empty buffer if the queue
+     * was full and the job was dropped.
+     */
+    export function i2cTransaction(addr: number, tx: Buffer, rxLen: number, repeated: boolean): Buffer {
+        if (!i2cWorkerStarted) {
+            i2cWorkerStarted = true;
+            control.inBackground(i2cWorker);
+        }
+        if (i2cQueue.length >= I2C_QUEUE_MAX) {
+            serial.writeLine("robotpu: i2c queue full, dropping job");
+            return pins.createBuffer(0);
+        }
+        let job = new I2CJob();
+        job.addr = addr;
+        job.tx = tx;
+        job.rxLen = rxLen;
+        job.repeated = repeated;
+        job.done = false;
+        i2cQueue.push(job);
+        while (!job.done) {
+            basic.pause(1);
+        }
+        return job.rx;
+    }
+
+    /** Serialized replacement for pins.i2cWriteBuffer on the shared bus. */
+    export function i2cWriteBuffer(addr: number, buf: Buffer, repeated?: boolean): void {
+        i2cTransaction(addr, buf, 0, repeated || false);
+    }
+
+    /** Serialized replacement for pins.i2cReadBuffer on the shared bus. */
+    export function i2cReadBuffer(addr: number, size: number, repeated?: boolean): Buffer {
+        return i2cTransaction(addr, null, size, repeated || false);
+    }
+
+    /** Serialized replacement for pins.i2cWriteNumber on the shared bus. */
+    export function i2cWriteNumber(addr: number, value: number, format: NumberFormat, repeated?: boolean): void {
+        let buf = pins.createBuffer(pins.sizeOf(format));
+        buf.setNumber(format, 0, value);
+        i2cTransaction(addr, buf, 0, repeated || false);
+    }
+
     export class PCB {
         public i2cAddress: number;
         private lastBlinkTS: number;
@@ -534,7 +619,7 @@ namespace robotPuPro {
             buf.setNumber(NumberFormat.UInt8LE, 1, sp >= 0 ? 0x01 : 0x02);
             buf.setNumber(NumberFormat.Int8LE, 2, Math.abs(sp));
             buf.setNumber(NumberFormat.UInt8LE, 3, 0);
-            pins.i2cWriteBuffer(this.i2cAddress, buf);
+            i2cWriteBuffer(this.i2cAddress, buf);
         }
 
         /**
@@ -549,7 +634,7 @@ namespace robotPuPro {
                 buf2.setNumber(NumberFormat.UInt8LE, 1, a);
                 buf2.setNumber(NumberFormat.UInt8LE, 2, 0);
                 buf2.setNumber(NumberFormat.UInt8LE, 3, 0);
-                pins.i2cWriteBuffer(this.i2cAddress, buf2);
+                i2cWriteBuffer(this.i2cAddress, buf2);
             } else if (sr == 8) {
                 // use pin 14 as servo
                 pins.servoWritePin(AnalogPin.P14, a);
@@ -598,7 +683,7 @@ namespace robotPuPro {
                 buf.setNumber(NumberFormat.UInt8LE, 1, a);
                 buf.setNumber(NumberFormat.UInt8LE, 2, 0);
                 buf.setNumber(NumberFormat.UInt8LE, 3, 0);
-                pins.i2cWriteBuffer(this.i2cAddress, buf);
+                i2cWriteBuffer(this.i2cAddress, buf);
             }
         }
 
@@ -672,7 +757,7 @@ namespace robotPuPro {
             buf3.setNumber(NumberFormat.UInt8LE, 1, light);
             buf3.setNumber(NumberFormat.UInt8LE, 2, 0);
             buf3.setNumber(NumberFormat.UInt8LE, 3, 0);
-            pins.i2cWriteBuffer(this.i2cAddress, buf3);
+            i2cWriteBuffer(this.i2cAddress, buf3);
         }
 
         /**
@@ -685,7 +770,7 @@ namespace robotPuPro {
             buf.setNumber(NumberFormat.UInt8LE, 1, 0);
             buf.setNumber(NumberFormat.UInt8LE, 2, 0);
             buf.setNumber(NumberFormat.UInt8LE, 3, 0);
-            pins.i2cWriteBuffer(this.i2cAddress, buf);
+            i2cWriteBuffer(this.i2cAddress, buf);
         }
 
         /**
@@ -695,8 +780,7 @@ namespace robotPuPro {
         public getBatteryLevel(): number {
             let cmd = pins.createBuffer(4);
             cmd.setNumber(NumberFormat.UInt8LE, 0, 0x33);
-            pins.i2cWriteBuffer(this.i2cAddress, cmd, true);
-            let ret = pins.i2cReadBuffer(this.i2cAddress, 1);
+            let ret = i2cTransaction(this.i2cAddress, cmd, 1, true);
             return ret.getNumber(NumberFormat.UInt8LE, 0);
         }
 
