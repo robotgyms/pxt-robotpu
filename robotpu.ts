@@ -494,6 +494,10 @@ namespace robotPuPro {
     let i2cReadTick = 0;
     function i2cWorker(): void {
         while (true) {
+            // Feeding here arms a hardware dead-man for the whole program:
+            // if this fiber ever wedges inside a non-yielding driver spin,
+            // the feed stops and the nRF watchdog hard-resets the board.
+            robotpuWatchdog.feed();
             let job = i2cQueue.shift();
             if (!job) {
                 basic.pause(1);
@@ -527,6 +531,10 @@ namespace robotPuPro {
     export function i2cTransaction(addr: number, tx: Buffer, rxLen: number, repeated: boolean): Buffer {
         if (!i2cWorkerStarted) {
             i2cWorkerStarted = true;
+            // 15 s > codal's worst-case ~11 s legit I2C error path, so a
+            // single stretched-but-recoverable transaction won't trip it,
+            // but the infinite waitForStop spin will.
+            robotpuWatchdog.start(15);
             control.inBackground(i2cWorker);
         }
         if (i2cQueue.length >= I2C_QUEUE_MAX) {

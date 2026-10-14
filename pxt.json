@@ -13,6 +13,8 @@
     "files": [
         "robotpu.ts",
         "main.ts",
+        "watchdog.cpp",
+        "shims.d.ts",
         "README.md",
         "_locales/pxt-robotpu-pro-jsdoc-strings.json",
         "_locales/pxt-robotpu-pro-strings.json",
