@@ -1,6 +1,6 @@
 {
     "name": "pxt-robotpu-pro",
-    "version": "1.1.9",
+    "version": "1.1.10",
     "description": "MakeCode extension (micro:bit (V2) only) for the advanced Robot PU API.",
     "license": "MIT",
     "dependencies": {
