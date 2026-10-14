@@ -22,6 +22,9 @@ void start(int timeoutSeconds) {
         return;
     if (timeoutSeconds <= 0)
         timeoutSeconds = 15;
+    // The WDT clocks from LFCLK — make sure the source is actually running;
+    // starting an already-running LFCLK is harmless.
+    NRF_CLOCK->TASKS_LFCLKSTART = 1;
     NRF_WDT->CRV = 32768 * (uint32_t)timeoutSeconds;
     NRF_WDT->RREN = WDT_RREN_RR0_Enabled << WDT_RREN_RR0_Pos;
     NRF_WDT->TASKS_START = 1;
