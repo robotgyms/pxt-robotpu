@@ -540,12 +540,16 @@ namespace robotPuPro {
                 if (job.txList) {
                     // Each buffer is its own transaction (START .. STOP):
                     // repeated=true here would chain the burst into one
-                    // stretched transfer with no STOP at the end.
+                    // stretched transfer with no STOP at the end. Pace each
+                    // write — zero-gap bursts make the STM32 slave stretch
+                    // SCL, which is what wedges codal's waitForStop spin.
                     for (let buf of job.txList) {
                         pins.i2cWriteBuffer(job.addr, buf, false);
+                        basic.pause(1);
                     }
                 } else if (job.tx) {
                     pins.i2cWriteBuffer(job.addr, job.tx, job.repeated);
+                    basic.pause(1);
                 }
                 if (job.rxLen > 0) {
                     job.rx = pins.i2cReadBuffer(job.addr, job.rxLen);
