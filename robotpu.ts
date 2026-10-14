@@ -523,8 +523,11 @@ namespace robotPuPro {
                 basic.pause(1);
             } else {
                 if (job.txList) {
+                    // Each buffer is its own transaction (START .. STOP):
+                    // repeated=true here would chain the burst into one
+                    // stretched transfer with no STOP at the end.
                     for (let buf of job.txList) {
-                        pins.i2cWriteBuffer(job.addr, buf, job.repeated);
+                        pins.i2cWriteBuffer(job.addr, buf, false);
                     }
                 } else if (job.tx) {
                     pins.i2cWriteBuffer(job.addr, job.tx, job.repeated);
@@ -588,17 +591,17 @@ namespace robotPuPro {
 
     /**
      * Write several buffers to one I2C address as a single queued job. The
-     * worker writes them back-to-back. Fire-and-forget: returns as soon as
-     * the job is queued, so a burst of servo writes adds no scheduling
-     * latency to the caller.
+     * worker writes them back-to-back, each as its own transaction with a
+     * STOP. Fire-and-forget: returns as soon as the job is queued, so a
+     * burst of servo writes adds no scheduling latency to the caller.
      */
-    export function i2cWriteBurst(addr: number, bufs: Buffer[], repeated?: boolean): void {
+    export function i2cWriteBurst(addr: number, bufs: Buffer[]): void {
         if (!bufs || bufs.length == 0) return;
         let job = new I2CJob();
         job.addr = addr;
         job.txList = bufs;
         job.rxLen = 0;
-        job.repeated = repeated || false;
+        job.repeated = false;
         job.done = false;
         i2cSubmit(job);
     }
@@ -641,6 +644,7 @@ namespace robotPuPro {
         public servoTarget: number[];
         public servoTrim: number[];
         private servoBatch: Buffer[];
+        private servoBatchDepth: number;
 
         constructor() {
             this.i2cAddress = 16;
@@ -657,6 +661,7 @@ namespace robotPuPro {
             this.idle = false;
             this.currentState = 0;
             this.servoBatch = null;
+            this.servoBatchDepth = 0;
 
             // Initialize vectors
             this.servoErr = [];
@@ -746,13 +751,25 @@ namespace robotPuPro {
          * collected and sent as one burst by flushServoBatch(). Wrapping a
          * gait step in a batch turns ~10 queued transactions into 1, which
          * keeps the move loop inside its 10 ms budget.
+         *
+         * Batches nest via a depth counter: only the outermost flush sends.
+         * INVARIANT: nothing may yield the fiber between begin and flush —
+         * another fiber's servo() writes would silently join this batch.
+         * servo()/servoStep() only push to an array while a batch is open,
+         * so callers must not add a pause/serial call in between.
          */
         public beginServoBatch(): void {
-            if (!this.servoBatch) this.servoBatch = [];
+            if (this.servoBatchDepth++ == 0) this.servoBatch = [];
         }
 
-        /** Send all servo writes collected since beginServoBatch() in one I2C job. */
+        /**
+         * Send all servo writes collected since the outermost
+         * beginServoBatch() in one I2C job. Nested flushes only close
+         * one nesting level; an unpaired flush is a no-op.
+         */
         public flushServoBatch(): void {
+            if (this.servoBatchDepth == 0) return;
+            if (--this.servoBatchDepth > 0) return;
             const bufs = this.servoBatch;
             this.servoBatch = null;
             if (bufs && bufs.length > 0) {
