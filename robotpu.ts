@@ -512,12 +512,27 @@ namespace robotPuPro {
     let i2cQueue: I2CJob[] = [];
     let i2cWorkerStarted = false;
 
+    // The robotpuWatchdog C++ shims don't exist in the simulator (the
+    // pxsim.robotpuWatchdog namespace is only present on hardware), so the
+    // first start() call throws there. Latch the outcome once: feeding in
+    // the worker loop then stays a cheap flag check instead of a try/catch
+    // per iteration, and sim runs degrade to no watchdog.
+    let wdtPresent = false;
+    function wdtStart(timeoutSeconds: number): boolean {
+        try {
+            robotpuWatchdog.start(timeoutSeconds);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function i2cWorker(): void {
         while (true) {
             // Feeding here arms a hardware dead-man for the whole program:
             // if this fiber ever wedges inside a non-yielding driver spin,
             // the feed stops and the nRF watchdog hard-resets the board.
-            robotpuWatchdog.feed();
+            if (wdtPresent) robotpuWatchdog.feed();
             let job = i2cQueue.shift();
             if (!job) {
                 basic.pause(1);
@@ -555,7 +570,7 @@ namespace robotPuPro {
             // 15 s > codal's worst-case ~11 s legit I2C error path, so a
             // single stretched-but-recoverable transaction won't trip it,
             // but the infinite waitForStop spin will.
-            robotpuWatchdog.start(15);
+            wdtPresent = wdtStart(15);
             control.inBackground(i2cWorker);
         }
         if (i2cQueue.length >= I2C_QUEUE_MAX) {
