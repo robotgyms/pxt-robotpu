@@ -491,6 +491,7 @@ namespace robotPuPro {
     let i2cQueue: I2CJob[] = [];
     let i2cWorkerStarted = false;
 
+    let i2cReadTick = 0;
     function i2cWorker(): void {
         while (true) {
             let job = i2cQueue.shift();
@@ -498,10 +499,18 @@ namespace robotPuPro {
                 basic.pause(1);
             } else {
                 if (job.tx) {
+                    // debug: name the transaction so the last serial line before
+                    // a freeze identifies the wedged slave/register.
+                    serial.writeLine("i2cw " + job.addr + ":" + job.tx[0]);
                     pins.i2cWriteBuffer(job.addr, job.tx, job.repeated);
+                    serial.writeLine("i2cw ok");
                 }
                 if (job.rxLen > 0) {
+                    if (++i2cReadTick % 50 == 0) serial.writeLine("i2cr " + job.addr);
                     job.rx = pins.i2cReadBuffer(job.addr, job.rxLen);
+                    if (job.rx.length != job.rxLen) {
+                        serial.writeLine("i2cr fail " + job.addr + ":" + job.rx.length);
+                    }
                 }
                 job.done = true;
             }
@@ -2337,7 +2346,7 @@ namespace robotPuPro {
 
             // 2. Randomly trigger a voice request for help (approx 1 in 500 cycles)
             if (randint(0, 500) == 0) {
-                // Use pxt-billy to speak the distress message
+                // Speak the distress message through the shared voice pipeline
                 this.talk("Help me stand up!");
 
                 // 3. Publish a status code via radio for remote monitoring
