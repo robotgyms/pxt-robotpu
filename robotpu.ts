@@ -527,6 +527,35 @@ namespace robotPuPro {
         }
     }
 
+    // The bounded TWIM shim exists only on hardware; in the simulator fall
+    // back to the stock pins.i2c* shims (which cannot wedge anyway).
+    let i2cShimPresent = false;
+    function i2cShimProbe(): boolean {
+        try {
+            return robotpuBus.hasBoundedI2C();
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // All bus traffic goes through the bounded driver: a stretched
+    // transaction returns an error in ~50 ms and the bus is cleared,
+    // instead of codal's waitForStop spinning forever without yielding.
+    function i2cWriteRaw(addr: number, buf: Buffer, repeated: boolean): void {
+        if (i2cShimPresent) {
+            if (robotpuBus.i2cWrite(addr, buf, repeated) != 0)
+                serial.writeLine("i2cw fail " + addr);
+        } else {
+            pins.i2cWriteBuffer(addr, buf, repeated);
+        }
+    }
+
+    function i2cReadRaw(addr: number, len: number): Buffer {
+        if (i2cShimPresent)
+            return robotpuBus.i2cRead(addr, len, false);
+        return pins.i2cReadBuffer(addr, len);
+    }
+
     function i2cWorker(): void {
         while (true) {
             // Feeding here arms a hardware dead-man for the whole program:
@@ -536,29 +565,29 @@ namespace robotPuPro {
             let job = i2cQueue.shift();
             if (!job) {
                 basic.pause(1);
-            } else {
-                if (job.txList) {
-                    // Each buffer is its own transaction (START .. STOP):
-                    // repeated=true here would chain the burst into one
-                    // stretched transfer with no STOP at the end. Pace each
-                    // write — zero-gap bursts make the STM32 slave stretch
-                    // SCL, which is what wedges codal's waitForStop spin.
-                    for (let buf of job.txList) {
-                        pins.i2cWriteBuffer(job.addr, buf, false);
-                        basic.pause(1);
-                    }
-                } else if (job.tx) {
-                    pins.i2cWriteBuffer(job.addr, job.tx, job.repeated);
+                continue;
+            }
+            if (job.txList) {
+                // Each buffer is its own transaction (START .. STOP):
+                // repeated=true here would chain the burst into one
+                // stretched transfer with no STOP at the end. Pace each
+                // write — zero-gap bursts make the STM32 slave stretch
+                // SCL, which is what wedges codal's waitForStop spin.
+                for (let buf of job.txList) {
+                    i2cWriteRaw(job.addr, buf, false);
                     basic.pause(1);
                 }
-                if (job.rxLen > 0) {
-                    job.rx = pins.i2cReadBuffer(job.addr, job.rxLen);
-                    if (job.rx.length != job.rxLen) {
-                        serial.writeLine("i2cr fail " + job.addr + ":" + job.rx.length);
-                    }
-                }
-                job.done = true;
+            } else if (job.tx) {
+                i2cWriteRaw(job.addr, job.tx, job.repeated);
+                basic.pause(1);
             }
+            if (job.rxLen > 0) {
+                job.rx = i2cReadRaw(job.addr, job.rxLen);
+                if (job.rx.length != job.rxLen) {
+                    serial.writeLine("i2cr fail " + job.addr + ":" + job.rx.length);
+                }
+            }
+            job.done = true;
         }
     }
 
@@ -571,10 +600,11 @@ namespace robotPuPro {
     function i2cSubmit(job: I2CJob): boolean {
         if (!i2cWorkerStarted) {
             i2cWorkerStarted = true;
-            // 15 s > codal's worst-case ~11 s legit I2C error path, so a
-            // single stretched-but-recoverable transaction won't trip it,
-            // but the infinite waitForStop spin will.
+            // Backstop for any residual non-yielding spin: bus transactions
+            // are hard-bounded at ~60 ms now, so a starving feed means a
+            // real scheduler lockup, not a long transaction.
             wdtPresent = wdtStart(15);
+            i2cShimPresent = i2cShimProbe();
             control.inBackground(i2cWorker);
         }
         if (i2cQueue.length >= I2C_QUEUE_MAX) {

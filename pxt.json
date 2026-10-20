@@ -14,6 +14,7 @@
         "robotpu.ts",
         "main.ts",
         "watchdog.cpp",
+        "busshim.cpp",
         "shims.d.ts",
         "README.md",
         "_locales/pxt-robotpu-pro-jsdoc-strings.json",
