@@ -412,13 +412,17 @@ namespace robotPuPro {
         trig: DigitalPin;
         echo: DigitalPin;
         private lastCm: number;
+        private workerStarted: boolean;
 
         constructor(trigPin: DigitalPin = DigitalPin.P2, echoPin: DigitalPin = DigitalPin.P8) {
             // Default timeout: 30000us (approx 500cm)
             this.timeoutUS = 500 * 2 * 30;
             this.trig = trigPin;
             this.echo = echoPin;
-            this.lastCm = -1;
+            // "Far" until the first real sample lands, so obstacle
+            // avoidance doesn't momentarily think a wall is at 0 cm.
+            this.lastCm = 400;
+            this.workerStarted = false;
 
             // Initialize pins
             pins.digitalWritePin(this.trig, 0);
@@ -426,9 +430,31 @@ namespace robotPuPro {
         }
 
         /**
-         * Measures distance in centimeters
+         * Measures distance in centimeters.
+         * Returns the most recent sample immediately. The ping runs on a
+         * dedicated background fiber so callers (e.g. the 100 Hz gait loop)
+         * never block on pulseIn's echo wait, which can take up to
+         * timeoutUS microseconds when nothing is in range.
          */
-        distanceCm(): number {
+        public distanceCm(): number {
+            if (!this.workerStarted) {
+                this.workerStarted = true;
+                control.inBackground(() => {
+                    while (true) {
+                        this.ping();
+                        // HC-SR04 needs ~60 ms between triggers to avoid
+                        // ghost echoes; this also paces CPU use.
+                        basic.pause(50);
+                    }
+                });
+            }
+            return this.lastCm;
+        }
+
+        /**
+         * Emit one ping and update the smoothed distance sample.
+         */
+        private ping(): void {
             // 1. Send 10us pulse to Trigger pin
             pins.digitalWritePin(this.trig, 0);
             control.waitMicros(5);
@@ -456,15 +482,9 @@ namespace robotPuPro {
             if (cm > 400) cm = 400;
 
             // Simple debouncing/smoothing against the previous reading
-            if (this.lastCm < 0) {
-                this.lastCm = cm;
-            } else {
-                let diff = Math.abs(cm - this.lastCm);
-                let alpha = diff > 60 ? 0.2 : 0.5;
-                this.lastCm = this.lastCm * (1 - alpha) + cm * alpha;
-            }
-
-            return this.lastCm;
+            let diff = Math.abs(cm - this.lastCm);
+            let alpha = diff > 60 ? 0.2 : 0.5;
+            this.lastCm = this.lastCm * (1 - alpha) + cm * alpha;
         }
     }
     // Configuration Constants
@@ -482,6 +502,7 @@ namespace robotPuPro {
     class I2CJob {
         addr: number;
         tx: Buffer;
+        txList: Buffer[];
         rxLen: number;
         repeated: boolean;
         rx: Buffer;
@@ -497,11 +518,24 @@ namespace robotPuPro {
             if (!job) {
                 basic.pause(1);
             } else {
-                if (job.tx) {
+                if (job.txList) {
+                    // Each buffer is its own transaction (START .. STOP):
+                    // repeated=true here would chain the burst into one
+                    // stretched transfer with no STOP at the end. Pace each
+                    // write — zero-gap bursts make the STM32 slave stretch
+                    // SCL, which is what wedges codal's waitForStop spin.
+                    for (let buf of job.txList) {
+                        pins.i2cWriteBuffer(job.addr, buf, false);
+                        basic.pause(1);
+                    }
+                } else if (job.tx) {
                     pins.i2cWriteBuffer(job.addr, job.tx, job.repeated);
                 }
                 if (job.rxLen > 0) {
                     job.rx = pins.i2cReadBuffer(job.addr, job.rxLen);
+                    if (job.rx.length != job.rxLen) {
+                        serial.writeLine("i2cr fail " + job.addr + ":" + job.rx.length);
+                    }
                 }
                 job.done = true;
             }
@@ -509,32 +543,62 @@ namespace robotPuPro {
     }
 
     /**
-     * Perform one I2C transaction on the shared robot bus. Optionally writes
-     * tx (pass null for a pure read), then reads rxLen bytes (0 for none).
-     * Serialized through the single I2C worker fiber; blocks the caller until
-     * complete. Returns the received buffer, or an empty buffer if the queue
-     * was full and the job was dropped.
+     * Queue a job on the I2C worker. Jobs that read data (rxLen > 0) block
+     * the caller until complete; write-only jobs are fire-and-forget —
+     * FIFO ordering is preserved and the caller never blocks. Returns false
+     * if the queue was full and the job was dropped.
      */
-    export function i2cTransaction(addr: number, tx: Buffer, rxLen: number, repeated: boolean): Buffer {
+    function i2cSubmit(job: I2CJob): boolean {
         if (!i2cWorkerStarted) {
             i2cWorkerStarted = true;
             control.inBackground(i2cWorker);
         }
         if (i2cQueue.length >= I2C_QUEUE_MAX) {
             serial.writeLine("robotpu: i2c queue full, dropping job");
-            return pins.createBuffer(0);
+            return false;
         }
+        i2cQueue.push(job);
+        if (job.rxLen > 0) {
+            while (!job.done) {
+                basic.pause(1);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Perform one I2C transaction on the shared robot bus. Optionally writes
+     * tx (pass null for a pure read), then reads rxLen bytes (0 for none).
+     * Serialized through the single I2C worker fiber. Write-only calls are
+     * fire-and-forget; calls that read data block until complete and return
+     * the received buffer, or an empty buffer if the job was dropped.
+     */
+    export function i2cTransaction(addr: number, tx: Buffer, rxLen: number, repeated: boolean): Buffer {
         let job = new I2CJob();
         job.addr = addr;
         job.tx = tx;
         job.rxLen = rxLen;
         job.repeated = repeated;
         job.done = false;
-        i2cQueue.push(job);
-        while (!job.done) {
-            basic.pause(1);
-        }
-        return job.rx;
+        const ok = i2cSubmit(job);
+        return (ok && job.rx) ? job.rx : pins.createBuffer(0);
+    }
+
+    /**
+     * Write several buffers to one I2C address as a single queued job. The
+     * worker writes them back-to-back. Fire-and-forget: returns as soon as
+     * the job is queued, so a burst of servo writes adds no scheduling
+     * latency to the caller.
+     */
+    export function i2cWriteBurst(addr: number, bufs: Buffer[], repeated?: boolean): void {
+        if (!bufs || bufs.length == 0) return;
+        let job = new I2CJob();
+        job.addr = addr;
+        job.txList = bufs;
+        job.rxLen = 0;
+        job.repeated = repeated || false;
+        job.done = false;
+        i2cSubmit(job);
     }
 
     /** Serialized replacement for pins.i2cWriteBuffer on the shared bus. */
@@ -574,6 +638,7 @@ namespace robotPuPro {
         public servoCtrl: number[];
         public servoTarget: number[];
         public servoTrim: number[];
+        private servoBatch: Buffer[];
 
         constructor() {
             this.i2cAddress = 16;
@@ -589,6 +654,7 @@ namespace robotPuPro {
             this.blinkG = 4000;
             this.idle = false;
             this.currentState = 0;
+            this.servoBatch = null;
 
             // Initialize vectors
             this.servoErr = [];
@@ -634,7 +700,11 @@ namespace robotPuPro {
                 buf2.setNumber(NumberFormat.UInt8LE, 1, a);
                 buf2.setNumber(NumberFormat.UInt8LE, 2, 0);
                 buf2.setNumber(NumberFormat.UInt8LE, 3, 0);
-                i2cWriteBuffer(this.i2cAddress, buf2);
+                if (this.servoBatch) {
+                    this.servoBatch.push(buf2);
+                } else {
+                    i2cWriteBuffer(this.i2cAddress, buf2);
+                }
             } else if (sr == 8) {
                 // use pin 14 as servo
                 pins.servoWritePin(AnalogPin.P14, a);
@@ -670,6 +740,25 @@ namespace robotPuPro {
         }
 
         /**
+         * Open a servo write batch: subsequent I2C writes from servo() are
+         * collected and sent as one burst by flushServoBatch(). Wrapping a
+         * gait step in a batch turns ~10 queued transactions into 1, which
+         * keeps the move loop inside its 10 ms budget.
+         */
+        public beginServoBatch(): void {
+            if (!this.servoBatch) this.servoBatch = [];
+        }
+
+        /** Send all servo writes collected since beginServoBatch() in one I2C job. */
+        public flushServoBatch(): void {
+            const bufs = this.servoBatch;
+            this.servoBatch = null;
+            if (bufs && bufs.length > 0) {
+                i2cWriteBurst(this.i2cAddress, bufs);
+            }
+        }
+
+        /**
          * Move a servo smoothly to an angle (0-180) using the PCB's smooth motion command.
          * @param sr servo index 0-7
          * @param a target angle
@@ -691,10 +780,12 @@ namespace robotPuPro {
          * Move all servos immediately to target state.
          */
         public servoMove(targets: number[]): void {
+            this.beginServoBatch();
             for (let p = 0; p < targets.length; p++) {
                 this.servoTarget[p] = targets[p] + this.servoTrim[p] + this.servoCtrl[p]
                 this.servo(p, this.servoTarget[p]);
             }
+            this.flushServoBatch();
             this.idle = true;
         }
 
@@ -739,12 +830,14 @@ namespace robotPuPro {
         public moveServos(targets: number[], speeds: number[],
             syncList: number[], syncSpeedGain: number,
             asyncList: number[], asyncSpeedGain: number): boolean {
+            this.beginServoBatch();
             for (let q of syncList) {
                 this.servoStep(targets[q] + this.servoTrim[q] + this.servoCtrl[q], syncSpeedGain * speeds[q], q);
             }
             for (let r of asyncList) {
                 this.servoStep(targets[r] + this.servoTrim[r] + this.servoCtrl[r], asyncSpeedGain * speeds[r], r);
             }
+            this.flushServoBatch();
             return this.isServoIdle(syncList)
         }
 
@@ -1480,6 +1573,22 @@ namespace robotPuPro {
     const FETAL_GST = -2;
     const SLEEP_GST = -1;
 
+    // Shared joint-index lists for pcb.move() calls on the per-tick gait
+    // path — hoisted to module consts so no array is allocated per tick.
+    const SYNC_BODY_JOINTS = [0, 1, 2, 3, 4, 5];      // legs + head
+    const ASYNC_ARM_JOINTS = [6, 7, 8, 9];            // shoulders + arms
+    const SYNC_LEG_JOINTS = [0, 1, 2, 3];             // legs only
+    const ASYNC_ALL_JOINTS = [4, 5, 6, 7, 8, 9];      // head + shoulders + arms
+
+    // Gait state sequences used by per-tick action handlers — hoisted so
+    // running the action doesn't allocate the same array every tick.
+    const SIDE_STEP_LEFT = [20, 22, 0, 19];
+    const SIDE_STEP_RIGHT = [18, 21, 23, 0];
+    const JUMP_STATES = [24, 14, 0, 0];
+    const STAND_STATE = [0];
+    const SIT_STATE = [15];
+    const FETAL_STATE = [1];
+
     /**
      * RobotPu Class for MakeCode
      * Optimized with internal PCB and Parameters instances.
@@ -1514,6 +1623,12 @@ namespace robotPuPro {
         private alertScale: number = 0.9;
         private musicActive: boolean = false;
         private restState: number = 26;
+        private restStateArr: number[] = [26];   // 1-elem wrapper for restState, reused by rest()
+        private restOffsets: number[] = [0, 0, 0, 0, 0, 0];  // scratch for rest()
+        private moveOffsets: number[] = [0, 0, 0, 0, 0, 0];  // scratch for moveBalance()
+        private sideStepOffsets: number[] = [0, 0, 0, 0, 0, 0]; // scratch for sideStep()
+        private danceOffsets: number[] = [0, 0, 0, 0, 0, 0];   // scratch for danceMove()
+        private exploreMidScratch: number[] = [];              // scratch for setExploreParam() mid window
         private sleepPoweredDown: boolean = false;
 
         // IMU & Balance
@@ -1814,11 +1929,13 @@ namespace robotPuPro {
         public sideStep(di: number): number {
             // 1. Select the gait state sequence based on direction
             // Python: [20, 22, 0, 19] if walkDirection > 0 else [18, 21, 23, 0]
-            let sts = di > 0 ? [20, 22, 0, 19] : [18, 21, 23, 0];
+            const sts = di > 0 ? SIDE_STEP_LEFT : SIDE_STEP_RIGHT;
 
             // 2. Reset the Control Vector to neutral
             // This clears any persistent tilt or pitch offsets
-            this.setControlOffsets([0, 1, 2, 3, 4, 5], [0, 0, 0, 0, 0, 0]);
+            const z = this.sideStepOffsets;
+            z[0] = 0; z[1] = 0; z[2] = 0; z[3] = 0; z[4] = 0; z[5] = 0;
+            this.setControlOffsets(SYNC_BODY_JOINTS, z);
 
             // 3. Calculate movement speed based on forward speed multiplier
             let movementSpeed = di * this.fwdSpeed;
@@ -1828,9 +1945,9 @@ namespace robotPuPro {
             return this.pcb.move(
                 this.pr,
                 sts,
-                [0, 1, 2, 3],
+                SYNC_LEG_JOINTS,
                 movementSpeed,
-                [4, 5, 6, 7, 8, 9],
+                ASYNC_ALL_JOINTS,
                 movementSpeed
             );
         }
@@ -2110,7 +2227,7 @@ namespace robotPuPro {
          * @param di Directional bias (-1.0 to 1.0)
          */
         public walk(sp: number, di: number): number {
-            let ret = this.moveBalance(sp, di, this.pr.walkFwdStates, this.pr.walkBwdStates, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9]);
+            let ret = this.moveBalance(sp, di, this.pr.walkFwdStates, this.pr.walkBwdStates, SYNC_LEG_JOINTS, ASYNC_ALL_JOINTS);
             if (ret == 0) {
                 if (this.pcb.lastPos == 1) { // update left step odometry
                     this.odom.leftStep(this.pcb.servoTarget[1] - this.lastLeftLegAngle);
@@ -2132,7 +2249,7 @@ namespace robotPuPro {
         * @param di Directional bias (-1.0 to 1.0)
         */
         public skate(sp: number, di: number): number {
-            let ret = this.moveBalance(sp, di, this.pr.skateFwdStates, this.pr.skateBwdStates, [0, 1, 2, 3], [4,5,6, 7, 8, 9]);
+            let ret = this.moveBalance(sp, di, this.pr.skateFwdStates, this.pr.skateBwdStates, SYNC_LEG_JOINTS, ASYNC_ALL_JOINTS);
             if (ret == 0) {
                 this.odom.pedometer += 1;
             }
@@ -2200,8 +2317,11 @@ namespace robotPuPro {
             let tiltOffset = leftTiltOffset + rightTiltOffset;
             sp /= 1.0 + 0.01 * (Math.abs(this.bodyRoll) + Math.abs(this.bodyPitch)) + Math.sqrt(Math.abs(tiltOffset * 0.5));
 
-            this.setControlOffsets([0, 1, 2, 3, 4, 5],
-                [tiltOffset, lf - tiltOffset, tiltOffset, -lf - tiltOffset, -40 * di - tiltOffset, Math.min(25.0, -2.0 * this.bodyPitch2)]);
+            const o = this.moveOffsets;
+            o[0] = tiltOffset; o[1] = lf - tiltOffset; o[2] = tiltOffset;
+            o[3] = -lf - tiltOffset; o[4] = -40 * di - tiltOffset;
+            o[5] = Math.min(25.0, -2.0 * this.bodyPitch2);
+            this.setControlOffsets(SYNC_BODY_JOINTS, o);
 
             // Call internal servo move
             return this.pcb.move(this.pr, sts, sync_list, sp, async_list, sp);
@@ -2311,16 +2431,21 @@ namespace robotPuPro {
                 this.pcb.servoCtrl[i] *= 0.99;
             }
             let rl = Math.min(35.0, Math.max(-35.0, this.bodyRoll2));
+            const o = this.restOffsets;
             if (Math.abs(rl) > 5) {
-                this.setControlOffsets([0, 1, 2, 3, 4, 5], [rl, rl * -1.0, rl, rl * -1.0, rl * -0.5 + yaw, pitch]);
+                o[0] = rl; o[1] = -rl; o[2] = rl; o[3] = -rl;
+                o[4] = rl * -0.5 + yaw; o[5] = pitch;
             } else {
-                this.setControlOffsets([0, 1, 2, 3, 4, 5], [yaw, pitch, yaw, pitch, yaw, pitch]);
+                o[0] = yaw; o[1] = pitch; o[2] = yaw; o[3] = pitch;
+                o[4] = yaw; o[5] = pitch;
             }
+            this.setControlOffsets(SYNC_BODY_JOINTS, o);
             if (Math.abs(this.bodyPitch2) > 10) {
-                this.setControlOffsets([5], [-this.bodyPitch2]);
+                this.pcb.servoCtrl[5] = -this.bodyPitch2;
             }
-            return this.pcb.move(this.pr, [this.restState], [0, 1, 2, 3, 4, 5], 1 + pitch * 0.25,
-                [6, 7, 8, 9], 0.5);
+            this.restStateArr[0] = this.restState;
+            return this.pcb.move(this.pr, this.restStateArr, SYNC_BODY_JOINTS, 1 + pitch * 0.25,
+                ASYNC_ARM_JOINTS, 0.5);
         }
 
         public trim(): void {
@@ -2337,7 +2462,7 @@ namespace robotPuPro {
 
             // 2. Randomly trigger a voice request for help (approx 1 in 500 cycles)
             if (randint(0, 500) == 0) {
-                // Use pxt-billy to speak the distress message
+                // Speak the distress message through the shared voice pipeline
                 this.talk("Help me stand up!");
 
                 // 3. Publish a status code via radio for remote monitoring
@@ -2360,7 +2485,7 @@ namespace robotPuPro {
 
             // 3. Move to the Fetal State (Index 1)
             // states: [1], syncList: all servos [0-5], speed: 2.0, asyncList: none, asyncSp: 0.5
-            this.pcb.move(this.pr, [1], [0, 1, 2, 3, 4, 5], 2.0, [6, 7, 8, 9], 0.5);
+            this.pcb.move(this.pr, FETAL_STATE, SYNC_BODY_JOINTS, 2.0, ASYNC_ARM_JOINTS, 0.5);
         }
 
         /**
@@ -2383,8 +2508,7 @@ namespace robotPuPro {
          */
         private setExploreParam(): void {
             // 1. Check for obstacles in the "middle" view of the point cloud
-            let mid_view = [this.pr.exploreDistance[this.pr.exploreMid1], this.pr.exploreDistance[this.pr.exploreMid2]];
-            let obs_hcsr = Math.min(mid_view[0], mid_view[1]);
+            let obs_hcsr = Math.min(this.pr.exploreDistance[this.pr.exploreMid1], this.pr.exploreDistance[this.pr.exploreMid2]);
 
             let nd = 0; // New Direction variable
 
@@ -2392,8 +2516,16 @@ namespace robotPuPro {
             if (obs_hcsr > this.exploreDangerDistance + this.exploreCautionDistance) {
                 // Path is getting wide open: Look only at middle indices for turn direction
                 // Python slice [mid1 : mid2+1]
-                let slice = this.pr.exploreDistance.slice(this.pr.exploreMid1, this.pr.exploreMid2 + 1);
-                nd = this.getTurnFromSonar(slice, 3);
+                let mid = this.exploreMidScratch;
+                const n = this.pr.exploreMid2 - this.pr.exploreMid1 + 1;
+                if (mid.length != n) {
+                    mid = this.exploreMidScratch = [];
+                    for (let i = 0; i < n; i++) mid.push(0);
+                }
+                for (let i = 0; i < n; i++) {
+                    mid[i] = this.pr.exploreDistance[this.pr.exploreMid1 + i];
+                }
+                nd = this.getTurnFromSonar(mid, 3);
             } else {
                 // Path is clear: Look at the whole point cloud for a better direction
                 nd = this.getTurnFromSonar(this.pr.exploreDistance, 5);
@@ -2411,11 +2543,6 @@ namespace robotPuPro {
 
                 dis -= 10 + randint(-5, 0);
 
-                // Low probability to shout for help via radio
-                if (randint(0, 400) == 0) {
-                    this.talk(this.content.sentences[5]);
-                    this.sendStatusCode("W1"); // Send Warning Code 1
-                }
             } else {
                 // Normal direction smoothing (Low pass filter)
                 this.exploreDirection = (this.exploreDirection * 3 + nd) * 0.25;
@@ -2559,7 +2686,7 @@ namespace robotPuPro {
             // states: [24, 14, 0, 0]
             // sync_servos (legs): [0, 1, 2, 3] at speed 3
             // async_servos (waist/head): [4, 5] at speed 2
-            return this.pcb.move(this.pr, [24, 14, 0, 0], [0, 1, 2, 3], 3, [4, 5, 6, 7, 8, 9], 2);
+            return this.pcb.move(this.pr, JUMP_STATES, SYNC_LEG_JOINTS, 3, ASYNC_ALL_JOINTS, 2);
         }
 
         /**
@@ -2569,7 +2696,7 @@ namespace robotPuPro {
         public kick(): number {
             // 1. Execute the forward walk states at high speed
             // legs: [0, 1, 2, 3] at speed 3, body/head: [4, 5] at speed 2
-            let md = this.pcb.move(this.pr, this.pr.boxingStates, [0, 1, 2, 3], 6, [4, 5, 6, 7, 8, 9], 4);
+            let md = this.pcb.move(this.pr, this.pr.boxingStates, SYNC_LEG_JOINTS, 6, ASYNC_ALL_JOINTS, 4);
 
             // 2. Check if the movement step is finished (md == 0)
             // and ensure the gait has reached index 0 or 2 (strike positions)
@@ -2594,10 +2721,10 @@ namespace robotPuPro {
             // asyncSpeed: 0.5
             return this.pcb.move(
                 this.pr,
-                [0],
-                [0, 1, 2, 3, 4, 5],
+                STAND_STATE,
+                SYNC_BODY_JOINTS,
                 2.0,
-                [6, 7, 8, 9],
+                ASYNC_ARM_JOINTS,
                 0.5
             );
         }
@@ -2616,10 +2743,10 @@ namespace robotPuPro {
             // asyncSpeed: 0.5
             return this.pcb.move(
                 this.pr,
-                [15],
-                [0, 1, 2, 3, 4, 5],
+                SIT_STATE,
+                SYNC_BODY_JOINTS,
                 2.0,
-                [6, 7, 8, 9],
+                ASYNC_ARM_JOINTS,
                 0.5
             );
         }
@@ -2918,8 +3045,10 @@ namespace robotPuPro {
 
             // 5. Apply control vectors to servos
             // Servo 5 (head/body pitch) reacts to sound volume
-            this.setControlOffsets([0, 1, 2, 3, 4, 5],
-                [ft, lt, ft, lt, this.rl, this.dancePitchWiggle - sl * 0.001]);
+            const o = this.danceOffsets;
+            o[0] = ft; o[1] = lt; o[2] = ft; o[3] = lt;
+            o[4] = this.rl; o[5] = this.dancePitchWiggle - sl * 0.001;
+            this.setControlOffsets(SYNC_BODY_JOINTS, o);
 
             // 6. Dynamic speed adjustment (capped at user target)
             this.danceSpeed = Math.min(this.danceSpeedTarget, this.danceSpeed * 1.01);
@@ -2928,8 +3057,8 @@ namespace robotPuPro {
             }
 
             // 7. Execute the movement via the PCB instance
-            return this.pcb.move(this.pr, this.danceState, [0, 1, 2, 3],
-                this.danceSpeed, [4, 5, 6, 7, 8, 9], this.danceSpeed);
+            return this.pcb.move(this.pr, this.danceState, SYNC_LEG_JOINTS,
+                this.danceSpeed, ASYNC_ALL_JOINTS, this.danceSpeed);
         }
 
         /**
