@@ -122,13 +122,8 @@ function RestArm () {
     pins.servoWritePin(AnalogPin.P15, 180)
 }
 
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 // press the logo button on Robot PU's head to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.toggleServoTrim()

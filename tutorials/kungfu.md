@@ -90,14 +90,9 @@ robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
 robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
 
 // allow gamepad remote control
-radio.onReceivedValue(function(name: string, value: number) {
-    robotPuPro.runKeyValueCommand(name,value)
-})
-
-// allow robots to exchange information for group activities
-radio.onReceivedString(function(receivedString: string) {
-    robotPuPro.runStringCommand(receivedString)
-})
+// forward gamepad commands to Robot PU and allow robots to exchange
+// information for group activities
+robotPuPro.connectToGamepad()
 // trigger servo calibration by gamepad 
 input.onLogoEvent(TouchButtonEvent.Pressed, function() {
     robotPuPro.toggleServoTrim()
@@ -209,10 +204,10 @@ This separation ensures the legs stabilize the body before the arms swing into p
 
 ### F. Radio and gamepad integration
 
-Even while the Kungfu sequence plays, the radio listeners remain active:
+Even while the Kungfu sequence plays, the radio listeners registered by `connectToGamepad()` remain active:
 
-- `runKeyValueCommand` handles gamepad joystick and button events.
-- `runStringCommand` handles text/speech events from other robots or the gamepad.
+- Gamepad joystick and button events reach the robot.
+- Text/speech events from other robots or the gamepad reach the robot.
 - The logo button enters servo trim calibration mode at any time.
 - Buttons A/B change the radio channel so you can control multiple robots independently.
 

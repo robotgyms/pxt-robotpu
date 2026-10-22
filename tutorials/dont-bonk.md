@@ -69,12 +69,8 @@ Robot PU uses a **front-facing ultrasonic sonar sensor**.
 
 The basic code is to get distance and walk, do not add any other code to slow down the observe-think-action loop.
 ```typescript
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 // press the logo button on Robot PU's head to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.toggleServoTrim()
@@ -287,12 +283,8 @@ This example does two things at the same time:
 2. It uses the **sonar distance** to generate an audio “parking sensor” effect (closer wall = higher pitch + faster beeps), while also mapping distance into a walking speed.
 
 ```typescript
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 // press the logo button on Robot PU's head to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.toggleServoTrim()
@@ -327,9 +319,9 @@ Pressing the logo button toggles servo trim mode — see [servo-trim-calibration
 
 What each part is doing:
 
-1. `radio.onReceivedString(...)` and `radio.onReceivedValue(...)`
-   - Any incoming radio message is forwarded into `robotPuPro.runStringCommand(...)` or `robotPuPro.runKeyValueCommand(...)`.
-   - This lets a second micro:bit send higher-level “commands” (strings or named values) while this program is also running its autonomous sonar logic.
+1. `robotPuPro.connectToGamepad()`
+   - Forwards any incoming radio command (strings or named values) to the robot.
+   - This lets a second micro:bit send higher-level “commands” while this program is also running its autonomous sonar logic.
 2. `robotPuPro.setChannel(166)`
    - Sets the radio group/channel so only devices on the same channel talk to each other.
 3. `robotPuPro.setWalkSpeedRange(-3, 4)`

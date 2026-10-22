@@ -1,6 +1,6 @@
  # 📻 Lesson: Remote Control Robot PU (radio commands)
 
-This lesson shows how to control **Robot PU** using a second micro:bit (or any radio sender) by forwarding radio messages into:
+This lesson shows how to control **Robot PU** using a second micro:bit (or any radio sender). On the robot side, `robotPuPro.connectToGamepad()` forwards incoming radio messages into:
 
 - `robotPuPro.runKeyValueCommand(key, value)`
 - `robotPuPro.runStringCommand(text)`
@@ -23,18 +23,14 @@ You can use this for:
 
 ## 2. Receiver program (Robot PU side)
 
-Put this in your Robot PU MakeCode project. It registers radio handlers and forwards the messages into the extension.
+Put this in your Robot PU MakeCode project. `connectToGamepad()` registers the radio handlers that forward messages into the extension.
 
 ```typescript
-// Register the event listener for incoming string messages
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-
-// listen to radio messages for commands of key value pairs
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// Forward gamepad commands (buttons, speed, turn, strings) to Robot PU.
+// Equivalent to registering:
+//   radio.onReceivedValue(...)  -> robotPuPro.runKeyValueCommand(name, value)
+//   radio.onReceivedString(...) -> robotPuPro.runStringCommand(text)
+robotPuPro.connectToGamepad()
 
 // press the logo button on Robot PU's head to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
@@ -49,6 +45,7 @@ Notes:
 
 - `runKeyValueCommand(...)` is meant for “structured” messages like joystick axes and buttons.
 - `runStringCommand(...)` is meant for “free text” messages (often prefixed with `#pu...`).
+- Only one `radio.onReceivedValue` handler can be active — if you register your own to intercept keys, it replaces the one `connectToGamepad()` installs, so forward anything you don't handle to `robotPuPro.runKeyValueCommand(name, value)` yourself.
 - `input.onLogoEvent(...)` toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
 ---
@@ -125,6 +122,10 @@ let lastSteerMs = control.millis()
 let speed = 0
 let turn = 0
 
+// Registering your own onReceivedValue replaces the one
+// connectToGamepad() installs (the last registration wins), so forward
+// everything you don't consume to runKeyValueCommand. If you also call
+// connectToGamepad(), put it BEFORE this handler.
 radio.onReceivedValue(function (name, value) {
     if (name == "#puspeed") {
         speed = value
@@ -152,7 +153,7 @@ basic.forever(function () {
 
 - **No response at all**
   - confirm both sides use the same radio group (`robotPuPro.setChannel(...)` vs `radio.setGroup(...)`).
-  - confirm the receiver program actually registered `radio.onReceivedValue` / `radio.onReceivedString`.
+  - confirm the receiver program called `robotPuPro.connectToGamepad()` (or registered its own `radio.onReceivedValue` / `radio.onReceivedString` handlers).
 
 - **Robot moves but feels laggy**
   - send at a steady rate (example: every 20ms). Avoid long blocking loops on the controller.

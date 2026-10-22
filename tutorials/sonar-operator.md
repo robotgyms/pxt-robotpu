@@ -207,12 +207,8 @@ It also adds two behaviors:
 Here is the version to make robot PU take actions to react with torpedo:
 
 ```typescript
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 // press the logo button on Robot PU's head to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.toggleServoTrim()

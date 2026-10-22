@@ -486,10 +486,8 @@ function track2 () {
 input.onButtonPressed(Button.B, function () {
     robotPuPro.changeChannel(-1)
 })
-// listen to radio messages for commands of key value pairs
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 // press logo button to start a dance track
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     track = robotPuPro.channel() % 4
@@ -599,16 +597,18 @@ function playSelectedTrack () {
     started = 0
 }
 
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
+
+// custom string handler — registered AFTER connectToGamepad() so it
+// replaces the default one (last registration wins). It intercepts
+// "#puChorus" and forwards everything else.
 radio.onReceivedString(function (receivedString) {
     if (receivedString == "#puChorus") {
         playSelectedTrack()
         return
     }
     robotPuPro.runStringCommand(receivedString)
-})
-
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -898,15 +898,17 @@ function playSelectedTrack(trackID:number) {
     started = 0
 }
 
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
+
+// custom string handler — registered AFTER connectToGamepad() so it
+// replaces the default one (last registration wins). It intercepts
+// "#puChorus" and forwards everything else.
 radio.onReceivedString(function (receivedString) {
     if (receivedString == "#puChorus") {
         playSelectedTrack(track)
     }
     robotPuPro.runStringCommand(receivedString)
-})
-
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -1177,15 +1179,17 @@ function playSelectedTrack(trackID:number) {
     started = 0
 }
 
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
+
+// custom string handler — registered AFTER connectToGamepad() so it
+// replaces the default one (last registration wins). It intercepts
+// "#puChorus" and forwards everything else.
 radio.onReceivedString(function (receivedString) {
     if (receivedString == "#puChorus") {
         playSelectedTrack(track)
     }
     robotPuPro.runStringCommand(receivedString)
-})
-
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
 })
 
 input.onButtonPressed(Button.A, function () {
@@ -1327,8 +1331,8 @@ Buttons A/B only change the channel; they do not start singing.
 
 This program also registers:
 
-- `radio.onReceivedString(...)` → `robotPuPro.runStringCommand(...)`
-- `radio.onReceivedValue(...)` → `robotPuPro.runKeyValueCommand(name, value)`
+- `robotPuPro.connectToGamepad()` → forwards key/value commands to `robotPuPro.runKeyValueCommand(name, value)`
+- `radio.onReceivedString(...)` → intercepts `#puChorus`, forwards other strings to `robotPuPro.runStringCommand(...)`
 
 So you can control Robot PU over radio while preparing the quartet.
 
@@ -1669,7 +1673,7 @@ Notes:
 
 - `control.inBackground(...)` prevents the radio callback from blocking.
 - Using `startAt` is more reliable than “start immediately on receive”.
-- If you already use `radio.onReceivedValue` for `robotPuPro.runKeyValueCommand(...)`, merge the logic into one handler.
+- Only one `radio.onReceivedValue` handler is active at a time. If you called `connectToGamepad()` and also need custom keys, register your own handler after it and forward unhandled keys to `robotPuPro.runKeyValueCommand(name, value)`.
 
 ---
 

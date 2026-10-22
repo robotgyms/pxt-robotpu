@@ -215,12 +215,8 @@ billy.say("Hello, how are you today?")
 Note: The `configure` function usually takes four arguments: (`pitch`, `speed`, `mouth`, `throat`). While Pitch and Speed are the most impactful, you can slightly increase the Throat value (the 4th parameter) to `140+` for older voices to make them sound "grittier."
 
 ```typescript
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 // press the logo button on Robot PU's head to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.toggleServoTrim()

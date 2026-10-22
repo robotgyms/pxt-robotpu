@@ -10,9 +10,9 @@ Goal:
 
 Key idea:
 
-- keep the two radio handlers:
-  - `radio.onReceivedString(...)` → `robotPuPro.runStringCommand(...)`
-  - `radio.onReceivedValue(...)` → `robotPuPro.runKeyValueCommand(...)`
+- keep `robotPuPro.connectToGamepad()`, which forwards radio commands into:
+  - `robotPuPro.runStringCommand(...)` (strings)
+  - `robotPuPro.runKeyValueCommand(...)` (name/value pairs)
 - then add any extra behaviors you want as local events and helper functions
 
 ---
@@ -21,8 +21,7 @@ Key idea:
 
 In the code below, the “remote control core” is:
 
-- `radio.onReceivedString(...)` (string commands like `#putHello!`, `#punName`)
-- `radio.onReceivedValue(...)` (key/value commands like `#puturn`, `#puspeed`)
+- `robotPuPro.connectToGamepad()` (forwards string commands like `#putHello!`, `#punName` and key/value commands like `#puturn`, `#puspeed`)
 - `robotPuPro.setChannel(166)` (pairing channel)
 
 If you delete everything else and keep only those pieces, you are back to the minimal receiver.
@@ -122,10 +121,8 @@ input.onButtonPressed(Button.AB, function () {
         robotPuPro.explore()
     }
 })
-// Register the event listener for incoming string messages
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
+// Forward gamepad commands (buttons, speed, turn, strings) to Robot PU.
+robotPuPro.connectToGamepad()
 // press button B to walk backward in circles
 input.onButtonPressed(Button.B, function () {
     robotPuPro.talk("Move backward!")
@@ -159,10 +156,6 @@ input.onGesture(Gesture.Shake, function () {
         ), music.PlaybackMode.InBackground)
     }
 })
-// listen to radio messages for commands of key value pairs
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
 // press logo button to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.toggleServoTrim()
@@ -192,12 +185,13 @@ The code above initializes the robot by asking it to greet, stand, and set the c
 Here are safe extensions that do not break compatibility with the retail gamepad protocol:
 
 - **Add a safety timeout**
-  - record `lastControlMs` inside the two radio handlers
+  - record `lastControlMs` inside a custom radio handler
   - if no messages arrive for ~500ms, call `robotPuPro.walk(0, 0)`
 
 - **Add custom radio commands (optional)**
   - intercept a new key in `radio.onReceivedValue`, handle it, then `return`
   - otherwise, fall back to `robotPuPro.runKeyValueCommand(name, value)`
+  - note: your own `radio.onReceivedValue` replaces the one `connectToGamepad()` installs — register it after `connectToGamepad()`, or skip `connectToGamepad()` entirely (see `remote-control.md` section 6)
 
 Example custom command ideas:
 
