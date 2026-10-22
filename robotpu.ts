@@ -1448,6 +1448,10 @@ namespace robotPuPro {
         TurnLeft = 12,
         //% block="turn right"
         TurnRight = 13,
+        //% block="side step left"
+        SideStepLeft = 23,
+        //% block="side step right"
+        SideStepRight = 24,
         //% block="skate"
         Skate = 22,
         //% block="explore"
@@ -1711,6 +1715,8 @@ namespace robotPuPro {
                 [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
                 [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
                 [Action.Skate]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.skateItr(); },
+                [Action.SideStepLeft]: () => { this.walkDirection = 1; return this.sideStep(this.walkDirection); },
+                [Action.SideStepRight]: () => { this.walkDirection = -1; return this.sideStep(this.walkDirection); },
                 [Action.Sit]: () => this.sit(),
                 [Action.Stand]: () => this.stand(),
                 [Action.Laugh]: () => { this.laugh(); return 0; },

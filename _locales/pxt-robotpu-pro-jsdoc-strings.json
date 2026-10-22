@@ -141,7 +141,7 @@
   "robotPuPro.setWalkSpeedRange|param|max": "maximum forward speed (positive value), eg: 4",
   "robotPuPro.setWalkSpeedRange|param|min": "maximum backward speed (negative value), eg: -3",
   "robotPuPro.sideStep": "Move sideways.",
-  "robotPuPro.sideStep|param|direction": "direction to step: -1 for left, 1 for right, eg: -1",
+  "robotPuPro.sideStep|param|direction": "direction to step: -1 for right, 1 for left, eg: -1",
   "robotPuPro.sing": "Sing a musical note sequence using the built-in music engine.\nNotes are written as letter names (A-G) with optional octave number, separated by spaces. Use '-' for a rest.",
   "robotPuPro.sing|param|song": "the note sequence string to sing, eg: \"C5 B G - E F E G \"",
   "robotPuPro.sonarDistanceCm": "Return the current sonar distance reading in centimeters. Returns a large value if nothing is detected.",
