@@ -1,0 +1,26 @@
+name: MakeCode CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install PXT CLI
+        run: npm install -g pxt
+
+      # pxt.json validation, extension + test.ts compile, docs check,
+      # and tutorial markdown link check — same as local `make test`.
+      - name: Run checks
+        run: make test

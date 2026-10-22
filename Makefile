@@ -1,4 +1,4 @@
-.PHONY: target install build check test release tag push-tag clean help
+.PHONY: target install build check test checkpkgcfg checkdocs doclinks release tag push-tag clean help
 
 PXT ?= pxt
 
@@ -13,7 +13,24 @@ build: install
 
 check: build
 
-test: build
+test: checkpkgcfg build checkdocs doclinks
+
+checkpkgcfg:
+	$(PXT) checkpkgcfg
+
+checkdocs:
+	$(PXT) checkdocs
+
+# pxt checkdocs does not scan tutorials/, so verify relative .md links by hand.
+doclinks:
+	@fail=0; \
+	for f in tutorials/*.md README.md; do \
+		for link in $$(grep -oE '\]\([^)#[:space:]]+\.md(#[^)]+)?\)' "$$f" | grep -v '://' | sed -E 's/^\]\(|\)$$//g; s/\#.*$$//'); do \
+			[ -f "$$(dirname "$$f")/$$link" ] || { echo "$$f: broken link -> $$link"; fail=1; }; \
+		done; \
+	done; \
+	[ $$fail -eq 0 ] && echo "All markdown links OK"; \
+	exit $$fail
 
 release: build
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=v*.*.**" && exit 1)
@@ -39,7 +56,7 @@ help:
 	@echo "  make install - install MakeCode package dependencies"
 	@echo "  make build  - init target, install dependencies, and compile the MakeCode extension"
 	@echo "  make check  - alias for build"
-	@echo "  make test   - alias for build"
+	@echo "  make test   - validate pxt.json, compile extension + test.ts, check docs and markdown links"
 	@echo "  make release VERSION=v1.0.39 - update pxt.json, commit, push, tag, and push tag"
 	@echo "  make tag VERSION=v1.0.39 - create a local release tag"
 	@echo "  make push-tag VERSION=v1.0.39 - create and push a release tag"

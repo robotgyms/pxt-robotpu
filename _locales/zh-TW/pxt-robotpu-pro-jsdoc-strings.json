@@ -143,7 +143,7 @@
   "robotPuPro.setWalkSpeedRange|param|max": "最大前進速度（正值）, eg: 4",
   "robotPuPro.setWalkSpeedRange|param|min": "最大後退速度（負值）, eg: -3",
   "robotPuPro.sideStep": "向側面移動。",
-  "robotPuPro.sideStep|param|direction": "步驟方向：-1 為左，1 為右, eg: -1",
+  "robotPuPro.sideStep|param|direction": "步驟方向：-1 為右，1 為左, eg: -1",
   "robotPuPro.sing": "使用內置音樂引擎唱出音符序列。\n音符以字母名稱 (A-G) 的形式書寫，並帶有可選的八度音階數，並以空格分隔。使用“-”進行休息。",
   "robotPuPro.sing|param|song": "要唱的音符序列字符串, eg: \"C5 B G - E F E G \"",
   "robotPuPro.sonarDistanceCm": "返回當前聲納距離讀數（以釐米為單位）。如果未檢測到任何內容，則返回一個較大的值。",

@@ -53,6 +53,12 @@ export enum Action {
     TurnLeft = 12,
     //% block="turn right"
     TurnRight = 13,
+    //% block="side step left"
+    SideStepLeft = 23,
+    //% block="side step right"
+    SideStepRight = 24,
+    //% block="skate"
+    Skate = 22,
     //% block="sit"
     Sit = 14,
     //% block="stand"
