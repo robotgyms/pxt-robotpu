@@ -417,12 +417,8 @@ robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightFoot, -5)
 robotPuPro.setServoTrim(robotPuPro.ServoJoint.RightLeg, 0)
 robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadYaw, -8)
 robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, 0)
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 
 input.onButtonPressed(Button.A, function () {
     setService(SERVICE_WIFI, true)

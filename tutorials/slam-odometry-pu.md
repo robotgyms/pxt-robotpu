@@ -5,12 +5,7 @@ This tutorial shows how to use Robot PU odometry for localization in SLAM.
 Validated MakeCode:
 
 ```typescript
-radio.onReceivedNumber(function (receivedNumber) {
-    robotPuPro.runStringCommand("")
-})
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+robotPuPro.connectToGamepad()
 let location: number[] = []
 robotPuPro.setChannel(166)
 basic.forever(function () {
@@ -35,8 +30,7 @@ Robot PU already includes odometry in `robotpu.ts`. The public MakeCode blocks u
 
 ## What the MakeCode does
 
-- **Receive number commands**: `radio.onReceivedNumber(...)` passes remote commands to `robotPuPro.runStringCommand("")`.
-- **Receive key-value commands**: `radio.onReceivedValue(...)` passes remote control values to `robotPuPro.runKeyValueCommand(name, value)`.
+- **Connect to the gamepad**: `robotPuPro.connectToGamepad()` forwards remote control commands (key/value pairs and command strings) to the robot.
 - **Set the radio channel**: `robotPuPro.setChannel(166)` keeps the robot on channel `166`.
 - **Read the pose**: `robotPuPro.locationArray()` returns `[x, y, theta]`.
 - **Print telemetry**: `serial.writeLine(...)` sends pose values to the serial console.

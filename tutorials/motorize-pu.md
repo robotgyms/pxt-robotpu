@@ -269,7 +269,7 @@ Here is an example to make the robot go to positions one by one.
 Key ideas:
 
 - Low-level servo commands automatically put the robot into the right internal state for direct joint control; you do not need to call `start()` or `stop()` before using them.
-- The `radio.onReceived...` handlers are optional. They are only needed if you want to also control the robot from a gamepad/remote using `robotPuPro.runStringCommand(...)` and `robotPuPro.runKeyValueCommand(...)`.
+- `robotPuPro.connectToGamepad()` is optional. It is only needed if you want to also control the robot from a gamepad/remote.
 - `robotPuPro.setChannel(166)` must match your controller/gamepad radio channel.
 - use `robotPuPro.servo()` to move each servo
 - use `pause()` to allow time for the movement to happen
@@ -283,12 +283,8 @@ function pos1 () {
     robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, 90)
     robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 90)
 }
-radio.onReceivedString(function (receivedString) {
-    robotPuPro.runStringCommand(receivedString)
-})
-radio.onReceivedValue(function (name, value) {
-    robotPuPro.runKeyValueCommand(name, value)
-})
+// forward gamepad commands to Robot PU
+robotPuPro.connectToGamepad()
 // press the logo button on Robot PU's head to enter/exit servo trim mode
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     robotPuPro.toggleServoTrim()

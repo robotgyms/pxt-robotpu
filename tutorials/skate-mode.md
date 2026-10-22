@@ -26,7 +26,7 @@
  
  Because walking and skating are completely different gaits — not just the same motion at a different speed:
  
- - **Different servo angles.** Each gait is a loop of poses: walking steps through gait states 2–7, skating steps through states 27–30. Every pose stores a different target angle for all 10 servos.
+ - **Different servo angles.** Each gait is a loop of poses: walking steps through gait states 2–7, skating steps through states 27–32 (backward skating reuses the shared backward states 3, 5, 6, 7). Every pose stores a different target angle for all 10 servos.
  - **Different timing.** Each pose also maps to a different per-servo speed vector — which joints move fast and which move slow changes between gaits.
  - **Different posture.** Skating keeps the feet low and glides; walking lifts and plants each foot. The balance corrections the IMU applies are tuned per gait.
  
@@ -41,18 +41,24 @@
  Flash this program to the micro:bit in Robot PU's head. It forwards gamepad commands and puts drive mode into the skate gait. The gamepad micro:bit needs its controller program too — see [gamepad.md](gamepad.md).
  
  ```typescript
- // Forward name/value commands (gamepad buttons, speed, turn, etc.).
- radio.onReceivedValue(function (name, value) {
-     robotPuPro.runKeyValueCommand(name, value)
- })
  // Logo button on Robot PU's head: enter or exit trim mode.
  input.onLogoEvent(TouchButtonEvent.Pressed, function () {
      robotPuPro.toggleServoTrim()
  })
- // Robot and gamepad must use the same radio channel.
- robotPuPro.setChannel(166)
- // Drive mode now skates instead of walks.
- robotPuPro.setWalkMode(robotPuPro.WalkMode.Skate)
+// press button A to use walk mode
+ input.onButtonPressed(Button.A, function () {
+    robotPuPro.setWalkMode(robotPuPro.WalkMode.Walk)
+})
+// press button B to use skate mode
+input.onButtonPressed(Button.B, function () {
+    robotPuPro.setWalkMode(robotPuPro.WalkMode.Skate)
+})
+// Set the radio channel to 166
+robotPuPro.setChannel(166)
+// Connect to the gamepad
+robotPuPro.connectToGamepad()
+ // Drive mode starts in walk mode.
+robotPuPro.setWalkMode(robotPuPro.WalkMode.Walk)
  ```
  
  The logo button on PU's head toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
@@ -116,9 +122,14 @@
  - double press (within 400 ms): set to skating mode
  
  ```typescript
- // The joystick press arrives as a "#puB" value — adjust the 1 to match
+ // The joystick press arrives as a "#puB" value — adjust the 2 to match
  // your gamepad. It is intercepted BEFORE runKeyValueCommand so it
- // doesn't also trigger the normal B1 action (explore).
+ // doesn't also trigger the normal B2 action (jump).
+ //
+ // This custom handler replaces the one connectToGamepad() installs —
+ // only one onReceivedValue handler is active at a time. If you also
+ // want string commands (#put, #pun, ...) forwarded, call
+ // robotPuPro.connectToGamepad() BEFORE this handler.
  let lastPressMs = 0
  radio.onReceivedValue(function (name, value) {
      if (name == "#puB" && value == 2) {
@@ -147,9 +158,9 @@
  
  Notes:
  
- - Intercepting `#puB` value `1` before `runKeyValueCommand` means that value no longer triggers its built-in action (explore).
- - The interception applies in trim mode too — if your joystick press shares value `1` with B1, trim mode loses B1's −1° adjustment (B4 still adjusts +1°).
- - If your joystick press sends a different value, change `value == 1`. Values 0–4 are mapped to the pin buttons; 5 and above are unused, so prefer one of those to keep all button actions working.
+ - Intercepting `#puB` value `2` before `runKeyValueCommand` means that value no longer triggers its built-in action (jump).
+ - The interception applies in trim mode too — value `2` selects the next servo there, so trim mode loses that step (B3 still goes to the previous servo, B1/B4 still adjust −1°/+1°).
+ - If your joystick press sends a different value, change `value == 2`. Values 0–4 are mapped to the pin buttons; 5 and above are unused, so prefer one of those to keep all button actions working.
  
  ---
  
@@ -167,5 +178,5 @@
  
  - `set walking mode` stores a `WalkMode` value on the robot.
  - `joystick()` — the drive-mode handler — looks that value up in the gait table every tick and calls `walk()` or `skate()`.
- - `skate()` reuses the same balance engine as `walk()` (`moveBalance()` with IMU feedback), but steps through the skate poses (gait states 27–30) instead of the walking poses (gait states 2–7).
+ - `skate()` reuses the same balance engine as `walk()` (`moveBalance()` with IMU feedback), but steps through the skate poses (gait states 27–32) instead of the walking poses (gait states 2–7).
  - Each gait state maps to a row in `stateTargets` (the servo angles) and a row in `speedCandidates` (per-servo speed) via `stateSpeedIndices` — that's why the two gaits look and feel so different even though they share one balance loop.

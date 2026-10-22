@@ -47,10 +47,8 @@
  By adding this code section to every program that uses Robot PU, you can calibrate the servos at any time. The logo button enters and exits trim mode, and the radio forwarding lets the gamepad buttons (`B1`–`B4`) reach the robot.
  
  ```typescript
- // Forward name/value commands (gamepad buttons, speed, turn, etc.).
- radio.onReceivedValue(function (name, value) {
-     robotPuPro.runKeyValueCommand(name, value)
- })
+ // Forward gamepad commands (buttons, speed, turn, etc.) to Robot PU.
+ robotPuPro.connectToGamepad()
  // Logo button on Robot PU's head: enter or exit trim mode.
  input.onLogoEvent(TouchButtonEvent.Pressed, function () {
      robotPuPro.toggleServoTrim()
@@ -61,17 +59,15 @@
  
  For example, in this barebone program:
  
- - Forwards gamepad commands to Robot PU (`runKeyValueCommand`).
+ - Forwards gamepad commands to Robot PU (`connectToGamepad`).
  - Pressing the micro:bit **logo button on Robot PU’s head** (not the gamepad) toggles trim mode (`robotPuPro.toggleServoTrim()`).
  - Prints the trim array over serial so you can record your final numbers.
  
  ```typescript
   // Robot and gamepad must use the same radio channel.
  robotPuPro.setChannel(166)
- // Forward name/value commands (gamepad buttons, speed, turn, etc.).
- radio.onReceivedValue(function (name, value) {
-     robotPuPro.runKeyValueCommand(name, value)
- })
+ // Forward gamepad commands (buttons, speed, turn, etc.) to Robot PU.
+ robotPuPro.connectToGamepad()
  // Logo button on Robot PU's head: enter or exit trim mode.
  input.onLogoEvent(TouchButtonEvent.Pressed, function () {
      robotPuPro.toggleServoTrim()

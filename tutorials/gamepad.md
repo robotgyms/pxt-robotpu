@@ -181,7 +181,7 @@ This gamepad controller uses a small “protocol” based on radio keys:
 - `#pun<name>` (string): controller name broadcast
 - `#put<phrase>` (string): a phrase chosen by tilting
 
-On the Robot PU program, you typically listen with:
+On the Robot PU program, `robotPuPro.connectToGamepad()` registers both handlers for you. It is equivalent to:
 
 - `radio.onReceivedValue((name, value) => robotPuPro.runKeyValueCommand(name, value))`
 - `radio.onReceivedString((s) => robotPuPro.runStringCommand(s))`
