@@ -88,7 +88,7 @@ This separation is important because the robot must keep walking smoothly even w
 
 ## Ball tracking behavior
 
-The main loop reads one packet from the Smart Hat every `20 ms` with `pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)`.
+The main loop reads one packet from the Smart Hat every `20 ms` with `robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)`.
 
 If the packet contains a soccer ball and `count > 0`, `trackBall` does three things.
 
@@ -188,7 +188,7 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 
 ## Troubleshooting
 
-- **No I2C packets**: Check Smart Hat power, I2C wiring, the multiplexer address, and the `pins.i2cWriteNumber(MUX_ADDR, 15, ...)` setup call.
+- **No I2C packets**: Check Smart Hat power, I2C wiring, the multiplexer address, and the `robotPuPro.i2cWriteNumber(MUX_ADDR, 15, ...)` setup call.
 - **Ball is not detected**: Improve lighting, move the ball into the camera view, and use a ball that matches the trained soccer-ball model.
 - **Head oscillates**: Reduce the head tracking gain from `0.6` to a smaller value.
 - **Robot turns too sharply**: Reduce the turn gain in `yaw * -0.05`.
@@ -239,7 +239,7 @@ function flagsText(f: number) {
     return s.length > 0 ? s.trim() : "none"
 }
 function setService(serviceId: number, enabled: boolean) {
-    pins.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
+    robotPuPro.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
 }
 
 function setSoccerDetection(enabled: boolean) {
@@ -442,7 +442,7 @@ function trackBall(p: Buffer) {
 }
 basic.showString("I")
 // enable TAC I2C channels
-pins.i2cWriteNumber(
+robotPuPro.i2cWriteNumber(
     MUX_ADDR,
     15,
     NumberFormat.Int8LE,
@@ -477,7 +477,7 @@ currentPitch = robotPuPro.servoTargets()[5]
 
 // Soccer ball detection loop
 basic.forever(function () {
-    let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
+    let packet = robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)
     if (packet.length == SIZE) {
         trackBall(packet)
     } else {

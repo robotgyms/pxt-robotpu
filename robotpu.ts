@@ -489,6 +489,87 @@ namespace robotPuPro {
     }
     // Configuration Constants
 
+    // ------------------------------------------------------------------
+    // Shared I2C bus serialization
+    //
+    // CODAL fibers yield inside pins.i2c* while waiting for the TWI
+    // peripheral, so two fibers doing I2C concurrently can interleave a
+    // transaction mid-transfer (corrupt data, or a wedged bus that freezes
+    // every fiber touching I2C). All bus traffic goes through the helpers
+    // below, which hold a cooperative lock for the duration of each
+    // transaction: an uncontended call costs a flag check only — no queue,
+    // no fiber handoff — while a contended caller sleeps ~1 ms.
+    //
+    // Rule: the lock is taken once per transaction and never nested — a
+    // helper that locks must not be called from code already holding it.
+    let i2cBusy = false;
+
+    function i2cLock(): void {
+        let waited = 0;
+        while (i2cBusy) {
+            basic.pause(1);
+            // If the previous holder ever dies mid-transaction, forcing
+            // the lock degrades to garbled bytes instead of freezing every
+            // fiber that touches the bus.
+            if (++waited > 500) {
+                serial.writeLine("robotpu: i2c lock stuck, forcing release");
+                break;
+            }
+        }
+        i2cBusy = true;
+    }
+
+    function i2cUnlock(): void {
+        i2cBusy = false;
+    }
+
+    /**
+     * Perform one I2C transaction on the shared robot bus, serialized
+     * against other fibers. Optionally writes tx (omit for a pure read),
+     * then reads rxLen bytes (0 for none). The lock covers the whole
+     * write+read so a repeated-start sequence can't be split. Returns the
+     * received buffer, or an empty buffer on read failure.
+     */
+    export function i2cTransaction(addr: number, tx?: Buffer, rxLen: number = 0, repeated: boolean = false): Buffer {
+        i2cLock();
+        let rx = pins.createBuffer(0);
+        if (tx) pins.i2cWriteBuffer(addr, tx, repeated);
+        if (rxLen > 0) {
+            rx = pins.i2cReadBuffer(addr, rxLen);
+            if (rx.length != rxLen) {
+                serial.writeLine("i2cr fail " + addr + ":" + rx.length);
+            }
+        }
+        i2cUnlock();
+        return rx;
+    }
+
+    /** Serialized replacement for pins.i2cWriteBuffer on the shared bus. */
+    export function i2cWriteBuffer(addr: number, buf: Buffer, repeated?: boolean): void {
+        i2cLock();
+        pins.i2cWriteBuffer(addr, buf, repeated || false);
+        i2cUnlock();
+    }
+
+    /** Serialized replacement for pins.i2cReadBuffer on the shared bus. */
+    export function i2cReadBuffer(addr: number, size: number, repeated?: boolean): Buffer {
+        return i2cTransaction(addr, undefined, size, repeated || false);
+    }
+
+    /** Serialized replacement for pins.i2cWriteNumber on the shared bus. */
+    export function i2cWriteNumber(addr: number, value: number, format: NumberFormat, repeated?: boolean): void {
+        let buf = pins.createBuffer(pins.sizeOf(format));
+        buf.setNumber(format, 0, value);
+        i2cWriteBuffer(addr, buf, repeated || false);
+    }
+
+    /** Serialized replacement for pins.i2cReadNumber on the shared bus. */
+    export function i2cReadNumber(addr: number, format: NumberFormat, repeated?: boolean): number {
+        let rx = i2cReadBuffer(addr, pins.sizeOf(format), repeated || false);
+        if (rx.length < pins.sizeOf(format)) return 0;
+        return rx.getNumber(format, 0);
+    }
+
     export class PCB {
         public i2cAddress: number;
         private lastBlinkTS: number;
@@ -554,7 +635,7 @@ namespace robotPuPro {
             buf.setNumber(NumberFormat.UInt8LE, 1, sp >= 0 ? 0x01 : 0x02);
             buf.setNumber(NumberFormat.Int8LE, 2, Math.abs(sp));
             buf.setNumber(NumberFormat.UInt8LE, 3, 0);
-            pins.i2cWriteBuffer(this.i2cAddress, buf);
+            i2cWriteBuffer(this.i2cAddress, buf);
         }
 
         /**
@@ -569,7 +650,7 @@ namespace robotPuPro {
                 buf2.setNumber(NumberFormat.UInt8LE, 1, a);
                 buf2.setNumber(NumberFormat.UInt8LE, 2, 0);
                 buf2.setNumber(NumberFormat.UInt8LE, 3, 0);
-                pins.i2cWriteBuffer(this.i2cAddress, buf2);
+                i2cWriteBuffer(this.i2cAddress, buf2);
             } else if (sr == 8) {
                 // use pin 14 as servo
                 pins.servoWritePin(AnalogPin.P14, a);
@@ -618,7 +699,7 @@ namespace robotPuPro {
                 buf.setNumber(NumberFormat.UInt8LE, 1, a);
                 buf.setNumber(NumberFormat.UInt8LE, 2, 0);
                 buf.setNumber(NumberFormat.UInt8LE, 3, 0);
-                pins.i2cWriteBuffer(this.i2cAddress, buf);
+                i2cWriteBuffer(this.i2cAddress, buf);
             }
         }
 
@@ -653,6 +734,9 @@ namespace robotPuPro {
             let targets = p.stateTargets[this.currentState];
             let spIdx = p.stateSpeedIndices[this.currentState] || 0;
             let speeds = p.speedCandidates[spIdx];
+            // A bad state index would dereference undefined below — treat
+            // it as "still moving" rather than panicking the gait fiber.
+            if (!targets || !speeds) return 1;
             if (this.moveServos(targets, speeds, syncList, sp, asyncList, asyncSp)) {
                 this.lastPos = this.pos;
                 this.pos = (this.pos + 1) % states.length;
@@ -692,7 +776,7 @@ namespace robotPuPro {
             buf3.setNumber(NumberFormat.UInt8LE, 1, light);
             buf3.setNumber(NumberFormat.UInt8LE, 2, 0);
             buf3.setNumber(NumberFormat.UInt8LE, 3, 0);
-            pins.i2cWriteBuffer(this.i2cAddress, buf3);
+            i2cWriteBuffer(this.i2cAddress, buf3);
         }
 
         /**
@@ -705,7 +789,7 @@ namespace robotPuPro {
             buf.setNumber(NumberFormat.UInt8LE, 1, 0);
             buf.setNumber(NumberFormat.UInt8LE, 2, 0);
             buf.setNumber(NumberFormat.UInt8LE, 3, 0);
-            pins.i2cWriteBuffer(this.i2cAddress, buf);
+            i2cWriteBuffer(this.i2cAddress, buf);
         }
 
         /**
@@ -715,8 +799,11 @@ namespace robotPuPro {
         public getBatteryLevel(): number {
             let cmd = pins.createBuffer(4);
             cmd.setNumber(NumberFormat.UInt8LE, 0, 0x33);
-            pins.i2cWriteBuffer(this.i2cAddress, cmd, true);
-            let ret = pins.i2cReadBuffer(this.i2cAddress, 1);
+            // Write+read under one lock so the repeated-start sequence
+            // can't be split by another fiber. A failed/short read would
+            // panic on getNumber(0), so guard the length first.
+            let ret = i2cTransaction(this.i2cAddress, cmd, 1, true);
+            if (ret.length < 1) return -1;
             return ret.getNumber(NumberFormat.UInt8LE, 0);
         }
 
@@ -1536,6 +1623,9 @@ namespace robotPuPro {
 
         /** Far threshold: Begin slowing down or planning turns if obstacle is within this (cm) */
         private exploreCautionDistance: number = 20;
+        
+        /** Depression decay for escape mode: decays to 0 over ~2 s of clear readings (100 Hz tick) */
+        private backupDisDecay: number = 1.0;
 
         // Command Dictionary
         public cmdFuncDict: { [key: string]: (v: number) => void };
@@ -2383,8 +2473,13 @@ namespace robotPuPro {
                 // Turn aggressively to escape the corner
                 nd = nd > 0 ? 1 : -1;
                 this.exploreDirection = (this.exploreDirection * 9 + nd) * 0.1; // Slow smoothing for escape
-
-                dis -= 10 + randint(-5, 0);
+                if (dis >= 0) {
+                    this.backupDisDecay *= 0.985;
+                    if (this.backupDisDecay < 0.05) this.backupDisDecay = 0;
+                } else {
+                    this.backupDisDecay = Math.min(1.0, this.backupDisDecay+0.1);
+                }
+                dis -= randint(6, 12) * this.backupDisDecay;
             } else {
                 // Normal direction smoothing (Low pass filter)
                 this.exploreDirection = (this.exploreDirection * 3 + nd) * 0.25;

@@ -176,8 +176,8 @@ In MakeCode, I2C integration usually looks like:
 
 ```typescript
 // Pseudocode shape only. Use the official HUSKYLENS 2 protocol.
-// pins.i2cWriteBuffer(addr, cmd)
-// let rx = pins.i2cReadBuffer(addr, n)
+// robotPuPro.i2cWriteBuffer(addr, cmd)
+// let rx = robotPuPro.i2cReadBuffer(addr, n)
 // decode rx
 ```
 
