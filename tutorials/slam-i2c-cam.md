@@ -41,7 +41,7 @@ This tutorial uses two important I2C addresses.
 The multiplexer is used because Robot PU can have multiple I2C devices connected. Before reading the ESP32 camera, the program opens the Smart Hat I2C channels by writing `0x0F` to the multiplexer.
 
 ```typescript
-pins.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
+robotPuPro.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
 ```
 
 This write message tells the multiplexer to open all four channels.
@@ -50,18 +50,18 @@ This write message tells the multiplexer to open all four channels.
 
 ## Reading and writing I2C messages in MakeCode
 
-MakeCode provides simple APIs for I2C communication.
+MakeCode provides simple APIs for I2C communication. Robot PU exposes them as serialized `robotPuPro.i2c...` helpers — always use those instead of the raw `pins.i2c...` calls so camera traffic can't corrupt the robot's own I2C transactions (servos, gait, sensors).
 
 ### Write one number to an I2C device
 
 ```typescript
-pins.i2cWriteNumber(address, value, format, repeated)
+robotPuPro.i2cWriteNumber(address, value, format, repeated)
 ```
 
 In this tutorial:
 
 ```typescript
-pins.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
+robotPuPro.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
 ```
 
 - **`MUX_ADDR`**: The device address to write to.
@@ -72,13 +72,13 @@ pins.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
 ### Read a buffer from an I2C device
 
 ```typescript
-pins.i2cReadBuffer(address, size, repeated)
+robotPuPro.i2cReadBuffer(address, size, repeated)
 ```
 
 In this tutorial:
 
 ```typescript
-let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
+let packet = robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)
 ```
 
 - **`ESP32_ADDR`**: The ESP32 camera I2C address.
@@ -246,7 +246,7 @@ The `basic.forever(...)` loop reads one packet every `20 ms`.
 
 ```typescript
 basic.forever(function () {
-    let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
+    let packet = robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)
 
     if (packet.length == SIZE) {
         printPacket(packet)
@@ -379,13 +379,13 @@ const SERVICE_SOCCER_BALL_DETECTION = 4
 const SERVICE_SOCCER_GOAL_DETECTION = 5
 
 function setService(serviceId: number, enabled: boolean) {
-    pins.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
+    robotPuPro.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
 }
 
 basic.showString("I")
 
 // Open all 4 channels in TCA9546A
-pins.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
+robotPuPro.i2cWriteNumber(MUX_ADDR, 0x0F, NumberFormat.Int8LE, false)
 
 // turn on detections
 basic.forever(function () {
@@ -401,7 +401,7 @@ basic.forever(function () {
 
 // parse i2c packages
 basic.forever(function () {
-    let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
+    let packet = robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)
 
     if (packet.length == SIZE) {
         printPacket(packet)

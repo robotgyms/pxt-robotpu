@@ -87,7 +87,7 @@ Example:
 The program follows an observe-transform-map-act loop:
 
 1. **Read I2C packet**
-   - `pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)` reads the latest camera result.
+   - `robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)` reads the latest camera result.
 
 2. **Decode detection**
    - `trackBall(packet)` checks whether the packet is for the ball or the goal.
@@ -309,7 +309,7 @@ function flagsText(f: number) {
     return s.length > 0 ? s.trim() : "none"
 }
 function setService(serviceId: number, enabled: boolean) {
-    pins.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
+    robotPuPro.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
 }
 
 function setSoccerDetection(enabled: boolean) {
@@ -597,7 +597,7 @@ function trackBall(p: Buffer) {
     }
 }
 basic.showString("I")
-pins.i2cWriteNumber(
+robotPuPro.i2cWriteNumber(
     MUX_ADDR,
     15,
     NumberFormat.Int8LE,
@@ -623,7 +623,7 @@ if (DEBUG_FLAG) {
     setService(SERVICE_WIFI, false)
 }
 basic.forever(function () {
-    let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
+    let packet = robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)
     if (packet.length == SIZE) {
         trackBall(packet)
     } else {

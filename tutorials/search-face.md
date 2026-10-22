@@ -28,7 +28,7 @@ Place the robot on a stable surface before testing. The program moves only the h
  
 ## Key idea: Search then trace
  
-The robot loops continuously and calls `pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)` to fetch the latest detection packet.
+The robot loops continuously and calls `robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)` to fetch the latest detection packet.
  
 Then it parses the packet and chooses one behavior:
  
@@ -268,7 +268,7 @@ function trackFace(p: Buffer) {
     }
 }
 function setService(serviceId: number, enabled: boolean) {
-    pins.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
+    robotPuPro.i2cWriteBuffer(ESP32_ADDR, Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]), false)
 }
 function setSoccerDetection(enabled: boolean) {
     setService(SERVICE_SOCCER_BALL_DETECTION, enabled)
@@ -277,7 +277,7 @@ function setSoccerDetection(enabled: boolean) {
 }
 
 basic.showString("I")
-pins.i2cWriteNumber(
+robotPuPro.i2cWriteNumber(
     MUX_ADDR,
     15,
     NumberFormat.Int8LE,
@@ -304,7 +304,7 @@ basic.forever(function () {
 })
 
 basic.forever(function () {
-    let packet = pins.i2cReadBuffer(ESP32_ADDR, SIZE, false)
+    let packet = robotPuPro.i2cReadBuffer(ESP32_ADDR, SIZE, false)
     if (packet.length == SIZE) {
         trackFace(packet)
     } else {
@@ -390,7 +390,7 @@ This creates a repeatable scan pattern that expands over time using `search_gain
 
 ## Troubleshooting
 
-- **No I2C packets**: Check Smart Hat power, I2C wiring, the multiplexer address, and the `pins.i2cWriteNumber(MUX_ADDR, 15, ...)` setup call.
+- **No I2C packets**: Check Smart Hat power, I2C wiring, the multiplexer address, and the `robotPuPro.i2cWriteNumber(MUX_ADDR, 15, ...)` setup call.
 - **Face is not detected**: Improve lighting, face the camera directly, and move closer to the Smart Hat.
 - **Head moves the wrong way**: Reverse the sign of the yaw or pitch correction if your camera firmware reports the opposite direction.
 - **Head oscillates**: Reduce the tracking gain from `0.08` to a smaller value.

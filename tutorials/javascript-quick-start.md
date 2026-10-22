@@ -368,13 +368,15 @@ let addr = 0x68
 let reg = 0x00
 
 // Tell the device which register we want
-pins.i2cWriteNumber(addr, reg, NumberFormat.UInt8BE, false)
+robotPuPro.i2cWriteNumber(addr, reg, NumberFormat.UInt8BE, false)
 
 // Read 1 byte back
-let value = pins.i2cReadNumber(addr, NumberFormat.UInt8BE, false)
+let value = robotPuPro.i2cReadNumber(addr, NumberFormat.UInt8BE, false)
 basic.showNumber(value)
 
 ```
+
+> **Note:** always use the `robotPuPro.i2c...` helpers rather than raw `pins.i2c...` calls — they serialize bus access against the robot's own I2C traffic (gait, head servos, etc.), which raw calls can corrupt. If a write and a following read must not be split by other bus traffic, use `robotPuPro.i2cTransaction(addr, txBuf, rxLen, true)` to run them as one atomic transaction.
 
 #### Read / write multiple bytes with buffers
 
@@ -385,10 +387,10 @@ let addr = 0x3C // common OLED address (example)
 let out = pins.createBuffer(2)
 out[0] = 0x00
 out[1] = 0xAF
-pins.i2cWriteBuffer(addr, out, false)
+robotPuPro.i2cWriteBuffer(addr, out, false)
 
 // Read N bytes
-let data = pins.i2cReadBuffer(addr, 6, false)
+let data = robotPuPro.i2cReadBuffer(addr, 6, false)
 basic.showNumber(data.length)
 
 ```

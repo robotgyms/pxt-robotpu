@@ -81,7 +81,7 @@ function clamp(value: number, minimum: number, maximum: number): number {
 }
 
 function setService(serviceId: number, enabled: boolean) {
-    pins.i2cWriteBuffer(
+    robotPuPro.i2cWriteBuffer(
         COGNICAP_ADDR,
         Buffer.fromArray([CMD_SERVICE_ENABLE, serviceId, enabled ? 1 : 0]),
         false
@@ -109,7 +109,7 @@ function sayBehavior(nextBehavior: string) {
 }
 
 function readFacePacket() {
-    let packet = pins.i2cReadBuffer(COGNICAP_ADDR, PACKET_SIZE, false)
+    let packet = robotPuPro.i2cReadBuffer(COGNICAP_ADDR, PACKET_SIZE, false)
     if (packet.length != PACKET_SIZE) {
         return
     }
@@ -164,7 +164,7 @@ function updateMotion() {
 billy.voicePreset(BillyVoicePreset.Robot)
 billy.say("I will keep one meter away from you")
 
-pins.i2cWriteNumber(MUX_ADDR, 15, NumberFormat.Int8LE, false)
+robotPuPro.i2cWriteNumber(MUX_ADDR, 15, NumberFormat.Int8LE, false)
 basic.pause(2000)
 setService(SERVICE_IMAGE_CAPTURE, true)
 basic.pause(20)

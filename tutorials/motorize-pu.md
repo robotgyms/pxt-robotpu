@@ -363,7 +363,7 @@ Robot PU solves this by having its own motor power path and an onboard controlle
 
 ### C. How the `pins` API relates to I2C
 
-Robot PU hides the low-level `pins.i2c...` calls inside the extension, but it helps to know what’s happening.
+Robot PU hides the low-level `pins.i2c...` calls inside the extension, but it helps to know what’s happening. User code should call the serialized `robotPuPro.i2c...` helpers instead of `pins.i2c...`, so bus access stays serialized with the robot's own I2C traffic.
 
 Example: simple I2C register read
 
@@ -372,8 +372,8 @@ Example: simple I2C register read
 const addr = 0x10
 const reg = 0x03
 
-pins.i2cWriteNumber(addr, reg, NumberFormat.UInt8LE)
-const value = pins.i2cReadNumber(addr, NumberFormat.UInt8LE)
+robotPuPro.i2cWriteNumber(addr, reg, NumberFormat.UInt8LE)
+const value = robotPuPro.i2cReadNumber(addr, NumberFormat.UInt8LE)
 basic.showNumber(value)
 ```
 
@@ -384,14 +384,15 @@ const addr = 0x10
 
 // Many devices will ACK a write of a single byte.
 // If the address is wrong, you may see 0 or an error-like value depending on device behavior.
-pins.i2cWriteNumber(addr, 0x00, NumberFormat.UInt8LE)
+robotPuPro.i2cWriteNumber(addr, 0x00, NumberFormat.UInt8LE)
 basic.showString("OK")
 ```
 
 Notes:
 
 - Different I2C chips have different register maps; the above shows the *pattern*, not Robot PU’s internal protocol.
-- In Robot PU, `WK` uses `pins.i2cWriteBuffer(...)` to send 4-byte packets.
+- In Robot PU, `WK` uses `robotPuPro.i2cWriteBuffer(...)` to send 4-byte packets.
+- A separate write followed by a read is serialized per call but is *not* atomic — another fiber's I2C traffic can interpose between them. Use `robotPuPro.i2cTransaction(addr, txBuf, rxLen, true)` when the pair must not be split.
 
 ---
 
@@ -424,8 +425,8 @@ this.i2cAddress = 16 // decimal == 0x10 hex
 In MakeCode, you typically talk to an I2C device using buffers:
 
 1. Build a small `Buffer` containing a register/command and data bytes.
-2. Send it with `pins.i2cWriteBuffer(address, buffer)`.
-3. Optionally read back bytes with `pins.i2cReadBuffer(...)` / `pins.i2cReadNumber(...)`.
+2. Send it with `robotPuPro.i2cWriteBuffer(address, buffer)`.
+3. Optionally read back bytes with `robotPuPro.i2cReadBuffer(...)` / `robotPuPro.i2cReadNumber(...)`.
 
 ### Example: write a command packet
 
@@ -438,7 +439,7 @@ buf.setNumber(NumberFormat.UInt8LE, 1, 90)   // example angle
 buf.setNumber(NumberFormat.UInt8LE, 2, 0)
 buf.setNumber(NumberFormat.UInt8LE, 3, 0)
 
-pins.i2cWriteBuffer(addr, buf)
+robotPuPro.i2cWriteBuffer(addr, buf)
 
 ```
 
@@ -470,7 +471,7 @@ packet.setNumber(NumberFormat.UInt8LE, 0, reg)
 packet.setNumber(NumberFormat.UInt8LE, 1, angle)
 packet.setNumber(NumberFormat.UInt8LE, 2, 0)
 packet.setNumber(NumberFormat.UInt8LE, 3, 0)
-pins.i2cWriteBuffer(0x10, packet)
+robotPuPro.i2cWriteBuffer(0x10, packet)
 
 ```
 
