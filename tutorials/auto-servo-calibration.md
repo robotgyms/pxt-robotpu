@@ -1,3 +1,7 @@
+# Auto Servo Calibration (Experimental)
+
+This snippet sweeps each foot servo through a range of angles and watches the IMU roll reading (`input.rotation(Rotation.Roll)`) to find the angle where the robot stands level — an automatic alternative to manual servo trim calibration. Open the serial console to see each candidate angle and tilt reading; the script prints the computed center angle for each foot.
+
 ```typescript
 robotPuPro.start(robotPuPro.Action.API,0)
 robotPuPro.stand()
