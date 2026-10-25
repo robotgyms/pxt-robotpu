@@ -1715,8 +1715,8 @@ namespace robotPuPro {
                 [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
                 [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
                 [Action.Skate]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.skateItr(); },
-                [Action.SideStepLeft]: () => { this.walkDirection = 1; return this.sideStep(this.walkDirection); },
-                [Action.SideStepRight]: () => { this.walkDirection = -1; return this.sideStep(this.walkDirection); },
+                [Action.SideStepLeft]: () => this.sideStep(1),
+                [Action.SideStepRight]: () => this.sideStep(-1),
                 [Action.Sit]: () => this.sit(),
                 [Action.Stand]: () => this.stand(),
                 [Action.Laugh]: () => { this.laugh(); return 0; },
@@ -1847,8 +1847,10 @@ namespace robotPuPro {
                 this.pcb.servoStep(90 + this.headPitchBias, 1, 5);
 
                 // 2. If the turn stick is pushed far left/right while standing, side-step
+                // walkDirection uses the gait convention (negative = left) while sideStep()
+                // takes positive = left, so the sign must be flipped here.
                 if (Math.abs(this.walkDirection) > 0.9) {
-                    return this.sideStep(this.walkDirection);
+                    return this.sideStep(-this.walkDirection);
                 }
 
                 // Otherwise, stay in idle stance

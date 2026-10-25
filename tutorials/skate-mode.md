@@ -99,7 +99,7 @@ robotPuPro.setWalkMode(robotPuPro.WalkMode.Walk)
  ```
  
  - `speed`: -5 (full backward) to 5 (full forward)
- - `turn`: -1 (full right) to 1 (full left), 0 is straight
+ - `turn`: -1 (full left) to 1 (full right), 0 is straight
  
  ---
  

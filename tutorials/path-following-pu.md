@@ -39,8 +39,8 @@ function turnToDir(dir: number) {
         const err = angleDiffDeg(target, h)
         if (Math.abs(err) < 15) return
 
-        if (err > 0) robotPuPro.sideStep(1)
-        else robotPuPro.sideStep(-1)
+        if (err > 0) robotPuPro.sideStep(-1)  // target right → step right (-1)
+        else robotPuPro.sideStep(1)           // target left → step left (+1)
         basic.pause(80)
     }
 }
