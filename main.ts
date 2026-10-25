@@ -262,7 +262,7 @@ namespace robotPuPro {
 
     /**
      * Set the left/right turning bias.
-     * @param direction turn bias from -1 (full right) to 1 (full left), 0 is straight, eg: 0
+     * @param direction turn bias from -1 (full left) to 1 (full right), 0 is straight, eg: 0
      */
     //% blockId=robotpu_set_walk_direction block="set walk direction to %direction"
     //% subcategory="Setup"
@@ -344,7 +344,7 @@ namespace robotPuPro {
     /**
      * Walk with a given speed and turn bias. Call repeatedly in a loop to keep walking.
      * @param speed walking speed from -5 (full backward) to 5 (full forward), eg: 2
-     * @param turn turn bias from -1 (full right) to 1 (full left), 0 is straight, eg: 0
+     * @param turn turn bias from -1 (full left) to 1 (full right), 0 is straight, eg: 0
      */
     //% blockId=robotpu_walk block="walk at speed %speed, turning %turn"
     //% subcategory="Actions"
@@ -362,7 +362,7 @@ namespace robotPuPro {
     /**
      * Skate with a given speed and turn bias. Call repeatedly in a loop to keep skating.
      * @param speed skating speed from -5 (full backward) to 5 (full forward), eg: 2
-     * @param turn turn bias from -1 (full right) to 1 (full left), 0 is straight, eg: 0
+     * @param turn turn bias from -1 (full left) to 1 (full right), 0 is straight, eg: 0
      */
     //% blockId=robotpu_skate block="skate at speed %speed, turning %turn"
     //% subcategory="Actions"

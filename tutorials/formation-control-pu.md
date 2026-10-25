@@ -58,8 +58,8 @@ basic.forever(function () {
     }
 
     if (cmd == "walk") robotPuPro.walk(2, 0)
-    else if (cmd == "left") robotPuPro.sideStep(-1)
-    else if (cmd == "right") robotPuPro.sideStep(1)
+    else if (cmd == "left") robotPuPro.sideStep(1)   // +1 = left
+    else if (cmd == "right") robotPuPro.sideStep(-1) // -1 = right
     else robotPuPro.rest()
 
     basic.pause(40)

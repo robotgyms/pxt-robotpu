@@ -18,23 +18,32 @@ Look for these blocks at the top of the Robot PU toolbox:
 
 | Token | What it does |
 | --- | --- |
-| `stop` | Cancels the current action and returns to the rest pose. |
+| `rest` | Holds a balanced idle pose. |
 | `walk` | Walks **forward**. |
 | `walk backward` | Walks backward. |
 | `turn left` | Walks forward while turning left. |
 | `turn right` | Walks forward while turning right. |
+| `side step left` | Steps sideways to the left. |
+| `side step right` | Steps sideways to the right. |
+| `skate` | Skates forward using the skate gait (see `set walk mode`). |
 | `explore` | Autonomously avoids obstacles using the sonar sensor. |
 | `dance` | Dances to the beat detected by the microphone. |
-| `rest` | Holds a balanced idle pose. |
 | `kick` | Performs a kicking motion. |
 | `jump` | Performs a jump sequence. |
+| `sit` | Moves to a sitting pose. |
+| `stand` | Moves to a neutral standing pose. |
+| `drive` | Hands control to the remote/joystick loop (speed + direction inputs). |
+| `calibrate` | Moves to the servo calibration pose. |
+| `duck` | Drops into a low protective crouch (one-shot pose). |
 | `laugh` | Plays a laughing sound effect (one-shot). |
 | `cry` | Plays a crying sound effect (one-shot). |
 | `scream` | Plays a screaming sound effect (one-shot). |
 | `funny` | Plays a funny/silly sound effect (one-shot). |
 | `blink` | Runs the eye blink animation using the robot's internal alert level. |
 | `greet` | Speaks the robot's name and serial number (one-shot). |
-| `stand` | Moves to a neutral standing pose. |
+| `API mode` | Switches to manual API mode — the background gait loop does nothing so your code (or `runStringCommand`/`runKeyValueCommand`) can drive the servos directly. |
+
+There is no `stop` **token** — stopping is done with the `stop robot` block (`robotPuPro.stop()`), which works with any running action.
 
 ## Start an action for a number of steps
 
@@ -172,8 +181,8 @@ robotPuPro.start(robotPuPro.Action.Walk, 10)
 while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
     // gradually slow down
     robotPuPro.setWalkSpeed(robotPuPro.walkSpeed() * 0.9)
-    // gradually turn left (positive direction = left, negative = right)
-    robotPuPro.setWalkDirection(robotPuPro.walkDirection() + 0.1)
+    // gradually turn left (negative direction = left, positive = right)
+    robotPuPro.setWalkDirection(robotPuPro.walkDirection() - 0.1)
     basic.pause(500)
 }
 ```

@@ -297,7 +297,7 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 - **Block**: `set walk direction to %direction`
 - **What it does**: Sets the left/right turning bias.
 - **Parameters**:
-  - `direction`: turn bias from `-1` (full right) to `1` (full left), `0` is straight
+  - `direction`: turn bias from `-1` (full left) to `1` (full right), `0` is straight
 
 #### `walkSpeed(): number`
 
@@ -308,6 +308,23 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 
 - **Block**: `walk direction`
 - **What it does**: Returns the current walking direction.
+
+#### `setWalkMode(mode: WalkMode): void`
+
+- **Block**: `set walking mode to %mode`
+- **What it does**: Selects the gait the robot uses in drive (joystick) mode: `robotPuPro.WalkMode.Walk` or `robotPuPro.WalkMode.Skate`.
+- **Parameters**:
+  - `mode`: the walking mode, e.g. `robotPuPro.WalkMode.Skate`
+
+#### `speakerOn(): void`
+
+- **Block**: `speaker on`
+- **What it does**: Enables the speaker output.
+
+#### `speakerOff(): void`
+
+- **Block**: `speaker off`
+- **What it does**: Mutes the speaker output.
 
 ### Sensors
 
@@ -366,6 +383,29 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 
 - **Block**: `step count`
 - **What it does**: Returns the number of walking steps counted by the odometry pedometer.
+
+#### `batteryLevel(): number`
+
+- **Block**: `battery level (%)`
+- **What it does**: Returns the battery charge percentage. Returns `-1` if the battery reading failed.
+
+#### `musicBeat(): boolean`
+
+- **Block**: `music beat`
+- **What it does**: Returns `true` when the internal beat tracker detects a beat. Call `musicTempo()` regularly to keep the tracker updated.
+
+#### `isMusic(): boolean`
+
+- **Block**: `is music playing`
+- **What it does**: Returns `true` when music is currently detected. Call `musicTempo()` regularly to keep the tracker updated.
+
+#### `ledLevel(pulseLevel: number = 4, decay: number = 0.86): number`
+
+- **Block**: `led level %pulseLevel %decay`
+- **What it does**: Returns a `0-1` level that pulses on louder sounds — use with `leftEyeBright` or `rightEyeBright`.
+- **Parameters**:
+  - `pulseLevel`: `1` = VU meter, `4` = strong pulse (default)
+  - `decay`: `0` = instant off, `0.86` = quick fade (default), `0.95` = slow fade
 
 ### Actuators
 
@@ -430,6 +470,29 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
   - `brightness`: `0 .. 1`
 - **What it does**: Sets right eye LED brightness.
 
+#### `servoSmooth(joint: ServoJoint, angle: number): void`
+
+- **Block**: `smooth move %joint servo to %angle`
+- **What it does**: Moves a servo joint smoothly to an angle (0-180) using the PCB's smooth motion command.
+- **Parameters**:
+  - `joint`: the servo joint to move, e.g. `robotPuPro.ServoJoint.HeadYaw`
+  - `angle`: target angle `0 .. 180`
+
+#### `setServoPower(on: boolean): void`
+
+- **Block**: `set servo power to %on`
+- **What it does**: Turns the servo power rail on or off.
+- **Parameters**:
+  - `on`: `true` to power the servos, `false` to cut power
+
+#### `dcMotor(motor: number, speed: number): void`
+
+- **Block**: `run DC motor %motor at speed %speed`
+- **What it does**: Runs a DC motor channel.
+- **Parameters**:
+  - `motor`: motor number (`1` or `2`)
+  - `speed`: motor speed `-100 .. 100`
+
 ### Actions
 
 #### `start(action: Action, steps: number): void`
@@ -447,6 +510,30 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 - **Parameters**:
   - `action`: the action to check
 - **Return**: `true` when the action is done
+
+#### `startAndWait(action: Action, steps: number): void`
+
+- **Block**: `start %action for %steps steps and wait`
+- **What it does**: Starts a robot action and blocks until the counted steps complete (or the action is pre-empted).
+- **Parameters**:
+  - `action`: one of the `robotPuPro.Action` values
+  - `steps`: number of steps to run
+
+#### `stepsDone(action: Action): number`
+
+- **Block**: `steps done for %action`
+- **What it does**: Returns the number of steps completed for a running or just-finished action.
+- **Parameters**:
+  - `action`: the action to check
+- **Return**: step count
+
+#### `stepsRemaining(action: Action): number`
+
+- **Block**: `steps remaining for %action`
+- **What it does**: Returns the number of steps remaining for a running action.
+- **Parameters**:
+  - `action`: the action to check
+- **Return**: step count
 
 #### `stop(): void`
 
@@ -484,6 +571,16 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 - **Notes**:
   - This is designed to be called repeatedly (e.g. inside `basic.forever`).
   - You may use speed higher than 5 to make the robot move faster but the robot will be less stable because it cannot balance well due to the limited sampling rate of IMU and servo action speed.
+
+#### `skate(speed: number, turn: number): void`
+
+- **Block**: `skate at speed %speed, turning %turn`
+- **What it does**: Executes a self-balancing skating gait. Reuses the same balance engine as `walk()` but steps through the skate poses (gait states 27–32). Call repeatedly in a loop to keep skating.
+- **Parameters**:
+  - `speed`: `-5 .. 5` (negative = backward, positive = forward)
+  - `turn`: `-1 .. 1` (negative = left, positive = right), `0` is straight
+- **Notes**:
+  - To skate from joystick/drive mode instead, select it with `setWalkMode(robotPuPro.WalkMode.Skate)`.
 
 #### `walkByCompass(headingDeg: number): number`
 
@@ -586,6 +683,21 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
   - `song`: Note sequence string. Notes are written as letter names (A-G) with optional octave number, separated by spaces. Use `-` for a rest.
   - `bpm`: Tempo in beats per minute (40–240).
 
+#### `composeSong(style: SongStyle = SongStyle.Disco): string`
+
+- **Block**: `compose song %style`
+- **What it does**: Composes a new song string in the chosen style. Pass the result to `sing()`.
+- **Parameters**:
+  - `style`: the song style, e.g. `robotPuPro.SongStyle.Disco`, `robotPuPro.SongStyle.Cute`
+- **Return**: `string` song
+
+#### `setDanceSpeed(speed: number): void`
+
+- **Block**: `set dance speed to %speed`
+- **What it does**: Sets the dance speed multiplier. `1.0` is default; higher is faster/more energetic.
+- **Parameters**:
+  - `speed`: speed multiplier, e.g. `1.5`
+
 #### `morse(code: string, unitMs: number): void`
 
 - **Block**: `play morse code %code|| at speed %unitMs ms`
@@ -685,6 +797,12 @@ Robot PU can be controlled over the micro:bit radio protocol by sending either:
 **Receiver (Robot PU micro:bit) example**:
 
 ```ts
+robotPuPro.connectToGamepad()
+```
+
+`connectToGamepad()` registers both radio handlers for you. It is equivalent to:
+
+```ts
 radio.onReceivedValue(function (name, value) {
     robotPuPro.runKeyValueCommand(name, value)
 })
@@ -692,6 +810,8 @@ radio.onReceivedString(function (text) {
     robotPuPro.runStringCommand(text)
 })
 ```
+
+If you register your own `radio.onReceivedValue` / `radio.onReceivedString` handlers to intercept messages, they replace the ones `connectToGamepad()` installs — forward anything you don't handle yourself.
 
 **Sender (gamepad micro:bit) example**:
 
@@ -738,6 +858,23 @@ If your controller is a phone/app over BLE, the typical architecture is:
 - Phone/app (BLE)
 - Controller micro:bit receives BLE events and converts them to `radio.sendValue(...)` / `radio.sendString(...)`
 - Robot PU micro:bit receives radio and calls `robotPuPro.runKeyValueCommand(...)` / `robotPuPro.runStringCommand(...)`
+
+#### `connectToGamepad(): void`
+
+- **Block**: `connect to gamepad`
+- **What it does**: Connects Robot PU to a gamepad over radio. Call once at startup — it registers the `radio.onReceivedValue` → `runKeyValueCommand` and `radio.onReceivedString` → `runStringCommand` handlers for you.
+- **Notes**:
+  - Only one handler of each type can be active at a time: a custom `radio.onReceivedValue` / `radio.onReceivedString` registered after this call replaces the forwarding handler.
+
+#### `watchDogOn(): void`
+
+- **Block**: `watchdog on`
+- **What it does**: Enables the dead-man watchdog for external control channels (radio / I2C / Bluetooth / gamepad). The robot stops and returns to idle if no command arrives for ~2 seconds. Use this when streaming movement commands from a controller.
+
+#### `watchDogOff(): void`
+
+- **Block**: `watchdog off`
+- **What it does**: Disables the dead-man watchdog.
 
 #### `runStringCommand(s: string): void`
 

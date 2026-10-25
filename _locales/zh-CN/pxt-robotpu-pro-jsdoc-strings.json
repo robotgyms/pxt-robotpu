@@ -49,7 +49,7 @@
   "robotPuPro.RobotPu.setGroupId": "设置无线电组 ID 并更新硬件设置。",
   "robotPuPro.RobotPu.setGroupId|param|channel": "设置无线电组 ID 的通道。",
   "robotPuPro.RobotPu.sideStep": "执行侧步（横向）运动。\n\n\n使用特定的状态指数执行侧步移动。",
-  "robotPuPro.RobotPu.sideStep|param|di": "方向偏差：右为正，左为负。",
+  "robotPuPro.RobotPu.sideStep|param|di": "方向偏差：左为正，右为负。",
   "robotPuPro.RobotPu.sing": "使用内置音乐引擎唱出音符序列字符串。",
   "robotPuPro.RobotPu.sing|param|s": "音符序列字符串，例如“C5 D E F G”。",
   "robotPuPro.RobotPu.sleepMode": "将机器人置于低功耗待机模式。\n从 Python 中的 sleep() 移植。",
