@@ -175,13 +175,13 @@ Pass a morse string to `robotPuPro.talk()` — the robot detects it automaticall
 
 ### Text → Morse Translation
 
-Use `RoboVoice.toMorse()` to convert any plain text string into a morse code string:
+Use `robotPuPro.toMorse()` to convert any plain text string into a morse code string:
 
 ```typescript
-RoboVoice.toMorse("SOS")       // → "... --- ..."
-RoboVoice.toMorse("Hello")     // → ".... . .-.. .-.. ---"
-RoboVoice.toMorse("Hi 73")     // → ".... ..  --... ...--"
-RoboVoice.toMorse("OK?")       // → "--- -.-  ..--.."
+robotPuPro.toMorse("SOS")       // → "... --- ..."
+robotPuPro.toMorse("Hello")     // → ".... . .-.. .-.. ---"
+robotPuPro.toMorse("Hi 73")     // → ".... ..  --... ...--"
+robotPuPro.toMorse("OK?")       // → "--- -.-  ..--.."
 ```
 
 The returned string uses:
@@ -192,10 +192,10 @@ The returned string uses:
 This output can be passed directly to `talk()`, `morse()`, or stored as a variable:
 
 ```typescript
-const code = RoboVoice.toMorse("Help me");
+const code = robotPuPro.toMorse("Help me");
 robotPuPro.talk(code);                     // auto-detected as morse → plays it
 
-this.voice.morse(code, 60);             // play fast
+robotPuPro.morse(code, 60);             // play fast
 basic.showString(code);                 // display on LED matrix
 ```
 
@@ -241,13 +241,13 @@ The `morse()` method accepts an optional `unitMs` parameter to control speed:
 
 ```typescript
 // Slow (great for learning): 120ms per dit
-this.voice.morse("... --- ...", 120);
+robotPuPro.morse("... --- ...", 120);
 
 // Standard: 80ms per dit (default)
-this.voice.morse("... --- ...");
+robotPuPro.morse("... --- ...");
 
 // Fast (experienced operator): 50ms per dit
-this.voice.morse("... --- ...", 50);
+robotPuPro.morse("... --- ...", 50);
 ```
 
 ### Common Morse Patterns
@@ -267,27 +267,21 @@ this.voice.morse("... --- ...", 50);
 The algorithm is implemented in the `RoboVoice` class in `robotpu.ts`.
 
 ```typescript
-// Create a voice instance
-let voice = new RoboVoice();
+// Speak a phrase — talk() auto-detects morse vs melodic voice
+robotPuPro.talk("Hello Robot!");
 
-// Speak a phrase — resets pitch state before each utterance
-voice.reset();
-voice.say("Hello Robot!");
-
-// Or use through RobotPu.talk() which wraps this automatically
-robotPuPro.talk("I am ready.");
+// Play morse directly at a custom speed
+robotPuPro.morse("... --- ...", 60);
 ```
 
 **Public API:**
 
 | Method | Description |
 |--------|-------------|
-| `speak(text, unitMs?)` | **Smart dispatcher.** Plays morse if text looks like morse, otherwise plays melodic voice. Called by `RobotPu.talk()`. |
-| `say(text)` | Play text as a melodic utterance. Blocks until complete. |
-| `morse(code, unitMs?)` | Play a morse code string with ITU-standard timing. Default 80ms per dit. |
-| `reset()` | Reset smoothed pitch state to neutral A4. Called automatically before each `speak()`. |
-| `RoboVoice.toMorse(text)` | **Static.** Translate plain text to ITU morse string. Returns string of `.`, `-`, spaces. |
-| `RoboVoice.isMorse(text)` | **Static.** Returns `true` if the string contains only morse characters. |
+| `robotPuPro.talk(text)` | **Smart dispatcher.** Plays morse if text looks like morse, otherwise plays melodic voice. |
+| `robotPuPro.morse(code, unitMs?)` | Play a morse code string with ITU-standard timing. Default 80ms per dit. |
+| `robotPuPro.morseText(text, unitMs?)` | Translate plain text to morse and play it in one step. |
+| `robotPuPro.toMorse(text)` | Translate plain text to ITU morse string. Returns string of `.`, `-`, spaces. |
 
 ---
 

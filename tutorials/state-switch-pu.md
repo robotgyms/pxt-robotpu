@@ -30,10 +30,10 @@ Without states, a robot program becomes one giant tangle of `if` statements. Wit
 
 ## 2. Where the actions live
 
-In the Robot PU MakeCode extension, `main.ts` defines the `Action` enum and the `start` / `stop` blocks you use in MakeCode:
+In the Robot PU MakeCode extension, `robotpu.ts` defines the `Action` enum, and `main.ts` defines the `start` / `stop` blocks you use in MakeCode:
 
 ```typescript
-// main.ts
+// robotpu.ts
 export enum Action {
     //% block="rest"
     Rest = 0,
@@ -80,7 +80,9 @@ export enum Action {
     //% block="calibrate"
     Calibrate = -4,
     //% block="duck"
-    Duck = -5
+    Duck = -5,
+    //% block="API mode"
+    API = 6
 }
 
 /** Start a robot action and run it for the given number of steps (0 or less = forever). */

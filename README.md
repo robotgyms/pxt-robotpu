@@ -517,7 +517,7 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 
 - **Block**: `side step %direction`
 - **Parameters**:
-  - `direction`: `-1 .. 1` (negative = left, positive = right)
+  - `direction`: `-1 .. 1` (negative = right, positive = left)
 - **What it does**: Performs a sideways step.
 
 #### `dance(): void`
@@ -621,6 +621,35 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 
 - **Block**: `funny`
 - **What it does**: Plays a funny sound effect. Call it when Robot PU feels funny.
+
+### I2C helpers
+
+Robot PU's servos, sensors, and gait loop share the micro:bit's I2C bus with any user code and extensions (e.g. CogniCap). Calling raw `pins.i2c*` from a second fiber can interleave transactions mid-transfer and corrupt the bus. Always use these serialized helpers instead — each holds a cooperative lock for one transaction, so an uncontended call costs only a flag check. JavaScript/Python only — not exposed as blocks.
+
+#### `i2cWriteBuffer(addr: number, buf: Buffer, repeated?: boolean): void`
+
+- **What it does**: Serialized `pins.i2cWriteBuffer` — writes `buf` to `addr` under the bus lock.
+
+#### `i2cReadBuffer(addr: number, size: number, repeated?: boolean): Buffer`
+
+- **What it does**: Serialized `pins.i2cReadBuffer` — reads `size` bytes from `addr` under the bus lock.
+- **Return**: the received buffer; empty on failure
+
+#### `i2cWriteNumber(addr: number, value: number, format: NumberFormat, repeated?: boolean): void`
+
+- **What it does**: Serialized `pins.i2cWriteNumber` — packs `value` per `format` and writes it under the bus lock.
+
+#### `i2cReadNumber(addr: number, format: NumberFormat, repeated?: boolean): number`
+
+- **What it does**: Serialized `pins.i2cReadNumber` — reads `pins.sizeOf(format)` bytes and decodes under the bus lock.
+- **Return**: decoded value; `0` on a short read
+
+#### `i2cTransaction(addr: number, tx?: Buffer, rxLen?: number, repeated?: boolean): Buffer`
+
+- **What it does**: Optional write of `tx` followed by a read of `rxLen` bytes, all under **one** lock — use this when a write→read pair must not be split by other bus traffic (e.g. repeated-start register reads). Pass `repeated = true` to keep control of the bus between the write and the read.
+- **Return**: the received buffer (empty if `rxLen` is 0 or the read failed)
+
+> Separate `i2cWriteBuffer` + `i2cReadBuffer` calls are each serialized, but other traffic can interleave between them. Use `i2cTransaction` when the pair must be atomic.
 
 ### Remote Control
 
