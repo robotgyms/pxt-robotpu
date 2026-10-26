@@ -15,7 +15,7 @@ You will program PU’s micro:bit to:
 
 When it works: **tilt the joystick and PU walks; press gamepad button B2 and PU Jumps.**
 
-> 🎁 **Open box and play**: Robot PU ships from the factory with this exact barebones program already installed on the default channel `166`. If you just unboxed your robot, skip Steps 1–2 — power on the robot, set up the gamepad (Step 3), and start driving. This tutorial shows how to *rebuild or customize* that factory program yourself.
+> 🎁 **Open box and play**: Both Robot PU and the gamepad ship from the factory already flashed — the robot runs this exact barebones program and the gamepad runs its controller program, both on the default channel `166`. If you don't want to change anything, **skip straight to Step 5** — just power on both devices and start driving. The earlier steps show how to *rebuild or customize* the factory programs yourself.
 
 ---
 
