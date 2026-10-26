@@ -981,7 +981,7 @@ namespace robotPuPro {
 
     /**
      * Execute a string command received over radio. Use this inside a radio.onReceivedString handler.
-     * Supported commands: #put<text> (speak), #pus<song> (sing), #puhi<name> (greet friend), #pun<name> (set robot name).
+     * Supported commands: #put<text> (speak), #pus<song> (sing), #puhi<name> (greet friend), #pun<sn> (set robot serial number, then greet).
      * @param command the command string received from radio, eg: "#putHello!"
      */
     //% blockId=robotpu_runStrCMD block="run string command %command"
