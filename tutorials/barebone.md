@@ -186,6 +186,10 @@ robotPuGamepad.setName("PU")
 >
 > `166` is the **factory default channel** — every Robot PU ships on it. If other Robot PUs are nearby (classroom, demo, robot meetup), their gamepads will interfere with yours. Pick your own channel (`0 .. 255`) to keep your pair private.
 >
+> Two easy ways to change it when playing with friends:
+> - **Manually**: press button **A** (channel +1) or **B** (channel −1) on either device until both show the same number — works on PU (with the full program above) and on the gamepad.
+> - **In code**: set your own default with `robotPuPro.setChannel(...)` on PU and `robotPuGamepad.setChannel(...)` on the gamepad.
+>
 > ⚠️ **Two programs, two micro:bits**: the `robotPuPro.*` program is flashed to the micro:bit in **Robot PU's brain** (inside the robot head); the `robotPuGamepad.*` program is flashed to the **gamepad micro:bit**. Don't mix them up — each extension only works on its own device.
 >
 > To use a different channel, change both sides: on PU call `robotPuPro.setChannel(n)` or `robotPuPro.changeChannel(±1)` (buttons A/B in the full program above), and on the gamepad call `robotPuGamepad.setChannel(n)` or press its own A/B buttons to step the channel.
