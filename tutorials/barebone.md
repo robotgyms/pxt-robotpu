@@ -12,127 +12,111 @@ You will program PU’s micro:bit to:
 - Connect to the gamepad (or any radio sender) with a single call.
 - Set your own radio channel for the robot and gamepad so only your devices talk to each other.
 - Give your Robot PU its own name.
-- Change channels and toggle servo trim mode from PU’s own buttons.
+
+When it works: **tilt the joystick and PU walks; press gamepad button B4 and PU kicks.**
 
 ---
 
 ## Requirements
 
-- Robot PU with a micro:bit
-- Robot PU gamepad: a second micro:bit running the controller program — see [gamepad.md](gamepad.md), or the minimal gamepad setup in the [pxt-robotpu-gamepad repo](https://github.com/robotgyms/pxt-robotpu-gamepad/blob/main/tutorials/hello-robotpu.md)
+- Robot PU with a micro:bit in its brain
+- Robot PU gamepad: a second micro:bit running the controller program — see the minimal setup in [pxt-robotpu-gamepad/hello-robotpu.md](https://github.com/robotgyms/pxt-robotpu-gamepad/blob/main/tutorials/hello-robotpu.md) or the full reference in [gamepad.md](gamepad.md)
 
 ---
 
-## Pairing: both devices on the same channel
+## Step 1 — Load the Robot PU extension
 
-Radio messages only reach each other if the **radio group numbers match**. The Robot PU channel **is** the micro:bit radio group:
+In the MakeCode editor (https://makecode.microbit.org/):
+
+1. Create a **New Project**.
+2. Click **Extensions**, paste `https://github.com/robotgyms/pxt-robotpu`, and select it.
+
+The editor will then recognize `robotPuPro.*` blocks.
+
+## Step 2 — Flash the 2-line program to PU's brain
 
 ```typescript
-// Robot PU side
+// Set the radio channel (0-255, factory default is 166)
 robotPuPro.setChannel(166)
+// Connect to the gamepad
 robotPuPro.connectToGamepad()
+```
 
-// Gamepad side (pxt-robotpu-gamepad extension)
+Download this program to the micro:bit inside **Robot PU's head**.
+
+> ⚠️ **On the first flash** the robot will stand up and calibrate itself — about 4 seconds of servo motion and eye flashes. This is normal; it happens once, the first time any `robotPuPro.*` block runs.
+
+## Step 3 — Set up the gamepad micro:bit
+
+Create a **separate** MakeCode project, add the gamepad extension (**Extensions → paste `https://github.com/robotgyms/pxt-robotpu-gamepad` → select it**), then:
+
+```typescript
 robotPuGamepad.setChannel(166)
 robotPuGamepad.start()
+// optional: set the name your gamepad uses to greet the robot
+robotPuGamepad.setName("PU")
 ```
 
-- Both lines set radio group `166` — pick any `0..255` you like, as long as both devices use the same number.
-- The default gamepad program uses channel `166`, so `166` works out of the box.
-- To re-pair at runtime, press button **A**/**B** on either device to step its channel up/down until they match (the full program below wires PU's buttons; the gamepad's own A/B buttons do the same there).
-- If PU does not react: check that both devices show the same channel number, then try a `#putHello!` string to confirm the link.
+Download this program to the **gamepad micro:bit**.
 
----
+> ⚠️ **Two programs, two micro:bits**: `robotPuPro.*` goes to PU's brain; `robotPuGamepad.*` goes to the gamepad. Each extension only works on its own device.
 
-## Load the Robot PU MakeCode Extension
+## Step 4 — Pair: both devices on the same channel
 
-To use the `robotPuPro.*` blocks/APIs, you must add the Robot PU extension into your MakeCode project.
+`setChannel(...)` sets the **micro:bit radio group** on both sides — the two devices can only talk when the numbers match. Valid range is `0 .. 255`.
 
-1. Open the MakeCode editor: https://makecode.microbit.org/
-2. Create a **New Project** (or open your existing one).
-3. Click **Extensions** (in the gear menu or toolbox, depending on the MakeCode layout).
-4. Search for the extension by pasting this GitHub URL:
+- `166` is the **factory default** — every Robot PU ships on it. If other Robot PUs are nearby (classroom, demo), their gamepads will interfere with yours — pick your own channel.
+- **Manual change**: press button **A** (+1) or **B** (−1) on either device until both show the same number. (PU's buttons need the full program below; the gamepad shows its channel on its display.)
+- **In code**: set your own default — `robotPuPro.setChannel(n)` on PU and `robotPuGamepad.setChannel(n)` on the gamepad.
+- **If PU doesn't react**: check both devices show the same channel, then try sending `#putHello!` — PU should say it.
 
-   `https://github.com/robotgyms/pxt-robotpu`
+## Step 5 — Try it
 
-5. Select the extension to add it to your project.
+- Move the joystick → PU walks and steers.
+- Press gamepad **B4** → PU kicks. (See the button table in the appendix for the rest.)
+- Radio drops out or gamepad turns off? The first received command arms PU's **dead-man watchdog** — PU stops on its own within ~2 seconds.
 
-After that, the editor will recognize calls like `robotPuPro.setChannel(...)` and `robotPuPro.connectToGamepad()`.
+## Step 6 — Make it yours
 
----
-
-## Minimal version of barebone program (copy into MakeCode JavaScript)
-
-```typescript
-// Set the radio channel to 166
-robotPuPro.setChannel(166)
-// Connect to the gamepad
-robotPuPro.connectToGamepad()
-```
-Two lines of code to establish robot remote control with gamepad.
-> **Note**: This is the minimal version. You can add more functionality as needed.  
-
----
-
-## Full version of barebone program (copy into MakeCode JavaScript)
+- **Channel**: move both devices off `166` (Step 4) so friends' robots can't grab your radio.
+- **Name**: the gamepad's `robotPuGamepad.setName("PU")` sends a `#pun` greeting — PU learns its name and speaks "My name is …". Change the string to rename your robot.
+- **Channel buttons on PU** (optional full program):
 
 ```typescript
-// Set the radio channel to 166
 robotPuPro.setChannel(166)
-// Connect to the gamepad
 robotPuPro.connectToGamepad()
 
-// Toggle servo trim mode when the logo button is pressed
 input.onLogoEvent(TouchButtonEvent.Pressed, function() {
-  robotPuPro.toggleServoTrim()
+  robotPuPro.toggleServoTrim()   // servo trim mode on/off
 })
-
-// Increase the radio channel when button A is pressed
 input.onButtonPressed(Button.A, function() {
-  robotPuPro.changeChannel(1)
+  robotPuPro.changeChannel(1)    // channel +1
 })
-
-// Decrease the radio channel when button B is pressed
 input.onButtonPressed(Button.B, function () {
-  robotPuPro.changeChannel(-1)
+  robotPuPro.changeChannel(-1)   // channel -1
 })
 ```
 
 ---
 
-## How it works
+## Appendix
 
-- `robotPuPro.setChannel(166)`
-  - Sets the radio channel/group.
-  - Your gamepad micro:bit must use the **same** channel number.
-- `robotPuPro.connectToGamepad()`
-  - Registers the two radio listeners and forwards every message into Robot PU:
-    - `radio.onReceivedValue(...)` → `robotPuPro.runKeyValueCommand(name, value)` (joystick axes and buttons)
-    - `radio.onReceivedString(...)` → `robotPuPro.runStringCommand(text)` (speak/sing phrases)
-  - It is exactly equivalent to writing this yourself:
+### What `connectToGamepad()` does
 
-    ```typescript
-    // Listen for radio name/value pairs from gamepad and other robot devices
-    radio.onReceivedValue(function(name: string, value: number) {
-      robotPuPro.runKeyValueCommand(name, value)
-    })
-    // Listen for radio strings from gamepad and other robot devices
-    radio.onReceivedString(function(receivedString: string) {
-      robotPuPro.runStringCommand(receivedString)
-    })
-    ```
+It registers the two radio listeners and forwards every message into Robot PU:
 
-  - Use the manual version instead if you ever want to **intercept** a key before it reaches Robot PU (handle it, then `return` without forwarding).
+```typescript
+radio.onReceivedValue(function(name: string, value: number) {
+  robotPuPro.runKeyValueCommand(name, value)
+})
+radio.onReceivedString(function(receivedString: string) {
+  robotPuPro.runStringCommand(receivedString)
+})
+```
 
-> Note: the first radio command received turns on Robot PU's dead-man watchdog. If the gamepad stops sending (off or out of range), PU stops moving on its own.
+Use the manual version instead if you want to **intercept** a key before it reaches Robot PU (handle it, then `return` without forwarding).
 
----
-
-## Using the gamepad
-
-Once the channels match, everything the gamepad sends is handled automatically.
-
-### Joysticks and tilt
+### Gamepad controls reference
 
 | Gamepad input          | Radio message          | What Robot PU does                              |
 | ---------------------- | ---------------------- | ----------------------------------------------- |
@@ -141,9 +125,7 @@ Once the channels match, everything the gamepad sends is handled automatically.
 | Tilt left / right      | `#puroll` `-90 .. 90`  | nudge PU's head left / right (yaw)*             |
 | Tilt forward / back    | `#pupitch` `-90 .. 90` | nudge PU's head down / up (pitch)*              |
 
-\* `#puroll` / `#pupitch` only move the head while PU is in the **Drive** action **and** nearly stopped (|walkSpeed| < 0.1). They nudge head yaw/pitch — they do not balance the body.
-
-### Buttons
+\* `#puroll` / `#pupitch` only move the head while PU is in the **Drive** action **and** nearly stopped (|walkSpeed| < 0.1). They do not balance the body.
 
 | Gamepad input       | Radio message     | Normal mode          | Servo trim mode            |
 | ------------------- | ----------------- | -------------------- | -------------------------- |
@@ -154,47 +136,10 @@ Once the channels match, everything the gamepad sends is handled automatically.
 | B4                  | `#puB` `4`        | kick                 | trim selected servo `+1°`  |
 | Logo                | `#pulogo` `1` or `#put<text>` | announce status / speak a phrase | same |
 
-### Gamepad micro:bit A/B buttons (channel select)
+Gamepad's own A/B buttons change the gamepad's channel (shown on its display); A+B sends `#pun<name>` to set PU's name and trigger a greet.
 
-These run **on the gamepad itself**, not on PU — they change the gamepad's radio group so it can pair with a robot on a different channel:
+Servo trim mode is entered/exited by pressing the **logo button on Robot PU's head** — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
-| Gamepad input | Effect                                             |
-| ------------- | -------------------------------------------------- |
-| A             | channel `+1` (shows the new channel)               |
-| B             | channel `-1` (shows the new channel)               |
-| A+B           | sends `#pun<name>` — sets PU's serial number `sn` (what `greet()` speaks as "My name is ..."); PU greets you |
+### Plain-sender alternative
 
-On the robot side, the `input.onButtonPressed(Button.A/B)` blocks in the full version above do the same thing on PU — press A/B on PU's micro:bit to nudge its channel until it matches the gamepad.
-
-> Servo trim mode is entered/exited by pressing the **logo button on Robot PU's head** (`robotPuPro.toggleServoTrim()`). See [servo-trim-calibration.md](servo-trim-calibration.md).
-
----
-
-## Quick test idea
-
-On a second micro:bit, set the same channel and send something simple:
-
-**Gamepad-side setup:** create a *separate* MakeCode project for the gamepad micro:bit and add the gamepad extension — **Extensions → paste `https://github.com/robotgyms/pxt-robotpu-gamepad` → select it**. Then add:
-
-```typescript
-robotPuGamepad.setChannel(166)
-robotPuGamepad.start()
-// optional: set the name of your robot
-robotPuGamepad.setName("PU")
-```
-
-> 📻 **About `setChannel(166)`**: `robotPuPro.setChannel(...)` on the robot and `robotPuGamepad.setChannel(...)` on the gamepad set the **same thing** — the micro:bit radio group. The two devices can only talk when the numbers match, and the valid range is `0 .. 255`.
->
-> `166` is the **factory default channel** — every Robot PU ships on it. If other Robot PUs are nearby (classroom, demo, robot meetup), their gamepads will interfere with yours. Pick your own channel (`0 .. 255`) to keep your pair private.
->
-> Two easy ways to change it when playing with friends:
-> - **Manually**: press button **A** (channel +1) or **B** (channel −1) on either device until both show the same number — works on PU (with the full program above) and on the gamepad.
-> - **In code**: set your own default with `robotPuPro.setChannel(...)` on PU and `robotPuGamepad.setChannel(...)` on the gamepad.
->
-> ⚠️ **Two programs, two micro:bits**: the `robotPuPro.*` program is flashed to the micro:bit in **Robot PU's brain** (inside the robot head); the `robotPuGamepad.*` program is flashed to the **gamepad micro:bit**. Don't mix them up — each extension only works on its own device.
->
-> To use a different channel, change both sides: on PU call `robotPuPro.setChannel(n)` or `robotPuPro.changeChannel(±1)` (buttons A/B in the full program above), and on the gamepad call `robotPuGamepad.setChannel(n)` or press its own A/B buttons to step the channel.
-
-> ⚠️ If you use a **plain sender** micro:bit (no gamepad extension) instead, use `radio.setGroup(166)` — not `robotPuPro.setChannel(166)`. Calling any `robotPuPro.*` block runs the full robot startup (stand → calibrate, ~4 s of servo/I2C activity), which a sender-only micro:bit doesn't need.
-
-If your receiver is working, PU walks when you tilt the joystick and kicks when you press gamepad button **B4**.
+If you use a **plain sender** micro:bit (no gamepad extension), use `radio.setGroup(166)` — not `robotPuPro.setChannel(166)`. Calling any `robotPuPro.*` block runs the full robot startup (stand → calibrate, ~4 s of servo/I2C activity), which a sender-only micro:bit doesn't need.
