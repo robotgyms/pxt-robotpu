@@ -18,7 +18,28 @@ You will program PU’s micro:bit to:
 ## Requirements
 
 - Robot PU with a micro:bit
-- Robot PU gamepad: a second micro:bit running the controller program — see [gamepad.md](gamepad.md)
+- Robot PU gamepad: a second micro:bit running the controller program — see [gamepad.md](gamepad.md), or the minimal gamepad setup in the [pxt-robotpu-gamepad repo](https://github.com/robotgyms/pxt-robotpu-gamepad/blob/main/tutorials/hello-robotpu.md)
+
+---
+
+## Pairing: both devices on the same channel
+
+Radio messages only reach each other if the **radio group numbers match**. The Robot PU channel **is** the micro:bit radio group:
+
+```typescript
+// Robot PU side
+robotPuPro.setChannel(166)
+robotPuPro.connectToGamepad()
+
+// Gamepad side (pxt-robotpu-gamepad extension)
+robotPuGamepad.setChannel(166)
+robotPuGamepad.start()
+```
+
+- Both lines set radio group `166` — pick any `0..255` you like, as long as both devices use the same number.
+- The default gamepad program uses channel `166`, so `166` works out of the box.
+- To re-pair at runtime, press button **A**/**B** on either device to step its channel up/down until they match (the full program below wires PU's buttons; the gamepad's own A/B buttons do the same there).
+- If PU does not react: check that both devices show the same channel number, then try a `#putHello!` string to confirm the link.
 
 ---
 
