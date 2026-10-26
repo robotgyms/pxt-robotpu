@@ -182,7 +182,9 @@ robotPuGamepad.start()
 robotPuGamepad.setName("PU")
 ```
 
-> 📻 **About `setChannel(166)`**: `robotPuPro.setChannel(...)` on the robot and `robotPuGamepad.setChannel(...)` on the gamepad set the **same thing** — the micro:bit radio group. The two devices can only talk when the numbers match, and the valid range is `0 .. 255` (`166` is the Robot PU default).
+> 📻 **About `setChannel(166)`**: `robotPuPro.setChannel(...)` on the robot and `robotPuGamepad.setChannel(...)` on the gamepad set the **same thing** — the micro:bit radio group. The two devices can only talk when the numbers match, and the valid range is `0 .. 255`.
+>
+> `166` is the **factory default channel** — every Robot PU ships on it. If other Robot PUs are nearby (classroom, demo, robot meetup), their gamepads will interfere with yours. Pick your own channel (`0 .. 255`) to keep your pair private.
 >
 > ⚠️ **Two programs, two micro:bits**: the `robotPuPro.*` program is flashed to the micro:bit in **Robot PU's brain** (inside the robot head); the `robotPuGamepad.*` program is flashed to the **gamepad micro:bit**. Don't mix them up — each extension only works on its own device.
 >
