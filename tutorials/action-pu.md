@@ -103,7 +103,7 @@ basic.showIcon(IconNames.Yes)
 
 Inside the loop you also can:
 - Call other **sound/sensor-only** functions for multitasking (eg. `laugh()`, `talk()`, reading sensors) — safe, as long as they don't touch the servos.
-- Call `stop()` to cancel the action you are waiting for, eg. on a button press.
+- Call `stop()` to cancel the action you are waiting for, eg. on a button press — but note `isDone(stoppedAction)` returns `false` after `stop()` (only `isDone(Rest)` reports done), so `break` out of the wait loop yourself.
 
 Avoid calling another **servo-driving** function (like `dance()`, `kick()`, `walk()`, or `servo()`) while waiting — those direct calls put the robot into `API` mode, which **cancels** the counted action entirely: the wait loop stalls because `isDone(...)` never returns `true`. (A second `start(...)` also cancels the wait — it replaces the action being counted.)
 
