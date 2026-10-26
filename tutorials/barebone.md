@@ -10,7 +10,8 @@ This is the smallest possible starting point for letting **Robot PU** receive co
 You will program PU’s micro:bit to:
 
 - Connect to the gamepad (or any radio sender) with a single call.
-- Use a specific radio channel so only your devices talk to each other.
+- Set your own radio channel for the robot and gamepad so only your devices talk to each other.
+- Give your Robot PU its own name.
 - Change channels and toggle servo trim mode from PU’s own buttons.
 
 ---
