@@ -174,15 +174,16 @@ On the robot side, the `input.onButtonPressed(Button.A/B)` blocks in the full ve
 On a second micro:bit, set the same channel and send something simple:
 
 ```typescript
-radio.setGroup(166)
-input.onButtonPressed(Button.A, function () {
-    radio.sendString("#putHello!")
-})
-input.onButtonPressed(Button.B, function () {
-    radio.sendValue("#puB", 4)
-})
+robotPuGamepad.setChannel(166)
+robotPuGamepad.start()
+// optional: set the name of your robot
+robotPuGamepad.setName("PU")
 ```
 
-> ⚠️ Use `radio.setGroup(166)` on a **plain sender** micro:bit — not `robotPuPro.setChannel(166)`. Calling any `robotPuPro.*` block runs the full robot startup (stand → calibrate, ~4 s of servo/I2C activity), which a sender-only micro:bit doesn't need.
+> 📻 **About `setChannel(166)`**: `robotPuPro.setChannel(...)` on the robot and `robotPuGamepad.setChannel(...)` on the gamepad set the **same thing** — the micro:bit radio group. The two devices can only talk when the numbers match, and the valid range is `0 .. 255` (`166` is the Robot PU default).
+>
+> To use a different channel, change both sides: on PU call `robotPuPro.setChannel(n)` or `robotPuPro.changeChannel(±1)` (buttons A/B in the full program above), and on the gamepad call `robotPuGamepad.setChannel(n)` or press its own A/B buttons to step the channel.
 
-If your receiver is working, PU should say "Hello!" on A and kick on B.
+> ⚠️ If you use a **plain sender** micro:bit (no gamepad extension) instead, use `radio.setGroup(166)` — not `robotPuPro.setChannel(166)`. Calling any `robotPuPro.*` block runs the full robot startup (stand → calibrate, ~4 s of servo/I2C activity), which a sender-only micro:bit doesn't need.
+
+If your receiver is working, PU walks when you tilt the joystick and kicks when you press gamepad button **B4**.
