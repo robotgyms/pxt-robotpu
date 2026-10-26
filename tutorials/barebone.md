@@ -182,6 +182,8 @@ robotPuGamepad.setName("PU")
 
 > 📻 **About `setChannel(166)`**: `robotPuPro.setChannel(...)` on the robot and `robotPuGamepad.setChannel(...)` on the gamepad set the **same thing** — the micro:bit radio group. The two devices can only talk when the numbers match, and the valid range is `0 .. 255` (`166` is the Robot PU default).
 >
+> ⚠️ **Two programs, two micro:bits**: the `robotPuPro.*` program is flashed to the micro:bit in **Robot PU's brain** (inside the robot head); the `robotPuGamepad.*` program is flashed to the **gamepad micro:bit**. Don't mix them up — each extension only works on its own device.
+>
 > To use a different channel, change both sides: on PU call `robotPuPro.setChannel(n)` or `robotPuPro.changeChannel(±1)` (buttons A/B in the full program above), and on the gamepad call `robotPuGamepad.setChannel(n)` or press its own A/B buttons to step the channel.
 
 > ⚠️ If you use a **plain sender** micro:bit (no gamepad extension) instead, use `radio.setGroup(166)` — not `robotPuPro.setChannel(166)`. Calling any `robotPuPro.*` block runs the full robot startup (stand → calibrate, ~4 s of servo/I2C activity), which a sender-only micro:bit doesn't need.
