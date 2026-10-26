@@ -173,6 +173,8 @@ On the robot side, the `input.onButtonPressed(Button.A/B)` blocks in the full ve
 
 On a second micro:bit, set the same channel and send something simple:
 
+**Gamepad-side setup:** create a *separate* MakeCode project for the gamepad micro:bit and add the gamepad extension — **Extensions → paste `https://github.com/robotgyms/pxt-robotpu-gamepad` → select it**. Then add:
+
 ```typescript
 robotPuGamepad.setChannel(166)
 robotPuGamepad.start()
