@@ -116,8 +116,10 @@ Once the channels match, everything the gamepad sends is handled automatically.
 | ---------------------- | ---------------------- | ----------------------------------------------- |
 | Joystick up/down       | `#puspeed` `-1 .. 1`   | walk forward / backward (dead-zone around 0)    |
 | Joystick left/right    | `#puturn` `-1 .. 1`    | turn left / right while walking                 |
-| Tilt left / right      | `#puroll` `-90 .. 90`  | turn PU's head left / right (yaw)               |
-| Tilt forward / back    | `#pupitch` `-90 .. 90` | tilt PU's head down / up (pitch)                |
+| Tilt left / right      | `#puroll` `-90 .. 90`  | nudge PU's head left / right (yaw)*             |
+| Tilt forward / back    | `#pupitch` `-90 .. 90` | nudge PU's head down / up (pitch)*              |
+
+\* `#puroll` / `#pupitch` only move the head while PU is in the **Drive** action **and** nearly stopped (|walkSpeed| < 0.1). They nudge head yaw/pitch — they do not balance the body.
 
 ### Buttons
 
@@ -138,7 +140,7 @@ These run **on the gamepad itself**, not on PU — they change the gamepad's rad
 | ------------- | -------------------------------------------------- |
 | A             | channel `+1` (shows the new channel)               |
 | B             | channel `-1` (shows the new channel)               |
-| A+B           | sends `#pun<name>` — sets PU's name; PU greets you |
+| A+B           | sends `#pun<name>` — sets PU's serial number `sn` (what `greet()` speaks as "My name is ..."); PU greets you |
 
 On the robot side, the `input.onButtonPressed(Button.A/B)` blocks in the full version above do the same thing on PU — press A/B on PU's micro:bit to nudge its channel until it matches the gamepad.
 
@@ -151,7 +153,7 @@ On the robot side, the `input.onButtonPressed(Button.A/B)` blocks in the full ve
 On a second micro:bit, set the same channel and send something simple:
 
 ```typescript
-robotPuPro.setChannel(166)
+radio.setGroup(166)
 input.onButtonPressed(Button.A, function () {
     radio.sendString("#putHello!")
 })
@@ -159,5 +161,7 @@ input.onButtonPressed(Button.B, function () {
     radio.sendValue("#puB", 4)
 })
 ```
+
+> ⚠️ Use `radio.setGroup(166)` on a **plain sender** micro:bit — not `robotPuPro.setChannel(166)`. Calling any `robotPuPro.*` block runs the full robot startup (stand → calibrate, ~4 s of servo/I2C activity), which a sender-only micro:bit doesn't need.
 
 If your receiver is working, PU should say "Hello!" on A and kick on B.

@@ -6,7 +6,7 @@ Use reinforcement learning to make robot PU learn skating.
 ## Reward function
 
 - Reward forward momentum by accumulating positive Y acceleration from the IMU.
-- Penalize falling down when `robotPuPro.bodyPitch()` or `robotPuPro.bodyRoll()` exceeds 60 degrees.
+- Penalize falling down when `robotPuPro.bodyPitch()` or `robotPuPro.bodyRoll()` exceeds 60 degrees. (Note: these getters are stale while only `moveServos()`/`servo()` calls drive the robot — see the API-mode caveat under "Fall detection" below.)
 
 ## Parameters to tune
 
@@ -33,7 +33,9 @@ accelerometer is noisy, so a single-sample reward measurement gives a very noisy
 - The random perturbation direction acts as built-in noise averaging over many update steps.
 - It is well proven for real robot gait tuning with noisy reward signals.
 
-One SPSA update step costs 2 physical trials (~6 seconds) instead of 6 (~18 seconds).
+One SPSA update step costs 3 physical trials (~9 seconds) in this program — the +ε and −ε
+gradient trials plus a candidate-evaluation trial — instead of 6 (~18 seconds) for
+finite-difference gradient descent.
 
 ## How one SPSA update works
 
@@ -76,6 +78,14 @@ apples to apples when evaluating `r_plus` vs `r_minus`. A timer-based trigger
 could catch the robot mid-stride on one trial and mid-air on another, skewing the gradient.
 
 ### Fall detection, stop, and recovery
+
+⚠️ **Caveat — `bodyPitch()`/`bodyRoll()` are stale in API mode.** Those getters read values
+that are only refreshed by `balanceParam()`, which runs inside the gait handlers
+(`walk`/`rest`/`dance`). This program drives servos with `moveServos()` only, so the internal
+state machine sits in API mode and the tilt values never update — the fall checks below will
+not fire reliably while skating. For real fall feedback here, read the raw IMU
+(`input.rotation(Rotation.Pitch)` / `input.rotation(Rotation.Roll)`) or periodically call a
+gait function such as `robotPuPro.stand()`/`rest()` to refresh the estimate.
 
 When a fall is detected (tilt > 45°) the sequence is:
 
@@ -208,16 +218,17 @@ function skate(speedGain: number): void {
 //
 // NOTE: control.inBackground() SPAWNS a new fiber each call — it does NOT
 // overwrite any existing background fiber. MakeCode already runs one fiber
-// from main.ts (updateStates + stateMachine every 5 ms). Our SPSA loop adds
+// from main.ts (updateStates + stateMachine every 10 ms). Our SPSA loop adds
 // a second independent fiber. Both run concurrently under the scheduler.
 //
 // The internal fiber calls robot.updateStates() which has its own fall
-// detection (bodyRoll2 > 75 deg, sets gst = -3). To prevent it from
-// hijacking control during a skate trial, low-level commands like
-// moveServos() automatically put the robot into the API state for direct
-// control. getRobotAPI() sets this automatically each time moveServos() is
-// called; waitForRecovery() keeps the learning loop paused so the internal
-// state machine does not take over.
+// detection (bodyRoll2 > 75 deg, sets gst = -3). Two caveats apply during
+// skate trials: (a) low-level commands like moveServos() automatically put
+// the robot into the API state for direct control — getRobotAPI() sets this
+// on every call — so the gait handlers that would refresh bodyRoll2 do not
+// run, leaving the internal tilt estimate STALE (the tip-over check will not
+// fire; only Gesture.FreeFall still works); and (b) waitForRecovery() keeps
+// the learning loop paused so the internal state machine does not take over.
 //
 // Why not one blocking for-loop?
 //   A blocking loop inside basic.forever stalls the MakeCode scheduler.
@@ -309,6 +320,9 @@ function waitForRecovery(): void {
     paused = true
     robotPuPro.talk("I fell")   // melodic voice; use billy.say() for real speech
     // wait until both tilt angles are safely upright
+    // NOTE: bodyPitch()/bodyRoll() only refresh while a gait handler runs;
+    // in API mode they are stale — for a live reading use input.rotation()
+    // instead, or call robotPuPro.stand() periodically to refresh them.
     while (Math.abs(robotPuPro.bodyPitch()) > 20 || Math.abs(robotPuPro.bodyRoll()) > 20) {
         basic.pause(200)
     }
@@ -350,6 +364,8 @@ basic.forever(function () {
     rewardAcc += effTick + stabTick
 
     // fall detection: add penalty to stability and signal Loop 2 to stop and recover
+    // (see caveat above: these tilt getters are stale in API mode — swap in
+    // input.rotation(...) for a live check when driving servos directly)
     if (Math.abs(robotPuPro.bodyPitch()) > 45 || Math.abs(robotPuPro.bodyRoll()) > 45) {
         stabilityAcc -= 500
         rewardAcc -= 500

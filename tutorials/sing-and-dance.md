@@ -12,7 +12,7 @@ This tutorial shows how to make Robot PU compose a disco song, sing it, and danc
 
 Robot PU has four building blocks that fit together for this project:
 
-- `robotPuPro.greet()` — wakes up and calibrates the robot.
+- `robotPuPro.greet()` — speaks the robot's serial number and name. The **first** `robotPuPro.*` call in a program also triggers the robot startup (stand → calibrate → rest, ~4 s); greet() itself only talks.
 - `robotPuPro.setDanceSpeed(6)` — sets a fast, energetic dance speed (default is 2.0; higher is faster).
 - `robotPuPro.composeSong(robotPuPro.SongStyle.Disco)` and `robotPuPro.composeSong(robotPuPro.SongStyle.Cute)` — compose new song strings in each style.
 - `robotPuPro.sing(song, 120)` — plays the song at 120 BPM; it is **blocking**, so the robot finishes the song before moving on.
@@ -52,7 +52,7 @@ basic.forever(function () {
 
 ## What happens
 
-1. `greet()` initializes the robot and stands it up.
+1. `greet()` makes the robot say its name — and because it's the first `robotPuPro.*` call, it also triggers the one-time startup (stand → calibrate).
 2. `setDanceSpeed(6)` makes the dance fast and energetic.
 3. The first `basic.forever` composes an 8-bar disco loop, sings it three times, then composes a cute-style loop, sings it three times, and repeats forever.
 4. The second `basic.forever` keeps calling `dance()` so the robot moves to the beat.

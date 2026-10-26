@@ -21,7 +21,7 @@ Key idea:
 
 In the code below, the “remote control core” is:
 
-- `robotPuPro.connectToGamepad()` (forwards string commands like `#putHello!`, `#punName` and key/value commands like `#puturn`, `#puspeed`)
+- `robotPuPro.connectToGamepad()` (forwards string commands like `#putHello!` (speak), `#pun<sn>` (set the robot's serial number, then greet) and key/value commands like `#puturn`, `#puspeed`)
 - `robotPuPro.setChannel(166)` (pairing channel)
 
 If you delete everything else and keep only those pieces, you are back to the minimal receiver.

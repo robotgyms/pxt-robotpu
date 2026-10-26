@@ -24,7 +24,7 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 
 Odometry estimates where the robot is by accumulating small motion updates.
 
-Robot PU already includes odometry in `robotpu.ts`. The public MakeCode blocks use the internal `RobotPUOdometry` class, so this tutorial reads the built-in pose instead of calculating a separate dead-reckoning model in the tutorial code.
+Robot PU already includes odometry in `robotpu.ts`. The public MakeCode blocks use the internal `Odometry` class, so this tutorial reads the built-in pose instead of calculating a separate dead-reckoning model in the tutorial code. `Odometry` is internal to the extension — in user code you access it through `robotPuPro.locationArray()`, `robotPuPro.resetOdom()`, and `robotPuPro.stepCount()`.
 
 ---
 
@@ -39,15 +39,15 @@ The `x` and `y` values are in millimeters. The `theta` value is in degrees.
 
 ---
 
-## How `RobotPUOdometry` works
+## How `Odometry` works
 
 In `robotpu.ts`, each `RobotPu` owns one odometry object:
 
 ```typescript
-this.odom = new RobotPUOdometry(25.0)
+this.odom = new Odometry(25.0)
 ```
 
-`RobotPUOdometry` stores the robot pose as a 3x3 SE(2) transformation matrix. Each walking step updates that matrix:
+`Odometry` stores the robot pose as a 3x3 SE(2) transformation matrix. Each walking step updates that matrix:
 
 - **Left support step**: `leftStep(yawAngleDeg)`
 - **Right support step**: `rightStep(yawAngleDeg)`
@@ -64,7 +64,7 @@ this.odom = new RobotPUOdometry(25.0)
 Robot PU is a biped robot with two leg yaw axes about `50 mm` apart. The odometry model uses half of that distance:
 
 ```typescript
-this.odom = new RobotPUOdometry(25.0)
+this.odom = new Odometry(25.0)
 ```
 
 So the support pivots are:
@@ -89,7 +89,7 @@ let yMm = T[1][2]
 let thetaDeg = Math.atan2(T[1][0], T[0][0]) * 180 / Math.PI
 ```
 
-This is exactly what `RobotPUOdometry.getPosition()` does before `robotPuPro.locationArray()` returns `[x, y, theta]`.
+This is exactly what `Odometry.getPosition()` does before `robotPuPro.locationArray()` returns `[x, y, theta]`.
 
 ---
 
@@ -180,10 +180,10 @@ This is why odometry needs the full transformation matrix. Tracking only heading
 ## MakeCode blocks used
 
 - **`set channel to 166`**
-- **`robot location array`**
+- **`robot position`**
 - **`serial write line`**
 
-The `robot location array` block returns:
+The `robot position` block returns:
 
 - **Index 0**: `x` in millimeters
 - **Index 1**: `y` in millimeters
@@ -197,7 +197,7 @@ The `robot location array` block returns:
 - **Open serial output**: Watch `x`, `y`, and `theta`.
 - **Move the robot**: Use radio remote commands or walking blocks so the gait steps complete.
 - **Watch pose drift**: The pose should change as walking steps update odometry.
-- **Reset odometry**: Use the `reset robot location` block when you want the pose to return to `(0, 0, 0)`.
+- **Reset odometry**: Use the `reset robot position` block when you want the pose to return to `(0, 0, 0)`.
 
 ---
 

@@ -57,7 +57,7 @@ This starts walking forward and stops after **10 completions**. A completion is 
 
 > **Tip:** `walk` means walk **forward**.
 
-> **Careful with `steps` on sound/animation tokens:** `laugh`, `cry`, `scream`, `funny`, `greet`, `blink`, and `stop` don't have a "gait cycle" — internally they always report "done" on every call. That means `steps` controls **how many times in a row** they repeat, not a gait boundary count. Use `steps = 1` to trigger them once:
+> **Careful with `steps` on sound/animation tokens:** `laugh`, `cry`, `scream`, `funny`, `greet`, and `blink` don't have a "gait cycle" — internally they always report "done" on every call. That means `steps` controls **how many times in a row** they repeat, not a gait boundary count. Use `steps = 1` to trigger them once:
 > ```typescript
 > robotPuPro.start(robotPuPro.Action.Laugh, 1)   // laughs once
 > robotPuPro.start(robotPuPro.Action.Laugh, 3)   // laughs 3 times in a row
@@ -105,7 +105,7 @@ Inside the loop you also can:
 - Call other **sound/sensor-only** functions for multitasking (eg. `laugh()`, `talk()`, reading sensors) — safe, as long as they don't touch the servos.
 - Call `stop()` to cancel the action you are waiting for, eg. on a button press.
 
-Avoid calling another **servo-driving** function (like `dance()`, `kick()`, or another `start(...)`) while waiting — it will fight the current action for control of the same servos.
+Avoid calling another **servo-driving** function (like `dance()`, `kick()`, `walk()`, or `servo()`) while waiting — those direct calls put the robot into `API` mode, which **cancels** the counted action entirely: the wait loop stalls because `isDone(...)` never returns `true`. (A second `start(...)` also cancels the wait — it replaces the action being counted.)
 
 ```typescript
 robotPuPro.start(robotPuPro.Action.Walk, 20)
@@ -114,7 +114,7 @@ while (!robotPuPro.isDone(robotPuPro.Action.Walk)) {
     // Do other things here
     robotPuPro.laugh() // Good: laugh() only plays sound, it never touches the servos.
     basic.pause(1000)
-    robotPuPro.dance() // Bad: dance() drives the same servos as walk(), so they fight over servo controls.
+    robotPuPro.dance() // Bad: dance() switches the robot to API mode, cancelling the counted walk — isDone(Walk) never returns true and the loop stalls.
     if (input.buttonIsPressed(Button.A)) { // Press button A to stop the walk action.
         robotPuPro.stop()
         break
@@ -355,6 +355,6 @@ Because each `start(action, 1)` / `isDone(...)` pair behaves like a single, comp
 
 - `start(...)` is **non-blocking**. The robot runs the action in the background.
 - `0` (or less) steps means **run forever** until `stop()` or another `start(...)`.
-- `isDone(action)` is `true` when that action has finished **or was stopped**.
+- `isDone(action)` is `true` only when that action **finished on its own**. After `stop()`, `isDone(stoppedAction)` returns `false` — only `isDone(robotPuPro.Action.Rest)` reports done.
 - The `steps` count counts **completion events** (`0` returns from the gait engine), which may be more or fewer than physical steps.
 - `stop()` resets the robot to the `rest` pose.

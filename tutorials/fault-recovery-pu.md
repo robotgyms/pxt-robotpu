@@ -41,8 +41,8 @@ function recover() {
     basic.pause(400)
 
     const dir = Math.randomRange(0, 1)
-    if (dir == 0) robotPuPro.sideStep(-1)
-    else robotPuPro.sideStep(1)
+    if (dir == 0) robotPuPro.sideStep(1)
+    else robotPuPro.sideStep(-1)
     basic.pause(350)
 }
 

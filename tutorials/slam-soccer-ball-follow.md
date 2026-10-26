@@ -14,7 +14,7 @@ By the end of this tutorial, Robot PU will:
 
 - **Enable the Smart Hat camera services**: Image capture and soccer ball detection are turned on over I2C.
 - **Read ball detections**: Each packet reports object type, detection status, ball position, box size, yaw error, and pitch error.
-- **Move the head toward the ball**: The head yaw and pitch servos use the camera error to keep the ball centered.
+- **Tilt the head toward the ball**: The head pitch servo (via `setServoTrim`) uses the camera pitch error to keep the ball in view.
 - **Walk toward the ball**: The robot walks forward based on ball distance and turns based on camera yaw error.
 - **Search when the ball is lost**: The head scans a small pattern until the camera sees the ball again.
 - **Talk while playing**: Robot PU says short soccer phrases when it finds the ball, loses the ball, searches, and chases.
@@ -93,35 +93,36 @@ The main loop reads one packet from the Smart Hat every `20 ms` with `robotPuPro
 If the packet contains a soccer ball and `count > 0`, `trackBall` does three things.
 
 - **Remember the last detection time**: `lastBallSeenTime` is updated so the robot knows the ball was recently visible.
-- **Center the camera**: The head yaw and pitch targets are adjusted from the camera yaw and pitch errors.
+- **Smooth the camera errors**: `yaw` and `pitch` are updated as moving averages (`yaw = (yaw + i8(p[16])) * 0.5`) so single noisy packets do not jerk the robot around.
 - **Walk toward the ball**: The robot walks forward using the measured ball distance and turns using the yaw error.
 
 The forward speed is computed from the ball distance:
 
 ```typescript
-walkSpeed = Math.max(-3, Math.min(3, (y_mm - 100) * 0.015))
+walkSpeed = Math.max(-6, Math.min(6, (y_mm - 150) * 0.2))
 ```
 
-Here, `y_mm` is the forward distance to the ball. The `-100` offset tells the robot to slow down when the ball is about `100 mm` away. The `Math.max` and `Math.min` calls clamp the speed to the safe range `-3..3`.
+Here, `y_mm` is the forward distance to the ball. The `-150` offset makes the speed cross zero when the ball is about `150 mm` away, so the robot slows down and stops just short of the ball. The `Math.max` and `Math.min` calls clamp the speed to the safe range `-6..6`.
 
 The turn command is smoothed:
 
 ```typescript
-walkTurn = Math.max(-0.7, Math.min(0.7, (walkTurn * 4 + yaw * -0.05) * 0.2))
+walkTurn = (walkTurn + Math.max(-1, Math.min(1, yaw * -0.2))) * 0.5
 ```
 
-This is a simple low-pass filter. It mixes the previous turn command with the newest yaw correction so the robot does not jerk left and right when the camera yaw error changes quickly.
+The camera yaw error is scaled by `-0.2` and clamped to `-1..1`, then averaged with the previous turn command. This low-pass behavior means the robot does not jerk left and right when the camera yaw error changes quickly.
 
 ---
 
 ## Head control
 
-The camera gives yaw and pitch errors, not absolute servo angles. The code adds a small correction to the current head target with `robotPuPro.servoStep`.
+The camera gives yaw and pitch errors, not absolute servo angles. In the validated program the two errors are handled differently:
 
-The gain `0.6` controls how aggressively the head moves toward the ball in the validated program.
+- **Pitch error → head pitch servo**: The action loop calls `robotPuPro.setServoTrim(robotPuPro.ServoJoint.HeadPitch, Math.min(maxHeadPitchAllowed, pitch))` every iteration. `maxHeadPitchAllowed` (default `40`) caps how far the head can tilt, so the camera tilts down toward a nearby ball without bottoming out.
+- **Yaw error → walk turn**: The yaw error does **not** drive the head yaw servo. It is scaled by `-0.2`, clamped, and blended into `walkTurn`, so the whole robot rotates to face the ball. Since the body follows the ball, the camera naturally stays centered.
 
-- **If the head moves too slowly**: Increase the gain slightly.
-- **If the head shakes or overshoots**: Decrease the gain.
+- **If the head tilts too far or too little**: Adjust `maxHeadPitchAllowed`.
+- **If the robot turns too sharply or too weakly**: Adjust the `yaw * -0.2` turn gain.
 - **If the camera loses the ball often**: Slow the walking speed or improve lighting.
 
 ---
@@ -174,10 +175,10 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 
 ## Tuning guide
 
-- **Forward speed**: Tune `(y_mm - 100) * 0.015` if the robot walks too fast or too slowly.
-- **Turn speed**: Tune `yaw * -0.05` if the robot turns too sharply, not enough, or in the wrong direction.
-- **Turn smoothing**: Tune `(walkTurn * 4 + yaw * -0.05) * 0.2`. More previous-turn weight makes turning smoother but slower to react.
-- **Head tracking gain**: Tune `yaw * 0.6` and `pitch * 0.6`.
+- **Forward speed**: Tune `(y_mm - 150) * 0.2` if the robot walks too fast or too slowly, and the `-6..6` clamp for the speed range.
+- **Turn speed**: Tune `yaw * -0.2` if the robot turns too sharply, not enough, or in the wrong direction.
+- **Turn smoothing**: Tune `(walkTurn + Math.max(-1, Math.min(1, yaw * -0.2))) * 0.5`. The `* 0.5` blend controls how smoothly the turn command reacts.
+- **Head pitch tracking**: Tune `Math.min(maxHeadPitchAllowed, pitch)` — raise `maxHeadPitchAllowed` to let the head tilt further.
 - **Search timing**: Tune `SCAN_WAIT_FRAMES` to make each search position shorter or longer.
 - **Lost timeout**: Tune `LOST_TIMEOUT_MS` to choose how long the robot keeps following the last known ball direction.
 - **Talk timing**: Tune the `basic.pause(5000)` in the talk loop if PU talks too often or not often enough.
@@ -190,9 +191,9 @@ For a kicking behavior, use goal packets together with ball packets to plan wher
 
 - **No I2C packets**: Check Smart Hat power, I2C wiring, the multiplexer address, and the `robotPuPro.i2cWriteNumber(MUX_ADDR, 15, ...)` setup call.
 - **Ball is not detected**: Improve lighting, move the ball into the camera view, and use a ball that matches the trained soccer-ball model.
-- **Head oscillates**: Reduce the head tracking gain from `0.6` to a smaller value.
-- **Robot turns too sharply**: Reduce the turn gain in `yaw * -0.05`.
-- **Robot walks too fast**: Reduce the forward gain in `(y_mm - 100) * 0.015`.
+- **Head tilts too far**: Lower `maxHeadPitchAllowed` in the `setServoTrim` call.
+- **Robot turns too sharply**: Reduce the turn gain in `yaw * -0.2`.
+- **Robot walks too fast**: Reduce the forward gain in `(y_mm - 150) * 0.2`.
 - **Robot loses the ball while walking**: Slow the robot down, increase `LOST_TIMEOUT_MS`, or make the search pattern wider.
 - **PU talks too much**: Increase the `5000 ms` pause in the talk loop or remove the looping chatter and keep only the found/lost state-change phrases.
 

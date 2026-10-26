@@ -93,7 +93,7 @@
  1. **Enter trim mode**
     - Press the micro:bit **logo button on Robot PU’s head** (not the gamepad).
     - PU moves into a calibration stand pose so the foot heels can be aligned.
-    - While in trim mode, normal actions pause until you exit — PU won’t walk or dance.
+    - In trim mode only the `#puB` gamepad buttons are remapped to trim controls — other commands still work, so don't push the joystick: `#puspeed`/`#puturn` will still switch PU into Drive and walk.
  2. **Select which servo to trim**
     - Press gamepad `B2` to move to the next servo.
     - Press gamepad `B3` to move to the previous servo.

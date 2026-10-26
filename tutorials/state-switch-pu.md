@@ -6,7 +6,7 @@ For Robot PU, examples of actions are:
 - standing still — `Rest`
 - exploring the room with autopilot — `Explore`
 - dancing — `Dance`
-- walking with the gamepad — `Walk`
+- driving with the gamepad — `Drive`
 
 In MakeCode, `robotPuPro.start(action, steps)` begins an action, and `robotPuPro.stop()` returns the robot to rest. If `steps` is `0` (or less), the action runs until you start another one or call `stop()`.
 

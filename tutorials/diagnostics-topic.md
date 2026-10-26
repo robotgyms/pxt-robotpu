@@ -46,7 +46,9 @@ You can also publish periodic numeric diagnostics:
 ## Example: diagnostics publisher
 
 ```typescript
-radio.setGroup(42)
+// The first robotPuPro.* call resets the radio group to the robot's
+// own channel, so set the group through the extension instead.
+robotPuPro.setChannel(42)
 
 let heartbeat = 0
 
@@ -54,7 +56,10 @@ basic.forever(function () {
     let d = robotPuPro.sonarDistanceCm()
     let h = input.compassHeading()
 
-    if (d < 0) {
+    // sonarDistanceCm() is smoothed and clamped to 2..400 cm, so it can
+    // never be negative. A reading at the 400 ceiling means "nothing in
+    // range" — report it as suspicious rather than a hard failure.
+    if (d >= 400) {
         radio.sendString("diag,err,sonar")
     } else if (d < 10) {
         radio.sendString("diag,warn,sonar")

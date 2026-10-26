@@ -1715,8 +1715,8 @@ namespace robotPuPro {
                 [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
                 [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
                 [Action.Skate]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.skateItr(); },
-                [Action.SideStepLeft]: () => this.sideStep(1),
-                [Action.SideStepRight]: () => this.sideStep(-1),
+                [Action.SideStepLeft]: () => this.sideStep(-1),
+                [Action.SideStepRight]: () => this.sideStep(1),
                 [Action.Sit]: () => this.sit(),
                 [Action.Stand]: () => this.stand(),
                 [Action.Laugh]: () => { this.laugh(); return 0; },
@@ -1847,10 +1847,9 @@ namespace robotPuPro {
                 this.pcb.servoStep(90 + this.headPitchBias, 1, 5);
 
                 // 2. If the turn stick is pushed far left/right while standing, side-step
-                // walkDirection uses the gait convention (negative = left) while sideStep()
-                // takes positive = left, so the sign must be flipped here.
+                // (walkDirection and sideStep share the same convention: negative = left)
                 if (Math.abs(this.walkDirection) > 0.9) {
-                    return this.sideStep(-this.walkDirection);
+                    return this.sideStep(this.walkDirection);
                 }
 
                 // Otherwise, stay in idle stance
@@ -1865,12 +1864,12 @@ namespace robotPuPro {
 
         /**
          * Executes a side-stepping (lateral) movement using specific state indices.
-         * @param di Directional bias: positive for left, negative for right.
+         * @param di Directional bias: negative for left, positive for right —
+         *           same convention as walk()/walkDirection (negative = left).
          */
         public sideStep(di: number): number {
             // 1. Select the gait state sequence based on direction
-            // Python: [20, 22, 0, 19] if walkDirection > 0 else [18, 21, 23, 0]
-            const sts = di > 0 ? SIDE_STEP_LEFT : SIDE_STEP_RIGHT;
+            const sts = di < 0 ? SIDE_STEP_LEFT : SIDE_STEP_RIGHT;
 
             // 2. Reset the Control Vector to neutral
             // This clears any persistent tilt or pitch offsets
@@ -1879,7 +1878,8 @@ namespace robotPuPro {
             this.setControlOffsets(SYNC_BODY_JOINTS, z);
 
             // 3. Calculate movement speed based on forward speed multiplier
-            let movementSpeed = di * this.fwdSpeed;
+            // (negated: keeps the original LEFT↔+speed / RIGHT↔-speed pairing)
+            let movementSpeed = -di * this.fwdSpeed;
 
             // 4. Execute the movement via the PCB engine
             // Parameters: states, syncList (0-3), syncSpeed, asyncList (4-5), asyncSpeed

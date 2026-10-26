@@ -39,10 +39,14 @@ function turnToDir(dir: number) {
         const err = angleDiffDeg(target, h)
         if (Math.abs(err) < 15) return
 
-        if (err > 0) robotPuPro.sideStep(-1)  // target right → step right (-1)
-        else robotPuPro.sideStep(1)           // target left → step left (+1)
+        // NOTE: sideStep() translates laterally — it does NOT rotate the body.
+        // Turning needs the walking gait: walk(speed, turn) arcs forward while
+        // steering (turn: -1 = left, +1 = right). A small speed keeps the arc tight.
+        // err > 0 means the target heading is clockwise → turn right (+1).
+        robotPuPro.walk(1.2, err > 0 ? 1 : -1)
         basic.pause(80)
     }
+    robotPuPro.rest()
 }
 
 basic.forever(function () {

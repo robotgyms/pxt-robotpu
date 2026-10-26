@@ -614,7 +614,7 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 
 - **Block**: `side step %direction`
 - **Parameters**:
-  - `direction`: `-1 .. 1` (negative = right, positive = left)
+  - `direction`: `-1 .. 1` (negative = left, positive = right)
 - **What it does**: Performs a sideways step.
 
 #### `dance(): void`

@@ -130,12 +130,15 @@ const rel_O = [obj_O[0] - pose_now_O[0], obj_O[1] - pose_now_O[1]]
 const rel_now = rot(-pose_now_O[2], rel_O[0], rel_O[1])
 ```
 
-Before testing, verify the units returned by `robotPuPro.locationArray()` in your firmware. This code assumes:
+`robotPuPro.locationArray()` returns **`[x_mm, y_mm, theta_deg]`** — position in **millimeters** and heading in **degrees**. The map math in this tutorial works in **meters and radians**, so `getPoseO()` converts the raw odometry before returning it:
 
-- **`x` and `y`**: meters.
-- **`theta`**: radians.
-
-If your odometry returns millimeters and degrees, convert inside `getPoseO()`.
+```typescript
+function getPoseO(): number[] {
+    // locationArray(): [x_mm, y_mm, theta_deg] — millimeters + degrees.
+    const loc = robotPuPro.locationArray()
+    return [loc[0] / 1000, loc[1] / 1000, loc[2] * Math.PI / 180]
+}
+```
 
 ---
 
@@ -179,7 +182,7 @@ This is the key idea of the tutorial: **turn continuous camera detections into d
 - **Start with debug enabled**: Keep `DEBUG_FLAG = true` so serial output shows detected positions.
 - **Verify I2C packets**: If you see `i2c read error`, check Smart Hat power, I2C wiring, and the multiplexer setup.
 - **Check detection coordinates**: Move the ball left/right and forward/back while watching `ball x` and `ball y`.
-- **Check odometry units**: Print `robotPuPro.locationArray()` and confirm whether it is meters/radians or millimeters/degrees.
+- **Check odometry units**: Print `robotPuPro.locationArray()` — it returns millimeters and degrees; `getPoseO()` converts them to meters and radians for the grid math.
 - **Check grid bounds**: If objects are not marked, they may be outside the `0.5 m x 0.5 m` local map.
 - **Tune resolution**: Increase `GRID_N` or `GRID_RES_M` if the map is too small.
 - **Tune turning**: If the robot turns the wrong way, flip the sign of `TURN_GAIN`.
@@ -222,6 +225,8 @@ This is the key idea of the tutorial: **turn continuous camera detections into d
  * Inputs:
  * 1) Odometry pose in odometry frame:
  *    - (x, y, theta)_robot^O(t): robot pose at time t in {O}.
+ *    - robotPuPro.locationArray() returns [x_mm, y_mm, theta_deg] (mm + deg);
+ *      getPoseO() converts it to meters + radians before use.
  * 2) Camera detections in camera frame (metric 3D points at time t_cam, expressed in {C_cam}):
  *    - p_ball^{C_cam}(t_cam) = (x, y, z)_cam_ball
  *    - p_goal^{C_cam}(t_cam) = (x, y, z)_cam_goal
@@ -452,12 +457,12 @@ let goal_pose_O: number[] = [0, 0, 0]
 let goal_valid = false
 let goal_rx_ms = 0
 
-// return robot current pose in odometry frame
+// return robot current pose in odometry frame, in meters + radians
 function getPoseO(): number[] {
-    // locationArray(): [x, y, theta] in odometry frame (units depend on implementation; assumed meters + radians here)
-    // If your odom uses different units, scale here.
+    // locationArray(): [x_mm, y_mm, theta_deg] in odometry frame — millimeters + degrees.
+    // Convert to meters + radians for the map/grid math below.
     const loc = robotPuPro.locationArray()
-    return [loc[0], loc[1], loc[2]]
+    return [loc[0] / 1000, loc[1] / 1000, loc[2] * Math.PI / 180]
 }
 
 // Transform a 2D point measured in robot/camera-local frame at time t_cam into

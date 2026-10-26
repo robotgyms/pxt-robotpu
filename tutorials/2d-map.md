@@ -130,7 +130,7 @@ function addProb(x: number, y: number, dv: number): void {
 }
 
 function drawGrid(): void {
-    led.clear()
+    basic.clearScreen()
     for (let y = 0; y < GRID; y++) {
         for (let x = 0; x < GRID; x++) {
             let v = grid[y][x]
@@ -203,7 +203,11 @@ basic.forever(function () {
     const headingDeg = input.compassHeading()
     const yawDeg = yawAngleFromSway(t)
 
-    // Optional: actively drive the head yaw to match the scan model
+    // Optional: actively drive the head yaw to match the scan model.
+    // NOTE: while walk() is running, the gait also drives the head-yaw
+    // joint each iteration, so it will override this servo command.
+    // For a clean scan sweep, pause walking first (e.g. set
+    // commandedSpeed = 0), run the sweep, then resume walking.
     const headYawServo = clampInt(90 + yawDeg, 0, 180)
     robotPuPro.servo(robotPuPro.ServoJoint.HeadYaw, headYawServo)
 

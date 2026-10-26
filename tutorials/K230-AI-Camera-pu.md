@@ -120,11 +120,12 @@ function updateInteraction(): void {
         return
     }
 
-    // Turn to face the person (walk()'s turn is positive=left, negative=right,
-    // so we negate humanX: person to the right (humanX>0) needs a right turn)
+    // Turn to face the person (walk()'s turn is negative=left, positive=right,
+    // and humanX is +1 on the right: person to the right (humanX>0) needs a
+    // positive turn value)
     let turn = 0
-    if (humanX > DEAD_BAND) turn = clamp(-humanX * TURN_GAIN, -MAX_TURN, 0)
-    else if (humanX < -DEAD_BAND) turn = clamp(-humanX * TURN_GAIN, 0, MAX_TURN)
+    if (humanX > DEAD_BAND) turn = clamp(humanX * TURN_GAIN, 0, MAX_TURN)
+    else if (humanX < -DEAD_BAND) turn = clamp(humanX * TURN_GAIN, -MAX_TURN, 0)
 
     // A conservative “approach” speed; adjust for your robot / space
     let speed = 0

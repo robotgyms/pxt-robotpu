@@ -23,7 +23,9 @@ const d = robotPuPro.frontDistanceArray()
 // d[4] far right
 ```
 
-These bins are built from the same internal scan binning used by the autopilot code (see `robotpu.ts` around the angle-to-bin mapping near line ~1078).
+These bins are built from the same internal scan binning used by the autopilot code (see `robotpu.ts` around the angle-to-bin mapping near line ~2550).
+
+**Important:** `frontDistanceArray()` only returns the *last* values written by `robotPuPro.sonarScan()` — it does **not** take a new reading itself. Call `robotPuPro.sonarScan()` first each loop iteration, otherwise the bins stay at their initial "far" values (~500 cm) and everything will look open forever.
 
 ---
 
@@ -72,6 +74,7 @@ function movingAverage(x: number): number {
 }
 
 basic.forever(function () {
+    robotPuPro.sonarScan()   // take a fresh reading before reading the bins
     const d = robotPuPro.frontDistanceArray()
     const frontRaw = d[2]
     const frontFiltered = movingAverage(frontRaw)
@@ -98,6 +101,7 @@ function ema(prev: number, x: number, a: number): number {
 }
 
 basic.forever(function () {
+    robotPuPro.sonarScan()
     const d = robotPuPro.frontDistanceArray()
     const rightRaw = d[4]
     rightFiltered = ema(rightFiltered, rightRaw, ALPHA)
@@ -120,11 +124,14 @@ function median3(a: number, b: number, c: number): number {
 }
 
 basic.forever(function () {
-    // take 3 readings (spaced slightly) and median-filter the front bin
+    // take 3 fresh readings (spaced slightly) and median-filter the front bin
+    robotPuPro.sonarScan()
     const a = robotPuPro.frontDistanceArray()[2]
     basic.pause(10)
+    robotPuPro.sonarScan()
     const b = robotPuPro.frontDistanceArray()[2]
     basic.pause(10)
+    robotPuPro.sonarScan()
     const c = robotPuPro.frontDistanceArray()[2]
 
     const frontMed = median3(a, b, c)
@@ -145,6 +152,7 @@ const ALPHA_LPF = 0.75
 const BETA = 0.55
 
 basic.forever(function () {
+    robotPuPro.sonarScan()
     const raw = robotPuPro.frontDistanceArray()[2]
     frontLPF = frontLPF + (1 - ALPHA_LPF) * (raw - frontLPF)
     const blended = BETA * raw + (1 - BETA) * frontLPF
@@ -270,11 +278,11 @@ function stepForward(): void {
 }
 
 function turnRight90ish(): void {
-    driveFor(380, TURN_SPEED, -TURN_BIAS)   // negative = right
+    driveFor(380, TURN_SPEED, TURN_BIAS)   // positive = right
 }
 
 function turnLeft90ish(): void {
-    driveFor(380, TURN_SPEED, TURN_BIAS)   // positive = left
+    driveFor(380, TURN_SPEED, -TURN_BIAS)   // negative = left
 }
 
 function turnAround(): void {
@@ -284,11 +292,14 @@ function turnAround(): void {
 }
 
 function filteredBins(): number[] {
-    // sample 3 frames for median
+    // sample 3 fresh frames for median (sonarScan bins by current head yaw)
+    robotPuPro.sonarScan()
     const a = robotPuPro.frontDistanceArray()
     basic.pause(5)
+    robotPuPro.sonarScan()
     const b = robotPuPro.frontDistanceArray()
     basic.pause(5)
+    robotPuPro.sonarScan()
     const c = robotPuPro.frontDistanceArray()
 
     const out: number[] = [0, 0, 0, 0, 0]

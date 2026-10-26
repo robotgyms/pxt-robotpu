@@ -71,7 +71,7 @@
  2. **Thinking**: compute how much to tilt/offset the legs and body to stay balanced
  3. **Action**: apply those offsets as “control vectors” to the servo targets
  
- Then it calls the lower-level gait engine (`wk.move(...)`) to advance the motion state.
+ Then it calls the lower-level gait engine (`this.pcb.move(...)`) to advance the motion state.
  
  ---
  
@@ -105,7 +105,7 @@
  - clamp the correction (`maxRollCtrl`) so it cannot over-correct
  - slow down when tilt is large (safety + stability)
  
- The output of “thinking” is a set of **control signals** written into `pr.servoCtrl[...]`.
+ The output of “thinking” is a set of **control signals** written into `this.pcb.servoCtrl[...]` (the servo control offsets live on the PCB object, not on `pr`/`Parameters`).
  
  That control vector is then combined with the current gait pose targets.
  
@@ -116,7 +116,7 @@
  The action step is:
  
  - apply the computed `servoCtrl` offsets
- - call `wk.move(...)` to take one small step toward the current pose
+ - call `this.pcb.move(...)` to take one small step toward the current pose
  
  That’s why motion actions are designed to be called repeatedly: each call is one iteration of the feedback + motion update.
  

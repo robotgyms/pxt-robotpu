@@ -132,7 +132,7 @@ function testVoice() {
 function testReturnValues() {
     robotPuPro.stop()
     robotPuPro.walk(2, 0);        basic.showNumber(1); basic.pause(200)
-    robotPuPro.sideStep(-1);      basic.showNumber(1); basic.pause(200)
+    robotPuPro.sideStep(1);      basic.showNumber(1); basic.pause(200)
     robotPuPro.explore();         basic.showNumber(1); basic.pause(200)
     robotPuPro.stand();           basic.showNumber(1); basic.pause(200)
     robotPuPro.sit();             basic.showNumber(1); basic.pause(200)
@@ -178,9 +178,9 @@ function testWalk() {
  * Pass: visible sideways motion, no crash.
  */
 function testSideStep() {
-    for (let i = 0; i < 100; i++) { robotPuPro.sideStep(-1) }
-    basic.pause(200)
     for (let i = 0; i < 100; i++) { robotPuPro.sideStep(1) }
+    basic.pause(200)
+    for (let i = 0; i < 100; i++) { robotPuPro.sideStep(-1) }
 }
 
 /**
@@ -306,7 +306,7 @@ function testActionDone() {
     basic.showNumber(1); basic.pause(200)
     robotPuPro.isDone(robotPuPro.Action.Explore)
     basic.showNumber(1); basic.pause(200)
-    robotPuPro.sideStep(-1)
+    robotPuPro.sideStep(1)
     basic.showNumber(1); basic.pause(200)
     robotPuPro.isDone(robotPuPro.Action.Dance)
     basic.showNumber(1); basic.pause(200)
