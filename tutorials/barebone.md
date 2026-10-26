@@ -1,5 +1,5 @@
 
-# 📡 Robot PU: Barebones Radio Receiver
+# 📡 Robot PU: Barebones Program for Control
 
 This is the smallest possible starting point for letting **Robot PU** receive commands over **micro:bit radio**.
 
@@ -13,7 +13,9 @@ You will program PU’s micro:bit to:
 - Set your own radio channel for the robot and gamepad so only your devices talk to each other.
 - Give your Robot PU its own name.
 
-When it works: **tilt the joystick and PU walks; press gamepad button B4 and PU kicks.**
+When it works: **tilt the joystick and PU walks; press gamepad button B2 and PU Jumps.**
+
+> 🎁 **Open box and play**: Robot PU ships from the factory with this exact barebones program already installed on the default channel `166`. If you just unboxed your robot, skip Steps 1–2 — power on the robot, set up the gamepad (Step 3), and start driving. This tutorial shows how to *rebuild or customize* that factory program yourself.
 
 ---
 
