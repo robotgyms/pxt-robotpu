@@ -11,7 +11,7 @@ This lesson explains how Robot PU moves using multiple servos, why it uses an **
 2. Why Robot PU drives servos over **I2C** instead of directly from the micro:bit pins.
 3. I2C basics (SDA/SCL, addresses, reads/writes).
 4. How to program I2C in MakeCode Static TypeScript.
-5. How the internal `WK` class coordinates:
+5. How the internal `PCB` class coordinates:
    1. Progressive servo moves (step-by-step) to control speed.
    2. Moving multiple servos at the same time.
    3. Detecting when a motion is complete.
@@ -243,8 +243,8 @@ Inside the extension, Robot PU treats its servos as 10 channels (indices `0..9`)
 5. `4`: head yaw (turn left/right)
 6. `5`: head pitch (look up/down)
 7. `6`: left shoulder
-8. `7`: left arm
-9. `8`: right shoulder
+8. `7`: right shoulder
+9. `8`: left arm
 10. `9`: right arm
 
 This is also why many gaits treat:
@@ -256,8 +256,8 @@ This is also why many gaits treat:
 | Robot Position | Left Foot | Left Leg | Right Foot | Right Leg | Neck (Yaw) | Head (Pitch) | Notes |
 |---|---:|---:|---:|---:|---:|---:|---|
 | Stand | 90 | 90 | 90 | 90 | 90 | 90 | Robot Stands Straight |
-| Jump | 130 | 90 | 50 | 90 | 90 | 30 | Robot Jumps with Feet, head raised |
-| Duck | 0 | 85 | 180 | 95 | 90 | 90 | Robot squats down, with feet folded |
+| Jump | 130 | 90 | 50 | 90 | 90 | 55 | Robot Jumps with Feet, head raised (state 24; the jump sequence then hits state 14 with head pitch 90) |
+| Duck | 10 | 150 | 170 | 30 | 40 | 125 | Robot squats down, with feet folded (state 1; state 15 `[0, 85, 180, 95, 90, 90]` is the sit pose) |
 | Calibrate | 90 | 60 | 90 | 120 | 90 | 90 | Robot calibrates by putting heels aligned |
 | Side Move 1 | 75 | 90 | 30 | 90 | 135 | 105 | Robot tiptoes to left |
 | Side Move 2 | 150 | 90 | 105 | 90 | 45 | 105 | Robot tiptoes to right |
@@ -387,7 +387,7 @@ basic.showString("OK")
 Notes:
 
 - Different I2C chips have different register maps; the above shows the *pattern*, not Robot PU’s internal protocol.
-- In Robot PU, `WK` uses `robotPuPro.i2cWriteBuffer(...)` to send 4-byte packets.
+- In Robot PU, the internal `PCB` class uses `i2cWriteBuffer(...)` to send 4-byte packets.
 - A separate write followed by a read is serialized per call but is *not* atomic — another fiber's I2C traffic can interpose between them. Use `robotPuPro.i2cTransaction(addr, txBuf, rxLen, true)` when the pair must not be split.
 
 ---
@@ -406,10 +406,10 @@ On the micro:bit edge connector these are typically:
 
 Each I2C device has an **address** (usually shown as 7-bit hex like `0x10`, `0x68`, `0x3C`).
 
-Robot PU’s controller address is represented in the extension by the `WK` class field:
+Robot PU’s controller address is represented in the extension by the internal `PCB` class field (extension internals — shown for understanding, not user-facing API):
 
 ```javascript
-// Inside WK
+// Inside the internal PCB class (namespace robotPuPro)
 this.i2cAddress = 16 // decimal == 0x10 hex
 
 ```
@@ -443,13 +443,15 @@ That is the same pattern Robot PU uses internally: build a 4-byte packet and sen
 
 ---
 
-## 5) The `WK` class: how Robot PU actually drives motion
+## 5) The `PCB` class: how Robot PU actually drives motion
 
-`WK` is the internal “hardware link” that sends motor/servo/light commands over I2C.
+`PCB` is the internal “hardware link” that sends motor/servo/light commands over I2C.
 
-### 5.1 Immediate servo command (`WK.servo`)
+> ⚠️ **Extension internals.** `PCB`, `Parameters`, and `Odometry` live inside `namespace robotPuPro` and are not part of the public API — `new PCB()` / `new Parameters()` will not compile in a MakeCode user project. The snippets in sections 5 and 7 are simplified extracts of the extension's own code, shown **for understanding the driver**. From your own code, use the public wrappers (`robotPuPro.servo`, `robotPuPro.servoStep`, `robotPuPro.servoStepStatus`, `robotPuPro.moveServos`), which reach the same internals through the singleton robot instance.
 
-`WK.servo(sr, a)` sets a single servo channel to an angle.
+### 5.1 Immediate servo command (`PCB.servo`)
+
+`PCB.servo(sr, a)` sets a single servo channel to an angle.
 
 Key ideas:
 
@@ -460,7 +462,7 @@ Key ideas:
 Conceptually:
 
 ```javascript
-// Simplified idea (matches the pattern in WK)
+// Simplified idea (matches the pattern in PCB)
 let reg = servoIndex + 3
 let packet = pins.createBuffer(4)
 packet.setNumber(NumberFormat.UInt8LE, 0, reg)
@@ -471,7 +473,7 @@ robotPuPro.i2cWriteBuffer(0x10, packet)
 
 ```
 
-### 5.2 Progressive servo movement (`WK.servoStep`) — controlling speed
+### 5.2 Progressive servo movement (`PCB.servoStep`) — controlling speed
 
 If you jump from angle `20` to `160` in one call, the movement can look “snappy” and can shake the robot.
 
@@ -481,7 +483,7 @@ Robot PU instead uses **stepping**:
 2. Move only a small amount each update (the “step size”).
 3. Repeat every tick until the error is small.
 
-In the real code, the current target per servo is stored in `Parameters.servoTarget[idx]` and updated gradually.
+In the real code, the current target per servo is stored in `this.pcb.servoTarget[idx]` (an array on the `PCB` instance, along with `servoErr`, `servoTrim`, and `servoCtrl`) and updated gradually. `Parameters` only holds the pose tables (`stateTargets`) and speed profiles.
 
 This is how Robot PU controls motion “speed” without relying on delays. Smaller steps = slower, smoother motion.
 
@@ -585,7 +587,7 @@ basic.forever(function () {
 
 Walking is a coordinated pose. Robot PU updates multiple servos during each update cycle.
 
-In `WK.move(...)`, two groups are supported:
+In `PCB.move(...)`, two groups are supported:
 
 1. `sync_list`: servos that must reach the pose together.
 2. `async_list`: servos that can move with a different speed (for style or balance).
@@ -598,12 +600,12 @@ This “many small steps per tick” approach is how PU moves multiple joints sm
 
 Robot PU needs to know when it has reached a pose so it can advance to the next pose in a sequence.
 
-Inside `WK`:
+Inside `PCB`:
 
-1. Each `servoStep` updates `Parameters.servoErr[idx]`.
-2. `isServoIdle(servoList, p)` checks if each servo’s error is “close enough” (currently `< 1`).
+1. Each `servoStep` updates `this.servoErr[idx]` (an array on the `PCB` instance).
+2. `isServoIdle(servoList)` checks if each servo’s error is “close enough” (currently `< 1`).
 
-When `isServoIdle(sync_list, p)` becomes true, `WK.move(...)` advances to the next state and increments `numSteps`.
+When `isServoIdle(syncList)` becomes true, `PCB.move(...)` advances to the next state and increments `numSteps`.
 
 This gives you a clean *“pose completed”* signal without needing a physical position sensor on the servo.
 
@@ -645,7 +647,7 @@ Program behavior:
 
 These are the two poses we’ll use (from the `Parameters.stateTargets` table in the code):
 
-1. Stand pose (index `0`): `[90, 90, 90, 90, 90, 80]`
+1. Stand pose (index `0`): `[90, 90, 90, 90, 90, 90]`
 2. Duck/crouch pose (index `1`): `[10, 150, 170, 30, 40, 125]`
 
 Servo index order is:
@@ -657,36 +659,41 @@ Servo index order is:
 5. `4` head yaw
 6. `5` head pitch
 
-### 7.3 Instant movement (snappy) using `WK.servo`
+### 7.3 Instant movement (snappy) using `PCB.servo`
 
 This sends the final angles directly. It’s immediate, but can look “snappy” and can shake the robot.
 
-```javascript
-let wk = new WK()
+> ⚠️ **Extension internals — for understanding, not runnable in MakeCode.** `PCB`/`Parameters` are internal classes inside `namespace robotPuPro`, so `new PCB()` does not compile in a user project. The snippets below show what the extension does internally. The user-facing equivalent is `robotPuPro.servo(joint, angle)` per joint (see `Stand()`/`Yoga()` in 7.6).
 
-let stand = [90, 90, 90, 90, 90, 80]
+```javascript
+// Inside the extension: RobotPu owns one PCB instance as this.pcb
+let pcb = new PCB()
+
+let stand = [90, 90, 90, 90, 90, 90]
 let duck = [10, 150, 170, 30, 40, 125]
 
 // Jump straight to stand, pause, then jump straight to duck
-for (let i = 0; i < 6; i++) wk.servo(i, stand[i])
+for (let i = 0; i < 6; i++) pcb.servo(i, stand[i])
 basic.pause(2000)
-for (let i = 0; i < 6; i++) wk.servo(i, duck[i])
+for (let i = 0; i < 6; i++) pcb.servo(i, duck[i])
 
 ```
 
-### 7.4 Progressive movement (smooth) using `WK.servoStep`
+### 7.4 Progressive movement (smooth) using `PCB.servoStep`
 
-`servoStep(target, sp, idx, pr)` moves one servo a small amount per update:
+`servoStep(target, sp, idx)` moves one servo a small amount per update:
 
 1. The **step size** `sp` controls speed.
 2. Call it repeatedly inside a loop.
-3. Use `wk.isServoIdle(...)` to know when you’ve arrived.
+3. Use `pcb.isServoIdle(servoList)` to know when you’ve arrived.
 
 ```javascript
+// Extension internals — for understanding, not runnable in MakeCode.
+// The public-API equivalent is robotPuPro.servoStep / servoStepStatus.
 let pr = new Parameters()
-let wk = new WK()
+let pcb = new PCB()
 
-let stand = [90, 90, 90, 90, 90, 80]
+let stand = [90, 90, 90, 90, 90, 90]
 let duck = [10, 150, 170, 30, 40, 125]
 let all = [0, 1, 2, 3, 4, 5]
 
@@ -695,27 +702,28 @@ let stepSize = 2 // smaller = slower/smoother, larger = faster
 
 basic.forever(function () {
     for (let i of all) {
-        wk.servoStep(target[i], stepSize, i, pr)
+        pcb.servoStep(target[i], stepSize, i)
     }
 
-    if (wk.isServoIdle(all, pr)) {
+    if (pcb.isServoIdle(all)) {
         // Swap targets to compare the effect back-and-forth
         target = (target == duck) ? stand : duck
         basic.pause(500)
     }
 
-    basic.pause(5)
+    basic.pause(10)
 })
 
 ```
 
-### 7.5 Free-fall behavior using `WK.move` (pose indices from `Parameters`)
+### 7.5 Free-fall behavior using `PCB.move` (pose indices from `Parameters`)
 
-This version uses the pose indices directly (`0` for stand, `1` for duck), and relies on `WK.move(...)` to drive all servos together (with stepping + completion detection internally).
+This version uses the pose indices directly (`0` for stand, `1` for duck), and relies on `PCB.move(...)` to drive all servos together (with stepping + completion detection internally).
 
 ```javascript
+// Extension internals — for understanding, not runnable in MakeCode.
 let pr = new Parameters()
-let wk = new WK()
+let pcb = new PCB()
 
 let allServos = [0, 1, 2, 3, 4, 5]
 let POSE_STAND = 0
@@ -740,9 +748,9 @@ basic.forever(function () {
     }
 
     // Drive the selected pose (one-state sequence)
-    wk.move(pr, [pose], allServos, 2.0, [], 0.5)
+    pcb.move(pr, [pose], allServos, 2.0, [], 0.5)
 
-    basic.pause(5)
+    basic.pause(10)
 })
 ```
 
@@ -758,7 +766,7 @@ You’ll typically combine 3 APIs:
    - Moves the joint gradually toward `targetAngle`.
    - Smaller `speed` values produce slower / smoother motion.
 3. **`robotPuPro.servoStepStatus(joint, targetAngle, speed)`**
-   - Returns `0` when the joint has reached the target, otherwise non‑zero.
+   - Returns the remaining error measured **before** this step is applied — so the call where the joint actually arrives still returns the last non‑zero error, and `0` shows up on the **next** call.
    - Useful for building “move-until-finished” loops while you simultaneously step other joints.
 
 In the demo below:

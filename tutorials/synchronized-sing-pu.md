@@ -41,7 +41,7 @@
  - Button **A** increments channel.
  - Button **B** decrements channel.
  - **Logo** starts the singing track selected by `channel % 4`.
- - `robotPuPro.greet()` initializes Robot PU.
+ - `robotPuPro.greet()` makes Robot PU say its name — as the first `robotPuPro.*` call it also runs the one-time startup (stand → calibrate, ~4 s).
  
  ```typescript
 function track3 () {
@@ -481,8 +481,13 @@ function track2 () {
     music.playTone(247, music.beat(BeatFraction.Quarter))
     music.playTone(220, music.beat(BeatFraction.Quarter))
     music.rest(music.beat(BeatFraction.Whole))
+    started = 0
+}
+// press button A to increment the radio channel
+input.onButtonPressed(Button.A, function () {
+    robotPuPro.changeChannel(1)
 })
-// press button B to walk backward in circles
+// press button B to decrement the radio channel
 input.onButtonPressed(Button.B, function () {
     robotPuPro.changeChannel(-1)
 })
@@ -1413,6 +1418,10 @@ radio.onReceivedString(function (msg: string) {
         else if (track == 1) track2()
         else if (track == 2) track3()
         else track4()
+    } else {
+        // this handler replaces the one connectToGamepad() installed —
+        // forward everything else (#put..., #puhi...) so the gamepad still works
+        robotPuPro.runStringCommand(msg)
     }
 })
 ```
@@ -1458,6 +1467,10 @@ radio.onReceivedValue(function (name: string, value: number) {
             else if (track == 2) track3()
             else track4()
         })
+    } else {
+        // this handler replaces the one connectToGamepad() installed —
+        // forward everything else (#puspeed, #puturn, ...) so the gamepad still works
+        robotPuPro.runKeyValueCommand(name, value)
     }
 })
 ```
@@ -1498,6 +1511,10 @@ radio.onReceivedValue(function (name: string, value: number) {
     if (name == "bpm") {
         bpm = value
         music.setTempo(bpm)
+    } else {
+        // forward unhandled keys — this handler replaces the one
+        // connectToGamepad() installed (last registration wins)
+        robotPuPro.runKeyValueCommand(name, value)
     }
 })
 ```
@@ -1552,6 +1569,10 @@ let barStartAt = -1
 radio.onReceivedValue(function (name: string, value: number) {
     if (name == "barStartAt") {
         barStartAt = value
+    } else {
+        // forward unhandled keys — this handler replaces the one
+        // connectToGamepad() installed (last registration wins)
+        robotPuPro.runKeyValueCommand(name, value)
     }
 })
 
@@ -1642,9 +1663,6 @@ let startAt = -1
 let bpm = 120
 
 radio.onReceivedValue(function (name: string, value: number) {
-    // keep existing:
-    // robotPuPro.runKeyValueCommand(name, value)
-
     if (name == "bpm") {
         bpm = value
     } else if (name == "startAt") {
@@ -1665,6 +1683,10 @@ radio.onReceivedValue(function (name: string, value: number) {
             else if (track == 2) track3()
             else track4()
         })
+    } else {
+        // this handler replaces the one connectToGamepad() installed —
+        // forward everything else so the gamepad still works
+        robotPuPro.runKeyValueCommand(name, value)
     }
 })
 ```

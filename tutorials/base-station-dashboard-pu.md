@@ -87,6 +87,6 @@ radio.onReceivedString(function (msg) {
 
 ## Next steps
 
-- Receive and display `(x,y)` from `odometry-pu.md`
+- Receive and display `(x,y)` from `slam-odometry-pu.md`
 - Display safety state from `safety-watchdog-pu.md`
 - Expand to a “topic browser” using button presses

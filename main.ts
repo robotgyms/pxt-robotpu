@@ -28,10 +28,10 @@ namespace robotPuPro {
         HeadPitch = 5,
         //% block="left shoulder"
         LeftShoulder = 6,
-        //% block="left arm"
-        LeftArm = 7,
         //% block="right shoulder"
-        RightShoulder = 8,
+        RightShoulder = 7,
+        //% block="left arm"
+        LeftArm = 8,
         //% block="right arm"
         RightArm = 9
     }
@@ -421,7 +421,7 @@ namespace robotPuPro {
 
     /**
      * Move sideways.
-     * @param direction direction to step: -1 for right, 1 for left, eg: -1
+     * @param direction direction to step: -1 for left, 1 for right, eg: -1
      */
     //% blockId=robotpu_side_step block="side step %direction"
     //% subcategory="Actions"

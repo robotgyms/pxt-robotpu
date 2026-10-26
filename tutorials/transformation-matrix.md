@@ -23,7 +23,7 @@ bodyPitch = headPitch * cos(yaw) - headRoll * sin(yaw)
 bodyRoll  = headPitch * sin(yaw) + headRoll * cos(yaw)
 ```
 
-That matches your current line 905 / 908 if:
+That matches `balanceParam()` in `robotpu.ts` (~lines 2215–2222) if:
 
 ```ts
 headPitch = bd_p
@@ -46,14 +46,14 @@ Assume:
 - `X`: robot right
 - `Y`: robot forward
 - `Z`: robot up
-- [roll](cci:1://file:///home/front/Documents/pxt-robotpu/robotpu.ts:1572:4-1572:79): rotation around `Y` or `forward axis`? Actually this depends on your convention.
-- [pitch](cci:1://file:///home/front/Documents/pxt-robotpu/robotpu.ts:1573:4-1573:89): rotation around `X` or side axis.
+- `roll` (`this.rl` in `robotpu.ts` ~line 1574): rotation around `Y` or `forward axis`? Actually this depends on your convention.
+- `pitch` (`this.pth` ~line 1573): rotation around `X` or side axis.
 - `yaw`: rotation around `Z`.
 
 For common robotics convention:
 
-- [roll](cci:1://file:///home/front/Documents/pxt-robotpu/robotpu.ts:1572:4-1572:79): rotation about body `X`
-- [pitch](cci:1://file:///home/front/Documents/pxt-robotpu/robotpu.ts:1573:4-1573:89): rotation about body `Y`
+- `roll`: rotation about body `X`
+- `pitch`: rotation about body `Y`
 - `yaw`: rotation about body `Z`
 
 But micro:bit `Dimension.X/Y/Z` and your current equations appear to use a custom convention, so signs may need testing.
@@ -149,12 +149,10 @@ this.bodyPitch =
 But note: your `bd_p` already partially compensates pitch using:
 
 ```ts
-let bd_p = this.pth + (
-    this.pr.stateTargets[0][5] +
-    this.pr.servoTrim[5] -
-    this.pr.servoTarget[5]
-);
+let bd_p = this.pth + (this.pr.stateTargets[0][5] - this.pcb.servoTarget[5]);
 ```
+
+(`stateTargets` lives on `this.pr`, the `Parameters` object; `servoTarget` lives on `this.pcb`, the PCB board abstraction. `pcb.servoTarget[p]` already includes the trim and control offsets — it is written as `targets[p] + servoTrim[p] + servoCtrl[p]` — so no separate `servoTrim` term is needed here.)
 
 That means pitch compensation is already happening in degrees before the yaw rotation.
 
@@ -194,8 +192,8 @@ g_body = Ry(-pitch) * Rz(-yaw) * g_head
 This code:
 
 ```ts
-let bd_p = this.pth + (this.pr.stateTargets[0][5] + this.pr.servoTrim[5] - this.pr.servoTarget[5]);
-let servo_yaw = (this.pr.servoTarget[4] - this.pr.stateTargets[0][4] - this.pr.servoTrim[4]) * (Math.PI / 180);
+let bd_p = this.pth + (this.pr.stateTargets[0][5] - this.pcb.servoTarget[5]);
+let servo_yaw = (this.pcb.servoTarget[4] - this.pr.stateTargets[0][4]) * (Math.PI / 180);
 
 this.bodyRoll = bd_p * Math.sin(servo_yaw) + this.rl * Math.cos(servo_yaw);
 this.bodyPitch = bd_p * Math.cos(servo_yaw) - this.rl * Math.sin(servo_yaw);
@@ -235,11 +233,7 @@ Your code matches that.
 Since you already include pitch compensation here:
 
 ```ts
-let bd_p = this.pth + (
-    this.pr.stateTargets[0][5] +
-    this.pr.servoTrim[5] -
-    this.pr.servoTarget[5]
-);
+let bd_p = this.pth + (this.pr.stateTargets[0][5] - this.pcb.servoTarget[5]);
 ```
 
 you do **not** need `servo_pitch` separately in the current 2D yaw-rotation approach.

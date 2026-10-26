@@ -60,10 +60,10 @@ A **speed profile** is also a 10-element array. Each number is the maximum step 
 
 ### D. `moveServos` — the motion engine
 
-`robotPuPro.moveServos(targets, speeds, syncList, syncGain, asyncList, asyncGain)` moves all servos toward their targets simultaneously:
+`robotPuPro.moveServos(targets, speeds, syncList, syncGain, asyncList, asyncGain)` performs **one step** toward the targets per call — it does not block until the servos arrive:
 
-- **`syncList`** — servo indices that block (wait until they arrive) before returning `true`
-- **`asyncList`** — servo indices that move in the background (non-blocking)
+- **`syncList`** — servo indices whose arrival decides the return value: the call returns `true` only when every `syncList` servo is within ~1° of its target. Keep calling it in a loop to keep stepping.
+- **`asyncList`** — servo indices that are also stepped but do not affect the return value
 - **`syncGain` / `asyncGain`** — speed multipliers for each group
 
 The action engine calls this repeatedly in `basic.forever` so the servos keep stepping toward the current target gait.
@@ -197,8 +197,8 @@ Because Loop 1 runs so frequently, the servos smoothly track any change Loop 2 m
 robotPuPro.moveServos(currentGait, currentSpeed, [0, 1, 2, 3], 1, [4, 5, 6, 7, 8, 9], 1)
 ```
 
-- **Sync group** `[0, 1, 2, 3]` — foot and leg servos. The function waits for these before returning `true`.
-- **Async group** `[4, 5, 6, 7, 8, 9]` — head and arm servos. These move in the background and do not delay the loop.
+- **Sync group** `[0, 1, 2, 3]` — foot and leg servos. The call returns `true` only once all of these have arrived (each call still performs just one step).
+- **Async group** `[4, 5, 6, 7, 8, 9]` — head and arm servos. These are stepped too, but their progress does not affect the return value.
 
 This separation ensures the legs stabilize the body before the arms swing into position.
 
@@ -233,7 +233,7 @@ Even while the Kungfu sequence plays, the radio listeners registered by `connect
 ### D. Gamepad integration test
 
 - Flash the gamepad micro:bit with the official Robot PU gamepad program.
-- Press button B1 on the gamepad while Kungfu is running — Robot PU should switch to autopilot mode.
+- Press button B1 on the gamepad while Kungfu is running. ⚠️ **Caveat:** B1 starts the autopilot (explore) action via radio, but this program calls `moveServos()` every 10 ms — and every low-level servo/gait API call re-asserts API mode, so the radio-driven action is stomped almost immediately. To let autopilot take over, first stop the action-engine loop (e.g. gate `moveServos` behind a flag that a gamepad command or button toggles).
 - Press the micro:bit logo to enter trim calibration mode without stopping the Kungfu sequence.
 
 ## Next steps

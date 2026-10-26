@@ -26,13 +26,15 @@ This tutorial shows how to publish and subscribe to `/cmd_vel` using Robot PU ra
 Use two numbers: `linear,angular`.
 
 - `linear` — forward speed in percent, range `-100` to `100`
-- `angular` — turn rate in percent, range `-100` to `100`
+- `angular` — turn rate in percent, range `-100` to `100` (negative = left, positive = right, matching `robotPuPro.walk`)
 
 Example radio strings:
 
 - `cmd,50,0` — drive forward at 50%
-- `cmd,0,30` — turn left at 30%
+- `cmd,50,-30` — drive forward while turning left at 30%
 - `cmd,0,0` — stop
+
+Note: `robotPuPro.walk(0, turn)` does nothing — Robot PU has no turn-in-place via `walk()`, so turning commands always include some linear speed.
 
 ---
 
@@ -60,11 +62,11 @@ input.onButtonPressed(Button.AB, function () {
 })
 
 input.onGesture(Gesture.TiltLeft, function () {
-    angular = 30
+    angular = -30
 })
 
 input.onGesture(Gesture.TiltRight, function () {
-    angular = -30
+    angular = 30
 })
 
 basic.forever(function () {
@@ -76,7 +78,9 @@ basic.forever(function () {
 ## Example: controller subscriber
 
 ```typescript
-radio.setGroup(42)
+// The first robotPuPro.* call resets the radio group to the robot's
+// own channel, so set the group through the extension instead.
+robotPuPro.setChannel(42)
 
 let linear = 0
 let angular = 0

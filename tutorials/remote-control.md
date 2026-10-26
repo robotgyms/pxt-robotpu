@@ -97,10 +97,10 @@ Where `x` and `y` are usually normalized joystick values (often around `-1..1`).
 
 Examples:
 
-- `radio.sendValue("#puA", 1)`
-- `radio.sendValue("#puB", 1)`
-- `radio.sendValue("#puAB", 1)`
-- `radio.sendValue("#pulogo", 1)`
+- `radio.sendValue("#puB", 0)` — stop / rest (values `1`–`4` trigger explore, jump, dance, kick)
+- `radio.sendValue("#pulogo", 1)` — status announcement
+
+> ⚠️ `#puA` and `#puAB` are **not** supported — Robot PU's key/value command table only handles `#puspeed`, `#puturn`, `#puroll`, `#pupitch`, `#puB`, `#pulogo`, `#purs`, and `#puact`. Other keys are silently ignored.
 
 ### C. Strings / phrases
 

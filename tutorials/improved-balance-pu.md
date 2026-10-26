@@ -39,9 +39,20 @@
  In MakeCode, you typically won’t replace internal balancing code. Instead you can:
  
  - run the algorithm in your own program loop
- - send small “bias” corrections into Robot PU using:
-   - `robotPuPro.runKeyValueCommand("#puroll", value)`
-   - `robotPuPro.runKeyValueCommand("#pupitch", value)`
+ - apply small corrections through the servo control-offset layer:
+   - `robotPuPro.setControlOffsets(indexes, values)`
+   - `robotPuPro.incrementControlOffsets(indexes, values, gain)`
+ 
+ These offsets are added on top of gait targets (`target + trim + ctrl`) inside
+ `moveServos`. Note that the built-in stabilizer recomputes offsets for joints
+ 0–5 (legs + head) on every gait tick — user offsets there are overwritten — so
+ apply your corrections to the async arm joints (6–9), or drive your own gait
+ with `moveServos` in API mode where you own all offsets.
+ 
+ > ⚠️ **Not `#puroll`/`#pupitch`:** those radio keys only set `headYawBias`/
+ > `headPitchBias`, consumed solely by `joystick()` (Drive mode) while the robot
+ > stands still (`|walkSpeed| < 0.1`) — they lean the head, they do not correct
+ > body balance during `walk()`/`dance()`.
  
  Then keep your main behavior running (walk/dance/rest).
  
@@ -111,8 +122,10 @@
      rollOut = Math.constrain(rollOut, -MAX_OUT, MAX_OUT)
      pitchOut = Math.constrain(pitchOut, -MAX_OUT, MAX_OUT)
  
-     robotPuPro.runKeyValueCommand("#puroll", rollOut)
-     robotPuPro.runKeyValueCommand("#pupitch", pitchOut)
+     // Apply through servoCtrl offsets on the arm joints (8=left arm,
+     // 9=right arm): differential = roll correction, common-mode = pitch.
+     // Leg/head offsets (0-5) would be overwritten by the stabilizer.
+     robotPuPro.setControlOffsets([8, 9], [rollOut + pitchOut, -rollOut + pitchOut])
  }
  
  // Example usage: assist while walking on uneven ground

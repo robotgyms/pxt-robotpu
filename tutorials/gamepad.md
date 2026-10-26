@@ -75,7 +75,7 @@ pins.onPulsed(DigitalPin.P14, PulseValue.High, function () {
     radio.sendValue("#puB", 2)
 })
 input.onButtonPressed(Button.A, function () {
-    radio.sendValue("#puA", 1)
+    radio.sendValue("#puA", 1)  // NOTE: Robot PU ignores "#puA" — kept for illustration
     channel += 1
     if (channel > 255) {
         channel = 0
@@ -88,13 +88,14 @@ pins.onPulsed(DigitalPin.P15, PulseValue.High, function () {
 })
 input.onButtonPressed(Button.AB, function () {
     basic.showNumber(channel)
-    radio.sendValue("#puAB", 1)
-    radio.sendString("#pun" + name)
+    radio.sendValue("#puAB", 1)  // NOTE: Robot PU ignores "#puAB" — kept for illustration
+    radio.sendString("#pun" + name)  // sets the ROBOT's serial number, then it greets
     basic.showString(name)
     basic.showNumber(channel)
 })
 radio.onReceivedString(function (receivedString) {
-    if (receivedString == "#puack") {
+    // Robot PU replies to "#puhi<name>" with "#puc:<sn>:ACK"
+    if (receivedString.substr(0, 4) == "#puc" && receivedString.indexOf("ACK") >= 0) {
         ack_count += 1
     }
 })
@@ -176,10 +177,14 @@ This gamepad controller uses a small “protocol” based on radio keys:
 - `#puspeed` (number): forward/back speed input
 - `#pupitch` (number): current pitch angle of the controller
 - `#puroll` (number): current roll angle of the controller
-- `#puA`, `#puB`, `#puAB` (number): button events from A/B/AB
+- `#puB` (number): button events (values 0–4)
 - `#pulogo` (number): logo pressed (fallback case)
-- `#pun<name>` (string): controller name broadcast
+- `#pun<name>` (string): sets the **robot's** serial number (`sn`) — PU then greets with “My name is <sn> <name>”
 - `#put<phrase>` (string): a phrase chosen by tilting
+
+> ⚠️ `#puA` and `#puAB` (sent by the A and A+B buttons in the code above) are **not** in Robot PU's command table — the robot silently ignores them. Only `#puB`, `#puspeed`, `#puturn`, `#puroll`, `#pupitch`, `#pulogo`, `#purs`, and `#puact` are handled as key/value commands.
+
+> Robot PU acknowledges a `#puhi<name>` greeting by sending back `#puc:<sn>:ACK` (a status string), which the `radio.onReceivedString` handler above counts.
 
 On the Robot PU program, `robotPuPro.connectToGamepad()` registers both handlers for you. It is equivalent to:
 
@@ -247,4 +252,4 @@ Otherwise it sends a generic `#pulogo`.
 - **Add a safety timeout on Robot PU**
   - If no `#puturn/#puspeed` message arrives for ~500ms, stop.
 - **Add a pairing indicator**
-  - Use `#puack` to show the controller is connected to the robot.
+  - Send `#puhi<name>` and watch for the robot's `#puc:<sn>:ACK` reply to show the controller is connected.

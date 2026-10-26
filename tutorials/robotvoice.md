@@ -19,7 +19,7 @@ The key insight is:
 > **If every note belongs to the same musical scale, any combination of notes will sound harmonious.**
 
 We chose the **A-pentatonic scale** because:
-- It contains only 5 note types per octave (A, C, E, G, and their octaves).
+- It contains only 4 distinct pitch classes (A, C, E, G), repeated across octaves.
 - There are **no dissonant intervals** — every pair of notes sounds good together.
 - The **A note** (440 Hz) is widely regarded as the most neutral and pleasant pitch for human hearing (it is the international tuning reference).
 
@@ -39,7 +39,7 @@ Every printable ASCII character produces a musical event — nothing is silently
 | **Comma** | `,` | Brief dip rest (60ms) + slight contour fall |
 | **Pause** | `;` `:` | Medium rest (75ms) + neutral drift |
 | **Dash** | `-` `—` | Deliberate rest (100ms) |
-| **Apostrophe** | `'` | Tiny +1 semitone glide (30ms) — keeps contraction flow |
+| **Apostrophe** | `'` | Tiny +1 scale-index step (30ms) — keeps contraction flow |
 | **Open bracket** | `(` `[` `{` | Drop to low G3 (60ms) — parenthetical aside |
 | **Close bracket** | `)` `]` `}` | Rise back to A4 (60ms) — exit aside |
 | **Special symbols** | `@` `#` `$` `%` `&` `*` | Sharp C5 accent (55ms) — emphasis |
@@ -92,7 +92,7 @@ We use the **corpus frequency rank** (from most to least common) to assign scale
 |---------------|---------|-------------|------|-----|
 | 1–6 (most common) | E, T, A, O, I, N | 8, 8, 12, 4, 8, 6 | **A4, A4, A5, A3, A4, E4** | Most letters heard → A family |
 | 7–14 | S, H, R, D, L, C, U, M | 9, 7, 10, 9, 7, 10, 9, 7 | C5/G4/E5 | Mid-range pleasant tones |
-| 15–26 (rare) | W, F, G, Y, P, B, V, K, J, X, Q, Z | 3–6 | G3/C4/E4 | Lower, less frequent presence |
+| 15–26 (rare) | W, F, G, Y, P, B, V, K, J, X, Q, Z | 5, 6, 5, 6, 3, 5, 3, 6, 2, 3, 1, 0 | C4/E4/G3/E3/C3/A2 | Lower, less frequent presence — rarest letters (J, Q, Z) reach the lowest tones |
 
 Because **E, T, A, O, I, N** account for roughly **60% of all letters** in English text, the robot's melody will land on A notes the majority of the time — exactly as intended.
 
@@ -138,7 +138,9 @@ Different letter types have different natural durations in speech:
 | Frequent consonants | n, s, r, l, m, h | **80 ms** — medium |
 | Stop consonants | p, b, t, k, d, g | **45 ms** — short percussive pop |
 | Other consonants | f, w, y, v, ... | **65 ms** — default |
-| Space / punctuation | ` `, `.`, `!`, `?` | **90 ms rest** |
+| Space | ` ` | **90 ms rest** + drift toward neutral A4 |
+
+Punctuation does **not** use the 90 ms rest — `.`, `!`, `?`, `,`, `;`, `-`, etc. each trigger their own tone/rest pattern (see the ASCII table above). Only the space character uses `DUR_REST` (90 ms).
 
 Vowels are long because they carry the vowel sound in speech.
 Stop consonants are short because they are percussive pops with no sustained tone.
@@ -151,13 +153,13 @@ This rhythm gives the melody a natural "speech-like" cadence.
 Speaking `"Hello Robot"` produces approximately:
 
 ```
-h  → 45ms  G4  (stop consonant, mid-range)
+h  → 80ms  G4  (frequent consonant, mid-range)
 e  → 140ms A4  (vowel, A-family, contour rises)
 l  → 80ms  ~A4 (smoothed, near previous)
 l  → 80ms  ~A4 (smoothed, nearly same)
 o  → 140ms A4  (vowel, contour rises further)
    → 90ms  rest (space, contour falls, pitch drifts to A4)
-r  → 65ms  ~E5 (contour rising from A4)
+r  → 80ms  ~E5 (frequent consonant, contour rising from A4)
 o  → 140ms A5  (vowel, contour pushes to A5)
 b  → 45ms  ~A4 (stop, smoothed back)
 o  → 140ms A4  (vowel)
@@ -201,7 +203,7 @@ basic.showString(code);                 // display on LED matrix
 
 ### Detection
 
-A string is treated as morse if it contains **only** the characters `.`, `-`, `/`, and space — and has at least one `.` or `-`.
+A string is treated as morse if it contains **only** the characters `.`, `-`, `/`, space, `\n`, and `\r` — and has at least one `.` or `-`.
 Any other character (a letter, digit, etc.) causes it to be treated as normal text.
 
 ```typescript

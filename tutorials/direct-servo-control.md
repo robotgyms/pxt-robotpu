@@ -67,11 +67,11 @@ robotPuPro.start(robotPuPro.Action.API, 0)
 |------:|-------|------:|-------|
 | 0 | `LeftFoot` | 5 | `HeadPitch` |
 | 1 | `LeftLeg` | 6 | `LeftShoulder` |
-| 2 | `RightFoot` | 7 | `LeftArm` |
-| 3 | `RightLeg` | 8 | `RightShoulder` |
+| 2 | `RightFoot` | 7 | `RightShoulder` |
+| 3 | `RightLeg` | 8 | `LeftArm` |
 | 4 | `HeadYaw` | 9 | `RightArm` |
 
-Angles are `0`–`180` degrees; `90` is roughly centered.
+Angles are `0`–`180` degrees; `90` is roughly centered. (Small print: `servo`/`servoSmooth` clamp to `0`–`180`, while `servoStep`/`servoStepStatus` clamp the target to `0`–`179` — use ≤179 as your target when stepping.)
 
 ---
 
@@ -82,11 +82,11 @@ Angles are `0`–`180` degrees; `90` is roughly centered.
 | `robotPuPro.servo(joint, angle)` | Jump instantly to `angle`. Good for setting a known start pose. |
 | `robotPuPro.servoSmooth(joint, angle)` | Move smoothly to `angle` using the PCB's own ramping. |
 | `robotPuPro.servoStep(joint, target, stepSize)` | Move **one step** (at most `stepSize` degrees) toward `target`. Call repeatedly — speed = `stepSize` × your call rate. |
-| `robotPuPro.servoStepStatus(joint, target, stepSize)` | Same step, but returns the remaining error — `0` means arrived. Use in `while` loops. |
+| `robotPuPro.servoStepStatus(joint, target, stepSize)` | Same step, but returns the remaining error **measured before this step** — the call that lands on target still returns the last non-zero error; `0` shows up on the *next* call. Use in `while` loops (the extra call is harmless). |
 | `robotPuPro.servoTargets()` | Live target array `[10]` — read it for relative moves, e.g. `servoTargets()[4]` is head yaw. |
-| `robotPuPro.servo(joint, ...)` + `setControlOffsets` / `incrementControlOffsets` | Add software offsets layered on top of motion targets. |
+| `robotPuPro.setControlOffsets` / `incrementControlOffsets` | Software offsets layered on top of motion targets — but only for paths that apply offsets: `moveServos` and the built-in gaits. `servo`/`servoStep` write raw targets and **bypass** these offsets. |
 | `robotPuPro.setServoPower(on)` | Power the servo rail on/off. |
-| `robotPuPro.moveServos(targets, speeds, syncList, syncGain, asyncList, asyncGain)` | Move many joints at once; `syncList` joints must arrive before it returns `true`. |
+| `robotPuPro.moveServos(targets, speeds, syncList, syncGain, asyncList, asyncGain)` | Step many joints at once (one step per call — keep calling it); returns `true` only once every `syncList` joint has arrived. |
 
 ---
 
@@ -106,7 +106,8 @@ robotPuPro.servo(robotPuPro.ServoJoint.HeadPitch, 90)
 basic.pause(500)
 
 // Slow, coordinated motion: raise the right leg while the head looks around.
-// servoStepStatus returns 0 when the joint arrives.
+// servoStepStatus returns the error measured before the step, so it reads 0
+// on the call AFTER arrival — the while loop still works (one extra step call).
 while (robotPuPro.servoStepStatus(robotPuPro.ServoJoint.RightLeg, 170, 0.05) != 0) {
     robotPuPro.servoStep(robotPuPro.ServoJoint.HeadYaw, 135, 0.05)
     robotPuPro.servoStep(robotPuPro.ServoJoint.HeadPitch, 60, 0.05)
@@ -277,7 +278,7 @@ How it works:
 - `robotPuPro.sing(...)` plays the melody through `music` at `BPM` beats per minute inside `control.inBackground`, so the servo loop never stalls while a note is playing.
 - The loop never pauses longer than 10 ms, so `servoStep` also keeps re-asserting API mode — the rest pose can't sneak in.
 
-> ⚠️ **Balance first!** The leg and foot servos hold PU upright — unlike the head, bad moves here can topple it. Keep leg/foot offsets small (`±8`–`10`), start on a flat surface, and reduce the values if PU wobbles. If it does fall, the built-in fall protection takes over automatically and returns to API mode after recovery.
+> ⚠️ **Balance first!** The leg and foot servos hold PU upright — unlike the head, bad moves here can topple it. Keep leg/foot offsets small (`±8`–`10`), start on a flat surface, and reduce the values if PU wobbles. ⚠️ **Caveat — tip-over detection is blind in API mode:** only the `Gesture.FreeFall` check still fires while your code owns the servos. The "tipped over" check relies on `bodyRoll2`/`bodyPitch2`, which are only refreshed while a gait handler (`walk`/`rest`/`dance`) runs — pure `servo`/`servoStep`/`moveServos` loops leave them stale, so a robot that tips over in API mode may not trigger the fetal/"help me" recovery. Watch the robot yourself during these demos.
 
 Make it your own:
 
@@ -291,7 +292,7 @@ Make it your own:
 
 ## Things to know
 
-- **Fall protection still wins.** Free-fall and tipped-over detection can take the robot out of API mode into the fetal / "help me" states — that's intentional. After it recovers, the robot returns to API mode (not Rest).
+- **Fall protection is limited in API mode.** The `Gesture.FreeFall` check always runs and can still pull the robot into the fetal state — that's intentional. But **tipped-over detection will not fire**: it reads `bodyRoll2`/`bodyPitch2`, which are only updated by `balanceParam()` inside the gait handlers (`walk`/`rest`/`dance`). While `gst == API` and your code only calls `servo`/`servoStep`/`moveServos`, those values stay stale. If a fetal/recovery cycle does complete, the robot returns to its previous state (e.g. API mode) rather than Rest.
 - **`servo` / `servoStep` use raw angles.** They bypass the trim and control offsets that `moveServos` and the built-in behaviors apply. If you need trim-corrected positioning, use `moveServos` instead.
 - **`servoStep` is incremental, not blocking.** One call = one small step. Use `servoStepStatus` in a `while` loop when you need to wait for arrival.
 - **The gamepad can interrupt you.** Radio commands like `#pua...` switch actions and will pull the robot out of API mode. Disable the sender or pick a private channel with `robotPuPro.setChannel(...)`.

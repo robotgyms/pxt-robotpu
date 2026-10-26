@@ -25,7 +25,7 @@ We want PU to move forward toward a **Target Wall**, then stop with the **smalle
 
 1. **Autonomous Only**: Once you press “Start,” you cannot touch a controller. PU must rely entirely on his code and sensors.
 2. **The Approach**: PU must move forward. Creeping inch-by-inch is allowed, but boring (see Tie-Breaker rules).
-3. **The Stop**: Once PU’s wheels stop moving completely, the run is over. No inching forward after the initial stop.
+3. **The Stop**: Once PU’s legs stop moving completely, the run is over. No inching forward after the initial stop.
 4. **The Bonk Rule**: If any part of Robot PU touches the wall at any speed, it is an automatic **GAME OVER**.
 
 ### How to Win (Scoring)
@@ -46,7 +46,7 @@ Example:
 
 If two engineers write code that stops PU at the **exact same distance**, the winner is the robot that **stopped first**.
 
-This means you can’t just program PU to drive at 1% speed. You need an algorithm that is fast **and** precise.
+This means you can’t just program PU to crawl at 1% speed. You need an algorithm that is fast **and** precise.
 
 ---
 
@@ -322,6 +322,7 @@ What each part is doing:
 1. `robotPuPro.connectToGamepad()`
    - Forwards any incoming radio command (strings or named values) to the robot.
    - This lets a second micro:bit send higher-level “commands” while this program is also running its autonomous sonar logic.
+   - ⚠️ **Caveat:** this program calls `robotPuPro.walk(...)` every ~10 ms, and every such API call re-asserts API mode — so commands that try to start an action (`#pua…`, `#puB`, `#puspeed`, `#puroll`/`#pupitch` head bias, etc.) get stomped almost immediately. Only fire-and-forget commands that act instantly (e.g. `#put…` talk, `#pus…` sing) survive the loop. If you want radio commands to take over, gate the `walk` call behind a flag a command can clear.
 2. `robotPuPro.setChannel(166)`
    - Sets the radio group/channel so only devices on the same channel talk to each other.
 3. `robotPuPro.setWalkSpeedRange(-3, 4)`
@@ -331,8 +332,8 @@ What each part is doing:
      - `pitch`: closer = higher frequency.
      - `pulseDelay`: closer = shorter delay (faster beeps).
    - Outside that range, it waits longer to avoid annoying noise when the reading is out-of-range.
-5. `robotPuPro.walk(Math.map(distance, 8, 20, 0, 4), 0)`
-   - Converts distance into forward walking speed: when the wall is close, speed approaches `0`; when farther, speed approaches `4`.
+5. `robotPuPro.walk(Math.map(distance, 7, 20, -1, 6), 0)`
+   - Converts distance into walking speed: when the wall is very close (≤7 cm), speed goes slightly **negative** (PU backs up a step); around 20 cm and beyond, speed approaches `6` forward.
 
 To allow PU to **back up** when it gets too close, tweak the mapping so very small distances produce a **negative speed**:
 

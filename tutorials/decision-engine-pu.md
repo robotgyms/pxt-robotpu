@@ -168,7 +168,9 @@ Radio‑controlled heading + speed, with local obstacle avoidance.
 // -----------------------------
 // Radio setup
 // -----------------------------
-radio.setGroup(42)
+// NOTE: the first robotPuPro.* call resets the radio group to the
+// robot's own channel, so set the group through the extension.
+robotPuPro.setChannel(42)
 
 // Leader broadcasts: "heading,speed"
 // heading = 0..359 degrees
@@ -189,7 +191,7 @@ targetSpeed = parseInt(parts[1])
 // -----------------------------
 const EMERGENCY_STOP_CM = 10     // hard stop
 const AVOID_CM = 20              // avoidance threshold
-const AVOID_TURN = -0.9          // strong turn (negative = right)
+const AVOID_TURN = 0.9           // strong turn right (positive = right)
 const FOLLOW_GAIN = 1 / 90       // heading error → turn
 
 // -----------------------------
@@ -233,7 +235,9 @@ return targetSpeed / 50
 // -----------------------------
 basic.forever(function () {
 
-    // Read center sonar bin
+    // Read center sonar bin (sonarScan updates the bins;
+    // frontDistanceArray only returns the last stored values)
+    robotPuPro.sonarScan()
     let d = robotPuPro.frontDistanceArray()[2]
 
     // 1) Emergency stop
@@ -287,7 +291,10 @@ Broadcasts heading + speed to all followers.
 // Leader Gamepad for Robot PU Swarm
 // Compass heading + joystick speed → radio
 // -------------------------------------
-radio.setGroup(42)   // All robots must use the same group
+// All robots must use the same group. On a dedicated controller
+// micro:bit, radio.setGroup(42) is fine; if the leader also calls
+// robotPuPro.* blocks, use robotPuPro.setChannel(42) instead.
+radio.setGroup(42)
 
 basic.forever(function () {
 

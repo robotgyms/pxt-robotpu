@@ -115,6 +115,9 @@ class ObstacleAvoidance {
 
     constructor() {
         basic.forever(() => {
+            // sonarScan() updates the bins; frontDistanceArray() only
+            // returns the last stored values (~500 cm before any scan).
+            robotPuPro.sonarScan()
             let d = robotPuPro.frontDistanceArray()[2]
 
             let nextMode = 0
@@ -187,7 +190,10 @@ class SmartFollower {
 ## Putting It All Together
 
 ```typescript
-radio.setGroup(42)
+// NOTE: the first robotPuPro.* call resets the radio group to the robot's
+// own channel, so a plain radio.setGroup(42) here would be overridden.
+// Use robotPuPro.setChannel(42) to set the group through the extension.
+robotPuPro.setChannel(42)
 
 let radioFollower = new RadioFollower()
 let nav = new NavigationController()
@@ -200,6 +206,10 @@ let follower = new SmartFollower(radioFollower, nav)
 Use this on the leader Robot PU (or a dedicated controller micro:bit). It broadcasts `heading,speed`.
 
 ```typescript
+// On a dedicated controller micro:bit, radio.setGroup(42) is fine.
+// If the leader is also a Robot PU that calls robotPuPro.* blocks,
+// use robotPuPro.setChannel(42) instead — the first robotPuPro call
+// resets the radio group to the robot's own channel.
 radio.setGroup(42)
 
 basic.forever(function () {

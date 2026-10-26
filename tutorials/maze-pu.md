@@ -33,7 +33,7 @@ Robot PU doesn’t need a full map for this approach. It just needs to decide �
 Robot PU is an interactive STEM buddy controlled by a micro:bit. In this maze project, we rely on:
 
 * **Movement**: `robotPuPro.walk(speed, turn)`
-* **Sonar scan**: `robotPuPro.frontDistanceArray()`
+* **Sonar scan**: `robotPuPro.sonarScan()` + `robotPuPro.frontDistanceArray()`
 
 ---
 
@@ -69,6 +69,8 @@ It returns **5 distance bins** from **left to right**:
 * `d[4]` = far right
 
 These bins are designed to give you a simple “left / front / right” view without moving the head.
+
+**Important:** the bins are only updated by `robotPuPro.sonarScan()` — `frontDistanceArray()` just returns the last stored values (initially ~500 cm, i.e. “everything looks open”). Call `sonarScan()` before each read.
 
 Then we decide the next motion using a priority order.
 
@@ -139,10 +141,14 @@ function hysteresisUpdate(isOpen: boolean, d: number, openOn: number, openOff: n
 }
 
 function filteredBins(): number[] {
+    // take 3 fresh frames for the median (sonarScan bins by current head yaw)
+    robotPuPro.sonarScan()
     const a = robotPuPro.frontDistanceArray()
     basic.pause(5)
+    robotPuPro.sonarScan()
     const b = robotPuPro.frontDistanceArray()
     basic.pause(5)
+    robotPuPro.sonarScan()
     const c = robotPuPro.frontDistanceArray()
 
     const out: number[] = [0, 0, 0, 0, 0]
@@ -187,13 +193,13 @@ basic.forever(function () {
     const safeSpeed = Math.map(Math.max(dRight, dLeft), 7, 25, 0, 3)
 
     if (dFront > 0 && dFront < TOO_CLOSE_CM) {
-        robotPuPro.walk(1.6, 0.9)   // emergency escape: turn left (positive = left)
+        robotPuPro.walk(1.6, -0.9)   // emergency escape: turn left (negative = left)
     } else if (rightOpen) {
-        robotPuPro.walk(safeSpeed, -0.35)   // turn right (negative = right)
+        robotPuPro.walk(safeSpeed, 0.35)   // turn right (positive = right)
     } else if (frontOpen) {
         robotPuPro.walk(safeSpeed, 0)
     } else {
-        robotPuPro.walk(1.6, 0.9)   // dead end: turn around, turn left (positive = left)
+        robotPuPro.walk(1.6, -0.9)   // dead end: turn around, turn left (negative = left)
     }
 
     radio.sendValue("fd0", d[0])
@@ -213,18 +219,18 @@ If you want to follow the **left wall** instead, flip the priority order:
 3. Else if **right is open** → turn right
 4. Else → turn around
 
-You can implement it by changing the decision section:
+You can implement it by changing the decision section (same style as the implementation above — `walk` turn is negative = left, positive = right):
 
 ```typescript
 // Left-hand rule priority
-if (leftOpen) {
-    turnLeft90ish()
+if (dFront > 0 && dFront < TOO_CLOSE_CM) {
+    robotPuPro.walk(1.6, 0.9)   // emergency escape: turn right (positive = right)
+} else if (leftOpen) {
+    robotPuPro.walk(safeSpeed, -0.35)   // turn left (negative = left)
 } else if (frontOpen) {
-    stepForward()
-} else if (rightOpen) {
-    turnRight90ish()
+    robotPuPro.walk(safeSpeed, 0)
 } else {
-    turnAround()
+    robotPuPro.walk(1.6, 0.9)   // dead end: turn around, turn right (positive = right)
 }
 ```
 
@@ -236,26 +242,26 @@ if (leftOpen) {
    1. Use cardboard walls or blocks that sonar can detect.
    2. Make the corridors wide enough for Robot PU to walk.
 2. **Tune thresholds**:
-   1. If PU scrapes walls, increase `OPEN_CM` and/or increase `TOO_CLOSE_CM`.
-   2. If PU refuses to enter corridors, decrease `OPEN_CM`.
+   1. If PU scrapes walls, increase `OPEN_MIN_CM` and/or increase `TOO_CLOSE_CM`.
+   2. If PU refuses to enter corridors, decrease `OPEN_MIN_CM`.
 3. **Tune turning**:
-   1. If turns are too small, increase turn duration in `turnRight90ish()` / `turnLeft90ish()`.
-   2. If turns overshoot, decrease duration or reduce `TURN_BIAS`.
+   1. If turns are too weak, increase the turn magnitude (`0.9` / `0.35` in the `walk` calls).
+   2. If turns overshoot, reduce the turn magnitude or lower the speed.
 
 ## Troubleshooting
 
 - **Robot scrapes walls**
-  - increase `OPEN_CM`
-  - slow down: reduce `FWD_SPEED`
+  - increase `OPEN_MIN_CM`
+  - slow down: reduce the `safeSpeed` / `1.6` speeds in the `walk` calls
 - **Robot turns too late and bonks**
   - increase `TOO_CLOSE_CM`
-  - increase the emergency turn duration
+  - increase the emergency turn magnitude (`0.9`)
 - **Robot oscillates in narrow corridors**
-  - reduce `TURN_BIAS`
-  - reduce `TURN_SPEED`
+  - reduce the turn magnitude (`0.35`)
+  - reduce `safeSpeed`
 - **Robot gets stuck turning in place**
-  - reduce `OPEN_CM` (it may think everything is blocked)
-  - increase `stepForward()` duration slightly
+  - reduce `OPEN_MIN_CM` (it may think everything is blocked)
+  - note that `walk(0, turn)` does nothing — turning requires a nonzero speed
 
 ---
 

@@ -161,7 +161,7 @@ basic.forever(function () {
 
 ## What happens
 
-1. `greet()` calibrates and stands the robot up.
+1. `greet()` speaks the robot's serial number and name. Since it's the first `robotPuPro.*` call, it also triggers the one-time robot startup (stand → calibrate → rest, ~4 s).
 2. A background `basic.forever` loop calls `musicTempo()` every 20 ms to keep the microphone beat detector updated.
 3. The main `basic.forever` loop picks an action using the Q-table, runs it, and checks `isMusic()`.
 4. If music is detected, every recent `(lastAction, action)` pair gets credit, the heart icon appears, and the learned best action is shown.
