@@ -93,7 +93,7 @@ class Content {
 let generator = new Content();
 let puMood = 0; // 0 = Elf, 1 = Robot
 music.setVolume(150); // Set global volume (0-255)
-billy.voicePreset(BillyVoicePreset.Elf); // Start as an Elf
+billy.configureVoice(VoicePreset.Elf); // Start as an Elf
 
 /**
  * SECTION 3: INTERACTION
@@ -111,12 +111,12 @@ input.onButtonPressed(Button.A, function () {
 input.onButtonPressed(Button.B, function () {
     if (puMood == 0) {
         puMood = 1;
-        billy.voicePreset(BillyVoicePreset.Robot);
+        billy.configureVoice(VoicePreset.Robot);
         basic.showIcon(IconNames.Angry);
         billy.say("I am a grumpy robot");
     } else {
         puMood = 0;
-        billy.voicePreset(BillyVoicePreset.Elf);
+        billy.configureVoice(VoicePreset.Elf);
         basic.showIcon(IconNames.Happy);
         billy.say("I am a happy elf");
     }
@@ -207,12 +207,12 @@ The "Billy" extension uses an 8-bit style synthesis. Generally, higher pitches s
 In the JavaScript/Python editor, your configuration block would look like this (using the "Middle Age" example):
 
 ```typescript
-// Middle Age Voice Example
-billy.configure(80, 95, 128, 0)
+// Middle Age Voice Example: speed=95, pitch=80, mouth=128, throat=140
+billy.configureVoice(95, 80, 128, 140)
 billy.say("Hello, how are you today?")
 ```
 
-Note: The `configure` function usually takes four arguments: (`pitch`, `speed`, `mouth`, `throat`). While Pitch and Speed are the most impactful, you can slightly increase the Throat value (the 4th parameter) to `140+` for older voices to make them sound "grittier."
+Note: `billy.configureVoice` takes four arguments — (`speed`, `pitch`, `mouth`, `throat`), each 0–255. While pitch and speed are the most impactful, you can slightly increase the throat value (the 4th parameter) to `140+` for older voices to make them sound "grittier."
 
 ```typescript
 // forward gamepad commands to Robot PU
@@ -226,10 +226,10 @@ let pitch = 0
 let distance = 0
 robotPuPro.setChannel(166)
 billy.configureVoice(
-80,
 95,
+80,
 128,
-0
+140
 )
 billy.say("I have a sonar")
 basic.forever(function () {
@@ -268,7 +268,7 @@ basic.forever(function () {
 
 Pressing the logo button toggles servo trim mode — see [servo-trim-calibration.md](servo-trim-calibration.md).
 
-* **More Moods**: Add a third state for `BillyVoicePreset.Dalek` to make PU sound like a metallic villain.
+* **More Moods**: Add a third state for `VoicePreset.Dalek` to make PU sound like a metallic villain.
 * **Touch Interaction**: Use the micro:bit V2 **Touch Logo** to trigger a "Giggle" sound or a special greeting.
 * **Chatty Sonar**: Update your sonar code so that when an object is closer than 10cm, PU shouts "Too close!" in his current mood voice.
 

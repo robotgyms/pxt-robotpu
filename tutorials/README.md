@@ -266,6 +266,8 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 
 - **Add arms** ⭐: [AddArms.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/AddArms.md)
 - **Servo trim calibration** ⭐: [servo-trim-calibration.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/servo-trim-calibration.md)
+- **Auto servo calibration (experimental)** ⭐⭐⭐: [auto-servo-calibration.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-servo-calibration.md)
+- **Auto feet servo calibration** *(work in progress — placeholder)*: [auto-feet-servo-calibration.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-feet-servo-calibration.md)
 - **Material specifications** ⭐: [specifications.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/specifications.md)
 
 ### Robot hardware & core APIs
@@ -273,6 +275,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **How Robot PU moves** ⭐: [motorize-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/motorize-pu.md)
 - **Direct servo control (API mode)** ⭐⭐: [direct-servo-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md)
 - **Robot actions** ⭐: [action-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-pu.md)
+- **Action Q-table (reinforcement learning)** ⭐⭐⭐: [action-qtable.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-qtable.md)
 - **Skate mode** ⭐: [skate-mode.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md)
 - **Robot observation** ⭐⭐: [observation-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/observation-pu.md)
 - **Don’t bonk** ⭐⭐: [dont-bonk.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md)
@@ -292,6 +295,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **Music + beat-driven behaviors** ⭐: [music-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/music-pu.md)
 - **Music library utilities** ⭐⭐: [musiclib-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/musiclib-pu.md)
 - **Dance choreography** ⭐: [dance-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dance-pu.md)
+- **Sing and dance** ⭐: [sing-and-dance.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sing-and-dance.md)
 - **Emotion state to expression** ⭐⭐: [emotion-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/emotion-pu.md)
 - **RoboVoice melodic speech** ⭐⭐: [robotvoice.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/robotvoice.md)
 - **Talk content patterns** ⭐⭐: [talk-content.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-content.md)
@@ -371,6 +375,9 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **OOP-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/OOP-pu.md
 - **README.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/README.md
 - **action-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-pu.md
+- **action-qtable.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-qtable.md
+- **auto-feet-servo-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-feet-servo-calibration.md *(work in progress — placeholder)*
+- **auto-servo-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-servo-calibration.md
 - **autopilot-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/autopilot-pu.md
 - **balance-PID-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/balance-PID-pu.md
 - **barebone.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/barebone.md
@@ -381,6 +388,7 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **decision-engine-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/decision-engine-pu.md
 - **demo-program.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/demo-program.md
 - **diagnostics-topic.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/diagnostics-topic.md
+- **direct-servo-control.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md
 - **dont-bonk.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md
 - **emotion-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/emotion-pu.md
 - **event-loop-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-loop-pu.md
@@ -414,6 +422,8 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **servo-trim-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/servo-trim-calibration.md
 - **shared-map-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/shared-map-pu.md
 - **signal-filters-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/signal-filters-pu.md
+- **sing-and-dance.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sing-and-dance.md
+- **skate-mode.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md
 - **slam-i2c-cam.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-i2c-cam.md
 - **slam-odometry-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-odometry-pu.md
 - **slam-soccer-ball-follow.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-ball-follow.md
@@ -436,5 +446,5 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 
 ## Folder contents quick reference
 
-- **Markdown tutorials**: `66` `.md` files, including this `README.md`.
+- **Markdown tutorials**: `72` `.md` files, including this `README.md`.
 - **Compiled examples**: `.hex` files are included for selected complete projects.
