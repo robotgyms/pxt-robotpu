@@ -9,9 +9,9 @@ This is the smallest possible starting point for letting **Robot PU** receive co
 
 You will program PU’s micro:bit to:
 
-- Connect to the gamepad (or any radio sender) with a single call.
-- Set your own radio channel for the robot and gamepad so only your devices talk to each other.
-- Give your Robot PU its own name.
+- Connect to the gamepad (or any radio sender) with a single call. *(Step 2)*
+- Set your own radio channel for the robot and gamepad so only your devices talk to each other. *(Step 4 & 6)*
+- Give your Robot PU its own name. *(Step 6)*
 
 When it works: **tilt the joystick and PU walks; press gamepad button B2 and PU Jumps.**
 
@@ -80,7 +80,7 @@ Download this program to the **gamepad micro:bit**.
 - Press gamepad **B2** → PU jumps. (See the button table in the appendix for the rest.)
 - Radio drops out or gamepad turns off? The first received command arms PU's **dead-man watchdog** — PU stops on its own within ~2 seconds.
 
-## Step 6 — Make it yours
+## Step 6 — Make it yours: your own channel and your own name
 
 - **Channel**: move both devices off `166` (Step 4) so friends' robots can't grab your radio.
 - **Name**: change `"PU"` in `robotPuGamepad.setName("PU")` to rename your robot — PU speaks "My name is …" when it greets you.
@@ -139,6 +139,8 @@ Use the manual version instead if you want to **intercept** a key before it reac
 | B3                  | `#puB` `3`        | dance                | select previous servo      |
 | B4                  | `#puB` `4`        | kick                 | trim selected servo `+1°`  |
 | Logo                | `#pulogo` `1` or `#put<text>` | announce status / speak a phrase | same |
+
+> 📖 **Read this table before driving** — some buttons do more than move. In particular **B1 makes PU walk off and explore on its own** (it keeps going until you press Stop). Pressing it by accident on a crowded table = a wandering robot.
 
 Gamepad's own A/B buttons change the gamepad's channel (shown on its display); A+B sends `#pun<name>` to set PU's name and trigger a greet.
 
