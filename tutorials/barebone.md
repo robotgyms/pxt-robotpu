@@ -75,7 +75,7 @@ Download this program to the **gamepad micro:bit**.
 >
 > 💡 Factory gamepads already run this program — the steps above are for rebuilding or customizing it. See [pxt-robotpu-gamepad/hello-robotpu.md](https://github.com/robotgyms/pxt-robotpu-gamepad/blob/main/tutorials/hello-robotpu.md) for the minimal setup and [gamepad.md](gamepad.md) for the full reference.
 
-## Step 5 — Check pairing:
+## Step 5 — Check pairing
 
 Let's check:
 - same channel between PU and gamepad
