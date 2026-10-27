@@ -37,7 +37,7 @@ Choose a unique channel number (0-255) that's not used by other Robot PUs in you
 In the MakeCode editor (https://makecode.microbit.org/):
 
 1. Create a **New Project**.
-2. Click **Extensions**, paste `https://github.com/robotgyms/pxt-robotpu`, and select it.
+2. Click **Extensions**, paste `robotgyms/pxt-robotpu`, and select it.
 
 The editor will then recognize `robotPuPro.*` blocks.
 
@@ -59,7 +59,7 @@ Download this program to the micro:bit inside **Robot PU's head**.
 
 ## Step 4 — Set up the gamepad
 
-Create a **separate** MakeCode project, add the gamepad extension (**Extensions → paste `https://github.com/robotgyms/pxt-robotpu-gamepad` → select it**), then copy the following code into the MakeCode editor:
+Create a **separate** MakeCode project, add the gamepad extension (**Extensions → paste `robotgyms/pxt-robotpu-gamepad` → select it**), then copy the following code into the MakeCode editor:
 
 ```typescript
 // Set YOUR radio channel (0-255, must match PU's channel from Step 1. Factory default is 166)
