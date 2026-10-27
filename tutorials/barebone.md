@@ -40,7 +40,7 @@ The editor will then recognize `robotPuPro.*` blocks.
 ## Step 2 — Flash the 2-line program to PU's brain
 
 ```typescript
-// Set the radio channel (0-255, factory default is 166)
+// Set YOUR radio channel (0-255, factory default is 166)
 robotPuPro.setChannel(166)
 // Connect to the gamepad
 robotPuPro.connectToGamepad()
@@ -69,9 +69,10 @@ Download this program to the **gamepad micro:bit**.
 
 ## Step 4 — Pair: both devices on the same channel
 
-`setChannel(...)` sets the **micro:bit radio group** on both sides — the two devices can only talk when the numbers match. Valid range is `0 .. 255`.
+`setChannel(...)` sets the **micro:bit radio group** on both sides — the two devices can only talk when the numbers match. Valid range is `0 .. 255`. The channel written in the program is **baked in at flash time** — changing the number in code does nothing until you re-flash.
 
 - `166` is the **factory default** — every Robot PU ships on it. If other Robot PUs are nearby (classroom, demo), their gamepads will interfere with yours — pick your own channel.
+- 🧑‍🏫 **Teachers**: assign each student/pair a **unique channel** (`167`, `168`, `169`, …) *before* anyone flashes. If everyone flashes the default `166` first, all robots cross-talk during the lesson — flash once with the assigned channel already in the code instead of flashing `166` and fixing it later.
 - **Manual change**: press button **A** (+1) or **B** (−1) on either device until both show the same number — the current channel is shown on the **LED display** of both micro:bits. (PU's buttons need the full program in Step 6.)
 - **In code**: set your own default — `robotPuPro.setChannel(n)` on PU and `robotPuGamepad.setChannel(n)` on the gamepad.
 - **If PU doesn't react**: check both devices show the same channel, and both are powered on.
