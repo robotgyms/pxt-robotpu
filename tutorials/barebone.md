@@ -24,7 +24,7 @@ When it works: **tilt the joystick and PU walks; press gamepad button B2 and PU 
 ## Requirements
 
 - Robot PU with a micro:bit in its brain
-- Robot PU gamepad: a second micro:bit running the controller program — see the minimal setup in [pxt-robotpu-gamepad/hello-robotpu.md](https://github.com/robotgyms/pxt-robotpu-gamepad/blob/main/tutorials/hello-robotpu.md) or the full reference in [gamepad.md](gamepad.md)
+- Robot PU gamepad: a second micro:bit running the controller program 
 
 ---
 
@@ -64,6 +64,8 @@ robotPuGamepad.setName("PU")
 Download this program to the **gamepad micro:bit**.
 
 > ⚠️ **Two programs, two micro:bits**: `robotPuPro.*` goes to PU's brain; `robotPuGamepad.*` goes to the gamepad. Each extension only works on its own device.
+>
+> 💡 Factory gamepads already run this program — the steps above are for rebuilding or customizing it. See [pxt-robotpu-gamepad/hello-robotpu.md](https://github.com/robotgyms/pxt-robotpu-gamepad/blob/main/tutorials/hello-robotpu.md) for the minimal setup and [gamepad.md](gamepad.md) for the full reference.
 
 ## Step 4 — Pair: both devices on the same channel
 
