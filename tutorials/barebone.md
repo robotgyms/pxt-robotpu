@@ -11,7 +11,6 @@ You will program PU’s micro:bit to:
 
 - Connect to the gamepad (or any radio sender) with a single call. *(Step 3)*
 - Set your own radio channel for the robot and gamepad so only your devices talk to each other. *(Steps 1 & 7)*
-- Give your Robot PU its own name. *(Step 4)*
 
 When it works: **tilt the joystick and PU walks; press gamepad button B2 and PU Jumps.**
 
@@ -30,6 +29,8 @@ When it works: **tilt the joystick and PU walks; press gamepad button B2 and PU 
 ## Step 1 - Pick your radio channel
 
 Choose a unique channel number (0-255) that's not used by other Robot PUs in your area. The factory default is `166`. If you are testing with multiple Robot PUs, make sure to use different channels for each student's pair.
+
+- 🧑‍🏫 **Teachers**: assign each student/pair a **unique channel** (`167`, `168`, `169`, …) *before* anyone flashes. If everyone flashes the default `166` first, all robots cross-talk during the lesson — flash once with the assigned channel already in the code instead of flashing `166` and fixing it later.
 
 ## Step 2 — Load the Robot PU extension
 
@@ -56,7 +57,7 @@ Download this program to the micro:bit inside **Robot PU's head**.
 
 > ⚠️ **On the first flash** the robot will stand up and calibrate itself — about 4 seconds of servo motion and eye flashes. This is normal; it happens once, the first time any `robotPuPro.*` block runs.
 
-## Step 4 — Set up the gamepad and name your robot
+## Step 4 — Set up the gamepad
 
 Create a **separate** MakeCode project, add the gamepad extension (**Extensions → paste `https://github.com/robotgyms/pxt-robotpu-gamepad` → select it**), then copy the following code into the MakeCode editor:
 
@@ -64,11 +65,9 @@ Create a **separate** MakeCode project, add the gamepad extension (**Extensions 
 // Set YOUR radio channel (0-255, must match PU's channel from Step 1. Factory default is 166)
 robotPuGamepad.setChannel(166)
 robotPuGamepad.start()
-// optional: give your Robot PU a name
-robotPuGamepad.setName("PU")
 ```
 
-Change the channel number to the one you chose in Step 1, and pick a name for your robot — PU speaks "My name is …" when it greets you.
+Change the channel number to the one you chose in Step 1.
 
 Download this program to the **gamepad micro:bit**.
 
@@ -76,14 +75,17 @@ Download this program to the **gamepad micro:bit**.
 >
 > 💡 Factory gamepads already run this program — the steps above are for rebuilding or customizing it. See [pxt-robotpu-gamepad/hello-robotpu.md](https://github.com/robotgyms/pxt-robotpu-gamepad/blob/main/tutorials/hello-robotpu.md) for the minimal setup and [gamepad.md](gamepad.md) for the full reference.
 
-## Step 5 — Check pairing: same channel?
+## Step 5 — Check pairing:
+
+Let's check:
+- same channel between PU and gamepad
+- different channels for all students' robot/gamepad pairs
 
 Channel numbers are shown on each micro:bit's **LED display**. The channel on PU's brain micro:bit must match the gamepad micro:bit's. If they don't, set the same `setChannel(...)` number in both programs and re-flash — or use the A/B button method in Step 7.
 
 `setChannel(...)` sets the **micro:bit radio group** on both sides — the two devices can only talk when the numbers match. Valid range is `0 .. 255`. The channel written in the program is **baked in at flash time** — changing the number in code does nothing until you re-flash.
 
 - `166` is the **factory default** — every Robot PU ships on it. If other Robot PUs are nearby (classroom, demo), their gamepads will interfere with yours — pick your own channel.
-- 🧑‍🏫 **Teachers**: assign each student/pair a **unique channel** (`167`, `168`, `169`, …) *before* anyone flashes. If everyone flashes the default `166` first, all robots cross-talk during the lesson — flash once with the assigned channel already in the code instead of flashing `166` and fixing it later.
 - **Manual change**: press button **A** (+1) or **B** (−1) on either device until both show the same number — the current channel is shown on the **LED display** of both micro:bits. (PU's buttons need the program in Step 7.)
 - **In code**: set your own default — `robotPuPro.setChannel(n)` on PU and `robotPuGamepad.setChannel(n)` on the gamepad.
 - **If PU doesn't react**: check both devices show the same channel, and both are powered on.
