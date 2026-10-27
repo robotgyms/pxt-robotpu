@@ -57,7 +57,7 @@ Create a **separate** MakeCode project, add the gamepad extension (**Extensions 
 ```typescript
 robotPuGamepad.setChannel(166)
 robotPuGamepad.start()
-// optional: set the name your gamepad uses to greet the robot
+// optional: give your Robot PU a name
 robotPuGamepad.setName("PU")
 ```
 
@@ -70,20 +70,20 @@ Download this program to the **gamepad micro:bit**.
 `setChannel(...)` sets the **micro:bit radio group** on both sides — the two devices can only talk when the numbers match. Valid range is `0 .. 255`.
 
 - `166` is the **factory default** — every Robot PU ships on it. If other Robot PUs are nearby (classroom, demo), their gamepads will interfere with yours — pick your own channel.
-- **Manual change**: press button **A** (+1) or **B** (−1) on either device until both show the same number. (PU's buttons need the full program below; the gamepad shows its channel on its display.)
+- **Manual change**: press button **A** (+1) or **B** (−1) on either device until both show the same number — the current channel is shown on the **LED display** of both micro:bits. (PU's buttons need the full program in Step 6.)
 - **In code**: set your own default — `robotPuPro.setChannel(n)` on PU and `robotPuGamepad.setChannel(n)` on the gamepad.
-- **If PU doesn't react**: check both devices show the same channel, then try sending `#putHello!` — PU should say it.
+- **If PU doesn't react**: check both devices show the same channel, and both are powered on.
 
 ## Step 5 — Try it
 
 - Move the joystick → PU walks and steers.
-- Press gamepad **B4** → PU kicks. (See the button table in the appendix for the rest.)
+- Press gamepad **B2** → PU jumps. (See the button table in the appendix for the rest.)
 - Radio drops out or gamepad turns off? The first received command arms PU's **dead-man watchdog** — PU stops on its own within ~2 seconds.
 
 ## Step 6 — Make it yours
 
 - **Channel**: move both devices off `166` (Step 4) so friends' robots can't grab your radio.
-- **Name**: the gamepad's `robotPuGamepad.setName("PU")` sends a `#pun` greeting — PU learns its name and speaks "My name is …". Change the string to rename your robot.
+- **Name**: change `"PU"` in `robotPuGamepad.setName("PU")` to rename your robot — PU speaks "My name is …" when it greets you.
 - **Channel buttons on PU** (optional full program):
 
 ```typescript
