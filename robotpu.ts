@@ -834,19 +834,48 @@ namespace robotPuPro {
         }
 
         /**
-         * Turn the speaker on 
+         * Enable the PCB's audio amplifier (I2C command 0x35).
+         * This gates power to the external speaker driver — separate from
+         * the micro:bit's own built-in speaker.
          */
-        public speakerOn(): void {
-            //music.setBuiltInSpeakerEnabled(true);
+        public amplifierOn(): void {
+            let buf = pins.createBuffer(4);
+            buf.setNumber(NumberFormat.UInt8LE, 0, 0x35);
+            buf.setNumber(NumberFormat.UInt8LE, 1, 0);
+            buf.setNumber(NumberFormat.UInt8LE, 2, 0);
+            buf.setNumber(NumberFormat.UInt8LE, 3, 0);
+            i2cWriteBuffer(this.i2cAddress, buf);
         }
 
         /**
-         * Turn the speaker off
+         * Disable the PCB's audio amplifier (I2C command 0x34).
+         * Powering down the amp avoids driver heating and saves battery.
+         */
+        public amplifierOff(): void {
+            let buf = pins.createBuffer(4);
+            buf.setNumber(NumberFormat.UInt8LE, 0, 0x34);
+            buf.setNumber(NumberFormat.UInt8LE, 1, 0);
+            buf.setNumber(NumberFormat.UInt8LE, 2, 0);
+            buf.setNumber(NumberFormat.UInt8LE, 3, 0);
+            i2cWriteBuffer(this.i2cAddress, buf);
+        }
+
+        /**
+         * Turn the micro:bit's onboard speaker on.
+         * Note: setBuiltInSpeakerEnabled selects the audio route —
+         * true = onboard speaker, false = P0 pin (the amplifier input).
+         * This does not control the PCB amplifier power (see amplifierOn/Off).
+         */
+        public speakerOn(): void {
+            music.setBuiltInSpeakerEnabled(true);
+        }
+
+        /**
+         * Turn the micro:bit's onboard speaker off (mutes onboard audio;
+         * routes the signal to P0). Amplifier power is unaffected.
          */
         public speakerOff(): void {
-            //music.setBuiltInSpeakerEnabled(false);
-            // Force Pin 0 LOW to pull down the driver transistor to avoid speaker overheating and wasting power
-            //pins.digitalWritePin(DigitalPin.P0, 0);
+            music.setBuiltInSpeakerEnabled(false);
         }
 
         /**
@@ -1758,17 +1787,17 @@ namespace robotPuPro {
             this.calibrate();
             this.rest();
             this.resetOdom();
-            this.pcb.speakerOff();
+            this.pcb.amplifierOff();
         }
 
         /**
-         * Turn the speaker on, run a sound function, then turn it off to save power.
+         * Turn the audio amplifier on, run a sound function, then turn it off to save power.
          * @param fn the sound-playing function to run
          */
-        private withSpeaker(fn: () => void): void {
-            this.pcb.speakerOn();
+        private withAmp(fn: () => void): void {
+            this.pcb.amplifierOn();
             fn();
-            this.pcb.speakerOff();
+            this.pcb.amplifierOff();
         }
 
         public resetOdom() {
@@ -1926,7 +1955,7 @@ namespace robotPuPro {
         }
 
         public talk(text: string): void {
-            this.withSpeaker(() => {
+            this.withAmp(() => {
                 this.voice.reset();
                 this.voice.speak(text);
             });
@@ -1937,7 +1966,7 @@ namespace robotPuPro {
          * Play a laughing sound effect. Call it when Robot PU feels happy
          */
         public laugh(): void {
-            this.pcb.speakerOn();
+            this.pcb.amplifierOn();
             let count = 2 + Math.random() * 3;
             for (let index = 0; index < count; index++) {
                 music.setVolume(255 - index * 30)
@@ -1950,14 +1979,14 @@ namespace robotPuPro {
                     120 + Math.random() * 50, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
                 basic.pause(60 + Math.random() * 10)
             }
-            this.pcb.speakerOff();
+            this.pcb.amplifierOff();
         }
 
         /**
          * Play a crying sound effect. Call it when Robot PU feels sad
          */
         public cry(): void {
-            this.pcb.speakerOn();
+            this.pcb.amplifierOn();
             let count = 3 + Math.random() * 3;
             for (let i = 0; i < count; i++) {
                 music.setVolume(Math.min(255, 125 + i * 40))
@@ -1976,14 +2005,14 @@ namespace robotPuPro {
                 )
                 basic.pause(120 + Math.random() * 10)
             }
-            this.pcb.speakerOff();
+            this.pcb.amplifierOff();
         }
 
         /**
          * Play a funny sound effect. Call it when Robot PU feels funny
          */
         public funny(): void {
-            this.pcb.speakerOn();
+            this.pcb.amplifierOn();
             music.setVolume(255)
             music.play(music.createSoundExpression(
                 WaveShape.Sawtooth,
@@ -1995,14 +2024,14 @@ namespace robotPuPro {
                 SoundExpressionEffect.Tremolo,
                 InterpolationCurve.Curve
             ), music.PlaybackMode.UntilDone)
-            this.pcb.speakerOff();
+            this.pcb.amplifierOff();
         }
 
         /**
          * Play a screaming sound effect. Call it when Robot PU gets suprised
          */
         public scream(): void {
-            this.pcb.speakerOn();
+            this.pcb.amplifierOn();
             music.setVolume(255)
             // weeweee
             music.play(
@@ -2032,7 +2061,7 @@ namespace robotPuPro {
                 ),
                 music.PlaybackMode.UntilDone
             );
-            this.pcb.speakerOff();
+            this.pcb.amplifierOff();
         }
 
         /*
@@ -2806,7 +2835,7 @@ namespace robotPuPro {
          * @param s The note sequence string, e.g. "C5 D E F G".
          */
         public sing(s: string, bpm: number = 120): void {
-            this.withSpeaker(() => {
+            this.withAmp(() => {
                 music.play(music.stringPlayable(s, bpm * 4), music.PlaybackMode.UntilDone);
             });
         }
@@ -2817,7 +2846,7 @@ namespace robotPuPro {
          * @param unitMs duration of one dit in milliseconds.
          */
         public morse(code: string, unitMs: number = 80): void {
-            this.withSpeaker(() => {
+            this.withAmp(() => {
                 this.voice.morse(code, unitMs);
             });
         }
@@ -2828,7 +2857,7 @@ namespace robotPuPro {
          * @param unitMs duration of one dit in milliseconds.
          */
         public morseText(text: string, unitMs: number = 80): void {
-            this.withSpeaker(() => {
+            this.withAmp(() => {
                 this.voice.morse(RoboVoice.toMorse(text), unitMs);
             });
         }
@@ -2840,7 +2869,7 @@ namespace robotPuPro {
          * @param durations tone durations in milliseconds.
          */
         public playToneSequenceMs(frequencies: number[], durations: number[]): void {
-            this.withSpeaker(() => {
+            this.withAmp(() => {
                 const n = Math.min(frequencies ? frequencies.length : 0, durations ? durations.length : 0);
                 for (let i = 0; i < n; i++) {
                     const dur = Math.max(0, Math.round(durations[i]));

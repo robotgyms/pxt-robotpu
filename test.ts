@@ -95,13 +95,13 @@ function testSetupExtended() {
 // ── Actions ────────────────────────────────────────────────────────────────
 
 /**
- * TEST: Actions - speakerOn, greet, talk, sing, laugh, cry, scream, funny, speakerOff
+ * TEST: Actions - amplifierOn, greet, talk, sing, laugh, cry, scream, funny, amplifierOff
  * [HARDWARE] RoboVoice melodic synthesizer and sound effects.
- * Expected: speaker is turned on, robot speaks/sings/plays effects, then speaker is turned off to save power.
+ * Expected: amplifier is turned on, robot speaks/sings/plays effects, then amplifier is turned off to save power.
  * Pass: audible sounds, no crash.
  */
 function testVoice() {
-    robotPuPro.speakerOn()
+    robotPuPro.amplifierOn()
     robotPuPro.greet()
     basic.pause(1000)
     robotPuPro.talk("Hello!")
@@ -120,7 +120,7 @@ function testVoice() {
     basic.pause(500)
     robotPuPro.funny()
     basic.pause(500)
-    robotPuPro.speakerOff()
+    robotPuPro.amplifierOff()
 }
 
 /**
