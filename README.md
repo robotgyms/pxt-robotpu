@@ -316,15 +316,25 @@ For a step-by-step calibration guide, see [tutorials/servo-trim-calibration.md](
 - **Parameters**:
   - `mode`: the walking mode, e.g. `robotPuPro.WalkMode.Skate`
 
+#### `amplifierOn(): void`
+
+- **Block**: `amplifier on`
+- **What it does**: Powers the PCB's audio amplifier (I2C `0x35`) — the external speaker driver. Separate from the micro:bit's built-in speaker.
+
+#### `amplifierOff(): void`
+
+- **Block**: `amplifier off`
+- **What it does**: Powers down the audio amplifier (I2C `0x34`) to save battery and avoid driver heating. Sound actions (`talk`, `sing`, `morse`, `greet`, `laugh`, …) turn the amp on and off automatically — you only need this for manual control.
+
 #### `speakerOn(): void`
 
 - **Block**: `speaker on`
-- **What it does**: Enables the speaker output.
+- **What it does**: Turns the micro:bit's **onboard speaker** on (`music.setBuiltInSpeakerEnabled(true)`). For the external speaker, use `amplifierOn` — the two are independent switches.
 
 #### `speakerOff(): void`
 
 - **Block**: `speaker off`
-- **What it does**: Mutes the speaker output.
+- **What it does**: Turns the micro:bit's onboard speaker off (routes audio to P0). Amplifier power is unaffected — use `amplifierOff` to power down the external amp and save battery.
 
 ### Sensors
 

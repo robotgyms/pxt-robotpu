@@ -213,20 +213,38 @@ namespace robotPuPro {
         ensureRobot().writeConfig();
     }
 
-    /** Turn the speaker on. */
-    //% blockId=robotpu_speaker_on block="speaker on"
+    /** Turn the audio amplifier on (powers the robot's external speaker). */
+    //% blockId=robotpu_amp_on block="amplifier on"
     //% subcategory="Setup"
     //% group="Setup"
     //% weight=95 blockGap=8
+    export function amplifierOn(): void {
+        ensureRobot().pcb.amplifierOn();
+    }
+
+    /** Turn the audio amplifier off to save power. */
+    //% blockId=robotpu_amp_off block="amplifier off"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=94 blockGap=8
+    export function amplifierOff(): void {
+        ensureRobot().pcb.amplifierOff();
+    }
+
+    /** Turn the micro:bit's onboard speaker on. For the external speaker use amplifierOn. */
+    //% blockId=robotpu_speaker_on block="speaker on"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=93 blockGap=8
     export function speakerOn(): void {
         ensureRobot().pcb.speakerOn();
     }
 
-    /** Turn the speaker off to save power. */
+    /** Turn the micro:bit's onboard speaker off. Amplifier power is unaffected. */
     //% blockId=robotpu_speaker_off block="speaker off"
     //% subcategory="Setup"
     //% group="Setup"
-    //% weight=94 blockGap=8
+    //% weight=92 blockGap=8
     export function speakerOff(): void {
         ensureRobot().pcb.speakerOff();
     }
