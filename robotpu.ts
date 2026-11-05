@@ -2414,7 +2414,7 @@ namespace robotPuPro {
                 this.pcb.servoCtrl[5] = -this.bodyPitch2;
             }
             this.restStateArr[0] = this.restState;
-            return this.pcb.move(this.pr, this.restStateArr, SYNC_BODY_JOINTS, 1 + pitch * 0.25,
+            return this.pcb.move(this.pr, this.restStateArr, SYNC_BODY_JOINTS, 1 + pitch * 0.05,
                 ASYNC_ARM_JOINTS, 0.5);
         }
 
