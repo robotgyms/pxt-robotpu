@@ -46,10 +46,12 @@ namespace robotPuPro {
                 while (true) {
                     robot.updateStates();   // Checks sensors and falls
                     robot.stateMachine();   // Executes current behavior logic
-                    // Use a slightly larger pause to prevent CPU starvation
-                    // 20ms is standard for robotics to maintain 50Hz responsiveness
-                    // but robot PU need 10ms to maintain 100Hz smoothness of actions
-                    basic.pause(10);
+                    // 18ms pause + ~2ms stateMachine runtime ≈ 20ms cycle,
+                    // ~50Hz — matching the MG90 servo PWM frame. The servo
+                    // can't take a new position faster than that, so a
+                    // faster tick only adds I2C traffic (each servoStep is
+                    // one write). Halves bus load and CPU use vs 100Hz.
+                    basic.pause(18);
                 }
             });
         }
