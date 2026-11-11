@@ -676,12 +676,17 @@ namespace robotPuPro {
             let err = target - this.servoTarget[idx];
             this.servoErr[idx] = err;
 
+            const prev = this.servoTarget[idx];
             if (Math.abs(err) <= sp) {
                 this.servoTarget[idx] = target;
             } else {
                 this.servoTarget[idx] += (err >= 0) ? sp : -sp;
             }
-            this.servo(idx, this.servoTarget[idx]);
+            // Skip the I2C write when the target didn't move: at steady
+            // state this was an unconditional write per joint per tick.
+            if (this.servoTarget[idx] != prev) {
+                this.servo(idx, this.servoTarget[idx]);
+            }
             return err
         }
 
