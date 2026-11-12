@@ -1482,10 +1482,10 @@ namespace robotPuPro {
         TurnLeft = 12,
         //% block="turn right"
         TurnRight = 13,
-        //% block="side step left"
-        SideStepLeft = 23,
-        //% block="side step right"
-        SideStepRight = 24,
+        //% block="step left"
+        StepLeft = 23,
+        //% block="step right"
+        StepRight = 24,
         //% block="skate"
         Skate = 22,
         //% block="explore"
@@ -1579,8 +1579,8 @@ namespace robotPuPro {
 
         // Movement & State
         public lastCmdTS: number;
-        private fwdSpeed: number = 4;
-        private bwdSpeed: number = -3;
+        private fwdSpeed: number = 5;
+        private bwdSpeed: number = -4;
         public walkSpeed: number = 0;
         public walkDirection: number = 0;
         public walkMode: WalkMode = WalkMode.Walk;
@@ -1749,8 +1749,8 @@ namespace robotPuPro {
                 [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
                 [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
                 [Action.Skate]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.skateItr(); },
-                [Action.SideStepLeft]: () => this.sideStep(-1),
-                [Action.SideStepRight]: () => this.sideStep(1),
+                [Action.StepLeft]: () => this.sideStep(-1),
+                [Action.StepRight]: () => this.sideStep(1),
                 [Action.Sit]: () => this.sit(),
                 [Action.Stand]: () => this.stand(),
                 [Action.Laugh]: () => { this.laugh(); return 0; },
@@ -1877,8 +1877,8 @@ namespace robotPuPro {
             if (Math.abs(this.walkSpeed) < 0.1) {
                 // Smoothly move the head/body to match bias values
                 // Servo 4 is waist/roll, Servo 5 is head/pitch
-                this.pcb.servoStep(90 + this.headYawBias, 1, 4);
-                this.pcb.servoStep(90 + this.headPitchBias, 1, 5);
+                this.pcb.servoStep(90 + this.headYawBias, 2, 4);
+                this.pcb.servoStep(90 + this.headPitchBias, 2, 5);
 
                 // 2. If the turn stick is pushed far left/right while standing, side-step
                 // (walkDirection and sideStep share the same convention: negative = left)
@@ -1971,102 +1971,102 @@ namespace robotPuPro {
          * Play a laughing sound effect. Call it when Robot PU feels happy
          */
         public laugh(): void {
-            this.pcb.amplifierOn();
-            let count = 2 + Math.random() * 3;
-            for (let index = 0; index < count; index++) {
-                music.setVolume(255 - index * 30)
-                music.play(music.createSoundExpression(
-                    WaveShape.Sawtooth,
-                    250 + Math.random() * 10,
-                    700 + Math.random() * 10,
-                    245 + Math.random() * 10,
-                    50 + Math.random() * 10,
-                    120 + Math.random() * 50, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
-                basic.pause(60 + Math.random() * 10)
-            }
-            this.pcb.amplifierOff();
+            this.withAmp(() => {
+                let count = 2 + Math.random() * 3;
+                for (let index = 0; index < count; index++) {
+                    music.setVolume(255 - index * 30)
+                    music.play(music.createSoundExpression(
+                        WaveShape.Sawtooth,
+                        250 + Math.random() * 10,
+                        700 + Math.random() * 10,
+                        245 + Math.random() * 10,
+                        50 + Math.random() * 10,
+                        120 + Math.random() * 50, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
+                    basic.pause(60 + Math.random() * 10)
+                }
+            });
         }
 
         /**
          * Play a crying sound effect. Call it when Robot PU feels sad
          */
         public cry(): void {
-            this.pcb.amplifierOn();
-            let count = 3 + Math.random() * 3;
-            for (let i = 0; i < count; i++) {
-                music.setVolume(Math.min(255, 125 + i * 40))
-                music.play(
-                    music.createSoundExpression(
-                        WaveShape.Square,
-                        500 + Math.random() * 10,    // start frequency
-                        180 + Math.random() * 10,    // end frequency (drop down)
-                        245 + Math.random() * 10,    // start volume
-                        60 + Math.random() * 10,     // end volume (fade out)
-                        400 + Math.random() * 200,    // duration (ms)
-                        SoundExpressionEffect.Vibrato,
-                        InterpolationCurve.Curve
-                    ),
-                    music.PlaybackMode.UntilDone
-                )
-                basic.pause(120 + Math.random() * 10)
-            }
-            this.pcb.amplifierOff();
+            this.withAmp(() => {
+                let count = 3 + Math.random() * 3;
+                for (let i = 0; i < count; i++) {
+                    music.setVolume(Math.min(255, 125 + i * 40))
+                    music.play(
+                        music.createSoundExpression(
+                            WaveShape.Square,
+                            500 + Math.random() * 10,    // start frequency
+                            180 + Math.random() * 10,    // end frequency (drop down)
+                            245 + Math.random() * 10,    // start volume
+                            60 + Math.random() * 10,     // end volume (fade out)
+                            400 + Math.random() * 200,    // duration (ms)
+                            SoundExpressionEffect.Vibrato,
+                            InterpolationCurve.Curve
+                        ),
+                        music.PlaybackMode.UntilDone
+                    )
+                    basic.pause(120 + Math.random() * 10)
+                }
+            });
         }
 
         /**
          * Play a funny sound effect. Call it when Robot PU feels funny
          */
         public funny(): void {
-            this.pcb.amplifierOn();
-            music.setVolume(255)
-            music.play(music.createSoundExpression(
-                WaveShape.Sawtooth,
-                100 + Math.random() * 50,
-                1000 + Math.random() * 10,
-                245 + Math.random() * 10,
-                27 + Math.random() * 10,
-                2000 + Math.random() * 1000,
-                SoundExpressionEffect.Tremolo,
-                InterpolationCurve.Curve
-            ), music.PlaybackMode.UntilDone)
-            this.pcb.amplifierOff();
+            this.withAmp(() => {
+                music.setVolume(255)
+                music.play(music.createSoundExpression(
+                    WaveShape.Sawtooth,
+                    100 + Math.random() * 50,
+                    1000 + Math.random() * 10,
+                    245 + Math.random() * 10,
+                    27 + Math.random() * 10,
+                    2000 + Math.random() * 1000,
+                    SoundExpressionEffect.Tremolo,
+                    InterpolationCurve.Curve
+                ), music.PlaybackMode.UntilDone)
+            });
         }
 
         /**
          * Play a screaming sound effect. Call it when Robot PU gets suprised
          */
         public scream(): void {
-            this.pcb.amplifierOn();
-            music.setVolume(255)
-            // weeweee
-            music.play(
-                music.createSoundExpression(
-                    WaveShape.Sawtooth,
-                    50 + Math.random() * 10,
-                    1500 + Math.random() * 50,
-                    235 + Math.random() * 20,
-                    235 + Math.random() * 20,
-                    300 + Math.random() * 100,
-                    SoundExpressionEffect.Tremolo,
-                    InterpolationCurve.Curve
-                ),
-                music.PlaybackMode.UntilDone
-            );
-            // WEEEEEEE
-            music.play(
-                music.createSoundExpression(
-                    WaveShape.Sawtooth,
-                    1200 + Math.random() * 30,
-                    2500 + Math.random() * 50,
-                    245 + Math.random() * 10,
-                    245 + Math.random() * 10,
-                    800 + Math.random() * 400,
-                    SoundExpressionEffect.Tremolo,
-                    InterpolationCurve.Curve
-                ),
-                music.PlaybackMode.UntilDone
-            );
-            this.pcb.amplifierOff();
+            this.withAmp(() => {
+                music.setVolume(255)
+                // weeweee
+                music.play(
+                    music.createSoundExpression(
+                        WaveShape.Sawtooth,
+                        50 + Math.random() * 10,
+                        1500 + Math.random() * 50,
+                        235 + Math.random() * 20,
+                        235 + Math.random() * 20,
+                        300 + Math.random() * 100,
+                        SoundExpressionEffect.Tremolo,
+                        InterpolationCurve.Curve
+                    ),
+                    music.PlaybackMode.UntilDone
+                );
+                // WEEEEEEE
+                music.play(
+                    music.createSoundExpression(
+                        WaveShape.Sawtooth,
+                        1200 + Math.random() * 30,
+                        2500 + Math.random() * 50,
+                        245 + Math.random() * 10,
+                        245 + Math.random() * 10,
+                        800 + Math.random() * 400,
+                        SoundExpressionEffect.Tremolo,
+                        InterpolationCurve.Curve
+                    ),
+                    music.PlaybackMode.UntilDone
+                );
+            });
         }
 
         /*

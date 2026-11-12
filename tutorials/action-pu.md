@@ -23,8 +23,8 @@ Look for these blocks at the top of the Robot PU toolbox:
 | `walk backward` | Walks backward. |
 | `turn left` | Walks forward while turning left. |
 | `turn right` | Walks forward while turning right. |
-| `side step left` | Steps sideways to the left. |
-| `side step right` | Steps sideways to the right. |
+| `step left` | Steps sideways to the left. |
+| `step right` | Steps sideways to the right. |
 | `skate` | Skates forward using the skate gait (see `set walk mode`). |
 | `explore` | Autonomously avoids obstacles using the sonar sensor. |
 | `dance` | Dances to the beat detected by the microphone. |
