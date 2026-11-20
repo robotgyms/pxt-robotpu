@@ -1767,7 +1767,6 @@ namespace robotPuPro {
                 [WalkMode.Skate]: () => this.skate(this.walkSpeed, this.walkDirection)
             };
             this.pcb.eyesCtl(1);
-            this.showChannel();
         }
 
         /**

@@ -208,6 +208,7 @@ Teachers can cherry-pick from the pool using these age/grade bands. The level is
 - **Peer chat over radio**: [pu-peer-chat.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/pu-peer-chat.md)
 - **Sonar operator**: [sonar-operator.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sonar-operator.md)
 - **Maze solving**: [maze-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-pu.md)
+- **Maze mapping + known-map racing**: [maze-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-map.md)
 - **Autopilot navigation**: [autopilot-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/autopilot-pu.md)
 - **2D mapping concepts**: [2d-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/2d-map.md)
 - **Emotion state to expression**: [emotion-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/emotion-pu.md)
@@ -326,6 +327,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **Submarine sonar complete project** ⭐⭐⭐: [submarine.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/submarine.md)
 - **Sonar operator** ⭐⭐: [sonar-operator.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sonar-operator.md)
 - **Maze solving** ⭐⭐: [maze-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-pu.md)
+- **Maze mapping + known-map racing** ⭐⭐⭐: [maze-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-map.md)
 - **Autopilot navigation** ⭐⭐: [autopilot-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/autopilot-pu.md)
 - **Leader-following decision engine** ⭐⭐⭐: [decision-engine-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/decision-engine-pu.md)
 - **2D mapping concepts** ⭐⭐: [2d-map.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/2d-map.md)
@@ -402,6 +404,7 @@ Every `.md` file in this folder is listed below with a GitHub URL.
 - **kungfu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/kungfu.md
 - **learn-skate.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/learn-skate.md
 - **local-planner-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/local-planner-pu.md
+- **maze-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-map.md
 - **maze-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-pu.md
 - **missions-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/missions-pu.md
 - **motorize-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/motorize-pu.md
