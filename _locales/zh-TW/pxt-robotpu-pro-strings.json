@@ -23,7 +23,7 @@
   "robotPuPro.frontDistanceArray|block": "前方距離",
   "robotPuPro.greet|block": "問候",
   "robotPuPro.incrementControlOffsets|block": "增量控制偏移 索引 %indexes 數值 %values 增益 %gain",
-  "robotPuPro.jump|block": "跳躍",
+  "robotPuPro.jump|block": "以速度 %speed 跳躍",
   "robotPuPro.kick|block": "踢腿",
   "robotPuPro.leftEyeBright|block": "設置左眼亮度為 %brightness",
   "robotPuPro.locationArray|block": "機器人位置",
@@ -90,5 +90,13 @@
   "{id:group}Advanced": "高級",
   "robotPuPro.startAndWait|block": "啟動 %action 走 %steps 步並等待",
   "robotPuPro.stepsDone|block": "%action 已完成步數",
-  "robotPuPro.stepsRemaining|block": "%action 剩餘步數"
+  "robotPuPro.stepsRemaining|block": "%action 剩餘步數",
+  "robotPuPro.setTurnSpeed|block": "設置轉向速度為 %speed",
+  "robotPuPro.turnSpeed|block": "轉向速度",
+  "robotPuPro.setJumpSpeed|block": "設置跳躍速度為 %speed",
+  "robotPuPro.jumpSpeed|block": "跳躍速度",
+  "robotPuPro.setExploreSpeedGain|block": "設置探索速度增益為 %gain",
+  "robotPuPro.exploreSpeedGain|block": "探索速度增益",
+  "robotPuPro.setExploreTurnGain|block": "設置探索轉向增益為 %gain",
+  "robotPuPro.exploreTurnGain|block": "探索轉向增益"
 }

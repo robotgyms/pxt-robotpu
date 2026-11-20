@@ -23,7 +23,7 @@
   "robotPuPro.frontDistanceArray|block": "front distances",
   "robotPuPro.greet|block": "greet",
   "robotPuPro.incrementControlOffsets|block": "increment control offsets for indexes %indexes by values %values with gain %gain",
-  "robotPuPro.jump|block": "jump",
+  "robotPuPro.jump|block": "jump at speed %speed",
   "robotPuPro.kick|block": "kick",
   "robotPuPro.leftEyeBright|block": "set left eye brightness to %brightness",
   "robotPuPro.locationArray|block": "robot position",
@@ -85,5 +85,13 @@
   "{id:subcategory}Setup": "Setup",
   "robotPuPro.startAndWait|block": "start %action for %steps steps and wait",
   "robotPuPro.stepsDone|block": "steps done for %action",
-  "robotPuPro.stepsRemaining|block": "steps remaining for %action"
+  "robotPuPro.stepsRemaining|block": "steps remaining for %action",
+  "robotPuPro.setTurnSpeed|block": "set turn speed to %speed",
+  "robotPuPro.turnSpeed|block": "turn speed",
+  "robotPuPro.setJumpSpeed|block": "set jump speed to %speed",
+  "robotPuPro.jumpSpeed|block": "jump speed",
+  "robotPuPro.setExploreSpeedGain|block": "set explore speed gain to %gain",
+  "robotPuPro.exploreSpeedGain|block": "explore speed gain",
+  "robotPuPro.setExploreTurnGain|block": "set explore turn gain to %gain",
+  "robotPuPro.exploreTurnGain|block": "explore turn gain"
 }

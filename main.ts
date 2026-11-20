@@ -316,6 +316,102 @@ namespace robotPuPro {
     }
 
     /**
+     * Set the turn rate used by the turn left and turn right actions. Higher values turn faster and tighter.
+     * @param speed turn rate from 0.1 (gentle arc) to 1.0 (spin in place), eg: 0.5
+     */
+    //% blockId=robotpu_set_turn_speed block="set turn speed to %speed"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% speed.min=0.1 speed.max=1 speed.defl=0.5
+    //% weight=93 blockGap=8
+    export function setTurnSpeed(speed: number): void {
+        ensureRobot().setTurnSpeed(speed);
+    }
+
+    /**
+     * Get the current turn rate used by the turn left and turn right actions.
+     */
+    //% blockId=robotpu_turn_speed_var block="turn speed"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=93
+    export function turnSpeed(): number {
+        return ensureRobot().turnSpeed;
+    }
+
+    /**
+     * Set the jump sequence speed used by the jump action. Higher values play the jump move faster.
+     * @param speed jump speed multiplier, eg: 3
+     */
+    //% blockId=robotpu_set_jump_speed block="set jump speed to %speed"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% speed.min=0.5 speed.max=10 speed.defl=3
+    //% weight=93 blockGap=8
+    export function setJumpSpeed(speed: number): void {
+        ensureRobot().setJumpSpeed(speed);
+    }
+
+    /**
+     * Get the current jump sequence speed used by the jump action.
+     */
+    //% blockId=robotpu_jump_speed_var block="jump speed"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=93
+    export function jumpSpeed(): number {
+        return ensureRobot().jumpSpeed;
+    }
+
+    /**
+     * Set how quickly exploration speed tracks its target — higher is snappier, lower is smoother.
+     * @param gain smoothing gain from 0.05 (sluggish) to 1.0 (instant), eg: 0.5
+     */
+    //% blockId=robotpu_set_explore_speed_gain block="set explore speed gain to %gain"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% gain.min=0.05 gain.max=1 gain.defl=0.5
+    //% weight=93 blockGap=8
+    export function setExploreSpeedGain(gain: number): void {
+        ensureRobot().setExploreSpeedGain(gain);
+    }
+
+    /**
+     * Get the current explore speed smoothing gain.
+     */
+    //% blockId=robotpu_explore_speed_gain_var block="explore speed gain"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=93
+    export function exploreSpeedGain(): number {
+        return ensureRobot().exploreSpeedGain;
+    }
+
+    /**
+     * Set how quickly exploration steering reacts to the sonar point cloud — higher is snappier, lower is smoother.
+     * @param gain smoothing gain from 0.05 (sluggish) to 1.0 (instant), eg: 0.25
+     */
+    //% blockId=robotpu_set_explore_turn_gain block="set explore turn gain to %gain"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% gain.min=0.05 gain.max=1 gain.defl=0.25
+    //% weight=93 blockGap=8
+    export function setExploreTurnGain(gain: number): void {
+        ensureRobot().setExploreTurnGain(gain);
+    }
+
+    /**
+     * Get the current explore direction smoothing gain.
+     */
+    //% blockId=robotpu_explore_turn_gain_var block="explore turn gain"
+    //% subcategory="Setup"
+    //% group="Setup"
+    //% weight=93
+    export function exploreTurnGain(): number {
+        return ensureRobot().exploreTurnGain;
+    }
+
+    /**
      * Select the gait the robot uses in drive (joystick) mode: walk or skate.
      * @param mode the walking mode, eg: robotPuPro.WalkMode.Walk
      */
@@ -363,6 +459,7 @@ namespace robotPuPro {
      * Set Robot PU's behavior mode directly.
     /**
      * Walk with a given speed and turn bias. Call repeatedly in a loop to keep walking.
+     * Returns the gait status: 0 when one step completes, non-zero while a step is in progress.
      * @param speed walking speed from -5 (full backward) to 5 (full forward), eg: 2
      * @param turn turn bias from -1 (full left) to 1 (full right), 0 is straight, eg: 0
      */
@@ -372,11 +469,11 @@ namespace robotPuPro {
     //% speed.min=-5 speed.max=5 speed.defl=2
     //% turn.min=-1 turn.max=1 turn.defl=0
     //% weight=85 blockGap=8
-    export function walk(speed: number, turn: number): void {
+    export function walk(speed: number, turn: number): number {
         const r = getRobotAPI();
         r.walkSpeed = speed;
         r.walkDirection = turn;
-        r.walk(speed, turn);
+        return r.walk(speed, turn);
     }
 
     /**
@@ -470,13 +567,18 @@ namespace robotPuPro {
         getRobotAPI().kick();
     }
 
-    /** Perform a jump sequence. Call repeatedly in a loop to complete the jump. */
-    //% blockId=robotpu_jump block="jump"
+    /**
+     * Perform a jump sequence. Call repeatedly in a loop to complete the jump.
+     * Returns the move status: 0 when one sequence step completes.
+     * @param speed jump speed multiplier, eg: 3
+     */
+    //% blockId=robotpu_jump block="jump at speed %speed"
     //% subcategory="Actions"
     //% group="Actions"
+    //% speed.min=0.5 speed.max=10 speed.defl=3
     //% weight=80 blockGap=8
-    export function jump(): void {
-        getRobotAPI().jump();
+    export function jump(speed: number = 3): number {
+        return getRobotAPI().jump(speed);
     }
 
     /** Play a laughing sound effect. Call it when Robot PU feels happy. */

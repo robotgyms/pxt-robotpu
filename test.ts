@@ -92,6 +92,32 @@ function testSetupExtended() {
     basic.pause(300)
 }
 
+/**
+ * TEST: Setup - setTurnSpeed/turnSpeed, setJumpSpeed/jumpSpeed,
+ *       setExploreSpeedGain/exploreSpeedGain, setExploreTurnGain/exploreTurnGain
+ * [SIMULATOR SAFE]
+ * Expected: setters update internal values, getters return the same; values restored to defaults.
+ * Pass: LED shows 0.8, 4, 0.7, 0.3, no crash.
+ */
+function testSpeedGains() {
+    robotPuPro.setTurnSpeed(0.8)
+    basic.showNumber(robotPuPro.turnSpeed())            // expect 0.8
+    basic.pause(300)
+    robotPuPro.setJumpSpeed(4)
+    basic.showNumber(robotPuPro.jumpSpeed())            // expect 4
+    basic.pause(300)
+    robotPuPro.setExploreSpeedGain(0.7)
+    basic.showNumber(robotPuPro.exploreSpeedGain())     // expect 0.7
+    basic.pause(300)
+    robotPuPro.setExploreTurnGain(0.3)
+    basic.showNumber(robotPuPro.exploreTurnGain())      // expect 0.3
+    basic.pause(300)
+    robotPuPro.setTurnSpeed(0.5)
+    robotPuPro.setJumpSpeed(3)
+    robotPuPro.setExploreSpeedGain(0.5)
+    robotPuPro.setExploreTurnGain(0.25)
+}
+
 // ── Actions ────────────────────────────────────────────────────────────────
 
 /**
@@ -131,7 +157,8 @@ function testVoice() {
  */
 function testReturnValues() {
     robotPuPro.stop()
-    robotPuPro.walk(2, 0);        basic.showNumber(1); basic.pause(200)
+    basic.showNumber(robotPuPro.walk(2, 0))   // shows gait status (0 = step done)
+    basic.pause(200)
     robotPuPro.sideStep(1);      basic.showNumber(1); basic.pause(200)
     robotPuPro.explore();         basic.showNumber(1); basic.pause(200)
     robotPuPro.stand();           basic.showNumber(1); basic.pause(200)
@@ -139,7 +166,8 @@ function testReturnValues() {
     robotPuPro.rest();            basic.showNumber(1); basic.pause(200)
     robotPuPro.dance();           basic.showNumber(1); basic.pause(200)
     robotPuPro.kick();            basic.showNumber(1); basic.pause(200)
-    robotPuPro.jump();            basic.showNumber(1); basic.pause(200)
+    basic.showNumber(robotPuPro.jump(4))      // shows move status (0 = step done)
+    basic.pause(200)
     robotPuPro.blink(5);          basic.showNumber(1); basic.pause(200)
 }
 
@@ -158,12 +186,18 @@ function testStandRestCalibrate() {
 }
 
 /**
- * TEST: Actions - walk (forward, backward, turn)
+ * TEST: Actions - walk (forward, backward, turn), startAndWait sequential routine
  * [HARDWARE]
- * Expected: robot walks forward 2 seconds, backward 2 seconds, turns left 2 seconds.
+ * Expected: a sequential routine (walk 4, turn left 2, turn right 2), then
+ *           robot walks forward 2 seconds, backward 2 seconds, turns left 2 seconds.
  * Pass: visible walking motion in correct directions, no crash.
  */
 function testWalk() {
+    robotPuPro.setTurnSpeed(0.5)
+    robotPuPro.startAndWait(robotPuPro.Action.Walk, 4)
+    robotPuPro.startAndWait(robotPuPro.Action.TurnLeft, 2)
+    robotPuPro.startAndWait(robotPuPro.Action.TurnRight, 2)
+    robotPuPro.stop()
     for (let i = 0; i < 200; i++) { robotPuPro.walk(2, 0) }
     basic.pause(200)
     for (let i = 0; i < 200; i++) { robotPuPro.walk(-2, 0) }
@@ -186,11 +220,11 @@ function testSideStep() {
 /**
  * TEST: Actions - jump, kick, dance
  * [HARDWARE]
- * Expected: robot jumps, kicks, then dances to ambient sound.
+ * Expected: robot jumps (at speed 4), kicks, then dances to ambient sound.
  * Pass: visible jump and kick motions, dance reacts to sound, no crash.
  */
 function testJumpKickDance() {
-    for (let i = 0; i < 50; i++) { robotPuPro.jump() }
+    for (let i = 0; i < 50; i++) { robotPuPro.jump(4) }
     basic.pause(200)
     for (let i = 0; i < 50; i++) { robotPuPro.kick() }
     basic.pause(200)
@@ -596,13 +630,14 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 })
 
 /**
- * Shake: run setup tests (channel, mode, eye brightness, speed range).
+ * Shake: run setup tests (channel, mode, eye brightness, speed range, gains).
  * [SIMULATOR SAFE] Expected: LED shows channel and mode values.
  */
 input.onGesture(Gesture.Shake, function () {
     basic.showNumber(5)
     testSetup()
     testSetupExtended()
+    testSpeedGains()
     testEyeBrightness()
 })
 

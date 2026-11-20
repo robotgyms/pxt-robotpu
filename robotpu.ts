@@ -1583,6 +1583,10 @@ namespace robotPuPro {
         private bwdSpeed: number = -4;
         public walkSpeed: number = 0;
         public walkDirection: number = 0;
+        /** Turn rate used by the TurnLeft/TurnRight actions: walk direction magnitude (0.1 gentle arc to 1.0 spin in place). */
+        public turnSpeed: number = 0.5;
+        /** Jump sequence speed used by the Jump action (pcb.move speed units). */
+        public jumpSpeed: number = 3;
         public walkMode: WalkMode = WalkMode.Walk;
         private headPitchBias: number = 0;
         private headYawBias: number = 0;
@@ -1644,6 +1648,12 @@ namespace robotPuPro {
 
         /** Current exploration speed command */
         private exploreSpeed: number = 0.0;
+
+        /** EMA gain for explore speed changes: how quickly speed tracks the target (0-1). */
+        public exploreSpeedGain: number = 0.5;
+
+        /** EMA gain for explore direction changes: how quickly steering reacts (0-1). */
+        public exploreTurnGain: number = 0.25;
 
         /** Smoothed steering command for heading hold (-1.0 to 1.0) */
         private headingDirection: number = 0.0;
@@ -1739,15 +1749,15 @@ namespace robotPuPro {
                 [SLEEP_GST]: () => 0,
                 [Action.Rest]: () => this.idle(),
                 [Action.Explore]: () => this.explore(),
-                [Action.Jump]: () => this.jump(),
+                [Action.Jump]: () => this.jump(this.jumpSpeed),
                 [Action.Dance]: () => this.dance(),
                 [Action.Kick]: () => this.kick(),
                 [Action.Drive]: () => this.joystick(),
                 [API_GST]: () => 0, // API / manual state: background loop does nothing
                 [Action.Walk]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.walkItr(); },
                 [Action.WalkBackward]: () => { this.walkSpeed = this.bwdSpeed; this.walkDirection = 0; return this.walkItr(); },
-                [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -0.5; return this.walkItr(); },
-                [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0.5; return this.walkItr(); },
+                [Action.TurnLeft]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = -this.turnSpeed; return this.walkItr(); },
+                [Action.TurnRight]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = this.turnSpeed; return this.walkItr(); },
                 [Action.Skate]: () => { this.walkSpeed = this.fwdSpeed; this.walkDirection = 0; return this.skateItr(); },
                 [Action.StepLeft]: () => this.sideStep(-1),
                 [Action.StepRight]: () => this.sideStep(1),
@@ -2523,7 +2533,7 @@ namespace robotPuPro {
                 dis -= randint(6, 12) * this.backupDisDecay;
             } else {
                 // Normal direction smoothing (Low pass filter)
-                this.exploreDirection = (this.exploreDirection * 3 + nd) * 0.25;
+                this.exploreDirection += (nd - this.exploreDirection) * this.exploreTurnGain;
             }
 
             // 5. Apply Low-pass filter to Speed
@@ -2533,7 +2543,7 @@ namespace robotPuPro {
             } else {
                 target_sp = Math.max(this.bwdSpeed, (dis - 5) * 0.6);
             }
-            this.exploreSpeed = (this.exploreSpeed + target_sp) * 0.5;
+            this.exploreSpeed += (target_sp - this.exploreSpeed) * this.exploreSpeedGain;
         }
 
         /**
@@ -2659,12 +2669,12 @@ namespace robotPuPro {
          * Executes a specific jumping sequence and manages the auxiliary jump servo.
          * Ported from jump() in Python.
          */
-        public jump(): number {
+        public jump(speed: number = 3): number {
             // 1. Execute the move sequence
             // states: [24, 14, 0, 0]
-            // sync_servos (legs): [0, 1, 2, 3] at speed 3
-            // async_servos (waist/head): [4, 5] at speed 2
-            return this.pcb.move(this.pr, JUMP_STATES, SYNC_LEG_JOINTS, 3, ASYNC_ALL_JOINTS, 2);
+            // sync_servos (legs): [0, 1, 2, 3] at `speed`
+            // async_servos (waist/head): [4, 5] at `speed`
+            return this.pcb.move(this.pr, JUMP_STATES, SYNC_LEG_JOINTS, speed, ASYNC_ALL_JOINTS, speed);
         }
 
         /**
@@ -3047,6 +3057,40 @@ namespace robotPuPro {
             const s = Math.max(0.1, Math.min(10.0, v));
             this.danceSpeed = s;
             this.danceSpeedTarget = s;
+        }
+
+        /**
+         * Set the turn rate used by the TurnLeft/TurnRight actions.
+         * @param v turn rate from 0.1 (gentle arc) to 1.0 (spin in place), eg: 0.5
+         */
+        public setTurnSpeed(v: number): void {
+            this.turnSpeed = Math.max(0.1, Math.min(1.0, Math.abs(v)));
+        }
+
+        /**
+         * Set the sequence speed used by the Jump action.
+         * @param v jump speed multiplier, typically 0.1 to 10, eg: 3
+         */
+        public setJumpSpeed(v: number): void {
+            this.jumpSpeed = Math.max(0.1, Math.min(10.0, Math.abs(v)));
+        }
+
+        /**
+         * Set the explore speed smoothing gain: how quickly the robot accelerates
+         * toward the target exploration speed and brakes near obstacles.
+         * @param v gain from 0.05 (very sluggish) to 1.0 (instant), eg: 0.5
+         */
+        public setExploreSpeedGain(v: number): void {
+            this.exploreSpeedGain = Math.max(0.05, Math.min(1.0, v));
+        }
+
+        /**
+         * Set the explore direction smoothing gain: how quickly steering reacts
+         * to the sonar point cloud.
+         * @param v gain from 0.05 (very sluggish) to 1.0 (instant), eg: 0.25
+         */
+        public setExploreTurnGain(v: number): void {
+            this.exploreTurnGain = Math.max(0.05, Math.min(1.0, v));
         }
 
         // Command Handlers
