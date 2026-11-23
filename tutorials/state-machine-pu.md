@@ -160,46 +160,47 @@ basic.forever(function () {
         sm = DanceSM.Recover
     }
 
-    if (sm == DanceSM.Idle) {
-        robotPuPro.stand()
+    switch (sm) {
+        case DanceSM.Idle:
+            robotPuPro.stand()
 
-        if (beat && safe) {
-            // Start dancing on beat
-            sm = DanceSM.Dancing
-            lastSwitchMs = now
-            nextMove()
-        }
-    }
-    else if (sm == DanceSM.Dancing) {
-        // Keep calling dance() so the internal routine can run
-        robotPuPro.dance()
+            if (beat && safe) {
+                // Start dancing on beat
+                sm = DanceSM.Dancing
+                lastSwitchMs = now
+                nextMove()
+            }
+            break
+        case DanceSM.Dancing:
+            // Keep calling dance() so the internal routine can run
+            robotPuPro.dance()
 
-        // Switch to next "gait state" on beat if:
-        // - safe
-        // - cooldown expired (cosmetic)
-        if (beat && safe && (now - lastSwitchMs > SWITCH_COOLDOWN_MS)) {
-            lastSwitchMs = now
-            nextMove()
+            // Switch to next "gait state" on beat if:
+            // - safe
+            // - cooldown expired (cosmetic)
+            if (beat && safe && (now - lastSwitchMs > SWITCH_COOLDOWN_MS)) {
+                lastSwitchMs = now
+                nextMove()
 
-            // Cosmetic feedback per move (example: LEDs)
-            // You can replace this with your own effects.
-            if (lastMove == 0) basic.showIcon(IconNames.Heart)
-            else if (lastMove == 1) basic.showIcon(IconNames.Diamond)
-            else if (lastMove == 2) basic.showIcon(IconNames.SmallDiamond)
-            else basic.showIcon(IconNames.Happy)
-        }
+                // Cosmetic feedback per move (example: LEDs)
+                // You can replace this with your own effects.
+                if (lastMove == 0) basic.showIcon(IconNames.Heart)
+                else if (lastMove == 1) basic.showIcon(IconNames.Diamond)
+                else if (lastMove == 2) basic.showIcon(IconNames.SmallDiamond)
+                else basic.showIcon(IconNames.Happy)
+            }
 
-        // If unsafe, recovery is handled by the global guard above
-    }
-    else {
-        // Recover
-        // Safety concern: stop dancing and return to stable pose
-        robotPuPro.stand()
+            // If unsafe, recovery is handled by the global guard above
+            break
+        default: // DanceSM.Recover
+            // Safety concern: stop dancing and return to stable pose
+            robotPuPro.stand()
 
-        // When safe again, go back to idle
-        if (safe) {
-            sm = DanceSM.Idle
-        }
+            // When safe again, go back to idle
+            if (safe) {
+                sm = DanceSM.Idle
+            }
+            break
     }
 
     basic.pause(20)

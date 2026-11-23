@@ -36,11 +36,11 @@ If you delete everything else and keep only those pieces, you are back to the mi
 // walk a short routine: forward, backward, sidestep left, sidestep right
 robotPuPro.talk("Move forward!")
 
-robotPuPro.setWalkSpeed(4)
+robotPuPro.setWalkSpeedRange(-4, 4)
 robotPuPro.startAndWait(robotPuPro.Action.Walk, 10)
 robotPuPro.startAndWait(robotPuPro.Action.WalkBackward, 10)
 
-robotPuPro.setWalkSpeed(6)
+robotPuPro.setWalkSpeedRange(-6, 6)
 robotPuPro.startAndWait(robotPuPro.Action.StepLeft, 6)
 robotPuPro.startAndWait(robotPuPro.Action.StepRight, 6)
 
@@ -69,7 +69,7 @@ robotPuPro.start(robotPuPro.Action.Rest, 0)
 To do something similar to:
 
 ```typescript
-robotPuPro.setWalkSpeed(6)
+robotPuPro.setWalkSpeedRange(-6, 6)
 robotPuPro.startAndWait(robotPuPro.Action.Walk, 10)
 ```
 
@@ -84,7 +84,7 @@ for (let index = 0; index < 50; index++) {
 To do something similar to:
 
 ```typescript
-robotPuPro.setWalkSpeed(4)
+robotPuPro.setWalkSpeedRange(-4, 4)
 robotPuPro.setTurnSpeed(0.7)
 robotPuPro.startAndWait(robotPuPro.Action.TurnLeft, 10)
 ```
