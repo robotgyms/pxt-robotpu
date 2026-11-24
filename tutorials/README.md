@@ -4,14 +4,14 @@ This folder contains the JavaScript / TypeScript tutorials for the **Robot PU** 
 
 These lessons are written for the **micro:bit MakeCode editor**:
 
-- **MakeCode editor**: https://makecode.microbit.org
-- **GitHub tutorial folder**: https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials
+- **MakeCode editor**: <https://makecode.microbit.org>
+- **GitHub tutorial folder**: <https://github.com/robotgyms/pxt-robotpu/tree/main/tutorials>
 
 ---
 
 ## How to use these tutorials
 
-- **Open MakeCode**: Go to https://makecode.microbit.org.
+- **Open MakeCode**: Go to <https://makecode.microbit.org>.
 - **Add Robot PU**: Add the **Robot PU** extension to your MakeCode project.
 - **Choose a tutorial**: Click a tutorial link below and copy the TypeScript code into MakeCode when provided.
 - **Flash examples**: If a tutorial mentions a `.hex` file, download and flash it to the micro:bit.
@@ -23,7 +23,7 @@ These lessons are written for the **micro:bit MakeCode editor**:
 Robot PU supports **10 servos**. The first 8 servos are driven through the I2C servo controller; the optional arm servos are driven directly from micro:bit PWM pins.
 
 | Servo index | Joint | Driver / Pin | Notes |
-|-------------|-------|--------------|-------|
+| --- | --- | --- | --- |
 | 0 | Left foot | I2C servo driver | Core leg |
 | 1 | Left leg | I2C servo driver | Core leg |
 | 2 | Right foot | I2C servo driver | Core leg |
@@ -170,7 +170,7 @@ mindmap
 Teachers can cherry-pick from the pool using these age/grade bands. The level is set by the **most complex program in the tutorial**, not by the topic name.
 
 | Age | Grade | Difficulty | What the hardest program usually involves |
-|-----|-------|------------|-------------------------------------------|
+| --- | --- | --- | --- |
 | 8-10 | 3-5 | Beginner | Single loops, simple sequences, no concurrency, no sensor fusion |
 | 11-13 | 6-8 | Intermediate | Concurrent loops, arrays, events, radio, basic autonomy, or multi-servo coordination |
 | 14-17 | 9-12 | Advanced | SLAM, camera parsing, mapping, path planning, control theory, ROS-style architecture, or machine learning |
@@ -188,6 +188,7 @@ Teachers can cherry-pick from the pool using these age/grade bands. The level is
 - **Remote control**: [remote-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/remote-control.md)
 - **Gamepad patterns**: [gamepad.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/gamepad.md)
 - **Skate mode**: [skate-mode.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md)
+- **Unique boot voice**: [unique-boot-voice.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/unique-boot-voice.md)
 
 ### Ages 11-13 (Grades 6-8)
 
@@ -276,7 +277,6 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **How Robot PU moves** ⭐: [motorize-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/motorize-pu.md)
 - **Direct servo control (API mode)** ⭐⭐: [direct-servo-control.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md)
 - **Robot actions** ⭐: [action-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-pu.md)
-- **Action Q-table (reinforcement learning)** ⭐⭐⭐: [action-qtable.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-qtable.md)
 - **Skate mode** ⭐: [skate-mode.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md)
 - **Robot observation** ⭐⭐: [observation-pu.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/observation-pu.md)
 - **Don’t bonk** ⭐⭐: [dont-bonk.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md)
@@ -301,6 +301,7 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 - **RoboVoice melodic speech** ⭐⭐: [robotvoice.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/robotvoice.md)
 - **Talk content patterns** ⭐⭐: [talk-content.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-content.md)
 - **Talk pxt-billy content** ⭐⭐: [talk-pxt-billy-content.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-pxt-billy-content.md)
+- **Unique boot voice** ⭐: [unique-boot-voice.md](https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/unique-boot-voice.md)
 
 ### Fun projects
 
@@ -371,83 +372,83 @@ Difficulty legend: ⭐ = Beginner (8-10), ⭐⭐ = Intermediate (11-13), ⭐⭐�
 
 Every `.md` file in this folder is listed below with a GitHub URL.
 
-- **2d-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/2d-map.md
-- **AddArms.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/AddArms.md
-- **K230-AI-Camera-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/K230-AI-Camera-pu.md
-- **OOP-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/OOP-pu.md
-- **README.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/README.md
-- **action-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-pu.md
-- **action-qtable.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-qtable.md
-- **auto-feet-servo-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-feet-servo-calibration.md *(work in progress — placeholder)*
-- **auto-servo-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-servo-calibration.md
-- **autopilot-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/autopilot-pu.md
-- **balance-PID-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/balance-PID-pu.md
-- **barebone.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/barebone.md
-- **base-station-dashboard-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/base-station-dashboard-pu.md
-- **behavior-tree-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/behavior-tree-pu.md
-- **cmd-vel-topic.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/cmd-vel-topic.md
-- **dance-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dance-pu.md
-- **decision-engine-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/decision-engine-pu.md
-- **demo-program.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/demo-program.md
-- **diagnostics-topic.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/diagnostics-topic.md
-- **direct-servo-control.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md
-- **dont-bonk.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md
-- **emotion-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/emotion-pu.md
-- **event-loop-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-loop-pu.md
-- **event-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-pu.md
-- **fault-recovery-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/fault-recovery-pu.md
-- **formation-control-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/formation-control-pu.md
-- **gamepad.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/gamepad.md
-- **heading-fusion-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/heading-fusion-pu.md
-- **improved-balance-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/improved-balance-pu.md
-- **javascript-quick-start.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/javascript-quick-start.md
-- **kungfu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/kungfu.md
-- **learn-skate.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/learn-skate.md
-- **local-planner-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/local-planner-pu.md
-- **maze-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-map.md
-- **maze-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-pu.md
-- **missions-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/missions-pu.md
-- **motorize-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/motorize-pu.md
-- **music-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/music-pu.md
-- **musiclib-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/musiclib-pu.md
-- **observation-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/observation-pu.md
-- **occupancy-grid-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/occupancy-grid-pu.md
-- **path-following-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/path-following-pu.md
-- **path-planning-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/path-planning-pu.md
-- **pu-peer-chat.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/pu-peer-chat.md
-- **remote-control.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/remote-control.md
-- **robotvoice.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/robotvoice.md
-- **ros-nodes.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/ros-nodes.md
-- **ros-topics.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/ros-topics.md
-- **safety-watchdog-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/safety-watchdog-pu.md
-- **scan-topic.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/scan-topic.md
-- **search-face.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/search-face.md
-- **servo-trim-calibration.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/servo-trim-calibration.md
-- **shared-map-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/shared-map-pu.md
-- **signal-filters-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/signal-filters-pu.md
-- **sing-and-dance.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sing-and-dance.md
-- **skate-mode.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md
-- **slam-i2c-cam.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-i2c-cam.md
-- **slam-odometry-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-odometry-pu.md
-- **slam-soccer-ball-follow.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-ball-follow.md
-- **slam-soccer-local-map.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-local-map.md
-- **slam-social-distance.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-social-distance.md
-- **sonar-operator.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sonar-operator.md
-- **specifications.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/specifications.md
-- **state-machine-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-machine-pu.md
-- **state-switch-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-switch-pu.md
-- **submarine.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/submarine.md
-- **synchronized-sing-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/synchronized-sing-pu.md
-- **talk-content.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-content.md
-- **talk-pxt-billy-content.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-pxt-billy-content.md
-- **task-allocation-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/task-allocation-pu.md
-- **telemetry-logging-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/telemetry-logging-pu.md
-- **thinking-pu.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/thinking-pu.md
-- **transformation-matrix.md**: https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/transformation-matrix.md
+- **2d-map.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/2d-map.md>
+- **AddArms.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/AddArms.md>
+- **K230-AI-Camera-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/K230-AI-Camera-pu.md>
+- **OOP-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/OOP-pu.md>
+- **README.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/README.md>
+- **action-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/action-pu.md>
+- **auto-feet-servo-calibration.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-feet-servo-calibration.md> *(work in progress — placeholder)*
+- **auto-servo-calibration.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/auto-servo-calibration.md>
+- **autopilot-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/autopilot-pu.md>
+- **balance-PID-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/balance-PID-pu.md>
+- **barebone.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/barebone.md>
+- **base-station-dashboard-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/base-station-dashboard-pu.md>
+- **behavior-tree-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/behavior-tree-pu.md>
+- **cmd-vel-topic.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/cmd-vel-topic.md>
+- **dance-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dance-pu.md>
+- **decision-engine-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/decision-engine-pu.md>
+- **demo-program.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/demo-program.md>
+- **diagnostics-topic.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/diagnostics-topic.md>
+- **direct-servo-control.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/direct-servo-control.md>
+- **dont-bonk.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/dont-bonk.md>
+- **emotion-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/emotion-pu.md>
+- **event-loop-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-loop-pu.md>
+- **event-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/event-pu.md>
+- **fault-recovery-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/fault-recovery-pu.md>
+- **formation-control-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/formation-control-pu.md>
+- **gamepad.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/gamepad.md>
+- **heading-fusion-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/heading-fusion-pu.md>
+- **improved-balance-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/improved-balance-pu.md>
+- **javascript-quick-start.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/javascript-quick-start.md>
+- **kungfu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/kungfu.md>
+- **learn-skate.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/learn-skate.md>
+- **local-planner-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/local-planner-pu.md>
+- **maze-map.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-map.md>
+- **maze-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/maze-pu.md>
+- **missions-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/missions-pu.md>
+- **motorize-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/motorize-pu.md>
+- **music-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/music-pu.md>
+- **musiclib-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/musiclib-pu.md>
+- **observation-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/observation-pu.md>
+- **occupancy-grid-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/occupancy-grid-pu.md>
+- **path-following-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/path-following-pu.md>
+- **path-planning-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/path-planning-pu.md>
+- **pu-peer-chat.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/pu-peer-chat.md>
+- **remote-control.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/remote-control.md>
+- **robotvoice.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/robotvoice.md>
+- **ros-nodes.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/ros-nodes.md>
+- **ros-topics.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/ros-topics.md>
+- **safety-watchdog-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/safety-watchdog-pu.md>
+- **scan-topic.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/scan-topic.md>
+- **search-face.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/search-face.md>
+- **servo-trim-calibration.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/servo-trim-calibration.md>
+- **shared-map-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/shared-map-pu.md>
+- **signal-filters-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/signal-filters-pu.md>
+- **sing-and-dance.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sing-and-dance.md>
+- **skate-mode.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/skate-mode.md>
+- **slam-i2c-cam.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-i2c-cam.md>
+- **slam-odometry-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-odometry-pu.md>
+- **slam-soccer-ball-follow.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-ball-follow.md>
+- **slam-soccer-local-map.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-soccer-local-map.md>
+- **slam-social-distance.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/slam-social-distance.md>
+- **sonar-operator.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/sonar-operator.md>
+- **specifications.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/specifications.md>
+- **state-machine-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-machine-pu.md>
+- **state-switch-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/state-switch-pu.md>
+- **submarine.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/submarine.md>
+- **synchronized-sing-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/synchronized-sing-pu.md>
+- **talk-content.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-content.md>
+- **talk-pxt-billy-content.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/talk-pxt-billy-content.md>
+- **task-allocation-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/task-allocation-pu.md>
+- **telemetry-logging-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/telemetry-logging-pu.md>
+- **thinking-pu.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/thinking-pu.md>
+- **transformation-matrix.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/transformation-matrix.md>
+- **unique-boot-voice.md**: <https://github.com/robotgyms/pxt-robotpu/blob/main/tutorials/unique-boot-voice.md>
 
 ---
 
 ## Folder contents quick reference
 
-- **Markdown tutorials**: `72` `.md` files, including this `README.md`.
+- **Markdown tutorials**: `74` `.md` files, including this `README.md`.
 - **Compiled examples**: `.hex` files are included for selected complete projects.
