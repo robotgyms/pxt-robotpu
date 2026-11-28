@@ -20,6 +20,11 @@ Everything you need is in the box:
 
 More about PU: [robotgyms.com/pu](https://robotgyms.com/pu) · [YouTube](https://www.youtube.com/@TheStoryofPu-yw8tr) · [TikTok](https://www.tiktok.com/@thestoryofpu) · [Quick-start video](https://youtu.be/aBw55nYjWDg)
 
+## Textbooks
+
+- [Coding Adventures with Robot PU](https://a.co/d/033I8nh0)
+- [Robot Pu Coding Camps](https://a.co/d/0gJT58xA)
+
 ## Why Robot PU
 
 - **10-DOF advanced motion**: full 10 degrees of freedom for richer poses, steps, jumps, kicks, and dance routines beyond the 6-DOF beginner version
