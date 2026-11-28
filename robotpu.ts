@@ -183,6 +183,7 @@ namespace robotPuPro {
         lastBeatTime: number;
         period: number;
         hits: number;
+        minBeatLoud: number;
 
         constructor() {
             this.loudThreshold = 15; // loudness threshold for beats
@@ -198,6 +199,7 @@ namespace robotPuPro {
             this.lastBeatTime = 0;
             this.period = 500; // most possible period in ms
             this.hits = 0;
+            this.minBeatLoud = 0.7; // absolute floor for a beat (scaled loud; ~raw soundLevel 70)
         }
 
         // ring buffer index calculation
@@ -247,7 +249,8 @@ namespace robotPuPro {
                     let nl = this.ringBufferIdx(cIdx, -1, this.bufferSize);
                     let nr = this.ringBufferIdx(cIdx, 1, this.bufferSize);
 
-                    if (this.buf[cIdx] > this.buf[nl] * snr &&
+                    if (this.buf[cIdx] > this.minBeatLoud &&
+                        this.buf[cIdx] > this.buf[nl] * snr &&
                         this.buf[cIdx] > this.buf[nr] * snr &&
                         this.buf[cIdx] > avgLoudness) {
                         c++;
@@ -1550,8 +1553,11 @@ namespace robotPuPro {
 
     // Gait state sequences used by per-tick action handlers — hoisted so
     // running the action doesn't allocate the same array every tick.
-    const SIDE_STEP_LEFT = [20, 22, 0, 19];
-    const SIDE_STEP_RIGHT = [18, 21, 23, 0];
+    // Verified on hardware 2026-11-27: [18,21,23,0] steps LEFT, [20,22,0,19]
+    // steps RIGHT. Do not re-swap for sign-convention reasons — servoStep()
+    // abs()s speed, so direction is determined by the state list alone.
+    const SIDE_STEP_LEFT = [18, 21, 23, 0];
+    const SIDE_STEP_RIGHT = [20, 22, 0, 19];
     const JUMP_STATES = [24, 14, 0, 0];
     const STAND_STATE = [0];
     const SIT_STATE = [15];
